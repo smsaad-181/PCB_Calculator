@@ -105,6 +105,40 @@ describe.each(SOLVERS)('%s: root exactly 0 terminates', (_name, solve) => {
   });
 });
 
+/*
+ * m-A (calc-validator): the absolute floor 4*eps*max(|lo|,|hi|) applies ONLY when the bracket
+ * contains 0 (lo <= 0 <= hi). A bracket that excludes 0 is purely relative, so tiny roots are
+ * resolved to relative accuracy regardless of how wide the bracket is.
+ */
+describe.each(SOLVERS)('%s: m-A absolute floor only when the bracket contains 0', (_name, solve) => {
+  it('root 1e-15 on [1e-18, 1] (excludes 0): relative error <= 1e-9', () => {
+    const out = solve((x) => x - 1e-15, 1e-18, 1);
+    expect(out.ok).toBe(true);
+    if (out.ok) expect(Math.abs(out.x - 1e-15) / 1e-15).toBeLessThanOrEqual(1e-9);
+  });
+  it('root 1e-13 on [1e-14, 1] (excludes 0): relative error <= 1e-9', () => {
+    const out = solve((x) => x - 1e-13, 1e-14, 1);
+    expect(out.ok).toBe(true);
+    if (out.ok) expect(Math.abs(out.x - 1e-13) / 1e-13).toBeLessThanOrEqual(1e-9);
+  });
+  it('root 1e-13 on [0, 1] (contains 0): only floor-limited accuracy is expected', () => {
+    // Documented: the floor is 4*eps*max(|lo|,|hi|) = 4*eps*1, so the error bound is that floor
+    // plus a 1e-12 relative allowance on the root.
+    const root = 1e-13;
+    const out = solve((x) => x - root, 0, 1);
+    expect(out.ok).toBe(true);
+    if (out.ok) expect(Math.abs(out.x - root)).toBeLessThanOrEqual(4 * Number.EPSILON * 1 + 1e-12 * root);
+  });
+  it('root exactly 0 on [-1, 1] still terminates (residual or width below floor)', () => {
+    const out = solve((x) => x, -1, 1);
+    expect(out.ok).toBe(true);
+    if (out.ok) {
+      expect(['residual', 'bracket']).toContain(out.converged);
+      expect(Math.abs(out.x)).toBeLessThanOrEqual(4 * Number.EPSILON);
+    }
+  });
+});
+
 describe.each(SOLVERS)('%s: xabs option', (_name, solve) => {
   it('absolute tolerance terminates earlier than the relative default', () => {
     const f = (x: number): number => x - 0.3 + 1e-3 * Math.sin(x);
