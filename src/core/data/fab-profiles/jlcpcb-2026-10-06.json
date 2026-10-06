@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "jlcpcb-2026-10-06",
+  "fabricator": "JLCPCB",
+  "profileDate": "2026-10-06",
+  "source": "https://jlcpcb.com/capabilities/pcb-capabilities",
+  "edition": "JLCPCB PCB capabilities page as retrieved 2026-10-06 (no document revision stated)",
+  "status": "UNVERIFIED",
+  "ledgerIds": ["S-008"],
+  "verifiedBy": "",
+  "bannerRequired": true,
+  "notes": "Fabricator figures read through a summarizing fetcher, re-read in a browser before use (R-21); fabs change limits without notice; example only, enter your fabricator's current values. Multilayer values are used where 1-2 layer values differ. 1-2 layer values: annular ring recommended 0.25 mm, absolute minimum 0.18 mm; minimum trace/space 4 mil / 4 mil (1 oz). Copper weights: 1 oz is the base outer copper only; other weights and inner-layer copper are not listed here.",
+  "limits": {
+    "minTraceWidth": { "value": 3.5, "unit": "mil" },
+    "minTraceSpace": { "value": 3.5, "unit": "mil" },
+    "minDrill": { "value": 0.15, "unit": "mm" },
+    "maxDrill": { "value": 6.3, "unit": "mm" },
+    "minAnnularRingRecommended": { "value": 0.2, "unit": "mm" },
+    "minAnnularRingAbsolute": { "value": 0.15, "unit": "mm" },
+    "holePlatingAverage": { "value": 18, "unit": "um" },
+    "drillTolerancePlus": { "value": 0.13, "unit": "mm" },
+    "drillToleranceMinus": { "value": 0.08, "unit": "mm" },
+    "holePositionTolerance": { "value": 0.075, "unit": "mm" },
+    "copperToEdge": { "value": 0.2, "unit": "mm" },
+    "holeToTrack": { "value": 0.2, "unit": "mm" },
+    "traceWidthTolerancePct": 20,
+    "impedanceTolerancePct": 10,
+    "copperWeightsOzFt2": [1]
+  }
+}

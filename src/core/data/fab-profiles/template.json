@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "template",
+  "fabricator": "YOUR FABRICATOR",
+  "profileDate": "2026-10-06",
+  "source": "Enter the URL or document name of your fabricator's current capability page",
+  "edition": "template, contains no fabricator data",
+  "status": "UNVERIFIED",
+  "ledgerIds": ["S-008"],
+  "verifiedBy": "",
+  "bannerRequired": true,
+  "notes": "Generic template. Every limit is absent on purpose: enter your fabricator's current published values, set profileDate to the day you read them and keep status UNVERIFIED until you have checked them yourself.",
+  "limits": {}
+}
