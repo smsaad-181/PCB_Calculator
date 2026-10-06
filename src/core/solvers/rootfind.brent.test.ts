@@ -4,8 +4,10 @@ import { bisect, brent } from './rootfind';
 
 /*
  * Brent must be genuine (calc-validator M-3): interpolation steps are active, so on smooth
- * problems brent is much faster than bisect. Contract A (efficiency) and B (worst case:
- * brent iterations <= bisect iterations + 10 for any bracketed problem).
+ * problems brent is much faster than bisect. Contract A (efficiency) and B (worst case: brent
+ * iterations <= N + 6 with N = ceil(log2(width0 / tol)), the bound proved in the rootfind.ts header).
+ * "brent <= bisect + 10" is only asserted on the polynomial/exponential families below; it does not
+ * hold for every function (bisect can stop early at an exact dyadic hit, e.g. calc-validator n-1).
  * The validator measured 6, 6, 12, 1 iterations with an original Brent on the first four problems.
  */
 

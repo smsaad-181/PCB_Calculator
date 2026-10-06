@@ -12,7 +12,7 @@ export interface LedgerRow {
 
 const E = 'edition not yet confirmed';
 
-export const LEDGER: readonly LedgerRow[] = [
+const LEDGER_ROWS: readonly LedgerRow[] = [
   { id: 'S-001', item: 'IPC-2221 trace current formula (legacy)', edition: 'IPC-2221B (2012) / IPC-2221C (2023-12), not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-002', item: 'IPC-2152 nature (charts vs closed form)', edition: 'IPC-2152 (2009), not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-003', item: 'Copper foil weight to thickness', edition: 'IPC-4562A (secondhand); fab sources', status: 'CONFLICT' },
@@ -37,3 +37,6 @@ export const LEDGER: readonly LedgerRow[] = [
   { id: 'S-050', item: 'twc IPC-2152 methods (cross-check tool; describes the tool only)', edition: 'ymic9963/twc commit 308002f (main, 2026-10-06)', status: 'VERIFIED' },
   { id: 'S-051', item: 'Cross-check tool licenses', edition: 'each repository license file, 2026-10-06', status: 'VERIFIED' },
 ];
+
+/** Frozen so no code path can mark a row VERIFIED at runtime (the compliance gate trusts these statuses). */
+export const LEDGER: readonly LedgerRow[] = Object.freeze(LEDGER_ROWS.map((r) => Object.freeze({ ...r })));

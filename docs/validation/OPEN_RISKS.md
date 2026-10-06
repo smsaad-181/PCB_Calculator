@@ -22,3 +22,13 @@
 | R-13 | Calculators must reject zero explicitly: parseQuantity accepts "1e-400 mm" and "-0 mm" as 0 (perf m-4). Callers use guardPositiveFinite. | calc-implementer | Test in each Phase 1 calculator | OPEN |
 | R-14 | Phase 1 self-heating caller must pass maxIter ≤ 50 and check `converged`/`fx` (a sign discontinuity returns ok with converged 'bracket'). Units table has no K/W or Ω·m entries (format falls back to SI exponents). | calc-implementer / units-engine-engineer | Add units + caller tests in Phase 1 | OPEN |
 | R-15 | Not observed in a browser/live: error boundary rendering, offline load, Lighthouse, live Pages URL. Action versions unverified and not SHA-pinned (R-7). `.nvmrc` is 22, local Node is 24: CI run not yet observed. | Human / devops | Open the PR; confirm Actions green and Pages loads | OPEN |
+
+### Phase 0 validator conditions (calc-validator, fix cycle 2: PASS-WITH-CONDITIONS)
+
+| # | Condition | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| C-1 | Gate residual (m-B): `complianceGateWith` is exported and accepts a caller-built ledger; mandatory input names are whatever the caller declares (`{x:true}` passes). `LEDGER` rows are now frozen (done). No calculator calls the gate in Phase 0. | calc-implementer + test-engineer | Before the FIRST gate caller (Phase 3): per-standard required-input lists, make `complianceGateWith` test-only | OPEN |
+| C-2 | Audit residual (m-C): the compliance-wording check is a tripwire, not proof. 33 of 39 probe evasions pass (e.g. "IPC-2221 compliance: PASS", "satisfied IPC-2221", "ready for fabrication", "certifies", string concatenation, escapes, homoglyphs, claims split across lines). Reviewers must read result/label text in PRs. | devops-engineer / human | Accept as known limitation, or add a runtime check on rendered output in Phase 1 UI tests | OPEN (accepted for Phase 0) |
+| C-3 | S-011c: twc's commented-out SMPS.us line (`twc.c:857`) has exponent −0.018 where the smps.us page shows −0.108; the ledger presents twc's line as "the website set". Record the transcription difference in S-011c and R-12. | standards-researcher | Ledger note | OPEN |
+| C-4 | Solver caller rules (extends R-14): never bracket a positive quantity starting from 0 (the absolute floor then applies and tiny roots lose accuracy: x − 1e-15 on [0,1] is 11 % off with ok:true); a `residual` result with fx = 0 can come from underflow far from the root; check `converged` and `fx`. | calc-implementer | Encode in each Phase 1 caller + test | OPEN |
+| C-5 | Housekeeping: oracle note and golden-vectors.json still say the via thermal conductivity is "UNLEDGERED" although S-007 exists (fails safe; R-10). | test-engineer | Update the vector's ledger ids when R-10 is resolved | OPEN |
