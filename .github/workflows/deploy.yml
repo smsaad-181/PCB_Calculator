@@ -12,6 +12,10 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,7 +30,7 @@ jobs:
       - run: npm run lint
       - name: Independent reference oracle self-check
         run: python3 tools/reference/ref_calcs.py
-      - run: npm test
+      - run: npm run test:coverage
       - run: npm run build
       - run: npm run check:size
       - run: npm run check:audit
@@ -41,6 +45,7 @@ jobs:
     needs: verify
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       pages: write
       id-token: write
