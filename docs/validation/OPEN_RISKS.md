@@ -57,3 +57,9 @@ These are foundation gaps, not wrong numbers (no calculator exists yet). Fix cyc
 | P-7 | `FabProfile` type + schema + labelled generic unverified example moved from Phase 2 into Phase 1 (via, annular ring, path/load need drill tolerance, plating, registration, min annular ring; published fabs differ, so the 25 µm plating test value must not be pre-filled in the UI) | calc-implementer + devops-engineer + human (R-5) | DEFERRED to Phase 1 task 0 |
 | P-m | Minor items m-1..m-11 of the report (badge wording gives what to check; About table Status column off-screen at 360 px; solver "suspect" flag at poles; NO_BRACKET→RUNAWAY mapping; show the parsed value next to fields; thermal-relief spoke/neck helper in path/load skill; IPC-2221 skill must use foilThickness(); shorten gate denial label) | various | OPEN |
 
+### Reference-system research (2026-10-06)
+| # | Risk | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| R-21 | Research notes in `docs/research/` were read through a summarizing fetcher; the JLCPCB stackup page came back partly garbled. Re-read numbers in a browser before they enter `src/` or the ledger. | Human / researcher | Verify each number used | OPEN |
+| R-22 | JLCPCB and KiCad disagree by 6-19 % on the same stackup (KiCad forum, June 2026) and JLCPCB's method is not public. Neither is ground truth for impedance. | Human | Phase 2: state which reference was used for any cross-check record | OPEN |
+
