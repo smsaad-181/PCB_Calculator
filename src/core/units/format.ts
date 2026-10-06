@@ -4,7 +4,7 @@ import { type Quantity } from './quantity';
 import { toUnit } from './units-table';
 
 export interface FormatOptions {
-  /** Significant digits (default 6, clamped to 1..21). */
+  /** Significant digits (integer 1..17, default 6; otherwise InvalidValueError). */
   readonly sig?: number;
   /** Explicit display unit: no prefix selection, value is converted into this unit. */
   readonly unit?: string;
@@ -56,7 +56,10 @@ function round(v: number, sig: number): number {
 /** Format with an engineering prefix (p n µ m k M G) or an explicit unit. Throws InvalidValueError on non-finite input. */
 export function formatQuantity(x: Quantity, opts: FormatOptions = {}): string {
   if (!Number.isFinite(x.si)) throw new InvalidValueError('Cannot format a non-finite quantity');
-  const sig = Math.min(21, Math.max(1, Math.trunc(opts.sig ?? 6)));
+  const sig = opts.sig ?? 6;
+  if (!Number.isInteger(sig) || sig < 1 || sig > 17) {
+    throw new InvalidValueError(`sig must be an integer in 1..17, got ${String(sig)}`);
+  }
 
   if (opts.unit !== undefined) return `${String(round(toUnit(x, opts.unit), sig))} ${opts.unit}`;
 
