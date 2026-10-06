@@ -7,3 +7,4 @@ coverage/
 .env.*
 .vite/
 __pycache__/
+.playwright-mcp/

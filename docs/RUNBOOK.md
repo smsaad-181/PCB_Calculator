@@ -17,20 +17,23 @@
 | 2 | Typecheck | `npm run typecheck` | `tsc --noEmit`, strict |
 | 3 | Lint | `npm run lint` | ESLint, including the `src/core` purity rules (no DOM/network/clock/random) |
 | 4 | Oracle | `python3 tools/reference/ref_calcs.py` | Independent Python reference vectors; exits non-zero on any mismatch |
-| 5 | Test | `npm test` | Vitest unit, golden-vector, property and audit tests |
-| 6 | Build | `npm run build` | Vite production build (`base: './'`, hash routing) |
-| 7 | Size | `npm run check:size` | Total gzip JS in `dist/` <= 150 KB (docs/SPEC.md); warns if one chunk > 50 KB |
-| 8 | Audit | `npm run check:audit` | Forbidden compliance phrases only in `src/core/gate.ts` / `gate.test.ts`; every JSON data table has source, edition, ledgerIds, status, verifiedBy (and bannerRequired when not VERIFIED; fab profiles also profileDate + fabricator); every LEDGER.md row has a valid status; every `S-nnn` referenced in `src/` exists in the ledger |
+| 5 | Golden check | `python3 tools/reference/gen_golden.py --check` | Committed golden vectors match the generator output |
+| 6 | Test | `npm run test:coverage` | Vitest unit, golden-vector, property and audit tests, with coverage |
+| 7 | Build | `npm run build` | Vite production build (`base: './'`, hash routing) |
+| 8 | Size | `npm run check:size` | Total gzip JS in `dist/` <= 150 KB (docs/SPEC.md); warns if one chunk > 50 KB |
+| 9 | Audit | `npm run check:audit` | Forbidden compliance phrases only in `src/core/gate.ts` / `gate.test.ts`; every JSON data table has source, edition, ledgerIds, status, verifiedBy (and bannerRequired when not VERIFIED; fab profiles also profileDate + fabricator); every LEDGER.md row has a valid status; every `S-nnn` referenced in `src/` exists in the ledger |
 
-- Pages artifact upload (`configure-pages`, `upload-pages-artifact`) happens in `verify` only on `main`, after all gates.
+- Pages artifact upload (`upload-pages-artifact`) happens in `verify` only on `main`, after all gates.
 
 ## Running the gates locally (Windows and Linux)
 ```
 npm ci
 npm run typecheck && npm run lint
 python3 tools/reference/ref_calcs.py     # on Windows use: python tools/reference/ref_calcs.py  (or: py -3 ...)
-npm test && npm run build && npm run check:size && npm run check:audit
+python3 tools/reference/gen_golden.py --check
+npm run test:coverage && npm run build && npm run check:size && npm run check:audit
 ```
+Node: CI uses the version in `.nvmrc` (22). Local development here uses Node 24. Both are supported (`engines` >=22).
 On Windows, `python3` is often the Microsoft Store stub and does nothing useful; use `python` or `py -3`. CI (Linux) uses `python3`. Use Git Bash or PowerShell; the npm scripts are shell-agnostic.
 
 ## Rollback
@@ -44,7 +47,11 @@ On Windows, `python3` is often the Microsoft Store stub and does nothing useful;
 No service worker is shipped. If one is ever added it must have a versioned precache and an update prompt; if any stale-cache risk appears, remove it rather than patch around it. Stale-cache complaints: hard-reload, then check whether a service worker was registered.
 
 ## Action versions (OPEN_RISKS R-7)
-Action versions in the workflow (`actions/checkout@v4`, `setup-node@v4`, `setup-python@v5`, `configure-pages@v5`, `upload-pages-artifact@v3`, `deploy-pages@v4`) are **not yet verified as current and not SHA-pinned**. Before first production deploy: check each action's GitHub releases page, update to current majors, pin to full commit SHAs (with a version comment), and close R-7.
+Actions are pinned to full commit SHAs with the tag in a trailing comment. Versions were checked against the actions/* releases on 2026-10-06: checkout v7.0.1, setup-node v7.0.0, setup-python v7.0.0, upload-pages-artifact v5.0.0, deploy-pages v5.0.1.
+
+`configure-pages` is deliberately not used: it needs Pages read permission, and its outputs are unused because the build uses `base: './'`.
+
+To bump a pin: look up the commit SHA of the new release tag (the repo's Releases/Tags page, or `git ls-remote https://github.com/actions/<name> refs/tags/<tag>*`; for annotated tags use the dereferenced `^{}` commit), replace the SHA in `.github/workflows/deploy.yml`, and update the trailing tag comment. Dependabot `github-actions` PRs do this weekly; they go through the same gates.
 
 ## Other
 - **Dependency updates:** Dependabot PRs go through the same gates.

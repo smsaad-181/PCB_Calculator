@@ -2,7 +2,8 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
-const coreGlobals = ['window', 'document', 'fetch', 'localStorage', 'sessionStorage', 'navigator'];
+const coreGlobals = ['window', 'document', 'fetch', 'localStorage', 'sessionStorage', 'navigator',
+  'process', 'performance', 'XMLHttpRequest', 'WebSocket', 'self', 'location', 'setTimeout', 'setInterval', 'crypto'];
 
 export default tseslint.config(
   { ignores: ['dist/', 'coverage/', 'node_modules/', 'tools/reference/'] },
@@ -34,6 +35,18 @@ export default tseslint.config(
         { object: 'globalThis', property: 'fetch', message: 'No network in src/core.' },
         { object: 'globalThis', property: 'window', message: 'No DOM in src/core.' },
         { object: 'globalThis', property: 'document', message: 'No DOM in src/core.' },
+        { object: 'globalThis', property: 'location', message: 'No DOM in src/core.' },
+        { object: 'globalThis', property: 'process', message: 'No process/env in src/core.' },
+        { object: 'globalThis', property: 'performance', message: 'No clock in src/core.' },
+        { object: 'globalThis', property: 'crypto', message: 'No entropy in src/core.' },
+        { object: 'globalThis', property: 'setTimeout', message: 'No timers in src/core.' },
+        { object: 'globalThis', property: 'setInterval', message: 'No timers in src/core.' },
+        { object: 'globalThis', property: 'XMLHttpRequest', message: 'No network in src/core.' },
+        { object: 'globalThis', property: 'WebSocket', message: 'No network in src/core.' },
+        { object: 'globalThis', property: 'self', message: 'No globals in src/core.' },
+        { object: 'performance', property: 'now', message: 'No clock in src/core.' },
+        { object: 'process', property: '*', message: 'No process/env in src/core.' },
+        { object: 'crypto', property: 'getRandomValues', message: 'No entropy in src/core.' },
       ],
       'no-restricted-syntax': [
         'error',

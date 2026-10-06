@@ -1,9 +1,26 @@
 import { defineConfig } from 'vitest/config';
+import type { Plugin } from 'vite';
 import preact from '@preact/preset-vite';
+
+export const PRODUCTION_CSP =
+  "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'";
+
+/** Injects a CSP meta tag into the production build only (dev server/HMR untouched). */
+export function cspPlugin(csp: string = PRODUCTION_CSP): Plugin {
+  return {
+    name: 'pcb-calc-csp',
+    apply: 'build',
+    transformIndexHtml(html: string): string {
+      const tag = `<meta http-equiv="Content-Security-Policy" content="${csp}" />`;
+      return html.replace('<head>', `<head>
+    ${tag}`);
+    },
+  };
+}
 
 export default defineConfig({
   base: './',
-  plugins: [preact()],
+  plugins: [preact(), cspPlugin()],
   build: { target: 'es2022', sourcemap: false },
   test: {
     environment: 'node',

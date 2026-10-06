@@ -6,7 +6,7 @@ Full original feature list: `MASTER_PROMPT_ORIGINAL.md`. This file corrects and 
 ## Corrections to the original prompt
 | Original | Correction |
 |---|---|
-| "Closed-form relationship derived from IPC-2152" | Believed false (ledger S-002 to verify). Mode A = "IPC-2152-informed estimate" (see skill `ipc2152-policy`). |
+| "Closed-form relationship derived from IPC-2152" | Partly right. **The standard:** IPC-2152 (2009) is reported to present charts plus correction factors, and no secondary source reports a printed closed-form equation (ledger S-002, `PAYWALLED-USER-MUST-VERIFY`: nobody here has read the standard). **Third-party fits:** published closed-form *fits* to IPC-2152 chart data do exist. Examples are Brooks & Adam 2015 (S-011a) and others (S-011b..e), all `UNVERIFIED` or `CONFLICT`. Mode A stays labelled **"IPC-2152-informed estimate"** because any equation is a third-party fit, not the standard (see skill `ipc2152-policy`). Open policy question: may Mode A use a cited published fit? Never digitize the charts ourselves. Human decision, see `docs/validation/OPEN_RISKS.md` R-8. |
 | °C/°F, oz/ft² as plain units | Separate dimensions: absolute temperature, ΔT, areal mass. |
 | Altitude/frequency applied to creepage | Altitude → clearance only. Frequency > ~30 kHz → IEC 60664-4 warning. |
 | IPC-2221C is the only IPC reference | Add IPC-6012 (acceptance), IPC-2141 (impedance, legacy), IPC-4562 (foil), IEC 60664-4, IEC 60063 (E-series). |

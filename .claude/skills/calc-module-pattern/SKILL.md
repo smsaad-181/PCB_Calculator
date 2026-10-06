@@ -24,9 +24,15 @@ interface CalcResult {
   warnings: string[];
   confidence: { level: 'high'|'medium'|'low'; reasons: string[] };
   recommendation: string;    // "Calculated limit" vs "Recommended design value" are separate
-  dataStatus: 'VERIFIED'|'UNVERIFIED'|'PAYWALLED';
+  dataStatus: 'VERIFIED'|'UNVERIFIED'|'PAYWALLED'|'CONFLICT';
 }
 ```
+`dataStatus` comes from the ledger rows the calculator uses (`reference.ledgerIds`). Map ledger statuses with `dataStatusFromLedger` in `src/core/data-status.ts`. Do not hand-write the mapping:
+- `VERIFIED` -> `'VERIFIED'`
+- `UNVERIFIED` -> `'UNVERIFIED'`
+- `PAYWALLED-USER-MUST-VERIFY` -> `'PAYWALLED'`
+- `CONFLICT` -> `'CONFLICT'` (sources disagree; the UI must show the badge and the calculator must state which value it chose and why).
+Any status other than `VERIFIED` downgrades confidence (rule (d) below) and renders a visible badge.
 ## Rules
 - Pure, deterministic, no I/O. Return errors as values (`Result<T,E>`), never NaN.
 - Confidence from `src/core/confidence.ts`: downgrade for each (a) out-of-range input, (b) defaulted assumption, (c) low-accuracy method class, (d) non-VERIFIED data.
