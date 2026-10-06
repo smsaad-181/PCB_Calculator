@@ -1,7 +1,11 @@
 import { DIM, describeDim, dimEqual, isDimensionless, type Dim, type Exps } from './dim';
 import { DimensionError, InvalidValueError } from './errors';
 
-/** SI magnitude plus dimension. Display units are never stored. */
+/**
+ * SI magnitude plus dimension. Display units are never stored.
+ * Instances are frozen and must only be created via q() or the algebra functions: raw `{ si, dim }`
+ * object literals bypass the finite and 0 K validation and must not be constructed outside q().
+ */
 export interface Quantity {
   readonly si: number;
   readonly dim: Dim;
@@ -28,7 +32,7 @@ function result(si: number, dim: Dim, op: string): Quantity {
   if (!Number.isFinite(si)) {
     throw new InvalidValueError(`${op} produced a non-finite result (overflow or division by zero)`);
   }
-  return { si: floorAbsTemp(si, dim), dim };
+  return Object.freeze({ si: floorAbsTemp(si, dim), dim });
 }
 
 /**
@@ -37,7 +41,7 @@ function result(si: number, dim: Dim, op: string): Quantity {
  */
 export function q(si: number, dim: Dim): Quantity {
   assertFinite(si, 'Value');
-  return { si: floorAbsTemp(si, dim), dim };
+  return Object.freeze({ si: floorAbsTemp(si, dim), dim });
 }
 
 export function sameDim(a: Quantity, b: Quantity): boolean {
@@ -75,7 +79,7 @@ export function neg(a: Quantity): Quantity {
 }
 
 export function abs(a: Quantity): Quantity {
-  return { si: Math.abs(a.si), dim: a.dim };
+  return Object.freeze({ si: Math.abs(a.si), dim: a.dim });
 }
 
 /** Returns -1, 0 or 1. Throws DimensionError unless dimensions are identical. */

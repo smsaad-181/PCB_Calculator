@@ -1,7 +1,7 @@
 import { DIM, dimEqual, describeDim } from './dim';
 import { DimensionError, InvalidValueError } from './errors';
 import { LEDGER_STATUS, type LedgerStatus } from './ledger';
-import { type Quantity } from './quantity';
+import { q, type Quantity } from './quantity';
 import { INCH_M, OZ_PER_FT2_KG_M2 } from './units-table';
 
 export type FoilConvention = 'nominal-35um' | 'nominal-1.35mil' | 'mass-density';
@@ -97,7 +97,7 @@ export function foilThickness(weight: Quantity, convention: FoilConvention, opts
   if (!Number.isFinite(si)) throw new InvalidValueError('Foil thickness overflows the representable range');
   const ledgerId = convention === 'mass-density' && !user ? 'S-003d' : 'S-003';
   return {
-    thickness: { si, dim: DIM.LENGTH },
+    thickness: q(si, DIM.LENGTH),
     convention,
     constantUsed: { value, unit: info.unit, source: user ? 'user' : 'default', ledgerId },
     statement: `${info.label.split(':')[0] as string} convention, constant ${String(value)} ${info.unit} (${user ? 'user-supplied' : 'default'}, ledger ${info.ledgerIds.join('+')})`,
