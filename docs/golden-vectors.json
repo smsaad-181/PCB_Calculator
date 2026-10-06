@@ -1,0 +1,85 @@
+{
+  "note": "Mirrors tools/reference/ref_calcs.py. Expected values are hand/formula-derived, NOT yet independently verified against KiCad or the standards.",
+  "vectors": [
+    {
+      "name": "ipc2221_ext_1A_dT10_width_mil",
+      "oracle_value": 11.825835520471326,
+      "expected_approx": 11.82,
+      "rel_tol": 0.02,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "ipc2221_ext_3A_dT10_width_mil",
+      "oracle_value": 53.81831752806748,
+      "expected_approx": 54.0,
+      "rel_tol": 0.03,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "ipc2221_int_1A_dT10_width_mil",
+      "oracle_value": 30.764199672661377,
+      "expected_approx": 31.0,
+      "rel_tol": 0.03,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "trace_R_100x0.3mm_35um_20C_ohm",
+      "oracle_value": 0.16419047619047625,
+      "expected_approx": 0.1642,
+      "rel_tol": 0.005,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "trace_R_same_30C_ohm",
+      "oracle_value": 0.1705939047619048,
+      "expected_approx": 0.1706,
+      "rel_tol": 0.005,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "via_area_mm2_0.3fin_25um",
+      "oracle_value": 0.025525440310417067,
+      "expected_approx": 0.02553,
+      "rel_tol": 0.01,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "via_R_mohm_1.6mm",
+      "oracle_value": 1.0806473723684533,
+      "expected_approx": 1.08,
+      "rel_tol": 0.02,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "via_theta_KperW_1.6mm",
+      "oracle_value": 162.81184987622464,
+      "expected_approx": 162.8,
+      "rel_tol": 0.03,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "skin_depth_um_10MHz",
+      "oracle_value": 20.89723190995582,
+      "expected_approx": 20.9,
+      "rel_tol": 0.01,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "annular_ring_mm_0.6pad_0.3hole",
+      "oracle_value": 0.15,
+      "expected_approx": 0.15,
+      "rel_tol": 1e-09,
+      "ledger": "see LEDGER",
+      "status": "UNVERIFIED"
+    }
+  ]
+}

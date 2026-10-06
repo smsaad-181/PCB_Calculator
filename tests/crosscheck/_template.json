@@ -1,0 +1,17 @@
+{
+  "tool": "REPLACE",
+  "toolId": "X-00",
+  "toolVersion": "REPLACE",
+  "retrieved": "YYYY-MM-DD",
+  "obtainedBy": "human",
+  "method": "REPLACE",
+  "cases": [
+    {
+      "id": "REPLACE",
+      "calculator": "REPLACE",
+      "inputs": {},
+      "toolOutputs": { "REPLACE": null },
+      "compare": [ { "output": "REPLACE", "relTol": 0.0, "why": "REPLACE" } ]
+    }
+  ]
+}

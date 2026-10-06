@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)", "Bash(npm ci:*)", "Bash(npm run:*)", "Bash(npm test:*)", "Bash(npx vitest:*)",
+      "Bash(npx tsc:*)", "Bash(npx eslint:*)", "Bash(npx vite:*)", "Bash(node:*)",
+      "Bash(python3 tools/reference/ref_calcs.py:*)", "Bash(python3:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout:*)", "Bash(git switch:*)",
+      "WebSearch", "WebFetch"
+    ],
+    "deny": ["Read(./.env)", "Read(./.env.*)", "Bash(git push --force:*)", "Bash(rm -rf /:*)"]
+  },
+  "enableAllProjectMcpServers": false
+}
