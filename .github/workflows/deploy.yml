@@ -30,6 +30,7 @@ jobs:
       - run: npm run lint
       - name: Independent reference oracle self-check
         run: python3 tools/reference/ref_calcs.py
+      - run: python3 tools/reference/gen_golden.py --check
       - run: npm run test:coverage
       - run: npm run build
       - run: npm run check:size

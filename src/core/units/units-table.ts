@@ -1,6 +1,6 @@
 import { DIM, dimEqual, describeDim, type Dim } from './dim';
 import { DimensionError, InvalidValueError, UnitError } from './errors';
-import { assertFinite, type Quantity } from './quantity';
+import { assertFinite, q, type Quantity } from './quantity';
 
 /**
  * Unit definitions. Conversion: si = (value + pre) * scale + post.
@@ -132,7 +132,7 @@ export function applyUnit(value: number, u: UnitDef): Quantity {
   assertFinite(value, 'Value');
   const si = u.pre === 0 && u.post === 0 ? value * u.scale : (value + u.pre) * u.scale + u.post;
   if (!Number.isFinite(si)) throw new InvalidValueError(`${String(value)} ${u.symbol} overflows the representable range`);
-  return { si, dim: u.dim };
+  return q(si, u.dim);
 }
 
 /** Convert a number in `unit` into an SI Quantity. */

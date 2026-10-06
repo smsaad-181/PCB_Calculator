@@ -14,17 +14,30 @@ export function assertFinite(v: number, what: string): void {
   }
 }
 
+/** Float noise tolerance below 0 K (e.g. -459.67 degF converts to -5.7e-14 K). Values in [-tol, 0) are accepted unchanged (not clamped, so round trips stay exact). */
+const ABS_ZERO_TOLERANCE_K = 1e-9;
+
+/** Single place enforcing the absolute-temperature floor. Returns the SI value unchanged or throws. */
+function floorAbsTemp(si: number, dim: Dim): number {
+  if (dim.kind !== 'absTemp' || si >= 0) return si;
+  if (si >= -ABS_ZERO_TOLERANCE_K) return si;
+  throw new InvalidValueError(`Absolute temperature ${String(si)} K is below absolute zero (0 K)`);
+}
+
 function result(si: number, dim: Dim, op: string): Quantity {
   if (!Number.isFinite(si)) {
     throw new InvalidValueError(`${op} produced a non-finite result (overflow or division by zero)`);
   }
-  return { si, dim };
+  return { si: floorAbsTemp(si, dim), dim };
 }
 
-/** Create a quantity from an SI value. Zero and negative values are allowed; sign rules belong to calculators. */
+/**
+ * Create a quantity from an SI value. Zero and negative values are allowed; sign rules belong to calculators.
+ * The one exception is absolute temperature, which must be >= 0 K (InvalidValueError below absolute zero).
+ */
 export function q(si: number, dim: Dim): Quantity {
   assertFinite(si, 'Value');
-  return { si, dim };
+  return { si: floorAbsTemp(si, dim), dim };
 }
 
 export function sameDim(a: Quantity, b: Quantity): boolean {
@@ -58,7 +71,7 @@ export function sub(a: Quantity, b: Quantity): Quantity {
 }
 
 export function neg(a: Quantity): Quantity {
-  return { si: 0 - a.si, dim: a.dim };
+  return result(0 - a.si, a.dim, 'negate');
 }
 
 export function abs(a: Quantity): Quantity {

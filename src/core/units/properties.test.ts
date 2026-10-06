@@ -39,6 +39,24 @@ const moderate = fc
   .tuple(fc.double({ min: 1e-3, max: 1e6, noNaN: true }), fc.boolean())
   .map(([v, neg]) => (neg ? -v : v));
 
+// Absolute temperatures below 0 K are invalid (finding m-1). Generators for absolute-temperature
+// quantities/units draw from a physically valid range with a margin above the floor.
+const ABS_UNITS = new Set(['K', `${DEG}C`, 'degC', `${DEG}F`, 'degF']);
+const ABS_FLOOR: Record<string, number> = { K: 0, [`${DEG}C`]: -273.15, degC: -273.15, [`${DEG}F`]: -459.67, degF: -459.67 };
+const absValue = (unit: string): fc.Arbitrary<number> => {
+  const lo = (ABS_FLOOR[unit] ?? 0) + 1;
+  return fc.double({ min: lo, max: lo + 1e6, noNaN: true });
+};
+/** Value valid for the unit: full signed range, except absolute-temperature units. */
+const valueFor = (unit: string): fc.Arbitrary<number> => (ABS_UNITS.has(unit) ? absValue(unit) : moderate);
+const unitAndValue = (units: readonly string[]): fc.Arbitrary<[string, number]> =>
+  fc.constantFrom(...units).chain((u) => valueFor(u).map((v): [string, number] => [u, v]));
+/** Signed value valid for a dimension: absTemp gets si >= 1 K. */
+const dimValue = (d: Dim): fc.Arbitrary<number> =>
+  d.kind === 'absTemp' ? fc.double({ min: 1, max: 1e6, noNaN: true }) : moderate;
+const dimAndValue = (dims: readonly Dim[]): fc.Arbitrary<[Dim, number]> =>
+  fc.constantFrom(...dims).chain((d) => dimValue(d).map((v): [Dim, number] => [d, v]));
+
 const wide = fc.double({ noNaN: true, noDefaultInfinity: true });
 
 const PLAIN_DIMS: Dim[] = [
@@ -50,7 +68,6 @@ const ALL_DIMS: Dim[] = [
   DIM.THERMAL_RESISTANCE, DIM.PER_KELVIN,
 ];
 const plainDim = fc.constantFrom(...PLAIN_DIMS);
-const anyDim = fc.constantFrom(...ALL_DIMS);
 
 function isTempPair(a: Dim, b: Dim): boolean {
   const kinds = new Set([a.kind, b.kind]);
@@ -60,7 +77,7 @@ function isTempPair(a: Dim, b: Dim): boolean {
 describe('property: unit round trip fromUnit -> toUnit', () => {
   it('scale units: relative error < 1e-12', () => {
     fc.assert(
-      fc.property(fc.constantFrom(...SCALE_UNITS), moderate, (unit, v) => {
+      fc.property(unitAndValue(SCALE_UNITS), ([unit, v]) => {
         const back = toUnit(fromUnit(v, unit), unit);
         expect(Math.abs(back - v) / Math.abs(v)).toBeLessThan(1e-12);
       }),
@@ -68,7 +85,7 @@ describe('property: unit round trip fromUnit -> toUnit', () => {
   });
   it('offset units (degC, degF): error < 1e-12 * (|v| + 300)', () => {
     fc.assert(
-      fc.property(fc.constantFrom(...OFFSET_UNITS), moderate, (unit, v) => {
+      fc.property(unitAndValue(OFFSET_UNITS), ([unit, v]) => {
         const back = toUnit(fromUnit(v, unit), unit);
         expect(Math.abs(back - v)).toBeLessThan(1e-12 * (Math.abs(v) + 300));
       }),
@@ -76,7 +93,7 @@ describe('property: unit round trip fromUnit -> toUnit', () => {
   });
   it('every round trip result is finite and the quantity si is finite', () => {
     fc.assert(
-      fc.property(fc.constantFrom(...SCALE_UNITS, ...OFFSET_UNITS), moderate, (unit, v) => {
+      fc.property(unitAndValue([...SCALE_UNITS, ...OFFSET_UNITS]), ([unit, v]) => {
         expect(Number.isFinite(fromUnit(v, unit).si)).toBe(true);
       }),
     );
@@ -104,6 +121,28 @@ describe('property: unit round trip fromUnit -> toUnit', () => {
       fc.property(fc.double({ min: -200, max: 1000, noNaN: true }), (c) => {
         const f = toUnit(fromUnit(c, `${DEG}C`), `${DEG}F`);
         expect(Math.abs(f - (1.8 * c + 32))).toBeLessThan(1e-9);
+      }),
+    );
+  });
+});
+
+describe('property: absolute temperature below absolute zero', () => {
+  it('fromUnit throws InvalidValueError for any value clearly below the floor', () => {
+    fc.assert(
+      fc.property(
+        fc.constantFrom(...ABS_UNITS).chain((u) =>
+          fc.double({ min: 1e-3, max: 1e6, noNaN: true }).map((d): [string, number] => [u, (ABS_FLOOR[u] ?? 0) - d]),
+        ),
+        ([unit, v]) => {
+          expect(() => fromUnit(v, unit)).toThrow(InvalidValueError);
+        },
+      ),
+    );
+  });
+  it('q(<0, ABS_TEMPERATURE) throws InvalidValueError', () => {
+    fc.assert(
+      fc.property(fc.double({ min: 1e-3, max: 1e6, noNaN: true }), (d) => {
+        expect(() => q(-d, DIM.ABS_TEMPERATURE)).toThrow(InvalidValueError);
       }),
     );
   });
@@ -208,7 +247,7 @@ describe('property: algebra', () => {
 describe('property: dimension mismatch always throws', () => {
   it('add / sub throw DimensionError for any two different dims (except abs/delta temperature pair)', () => {
     fc.assert(
-      fc.property(anyDim, anyDim, moderate, moderate, (da, db, x, y) => {
+      fc.property(dimAndValue(ALL_DIMS), dimAndValue(ALL_DIMS), ([da, x], [db, y]) => {
         fc.pre(!sameDim(q(1, da), q(1, db)));
         fc.pre(!isTempPair(da, db));
         expect(() => add(q(x, da), q(y, db))).toThrow(DimensionError);
@@ -218,7 +257,7 @@ describe('property: dimension mismatch always throws', () => {
   });
   it('compare throws DimensionError for any two different dims', () => {
     fc.assert(
-      fc.property(anyDim, anyDim, moderate, moderate, (da, db, x, y) => {
+      fc.property(dimAndValue(ALL_DIMS), dimAndValue(ALL_DIMS), ([da, x], [db, y]) => {
         fc.pre(!sameDim(q(1, da), q(1, db)));
         expect(() => compare(q(x, da), q(y, db))).toThrow(DimensionError);
       }),
@@ -231,7 +270,7 @@ describe('property: dimension mismatch always throws', () => {
       [`${DEG}C`, DIM.ABS_TEMPERATURE], [`${DELTA}K`, DIM.TEMPERATURE_DIFFERENCE],
     ];
     fc.assert(
-      fc.property(anyDim, fc.constantFrom(...unitDims), moderate, (d, [unit, ud], x) => {
+      fc.property(dimAndValue(ALL_DIMS), fc.constantFrom(...unitDims), ([d, x], [unit, ud]) => {
         fc.pre(!sameDim(q(1, d), q(1, ud)));
         expect(() => toUnit(q(x, d), unit)).toThrow(DimensionError);
       }),
@@ -239,7 +278,7 @@ describe('property: dimension mismatch always throws', () => {
   });
   it('absolute temperature is never accepted by mul / div / pow', () => {
     fc.assert(
-      fc.property(plainDim, moderate, moderate, (d, x, y) => {
+      fc.property(plainDim, moderate, fc.double({ min: 1, max: 1e6, noNaN: true }), (d, x, y) => {
         const t = q(y, DIM.ABS_TEMPERATURE);
         expect(() => mul(q(x, d), t)).toThrow(DimensionError);
         expect(() => mul(t, q(x, d))).toThrow(DimensionError);

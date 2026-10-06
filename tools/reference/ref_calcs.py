@@ -9,6 +9,7 @@ automatically right: investigate against a primary source and record the outcome
 Constants are UNVERIFIED until the ledger marks them verified.
 Run:  python3 tools/reference/ref_calcs.py            (prints golden vectors, exits non-zero on mismatch)
       python3 tools/reference/ref_calcs.py --json     (machine-readable)
+Generate docs/golden-vectors.json:  python3 tools/reference/gen_golden.py   (CI: --check)
 """
 import json, math, sys
 
@@ -23,6 +24,7 @@ K_EXT, K_INT = 0.048, 0.024  # IPC-2221 legacy coefficients (verify!)
 B_DT, C_AREA = 0.44, 0.725   # IPC-2221 exponents (verify!)
 MU0 = 4e-7 * math.pi
 K_CU_THERMAL = 385.0         # W/m.K (assumption, editable)
+# TODO(standards-researcher): K_CU_THERMAL is UNLEDGERED (no row in docs/sources/LEDGER.md). Add one.
 
 # ---- units (S-003, S-005, S-006) ----
 OZ_KG = 0.028349523125       # avoirdupois ounce, exact by definition (S-006)
@@ -72,29 +74,37 @@ def self_heating_converge(I, w_m, t_m, L_m, theta_per_len=None, dT_target=None):
     Returns steady dT such that dT = f(I) with R rising with T. (Illustrative oracle; see skill.)"""
     raise NotImplementedError("Add once the self-heating model is specified in docs/phases/phase-1.md")
 
+# Golden vectors: (name, computed value, pinned expected, rel_tol, ledger ids the value depends on, note).
+# `pinned expected` are full-precision literals recorded from this oracle (regression pins; they catch any
+# change to the constants/formulas above). Tolerances: exact closed-form math 1e-9 relative; IPC-2221 width
+# vectors 1e-6 (closed form GIVEN the coefficients; the empirical uncertainty is in the coefficients
+# S-001/S-003, which is a ledger matter, not an arithmetic tolerance).
+# docs/golden-vectors.json is GENERATED from this list by tools/reference/gen_golden.py (never edit by hand).
 GOLDEN = [
-  ("ipc2221_ext_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, True),  11.8262, 0.02),
-  ("ipc2221_ext_3A_dT10_width_mil",  ipc2221_width_mil(3, 10, 1, True),  53.8202,  0.03),
-  ("ipc2221_int_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, False), 30.7653,  0.03),
-  ("trace_R_100x0.3mm_35um_20C_ohm", trace_R(0.1, 0.3e-3, 35e-6, 20),    0.1642, 0.005),
-  ("trace_R_same_30C_ohm",           trace_R(0.1, 0.3e-3, 35e-6, 30),    0.170653, 0.005),
-  ("via_area_mm2_0.3fin_25um",       via_area_m2(0.3e-3, 25e-6) * 1e6,   0.02553, 0.01),
-  ("via_R_mohm_1.6mm",               via_R(0.3e-3, 25e-6, 1.6e-3) * 1e3, 1.08071,  0.02),
-  ("via_theta_KperW_1.6mm",          via_theta(0.3e-3, 25e-6, 1.6e-3),   162.8, 0.03),
-  ("skin_depth_um_10MHz",            skin_depth_m(10e6) * 1e6,           20.8978,  0.01),
-  ("annular_ring_mm_0.6pad_0.3hole", annular_ring(0.6, 0.3),             0.15,  1e-9),
-  ("units_oz_ft2_to_kg_m2",         oz_ft2_to_kg_m2(1.0),               0.30515172727394063, 1e-12),
-  ("awg_36_diameter_mm",             awg_diameter_mm(36),                0.127, 1e-12),
-  ("awg_0000_diameter_mm",           awg_diameter_mm(-3),                11.684, 1e-9),
-  ("awg_10_diameter_mm",             awg_diameter_mm(10),                2.5881867280128636, 1e-9),
-  ("awg_20_diameter_mm",             awg_diameter_mm(20),                0.8118209703737738, 1e-9),
-  ("awg_40_diameter_mm",             awg_diameter_mm(40),                0.0798710851323451, 1e-9),
-  ("awg_20_area_mm2",                awg_area_mm2(20),                   0.5176192419280384, 1e-9),
+  ("ipc2221_ext_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, True),  11.82624097768917,   1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("ipc2221_ext_3A_dT10_width_mil",  ipc2221_width_mil(3, 10, 1, True),  53.820162727525585,  1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("ipc2221_int_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, False), 30.76525444522158,   1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("trace_R_100x0.3mm_35um_20C_ohm", trace_R(0.1, 0.3e-3, 35e-6, 20),    0.1642,              1e-9, ("S-004", "S-003"), "convention: 35 um/oz"),
+  ("trace_R_same_30C_ohm",           trace_R(0.1, 0.3e-3, 35e-6, 30),    0.17065306000000002, 1e-9, ("S-004", "S-003"), "convention: 35 um/oz"),
+  ("via_area_mm2_0.3fin_25um",       via_area_m2(0.3e-3, 25e-6) * 1e6,   0.025525440310417067, 1e-9, (), "pure geometry, no constants"),
+  ("via_R_mohm_1.6mm",               via_R(0.3e-3, 25e-6, 1.6e-3) * 1e3, 1.0807100549306556,  1e-9, ("S-004",), ""),
+  # TODO(standards-researcher): k_Cu = 385 W/m.K (K_CU_THERMAL) is UNLEDGERED -- it has no row in
+  # docs/sources/LEDGER.md. Add a row (source, edition, status); until then this vector is flagged UNLEDGERED.
+  ("via_theta_KperW_1.6mm",          via_theta(0.3e-3, 25e-6, 1.6e-3),   162.81184987622464, 1e-9, (), "UNLEDGERED: k_Cu = 385 W/m.K has no ledger row"),
+  ("skin_depth_um_10MHz",            skin_depth_m(10e6) * 1e6,           20.89783796937823,  1e-9, ("S-004", "S-013"), "mu_r = 1, mu0 = 4e-7*pi"),
+  ("annular_ring_mm_0.6pad_0.3hole", annular_ring(0.6, 0.3),             0.15,               1e-9, (), "pure geometry, no constants"),
+  ("units_oz_ft2_to_kg_m2",         oz_ft2_to_kg_m2(1.0),               0.30515172727394063, 1e-9, ("S-006",), ""),
+  ("awg_36_diameter_mm",             awg_diameter_mm(36),                0.127,              1e-9, ("S-005",), ""),
+  ("awg_0000_diameter_mm",           awg_diameter_mm(-3),                11.684,             1e-9, ("S-005",), ""),
+  ("awg_10_diameter_mm",             awg_diameter_mm(10),                2.5881867280128636, 1e-9, ("S-005",), ""),
+  ("awg_20_diameter_mm",             awg_diameter_mm(20),                0.8118209703737738, 1e-9, ("S-005",), ""),
+  ("awg_40_diameter_mm",             awg_diameter_mm(40),                0.0798710851323451, 1e-9, ("S-005",), ""),
+  ("awg_20_area_mm2",                awg_area_mm2(20),                   0.5176192419280384, 1e-9, ("S-005",), ""),
 ]
 
 def main():
     rows, bad = [], 0
-    for name, got, want, rtol in GOLDEN:
+    for name, got, want, rtol, _ids, _note in GOLDEN:
         ok = abs(got - want) <= rtol * abs(want) if want else abs(got) <= rtol
         bad += (not ok)
         rows.append({"name": name, "got": got, "expected": want, "rel_tol": rtol, "ok": ok})

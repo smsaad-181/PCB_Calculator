@@ -1,4 +1,3 @@
-import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   FORBIDDEN_PHRASES,
@@ -84,7 +83,8 @@ describe('compliance phrase grep', () => {
     expect(matches(s)).toBe(false);
   });
   it('the repository itself (src, index.html, public) has no hits with the widened detector', () => {
-    const root = fileURLToPath(new URL('..', import.meta.url));
+    // tests/fixtures/audit/../../.. is the repository root; fixtureRoot normalises the path.
+    const root = fx('../../..');
     expect(scanForbiddenPhrases(root)).toEqual([]);
   });
 });

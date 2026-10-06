@@ -1,6 +1,6 @@
 import { dimEqual, isDimensionless, type Dim } from './dim';
 import { DimensionError, InvalidValueError, UnitError } from './errors';
-import { type Quantity } from './quantity';
+import { q, type Quantity } from './quantity';
 import { PREFIX_SCALE, applyUnit, resolveUnit } from './units-table';
 
 export type ParseResult =
@@ -28,7 +28,7 @@ export function parseQuantity(text: string, expectedDim?: Dim): ParseResult {
 
     if (unit === '') {
       if (expectedDim !== undefined && isDimensionless(expectedDim)) {
-        return { ok: true, value: { si: value, dim: expectedDim } };
+        return { ok: true, value: q(value, expectedDim) };
       }
       return fail(new UnitError(`Missing unit in "${text.trim()}"`));
     }
@@ -42,7 +42,7 @@ export function parseQuantity(text: string, expectedDim?: Dim): ParseResult {
       if (scale !== undefined) {
         const si = value * scale;
         if (!Number.isFinite(si)) return fail(new InvalidValueError(`"${text.trim()}" overflows the representable range`));
-        return { ok: true, value: { si, dim: expectedDim } };
+        return { ok: true, value: q(si, expectedDim) };
       }
     }
     if (u) return fail(new DimensionError(`Unit "${unit}" does not match the expected dimension`));
