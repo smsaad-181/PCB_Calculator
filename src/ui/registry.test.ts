@@ -20,9 +20,20 @@ describe('registry', () => {
 
 describe('badgeText', () => {
   it('is null for VERIFIED', () => expect(badgeText('VERIFIED', ['S-001'])).toBeNull());
-  it('names the ledger id', () => {
-    expect(badgeText('UNVERIFIED', ['S-001'])).toBe('UNVERIFIED data — see source ledger S-001');
-    expect(badgeText('CONFLICT', ['S-002'])).toContain('S-002');
-    expect(badgeText('PAYWALLED-USER-MUST-VERIFY', [])).toContain('UNVERIFIED');
+  it('uses actionable wording and names the ledger id', () => {
+    expect(badgeText('UNVERIFIED', ['S-001'])).toBe('Not independently verified — see source ledger S-001');
+    expect(badgeText('CONFLICT', ['S-002'])).toBe('Sources disagree — see source ledger S-002');
+    expect(badgeText('PAYWALLED-USER-MUST-VERIFY', ['S-003'])).toBe(
+      'Not checked against the standard (paywalled): compare with your licensed copy — see source ledger S-003',
+    );
+  });
+  it('falls back to a generic ledger reference and joins several ids', () => {
+    expect(badgeText('UNVERIFIED', [])).toBe('Not independently verified — see the source ledger');
+    expect(badgeText('UNVERIFIED', ['S-001', 'S-004'])).toContain('S-001, S-004');
+  });
+  it('never uses the old wording', () => {
+    for (const s of ['UNVERIFIED', 'PAYWALLED-USER-MUST-VERIFY', 'CONFLICT'] as const) {
+      expect(badgeText(s, ['S-001'])).not.toMatch(/you must verify|UNVERIFIED \(/);
+    }
   });
 });

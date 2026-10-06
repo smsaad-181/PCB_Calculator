@@ -37,3 +37,16 @@ button { font: inherit; min-height: 2.75rem; padding: 0.4rem 1rem; cursor: point
 .table-wrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; }
 th, td { text-align: left; border-bottom: 1px solid var(--border); padding: 0.5rem; vertical-align: top; }
+.banner { display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; border: 2px solid var(--warn-border); background: var(--warn-bg); color: var(--warn-fg); border-radius: 6px; padding: 0.25rem 1rem; margin-bottom: 1rem; }
+.banner ul { margin: 0.25rem 0 0.75rem; padding-left: 1.25rem; }
+.banner button { flex: none; margin-top: 0.5rem; }
+.badge-unverified { max-width: 100%; overflow-wrap: anywhere; }
+/* Narrow screens: stack ledger rows as cards so the Status column is never scrolled out of view (m-2). */
+@media (max-width: 37.5rem) {
+  .ledger-table, .ledger-table tbody, .ledger-table tr, .ledger-table th, .ledger-table td { display: block; width: 100%; }
+  .ledger-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .ledger-table tr { background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 0.75rem; padding: 0.25rem 0; }
+  .ledger-table th, .ledger-table td { border-bottom: 0; padding: 0.25rem 0.75rem; }
+  .ledger-table th[scope="row"] { font-size: 1.05rem; }
+  .ledger-table td[data-label]::before, .ledger-table th[data-label]::before { content: attr(data-label); display: block; color: var(--muted); font-size: 0.8rem; font-weight: 400; text-transform: uppercase; letter-spacing: 0.03em; }
+}

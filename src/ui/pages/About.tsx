@@ -18,7 +18,7 @@ export function About() {
         it is used.
       </p>
       <div class="table-wrap">
-        <table>
+        <table class="ledger-table">
           <caption class="visually-hidden">Source ledger: id, item, edition and verification status</caption>
           <thead>
             <tr>
@@ -31,10 +31,10 @@ export function About() {
           <tbody>
             {LEDGER.map((r) => (
               <tr key={r.id}>
-                <th scope="row">{r.id}</th>
-                <td>{r.item}</td>
-                <td>{r.edition}</td>
-                <td>
+                <th scope="row" data-label="ID">{r.id}</th>
+                <td data-label="Item">{r.item}</td>
+                <td data-label="Edition">{r.edition}</td>
+                <td data-label="Status">
                   {r.status === 'VERIFIED' ? <span>VERIFIED</span> : <UnverifiedBadge status={r.status} ledgerIds={[r.id]} />}
                 </td>
               </tr>

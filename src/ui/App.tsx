@@ -1,5 +1,6 @@
-import { useEffect } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 import { useParsedHash } from '../state/useHash';
+import { DiscardBanner } from './components/DiscardBanner';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { About } from './pages/About';
 import { CalcPage } from './pages/CalcPage';
@@ -10,7 +11,9 @@ function focusMain(): void {
 }
 
 export function App() {
-  const { route } = useParsedHash();
+  const parsed = useParsedHash();
+  const { route } = parsed;
+  const [dismissedFor, setDismissedFor] = useState<string | null>(null);
   const key = route.name === 'calc' ? `calc:${route.id}` : route.name;
 
   useEffect(focusMain, [key]);
@@ -39,6 +42,10 @@ export function App() {
         </nav>
       </header>
       <main id="main" tabIndex={-1}>
+        {dismissedFor !== parsed.hash && <DiscardBanner parsed={parsed} onDismiss={() => {
+              setDismissedFor(parsed.hash);
+              focusMain();
+            }} />}
         <ErrorBoundary key={key} label="This page">
           {route.name === 'home' && <Home />}
           {route.name === 'about' && <About />}

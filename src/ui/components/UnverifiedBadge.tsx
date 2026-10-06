@@ -7,14 +7,14 @@ interface Props {
 
 export function badgeText(status: LedgerStatus, ledgerIds: readonly string[]): string | null {
   if (status === 'VERIFIED') return null;
-  const refs = ledgerIds.length > 0 ? ledgerIds.join(', ') : 'source ledger';
+  const where = ledgerIds.length > 0 ? `source ledger ${ledgerIds.join(', ')}` : 'the source ledger';
   switch (status) {
     case 'UNVERIFIED':
-      return `UNVERIFIED data — see source ledger ${refs}`;
+      return `Not independently verified — see ${where}`;
     case 'PAYWALLED-USER-MUST-VERIFY':
-      return `UNVERIFIED (paywalled, you must verify) — see source ledger ${refs}`;
+      return `Not checked against the standard (paywalled): compare with your licensed copy — see ${where}`;
     case 'CONFLICT':
-      return `UNVERIFIED (sources conflict) — see source ledger ${refs}`;
+      return `Sources disagree — see ${where}`;
   }
 }
 
