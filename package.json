@@ -1,0 +1,36 @@
+{
+  "name": "pcb-calc",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "PCB Calculator Suite",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "check:size": "node tools/check-size.mjs",
+    "check:audit": "node tools/check-audit.mjs"
+  },
+  "dependencies": {
+    "preact": "^11.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@preact/preset-vite": "^2.10.6",
+    "@vitest/coverage-v8": "^5.0.3",
+    "eslint": "^10.12.0",
+    "fast-check": "^4.10.2",
+    "globals": "^17.13.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.71.1",
+    "vite": "^8.3.3",
+    "vitest": "^5.0.3"
+  }
+}
