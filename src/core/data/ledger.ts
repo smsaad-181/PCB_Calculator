@@ -22,6 +22,7 @@ const LEDGER_ROWS: readonly LedgerRow[] = [
   { id: 'S-005', item: 'AWG diameter', edition: 'NBS Circular 31 (1914); NBS Handbook 100 (1966); ASTM B258-18 not read', status: 'VERIFIED' },
   { id: 'S-006', item: 'Exact unit conversions', edition: 'NIST SP 811 (2008) App. B.8', status: 'VERIFIED' },
   { id: 'S-007', item: 'Copper thermal conductivity (pure 401, C11000 391-394, oracle 385 unsourced)', edition: 'Ho, Powell & Liley 1972; Aurubis C11000 datasheet', status: 'CONFLICT' },
+  { id: 'S-008', item: 'Fabricator capability data (JLCPCB published, example fab profile)', edition: 'jlcpcb.com capabilities, retrieved 2026-10-06', status: 'UNVERIFIED' },
   { id: 'S-010', item: 'IPC-2221 chart validity range', edition: 'IPC-2221B/C Figure 6-4, not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-011a', item: 'IPC-2152 fit: Brooks & Adam, external traces', edition: 'PCD&F 2015-05-29', status: 'UNVERIFIED' },
   { id: 'S-011b', item: 'IPC-2152 fit: Brooks & Adam, internal traces', edition: 'PCD&F 2015 Appendix 1, not read', status: 'UNVERIFIED' },
