@@ -1,3 +1,5 @@
+// NOTE: numeric literals such as 8960, 0.0039 and 1.724e-8 in this file are arbitrary test numbers used only
+// to exercise dimension algebra. They are NOT ledger values (see docs/sources/LEDGER.md S-003d, S-003e, S-004).
 import { describe, expect, it } from 'vitest';
 import {
   DIM,

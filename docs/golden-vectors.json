@@ -1,44 +1,44 @@
 {
-  "note": "Mirrors tools/reference/ref_calcs.py. Expected values are hand/formula-derived, NOT yet independently verified against KiCad or the standards.",
+  "note": "Mirrors tools/reference/ref_calcs.py. Constants: rho20 1.7241e-8 and alpha 0.00393 (S-004, VERIFIED); foil 35 um per oz/ft2 is a chosen convention (S-003, CONFLICT). Expected values are oracle-derived (implementation vs formula), NOT independent verification of the standards.",
   "vectors": [
     {
       "name": "ipc2221_ext_1A_dT10_width_mil",
-      "oracle_value": 11.825835520471326,
-      "expected_approx": 11.82,
+      "oracle_value": 11.82624097768917,
+      "expected_approx": 11.8262,
       "rel_tol": 0.02,
-      "ledger": "see LEDGER",
+      "ledger": "S-001, S-003 (convention: 35 um/oz)",
       "status": "UNVERIFIED"
     },
     {
       "name": "ipc2221_ext_3A_dT10_width_mil",
-      "oracle_value": 53.81831752806748,
-      "expected_approx": 54.0,
+      "oracle_value": 53.820162727525585,
+      "expected_approx": 53.8202,
       "rel_tol": 0.03,
-      "ledger": "see LEDGER",
+      "ledger": "S-001, S-003 (convention: 35 um/oz)",
       "status": "UNVERIFIED"
     },
     {
       "name": "ipc2221_int_1A_dT10_width_mil",
-      "oracle_value": 30.764199672661377,
-      "expected_approx": 31.0,
+      "oracle_value": 30.76525444522158,
+      "expected_approx": 30.7653,
       "rel_tol": 0.03,
-      "ledger": "see LEDGER",
+      "ledger": "S-001, S-003 (convention: 35 um/oz)",
       "status": "UNVERIFIED"
     },
     {
       "name": "trace_R_100x0.3mm_35um_20C_ohm",
-      "oracle_value": 0.16419047619047625,
+      "oracle_value": 0.1642,
       "expected_approx": 0.1642,
       "rel_tol": 0.005,
-      "ledger": "see LEDGER",
+      "ledger": "S-004, S-003 (convention: 35 um/oz)",
       "status": "UNVERIFIED"
     },
     {
       "name": "trace_R_same_30C_ohm",
-      "oracle_value": 0.1705939047619048,
-      "expected_approx": 0.1706,
+      "oracle_value": 0.17065306000000002,
+      "expected_approx": 0.170653,
       "rel_tol": 0.005,
-      "ledger": "see LEDGER",
+      "ledger": "S-004, S-003 (convention: 35 um/oz)",
       "status": "UNVERIFIED"
     },
     {
@@ -51,10 +51,10 @@
     },
     {
       "name": "via_R_mohm_1.6mm",
-      "oracle_value": 1.0806473723684533,
-      "expected_approx": 1.08,
+      "oracle_value": 1.0807100549306556,
+      "expected_approx": 1.08071,
       "rel_tol": 0.02,
-      "ledger": "see LEDGER",
+      "ledger": "S-004",
       "status": "UNVERIFIED"
     },
     {
@@ -67,10 +67,10 @@
     },
     {
       "name": "skin_depth_um_10MHz",
-      "oracle_value": 20.89723190995582,
-      "expected_approx": 20.9,
+      "oracle_value": 20.89783796937823,
+      "expected_approx": 20.8978,
       "rel_tol": 0.01,
-      "ledger": "see LEDGER",
+      "ledger": "S-004",
       "status": "UNVERIFIED"
     },
     {

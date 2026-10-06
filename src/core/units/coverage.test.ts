@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { LEDGER } from '../data/ledger';
 import {
   DIM,
   DimensionError,
@@ -23,13 +24,20 @@ describe('foilThickness: guards and user override', () => {
   const oneOz = fromUnit(1, 'oz/ft2');
 
   it('user-supplied constant is used, reported source "user" and status UNVERIFIED', () => {
-    const r = foilThickness(oneOz, 'ipc-nominal', { constant: 1.4 });
+    const r = foilThickness(oneOz, 'nominal-1.35mil', { constant: 1.4 });
     expect(r.constantUsed.source).toBe('user');
     expect(r.constantUsed.value).toBe(1.4);
     expect(r.status).toBe('UNVERIFIED');
     expect(r.statement).toContain('user-supplied');
-    // 1 oz/ft2 * 1.4 mil per oz/ft2 = 1.4 mil = 35.56 um (1 mil = 25.4 um exactly, S-006)
+    // 1 oz/ft2 * 1.4 mil per oz/ft2 = 1.4 mil (1 mil = 25.4 um exactly, S-006)
     expect(toUnit(r.thickness, 'mil')).toBeCloseTo(1.4, 12);
+  });
+
+  it('user override of nominal-35um is in um per oz/ft2 and reported UNVERIFIED', () => {
+    const r = foilThickness(oneOz, 'nominal-35um', { constant: 36 });
+    expect(r.constantUsed.source).toBe('user');
+    expect(r.status).toBe('UNVERIFIED');
+    expect(r.thickness.si / 36e-6).toBeCloseTo(1, 12);
   });
 
   it('user override of the mass-density constant divides areal mass by it', () => {
@@ -39,29 +47,34 @@ describe('foilThickness: guards and user override', () => {
     expect(r.thickness.si / (oneOz.si / 9000)).toBeCloseTo(1, 12);
   });
 
-  it('default constant is reported source "default" with the convention status', () => {
-    const r = foilThickness(oneOz, 'ipc-nominal');
-    expect(r.constantUsed.source).toBe('default');
-    expect(r.status).toBe(FOIL_CONVENTIONS['ipc-nominal'].status);
-  });
+  it.each(['nominal-35um', 'nominal-1.35mil', 'mass-density'] as const)(
+    'default constant of %s is reported source "default" with the S-003 ledger status',
+    (conv) => {
+      const r = foilThickness(oneOz, conv);
+      expect(r.constantUsed.source).toBe('default');
+      expect(r.status).toBe(FOIL_CONVENTIONS[conv].status);
+      expect(r.status).toBe(LEDGER.find((x) => x.id === 'S-003')?.status);
+    },
+  );
 
   it.each([0, -1, Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY])(
     'rejects invalid override constant %s',
     (c) => {
-      expect(() => foilThickness(oneOz, 'ipc-nominal', { constant: c })).toThrow(InvalidValueError);
+      expect(() => foilThickness(oneOz, 'nominal-35um', { constant: c })).toThrow(InvalidValueError);
+      expect(() => foilThickness(oneOz, 'nominal-1.35mil', { constant: c })).toThrow(InvalidValueError);
       expect(() => foilThickness(oneOz, 'mass-density', { constant: c })).toThrow(InvalidValueError);
     },
   );
 
   it('rejects a non-finite or non-positive weight', () => {
     const inf = { si: Number.POSITIVE_INFINITY, dim: DIM.AREAL_MASS };
-    expect(() => foilThickness(inf, 'ipc-nominal')).toThrow(InvalidValueError);
-    expect(() => foilThickness(q(0, DIM.AREAL_MASS), 'ipc-nominal')).toThrow(InvalidValueError);
+    expect(() => foilThickness(inf, 'nominal-35um')).toThrow(InvalidValueError);
+    expect(() => foilThickness(q(0, DIM.AREAL_MASS), 'nominal-35um')).toThrow(InvalidValueError);
     expect(() => foilThickness(q(-1, DIM.AREAL_MASS), 'mass-density')).toThrow(InvalidValueError);
   });
 
   it('rejects a weight that is not an areal mass (a plain length cannot be used as foil weight)', () => {
-    expect(() => foilThickness(q(1, DIM.LENGTH), 'ipc-nominal')).toThrow(DimensionError);
+    expect(() => foilThickness(q(1, DIM.LENGTH), 'nominal-35um')).toThrow(DimensionError);
   });
 
   it('throws instead of returning an infinite thickness on overflow', () => {

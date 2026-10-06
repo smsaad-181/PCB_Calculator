@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
+import { LEDGER } from '../data/ledger';
 import {
   DIM,
   DimensionError,
+  FOIL_CONVENTIONS,
+  type FoilConvention,
   InvalidValueError,
   UnitError,
   awgArea,
@@ -119,39 +122,96 @@ describe('copper foil: areal mass [S-006] and thickness [S-003]', () => {
     expect(relErr(toUnit(fromUnit(1, 'oz/ft2'), 'kg/m2'), OZ_FT2_TO_KG_M2)).toBeLessThanOrEqual(1e-12);
     expect(relErr(toUnit(q(OZ_FT2_TO_KG_M2, DIM.AREAL_MASS), 'oz/ft2'), 1)).toBeLessThanOrEqual(1e-12);
   });
-  it('[S-003] ipc-nominal: 1 oz = 1.378 mil', () => {
-    const r = foilThickness(fromUnit(1, 'oz/ft2'), 'ipc-nominal');
+  it('[S-003] nominal-35um: 1 oz/ft2 = 35 um exactly, not attributed to IPC', () => {
+    const r = foilThickness(fromUnit(1, 'oz/ft2'), 'nominal-35um');
     expect(sameDim(r.thickness, q(1, DIM.LENGTH))).toBe(true);
-    expect(relErr(r.thickness.si, 1.378 * 25.4e-6)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(toUnit(r.thickness, `${MU}m`), 35.0012)).toBeLessThanOrEqual(1e-6);
+    expect(relErr(r.thickness.si, 35e-6)).toBeLessThanOrEqual(1e-12);
+    expect(FOIL_CONVENTIONS['nominal-35um'].label).not.toMatch(/IPC/);
+    expect(r.statement).not.toMatch(/IPC/);
+    expect(FOIL_CONVENTIONS['nominal-35um'].label).toContain('1.378');
+    expect(FOIL_CONVENTIONS['nominal-35um'].value).toBe(35);
+    expect(FOIL_CONVENTIONS['nominal-35um'].unit).toMatch(/um|\u00b5m/);
   });
-  it('[S-003] ipc-nominal scales linearly (0.5, 2, 3 oz)', () => {
-    const one = foilThickness(fromUnit(1, 'oz/ft2'), 'ipc-nominal').thickness.si;
-    for (const oz of [0.5, 2, 3]) {
-      const t = foilThickness(fromUnit(oz, 'oz/ft2'), 'ipc-nominal').thickness.si;
-      expect(relErr(t, oz * one)).toBeLessThanOrEqual(1e-12);
+  it('[S-003] nominal-1.35mil: 1 oz/ft2 = 1.35 mil, labelled as reported/secondhand/unverified', () => {
+    const r = foilThickness(fromUnit(1, 'oz/ft2'), 'nominal-1.35mil');
+    expect(relErr(r.thickness.si, 1.35 * 25.4e-6)).toBeLessThanOrEqual(1e-12);
+    const label = FOIL_CONVENTIONS['nominal-1.35mil'].label;
+    expect(label).toMatch(/IPC-4562A/);
+    expect(label).toMatch(/unverified/i);
+    expect(label).toMatch(/secondhand/i);
+    expect(FOIL_CONVENTIONS['nominal-1.35mil'].value).toBe(1.35);
+    expect(FOIL_CONVENTIONS['nominal-1.35mil'].unit).toMatch(/mil/);
+  });
+  it('[S-003] all conventions scale linearly (0.5, 2, 3 oz)', () => {
+    for (const conv of ['nominal-35um', 'nominal-1.35mil', 'mass-density'] as const) {
+      const one = foilThickness(fromUnit(1, 'oz/ft2'), conv).thickness.si;
+      for (const oz of [0.5, 2, 3]) {
+        const t = foilThickness(fromUnit(oz, 'oz/ft2'), conv).thickness.si;
+        expect(relErr(t, oz * one)).toBeLessThanOrEqual(1e-12);
+      }
     }
   });
-  it('[S-003] mass-density plausibility only (0.30515 kg/m2 / 8960 kg/m3, placeholder density)', () => {
+  it('[S-003d] mass-density: default IACS density 8890 kg/m3', () => {
     const r = foilThickness(fromUnit(1, 'oz/ft2'), 'mass-density');
     expect(sameDim(r.thickness, q(1, DIM.LENGTH))).toBe(true);
-    expect(relErr(r.thickness.si, 0.30515 / 8960)).toBeLessThan(1e-3);
+    expect(relErr(r.thickness.si, OZ_KG / (FT_M * FT_M) / 8890)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(r.thickness.si, 0.028349523125 / 0.09290304 / 8890)).toBeLessThanOrEqual(1e-12);
+    expect(FOIL_CONVENTIONS['mass-density'].value).toBe(8890);
+    expect(FOIL_CONVENTIONS['mass-density'].unit).toBe('kg/m3');
+    expect(r.constantUsed.value).toBe(8890);
+    expect(r.constantUsed.source).toBe('default');
+    expect(r.constantUsed.ledgerId).toBe('S-003d');
+    expect(FOIL_CONVENTIONS['mass-density'].ledgerIds).toContain('S-003d');
   });
-  it('[S-003] result carries ledger ID and a ledger status', () => {
-    for (const conv of ['ipc-nominal', 'mass-density'] as const) {
+  it('[S-003] result carries ledger ID S-003 and exactly the ledger status of S-003', () => {
+    const row = LEDGER.find((x) => x.id === 'S-003');
+    expect(row).toBeDefined();
+    for (const conv of ['nominal-35um', 'nominal-1.35mil', 'mass-density'] as const) {
       const r = foilThickness(fromUnit(1, 'oz/ft2'), conv);
       expect(r.ledgerId).toBe('S-003');
-      expect(r.status).toMatch(/^(VERIFIED|UNVERIFIED|PAYWALLED-USER-MUST-VERIFY)$/);
+      expect(r.status).toBe(row?.status);
+      expect(r.status).toMatch(/^(VERIFIED|UNVERIFIED|PAYWALLED-USER-MUST-VERIFY|CONFLICT)$/);
     }
   });
+  it('[S-003] FOIL_CONVENTIONS exposes exactly the three conventions with full metadata', () => {
+    expect(Object.keys(FOIL_CONVENTIONS).sort()).toEqual(['mass-density', 'nominal-1.35mil', 'nominal-35um']);
+    const row = LEDGER.find((x) => x.id === 'S-003');
+    for (const [id, info] of Object.entries(FOIL_CONVENTIONS)) {
+      expect(info.id).toBe(id);
+      expect(info.label.length).toBeGreaterThan(0);
+      expect(info.value).toBeGreaterThan(0);
+      expect(info.unit.length).toBeGreaterThan(0);
+      expect(info.ledgerIds).toContain('S-003');
+      expect(info.status).toBe(row?.status);
+    }
+  });
+  it("[S-003] the removed 'ipc-nominal' convention id throws", () => {
+    const legacy = 'ipc-nominal' as unknown as FoilConvention;
+    expect(() => foilThickness(fromUnit(1, 'oz/ft2'), legacy)).toThrow();
+    expect(Object.keys(FOIL_CONVENTIONS)).not.toContain('ipc-nominal');
+  });
+  it('[S-003] the three conventions differ; ordering from arithmetic, spread < 2.1 %', () => {
+    const oz = fromUnit(1, 'oz/ft2');
+    const t35 = foilThickness(oz, 'nominal-35um').thickness.si; // 35.000 um
+    const t135 = foilThickness(oz, 'nominal-1.35mil').thickness.si; // 34.290 um
+    const tMass = foilThickness(oz, 'mass-density').thickness.si; // ~34.33 um at 8890 kg/m3
+    // 35 um > mass@8890 (~34.33 um) > 1.35 mil (34.29 um): mass-density is slightly ABOVE 1.35 mil.
+    expect(t35).toBeGreaterThan(tMass);
+    expect(tMass).toBeGreaterThan(t135);
+    const spread = (Math.max(t35, t135, tMass) - Math.min(t35, t135, tMass)) / Math.min(t35, t135, tMass);
+    expect(spread).toBeLessThan(0.021);
+    expect(spread).toBeGreaterThan(0.02);
+    expect(relErr(toUnit(foilThickness(oz, 'mass-density').thickness, `${MU}m`), 34.33)).toBeLessThan(1e-3);
+  });
   it('foilThickness rejects non-arealMass input (DimensionError)', () => {
-    expect(() => foilThickness(q(1, DIM.LENGTH), 'ipc-nominal')).toThrow(DimensionError);
+    expect(() => foilThickness(q(1, DIM.LENGTH), 'nominal-35um')).toThrow(DimensionError);
     expect(() => foilThickness(q(1, DIM.MASS), 'mass-density')).toThrow(DimensionError);
-    expect(() => foilThickness(q(1, DIM.ABS_TEMPERATURE), 'ipc-nominal')).toThrow(DimensionError);
+    expect(() => foilThickness(q(1, DIM.ABS_TEMPERATURE), 'nominal-1.35mil')).toThrow(DimensionError);
   });
   it('foilThickness rejects zero and negative weight (rule 10)', () => {
-    expect(() => foilThickness(q(0, DIM.AREAL_MASS), 'ipc-nominal')).toThrow(InvalidValueError);
+    expect(() => foilThickness(q(0, DIM.AREAL_MASS), 'nominal-35um')).toThrow(InvalidValueError);
     expect(() => foilThickness(q(-0.3, DIM.AREAL_MASS), 'mass-density')).toThrow(InvalidValueError);
+    expect(() => foilThickness(q(-0.3, DIM.AREAL_MASS), 'nominal-1.35mil')).toThrow(InvalidValueError);
   });
 });
 

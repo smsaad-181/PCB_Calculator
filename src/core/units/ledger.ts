@@ -2,7 +2,7 @@ import { LEDGER, type LedgerStatus } from '../data/ledger';
 
 export type { LedgerStatus };
 
-type UnitsLedgerId = 'S-003' | 'S-005' | 'S-006';
+type UnitsLedgerId = 'S-003' | 'S-003d' | 'S-005' | 'S-006';
 
 function statusOf(id: UnitsLedgerId): LedgerStatus {
   const row = LEDGER.find((r) => r.id === id);
@@ -17,6 +17,7 @@ function statusOf(id: UnitsLedgerId): LedgerStatus {
  */
 export const LEDGER_STATUS: Readonly<Record<UnitsLedgerId, LedgerStatus>> = {
   'S-003': statusOf('S-003'),
+  'S-003d': statusOf('S-003d'),
   'S-005': statusOf('S-005'),
   'S-006': statusOf('S-006'),
 };

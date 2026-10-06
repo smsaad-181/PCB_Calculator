@@ -13,9 +13,12 @@ Run:  python3 tools/reference/ref_calcs.py            (prints golden vectors, ex
 import json, math, sys
 
 # ---- constants (verify in docs/sources/LEDGER.md) ----
-RHO_CU_20C = 1.724e-8        # ohm*m, annealed copper @20C (editable in app)
-ALPHA_CU = 0.0039            # 1/C (commonly quoted ~0.00393)
-MIL_PER_OZ = 1.378           # IPC convention: 1 oz ~ 1.378 mil (~35 um)
+RHO_CU_20C = 1.7241e-8       # ohm*m, 100 % IACS copper @20C (S-004, VERIFIED; = 1/58 uohm*m)
+ALPHA_CU = 0.00393           # 1/K at 20C, 100 % IACS copper (S-004, VERIFIED)
+# Foil thickness: CHOSEN CONVENTION, not a standard. 1 oz/ft2 = 35 um nominal (S-003, status CONFLICT).
+# Alternatives in S-003: 1.35 mil (34.29 um, reported IPC-4562A, secondhand); mass/8890 kg/m3 (34.33 um, S-003d).
+FOIL_UM_PER_OZ = 35.0
+MIL_PER_OZ = FOIL_UM_PER_OZ / 25.4   # 35 um expressed in mil = 1.37795 (S-006: 1 mil = 25.4 um exactly)
 K_EXT, K_INT = 0.048, 0.024  # IPC-2221 legacy coefficients (verify!)
 B_DT, C_AREA = 0.44, 0.725   # IPC-2221 exponents (verify!)
 MU0 = 4e-7 * math.pi
@@ -70,15 +73,15 @@ def self_heating_converge(I, w_m, t_m, L_m, theta_per_len=None, dT_target=None):
     raise NotImplementedError("Add once the self-heating model is specified in docs/phases/phase-1.md")
 
 GOLDEN = [
-  ("ipc2221_ext_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, True),  11.82, 0.02),
-  ("ipc2221_ext_3A_dT10_width_mil",  ipc2221_width_mil(3, 10, 1, True),  54.0,  0.03),
-  ("ipc2221_int_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, False), 31.0,  0.03),
+  ("ipc2221_ext_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, True),  11.8262, 0.02),
+  ("ipc2221_ext_3A_dT10_width_mil",  ipc2221_width_mil(3, 10, 1, True),  53.8202,  0.03),
+  ("ipc2221_int_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, False), 30.7653,  0.03),
   ("trace_R_100x0.3mm_35um_20C_ohm", trace_R(0.1, 0.3e-3, 35e-6, 20),    0.1642, 0.005),
-  ("trace_R_same_30C_ohm",           trace_R(0.1, 0.3e-3, 35e-6, 30),    0.1706, 0.005),
+  ("trace_R_same_30C_ohm",           trace_R(0.1, 0.3e-3, 35e-6, 30),    0.170653, 0.005),
   ("via_area_mm2_0.3fin_25um",       via_area_m2(0.3e-3, 25e-6) * 1e6,   0.02553, 0.01),
-  ("via_R_mohm_1.6mm",               via_R(0.3e-3, 25e-6, 1.6e-3) * 1e3, 1.08,  0.02),
+  ("via_R_mohm_1.6mm",               via_R(0.3e-3, 25e-6, 1.6e-3) * 1e3, 1.08071,  0.02),
   ("via_theta_KperW_1.6mm",          via_theta(0.3e-3, 25e-6, 1.6e-3),   162.8, 0.03),
-  ("skin_depth_um_10MHz",            skin_depth_m(10e6) * 1e6,           20.9,  0.01),
+  ("skin_depth_um_10MHz",            skin_depth_m(10e6) * 1e6,           20.8978,  0.01),
   ("annular_ring_mm_0.6pad_0.3hole", annular_ring(0.6, 0.3),             0.15,  1e-9),
   ("units_oz_ft2_to_kg_m2",         oz_ft2_to_kg_m2(1.0),               0.30515172727394063, 1e-12),
   ("awg_36_diameter_mm",             awg_diameter_mm(36),                0.127, 1e-12),
