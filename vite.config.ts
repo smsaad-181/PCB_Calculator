@@ -7,6 +7,7 @@ export default defineConfig({
   build: { target: 'es2022', sourcemap: false },
   test: {
     environment: 'node',
+    exclude: ['node_modules/**', 'dist/**', 'tests/fixtures/**'],
     include: ['src/**/*.test.ts', 'src/**/*.test.tsx', 'tests/**/*.test.ts'],
     coverage: {
       provider: 'v8',

@@ -21,6 +21,19 @@ B_DT, C_AREA = 0.44, 0.725   # IPC-2221 exponents (verify!)
 MU0 = 4e-7 * math.pi
 K_CU_THERMAL = 385.0         # W/m.K (assumption, editable)
 
+# ---- units (S-003, S-005, S-006) ----
+OZ_KG = 0.028349523125       # avoirdupois ounce, exact by definition (S-006)
+FT_M = 0.3048                # international foot, exact (S-006)
+
+def oz_ft2_to_kg_m2(oz=1.0):
+    return oz * OZ_KG / FT_M ** 2
+
+def awg_diameter_mm(n):      # S-005; n: 0000=-3, 000=-2, 00=-1
+    return 0.127 * 92.0 ** ((36 - n) / 39.0)
+
+def awg_area_mm2(n):
+    return math.pi * awg_diameter_mm(n) ** 2 / 4.0
+
 def ipc2221_area_mil2(I, dT, k):
     return (I / (k * dT ** B_DT)) ** (1.0 / C_AREA)
 
@@ -67,6 +80,13 @@ GOLDEN = [
   ("via_theta_KperW_1.6mm",          via_theta(0.3e-3, 25e-6, 1.6e-3),   162.8, 0.03),
   ("skin_depth_um_10MHz",            skin_depth_m(10e6) * 1e6,           20.9,  0.01),
   ("annular_ring_mm_0.6pad_0.3hole", annular_ring(0.6, 0.3),             0.15,  1e-9),
+  ("units_oz_ft2_to_kg_m2",         oz_ft2_to_kg_m2(1.0),               0.30515172727394063, 1e-12),
+  ("awg_36_diameter_mm",             awg_diameter_mm(36),                0.127, 1e-12),
+  ("awg_0000_diameter_mm",           awg_diameter_mm(-3),                11.684, 1e-9),
+  ("awg_10_diameter_mm",             awg_diameter_mm(10),                2.5881867280128636, 1e-9),
+  ("awg_20_diameter_mm",             awg_diameter_mm(20),                0.8118209703737738, 1e-9),
+  ("awg_40_diameter_mm",             awg_diameter_mm(40),                0.0798710851323451, 1e-9),
+  ("awg_20_area_mm2",                awg_area_mm2(20),                   0.5176192419280384, 1e-9),
 ]
 
 def main():
