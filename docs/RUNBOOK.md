@@ -5,7 +5,7 @@
 2. Settings -> Pages -> Build and deployment -> **Source: GitHub Actions** (not "Deploy from a branch").
 3. Settings -> Environments -> `github-pages`: leave the default (deploys from `main` only is recommended).
 4. Merge to `main`; the workflow `.github/workflows/deploy.yml` deploys. The URL is shown on the deploy job.
-5. Optional custom domain: add a `CNAME` file in `public/`.
+5. Optional custom domain: set it in Settings → Pages. A `CNAME` file in `public/` is ignored when Pages is deployed from an Actions workflow.
 
 ## Pipeline (`.github/workflows/deploy.yml`)
 - Pull requests and pushes run the `verify` job only (no deploy permissions). The `deploy` job runs only on `main`, after `verify` passes.

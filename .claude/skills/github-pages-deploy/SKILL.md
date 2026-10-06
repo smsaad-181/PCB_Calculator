@@ -11,4 +11,4 @@ description: Vite + GitHub Actions deployment to GitHub Pages, base path, hash r
 - Service worker: versioned precache keyed on build hash; "update available" prompt; must never trap users on a stale build. If in doubt, omit.
 - Budgets: gzip JS < 150 KB total; per-calculator dynamic imports.
 - Rollback: revert the bad commit on `main`; pipeline redeploys. Document in `docs/RUNBOOK.md`.
-- Custom domain: needs CNAME file in `public/`.
+- Custom domain: set in repo Settings → Pages (a CNAME file is ignored for Actions-based deployments).
