@@ -1,6 +1,9 @@
 // Pure URL-hash parse/serialize. Shape: #/calc/<id>?v=1&key=value&...
 // Malformed input never throws; it degrades to home route + empty (default) state.
 export const HASH_SCHEMA_VERSION = 1;
+/** DoS guards: hashes longer than this, or with more query keys, discard state (checked before decoding). */
+export const MAX_HASH_LENGTH = 8192;
+export const MAX_STATE_KEYS = 64;
 
 export type Route =
   | { readonly name: 'home' }
@@ -45,6 +48,12 @@ export function parseHash(hash: string): ParsedHash {
   const query = q >= 0 ? raw.slice(q + 1) : '';
   const route = parseRoute(path);
   if (query === '') return { route, state: {}, stateDiscarded: false };
+  if (raw.length > MAX_HASH_LENGTH) return { route, state: {}, stateDiscarded: true };
+  // Count '&' separators with early abort, before any decoding.
+  let keyCount = 1;
+  for (let i = query.indexOf('&'); i >= 0; i = query.indexOf('&', i + 1)) {
+    if (++keyCount > MAX_STATE_KEYS) return { route, state: {}, stateDiscarded: true };
+  }
 
   const state: Record<string, string> = Object.create(null) as Record<string, string>;
   let version: string | null = null;
