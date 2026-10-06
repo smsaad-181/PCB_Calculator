@@ -9,3 +9,16 @@
 | R-5 | Fabricator stackup, trace/space, drill, plating | Human | Fill fab profile JSON | OPEN |
 | R-6 | Phase 4 thermal scope (prompt truncated at section 15) | Human | Confirm scope | OPEN |
 | R-7 | MCP servers and action versions currency | devops-engineer | Verify at build time | OPEN |
+
+## Phase 0 carry-forward (logged 2026-10-06)
+
+| # | Risk | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| R-8 | IPC-2152 policy wording: the standard is charts-only, but third-party closed-form fits exist (Brooks & Adam 2015, S-011a; KiCad dev branch uses one). CLAUDE.md forbids digitizing IPC charts; whether Mode A may use a cited published third-party fit is a policy/licensing call. `ipc2152-policy` skill still says "no closed form exists" and must be reworded. | Human | Decide whether Mode A may use a cited published fit; then update skill + CLAUDE.md rule 3 | OPEN |
+| R-9 | Foil thickness convention is a CONFLICT (S-003): 35 µm vs 34.8 µm vs 34.29 µm (1.35 mil). Moves widths by up to ~2.07 %. Mode A fits (S-011a) use Brooks & Adam's own table (0.5 oz = 0.65 mil, 3 oz = 3.9 mil), not oz × 1.35. | Human + researcher | Pick the default convention; verify against IPC-4562A table | OPEN |
+| R-10 | Copper thermal conductivity (S-007, CONFLICT): oracle uses 385 W/m·K, which no source supports (pure Cu 401; C11000 391-394). Plated via-barrel copper not researched. | Researcher + human | Choose material class for via θ; fix oracle constant and golden vector | OPEN, must close before Phase 1 via calculator |
+| R-11 | Resistivity constant: exact IACS value is 1/58 µΩ·m (1.724137…e-8); 1.7241e-8 is a rounding (S-004). Oracle and any TS constant should use 1/58e6 or label the rounding. | calc-implementer | Use exact value in Phase 1; regenerate golden vectors | OPEN, must close before Phase 1 |
+| R-12 | S-050 only re-checked the k/ΔT/oz constants at pinned twc commit 308002f; Methods A-C constants not re-checked. | Researcher | Re-read before any tests/crosscheck record | OPEN |
+| R-13 | Calculators must reject zero explicitly: parseQuantity accepts "1e-400 mm" and "-0 mm" as 0 (perf m-4). Callers use guardPositiveFinite. | calc-implementer | Test in each Phase 1 calculator | OPEN |
+| R-14 | Phase 1 self-heating caller must pass maxIter ≤ 50 and check `converged`/`fx` (a sign discontinuity returns ok with converged 'bracket'). Units table has no K/W or Ω·m entries (format falls back to SI exponents). | calc-implementer / units-engine-engineer | Add units + caller tests in Phase 1 | OPEN |
+| R-15 | Not observed in a browser/live: error boundary rendering, offline load, Lighthouse, live Pages URL. Action versions unverified and not SHA-pinned (R-7). `.nvmrc` is 22, local Node is 24: CI run not yet observed. | Human / devops | Open the PR; confirm Actions green and Pages loads | OPEN |
