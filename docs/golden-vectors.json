@@ -80,6 +80,62 @@
       "rel_tol": 1e-09,
       "ledger": "see LEDGER",
       "status": "UNVERIFIED"
+    },
+    {
+      "name": "units_oz_ft2_to_kg_m2",
+      "oracle_value": 0.30515172727394063,
+      "expected_approx": 0.30515172727394063,
+      "rel_tol": 1e-12,
+      "ledger": "S-006",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "awg_36_diameter_mm",
+      "oracle_value": 0.127,
+      "expected_approx": 0.127,
+      "rel_tol": 1e-12,
+      "ledger": "S-005",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "awg_0000_diameter_mm",
+      "oracle_value": 11.684,
+      "expected_approx": 11.684,
+      "rel_tol": 1e-09,
+      "ledger": "S-005",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "awg_10_diameter_mm",
+      "oracle_value": 2.5881867280128636,
+      "expected_approx": 2.5881867280128636,
+      "rel_tol": 1e-09,
+      "ledger": "S-005",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "awg_20_diameter_mm",
+      "oracle_value": 0.8118209703737738,
+      "expected_approx": 0.8118209703737738,
+      "rel_tol": 1e-09,
+      "ledger": "S-005",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "awg_40_diameter_mm",
+      "oracle_value": 0.0798710851323451,
+      "expected_approx": 0.0798710851323451,
+      "rel_tol": 1e-09,
+      "ledger": "S-005",
+      "status": "UNVERIFIED"
+    },
+    {
+      "name": "awg_20_area_mm2",
+      "oracle_value": 0.5176192419280384,
+      "expected_approx": 0.5176192419280384,
+      "rel_tol": 1e-09,
+      "ledger": "S-005",
+      "status": "UNVERIFIED"
     }
   ]
 }
