@@ -5,7 +5,7 @@ export type LedgerStatus = 'VERIFIED' | 'UNVERIFIED' | 'PAYWALLED-USER-MUST-VERI
 export interface LedgerRow {
   readonly id: string;
   readonly item: string;
-  /** Edition is not yet recorded in the ledger for any row. */
+  /** Edition or source date as recorded in the ledger; "not confirmed" where no source was read. */
   readonly edition: string;
   readonly status: LedgerStatus;
 }
@@ -13,20 +13,26 @@ export interface LedgerRow {
 const E = 'edition not yet confirmed';
 
 export const LEDGER: readonly LedgerRow[] = [
-  { id: 'S-001', item: 'IPC-2221 trace current formula', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-002', item: 'IPC-2152 nature (chart/data based vs closed form)', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-003', item: 'Copper foil weight to thickness', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-004', item: 'Copper resistivity and temperature coefficient', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-005', item: 'AWG diameter', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-006', item: 'Exact unit conversions', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-010', item: 'IPC-2221 validity ranges', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-011', item: 'IPC-2152 third-party fits', edition: E, status: 'UNVERIFIED' },
+  { id: 'S-001', item: 'IPC-2221 trace current formula (legacy)', edition: 'IPC-2221B (2012) / IPC-2221C (2023-12), not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-002', item: 'IPC-2152 nature (charts vs closed form)', edition: 'IPC-2152 (2009), not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-003', item: 'Copper foil weight to thickness', edition: 'IPC-4562A (secondhand); fab sources', status: 'CONFLICT' },
+  { id: 'S-003d', item: 'Copper density, IACS reference value', edition: 'NBS Circular 31 (1914); NBS Handbook 100 (1966)', status: 'VERIFIED' },
+  { id: 'S-003e', item: 'Copper density, pure copper', edition: 'RSC; LANL periodic tables', status: 'CONFLICT' },
+  { id: 'S-004', item: 'Copper resistivity and temperature coefficient (IACS)', edition: 'NBS Circular 31 (1914); NBS Handbook 100 (1966)', status: 'VERIFIED' },
+  { id: 'S-005', item: 'AWG diameter', edition: 'NBS Circular 31 (1914); NBS Handbook 100 (1966); ASTM B258-18 not read', status: 'VERIFIED' },
+  { id: 'S-006', item: 'Exact unit conversions', edition: 'NIST SP 811 (2008) App. B.8', status: 'VERIFIED' },
+  { id: 'S-010', item: 'IPC-2221 chart validity range', edition: 'IPC-2221B/C Figure 6-4, not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-011a', item: 'IPC-2152 fit: Brooks & Adam, external traces', edition: 'PCD&F 2015-05-29', status: 'UNVERIFIED' },
+  { id: 'S-011b', item: 'IPC-2152 fit: Brooks & Adam, internal traces', edition: 'PCD&F 2015 Appendix 1, not read', status: 'UNVERIFIED' },
+  { id: 'S-011c', item: 'IPC-2152 fit: SMPS.us (Jack Olson coefficients)', edition: 'smps.us, retrieved 2026-10-06', status: 'CONFLICT' },
+  { id: 'S-011d', item: 'IPC-2152 fit: NinjaCalc', edition: E, status: 'UNVERIFIED' },
+  { id: 'S-011e', item: 'IPC-2152 fit: Sierra Circuits (undisclosed)', edition: E, status: 'UNVERIFIED' },
   { id: 'S-012', item: 'Plated copper resistivity', edition: E, status: 'UNVERIFIED' },
   { id: 'S-013', item: 'Skin depth', edition: E, status: 'UNVERIFIED' },
   { id: 'S-016', item: 'E-series preferred values (IEC 60063)', edition: E, status: 'UNVERIFIED' },
   { id: 'S-020…S-028', item: 'Impedance models and presets', edition: E, status: 'UNVERIFIED' },
   { id: 'S-030…S-034', item: 'IEC 60664 / IPC spacing', edition: E, status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-040…S-044', item: 'Thermal, fusing and RF references', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-050', item: 'twc IPC-2152 methods (cross-check tool)', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-051', item: 'Cross-check tool licenses', edition: E, status: 'UNVERIFIED' },
+  { id: 'S-050', item: 'twc IPC-2152 methods (cross-check tool; describes the tool only)', edition: 'ymic9963/twc main, commit not recorded', status: 'VERIFIED' },
+  { id: 'S-051', item: 'Cross-check tool licenses', edition: 'each repository license file, 2026-10-06', status: 'VERIFIED' },
 ];

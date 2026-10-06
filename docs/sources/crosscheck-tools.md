@@ -7,11 +7,13 @@ Cross-check tools are **other people's calculators** used to catch implementatio
 2. **Use values, not code.** GPL tools (KiCad, Qucs-S, twc, rf-tool) are read for formulas and run for outputs. Their source is never copied, translated, or pasted into `src/`. We record the numbers they produced. (Not legal advice. If in doubt, ask a lawyer.)
 
 ## Approved reference tools (all unverified by us until the ledger says otherwise)
-| ID | Tool | License (as reported, verify) | Use |
+Licenses for X-01 to X-05 checked against each repo's license file on 2026-10-06 (ledger S-051, `notes/crosscheck-licenses.md`).
+
+| ID | Tool | License (S-051) | Use |
 |---|---|---|---|
-| X-01 | KiCad `pcb_calculator` (GUI or source `pcb_calculator/`) | GPL-3.0 | Trace width (IPC-2221), impedance, vias. Human runs GUI and records outputs; agents may read the formulas. |
+| X-01 | KiCad `pcb_calculator` (GUI or source `pcb_calculator/`) | GPL-3.0-or-later | Trace width, impedance, vias. Human runs GUI and records outputs; agents may read the formulas. **Version matters:** 9.0 stable uses IPC-2221; the master branch uses the Brooks & Adam IPC-2152 fit (ledger S-011a/b). Record the KiCad version. |
 | X-02 | Qucs-S transcalc | GPL-2.0 | Microstrip/stripline/CPW impedance |
-| X-03 | `ymic9963/twc` | GPL-3.0 | IPC-2221 and its IPC-2152 methods. **Also a research lead for ledger S-002/S-011: find out what its IPC-2152 methods really are** (curve fit? table? which source?) and whether our claim "IPC-2152 has no closed form" is true. |
+| X-03 | `ymic9963/twc` | GPL-3.0 | IPC-2221 and its IPC-2152 methods. Research done (ledger S-050): its three IPC-2152 methods are curve fits copied from NinjaCalc (A), SMPS.us (B) and Sierra Circuits (C), not equations from the standard. |
 | X-04 | `ErikBuer/rf-tool` | GPL-3.0 | Hammerstad-Jensen incl. frequency effects |
 | X-05 | `osaether/weeks` | MIT | Partial inductance (Weeks 1979) |
 | X-06 | `rftools-mcp` (optional, see `docs/optional/rftools-mcp.md`) | MIT (verify) | Second opinion on RF/impedance/Ohm results. New, few users. |

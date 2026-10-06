@@ -6,12 +6,22 @@ const md = Object.values(files)[0] as string | undefined;
 
 function parseRows(text: string): Map<string, string> {
   const rows = new Map<string, string>();
+  // Index of the "Status" column in the current table; tables differ in width.
+  let statusCol = -1;
   for (const line of text.split(/\r?\n/)) {
-    if (!/^\|\s*S-\d/.test(line)) continue;
+    if (!line.startsWith('|')) {
+      statusCol = -1;
+      continue;
+    }
     const cells = line.split('|').map((c) => c.trim());
-    // ['', id, item, value, where, status, '']
+    // ['', id, ..., status, ..., '']
+    if (!/^S-\d/.test(cells[1] ?? '')) {
+      const h = cells.indexOf('Status');
+      if (h >= 0) statusCol = h;
+      continue;
+    }
     const id = cells[1];
-    const status = cells[cells.length - 2];
+    const status = cells[statusCol >= 0 ? statusCol : cells.length - 2];
     if (id && status) rows.set(id, status);
   }
   return rows;

@@ -109,26 +109,39 @@ export function auditDataTables(root, dirs = DATA_DIRS) {
   return { count: seen.size, errors };
 }
 
-const idNum = (id) => Number(id.slice(2));
+/** Ledger IDs: S-001, or sub-rows like S-011a. */
+const LEDGER_ID_RE = /S-\d{3}[a-z]?/g;
+const idNum = (id) => Number(id.slice(2, 5));
 
-/** Parse the ledger markdown table. Ranges like "S-020…S-028" cover every ID in between. */
+/**
+ * Parse the ledger markdown tables. Ranges like "S-020…S-028" cover every ID in between.
+ * The status cell is located by the "Status" header of the current table (falls back to the last column).
+ */
 export function parseLedger(text) {
   const ids = new Set();
   const ranges = [];
   const errors = [];
   let rows = 0;
+  let statusCol = -1;
   text.split(/\r?\n/).forEach((line, i) => {
-    if (!line.trim().startsWith('|')) return;
+    if (!line.trim().startsWith('|')) {
+      statusCol = -1;
+      return;
+    }
     const cells = line
       .trim()
       .replace(/^\||\|$/g, '')
       .split('|')
       .map((c) => c.trim());
     const idCell = cells[0] ?? '';
-    const found = idCell.match(/S-\d{3}/g);
-    if (!found) return; // header / separator
+    const found = idCell.match(LEDGER_ID_RE);
+    if (!found) {
+      const h = cells.indexOf('Status');
+      if (h >= 0) statusCol = h;
+      return; // header / separator
+    }
     rows++;
-    const status = cells[cells.length - 1] ?? '';
+    const status = cells[statusCol >= 0 ? statusCol : cells.length - 1] ?? '';
     if (!LEDGER_STATUS.includes(status))
       errors.push(`LEDGER.md line ${i + 1} (${idCell}): status "${status}" not in ${LEDGER_STATUS.join('|')}`);
     if (found.length >= 2) ranges.push([idNum(found[0] ?? 'S-000'), idNum(found[found.length - 1] ?? 'S-000')]);
@@ -140,11 +153,13 @@ export function parseLedger(text) {
 
 export function ledgerCovers(ledger, id) {
   if (ledger.ids.has(id)) return true;
+  // A parent ID (S-011) is covered by its sub-rows (S-011a, S-011b, ...).
+  for (const known of ledger.ids) if (known.startsWith(id) && known.length === id.length + 1) return true;
   const n = idNum(id);
   return ledger.ranges.some(([a, b]) => n >= a && n <= b);
 }
 
-/** Every /S-\d{3}/ referenced in src/** must exist in the ledger. */
+/** Every ledger ID (S-001, S-011a) referenced in src/** must exist in the ledger. */
 export function auditLedgerRefs(root, ledger, srcDir = 'src') {
   const errors = [];
   for (const file of walk(join(root, srcDir))) {
@@ -153,7 +168,7 @@ export function auditLedgerRefs(root, ledger, srcDir = 'src') {
     readFileSync(file, 'utf8')
       .split(/\r?\n/)
       .forEach((text, i) => {
-        for (const m of text.matchAll(/S-\d{3}/g))
+        for (const m of text.matchAll(LEDGER_ID_RE))
           if (!ledgerCovers(ledger, m[0]))
             errors.push(`${rel}:${i + 1}: ledger ID ${m[0]} not found in docs/sources/LEDGER.md`);
       });
