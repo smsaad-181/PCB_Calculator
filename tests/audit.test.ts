@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  FORBIDDEN_PHRASES,
+  detectForbidden,
   auditDataTables,
   fixtureRoot,
   ledgerCovers,
@@ -11,7 +11,7 @@ import {
 } from '../tools/audit-lib.mjs';
 
 const fx = (name: string): string => fixtureRoot(import.meta.url, name);
-const matches = (s: string): boolean => new RegExp(FORBIDDEN_PHRASES.source, 'i').test(s);
+const matches = (s: string): boolean => detectForbidden(s).length > 0;
 
 describe('compliance phrase grep', () => {
   it('detects a forbidden phrase outside the gate', () => {
@@ -74,13 +74,60 @@ describe('compliance phrase grep', () => {
     'not compliant',
     'non-compliant',
     'IPC-2221 non-compliant',
-    'compliant with nothing',
     'safe for production use? unknown',
     'fabrication ready? ask your fab',
     'the meeting minutes',
     'conformal coating',
+    'Not assessed for compliance',
+    'non-compliant',
+    'not compliant with anything',
+    'compliance is not assessed',
+    'This tool does not certify designs',
+    'IPC-2221 legacy formula (not a compliance claim)',
+    'IPC-2221 does not comply with itself',
+    'never guaranteed',
+    'IPC-2221 does not meet nothing',
+    'no fab-ready claim',
   ])('does not match "%s"', (s) => {
     expect(matches(s)).toBe(false);
+  });
+  // m-C: rule-based detector (R1 claim words, R2 readiness words, R3 IPC/IEC + verb, R4 templates).
+  it.each([
+    'IPC-2221 Class 2 compliant',
+    'IEC60664 compliant',
+    'in compliance with IPC-2221',
+    'production-ready',
+    'production ready',
+    'manufacturing-ready',
+    'safe to manufacture',
+    'guaranteed',
+    '${name} compliant',
+    '`${name}-compliant`',
+    'Fully compliant',
+    'Complies with the standard',
+    'You must comply with the standard',
+    'conformant',
+    'approved by the fab',
+    'certified',
+    'This board meets IEC limits',
+    'Meet IPC requirements',
+    'IEC 60664 satisfies the check',
+    'IPC-2221 passes',
+    'IPC class 2 qualified',
+    'IPC approved',
+    'compliant with nothing',
+    'not compliant but also compliant',
+    'does not certify compliance but is certified',
+    'IPC-2221 is not wrong and meets the spec',
+  ])('R-new matches "%s"', (s) => {
+    expect(matches(s)).toBe(true);
+  });
+  it('reports only the un-negated phrase when a line mixes both', () => {
+    expect(detectForbidden('not compliant but also compliant')).toEqual(['compliant']);
+  });
+  it('R3 needs an IPC/IEC token', () => {
+    expect(matches('the board meets expectations')).toBe(false);
+    expect(matches('the board meets IPC expectations')).toBe(true);
   });
   it('the repository itself (src, index.html, public) has no hits with the widened detector', () => {
     // tests/fixtures/audit/../../.. is the repository root; fixtureRoot normalises the path.

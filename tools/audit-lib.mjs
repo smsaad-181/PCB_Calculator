@@ -4,25 +4,38 @@ import { readdirSync, readFileSync, statSync, existsSync } from 'node:fs';
 import { join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-// CLAUDE.md rule 2: only the gate (and its test, which asserts on the label text) may contain these.
-// Matches "IPC compliant", "IPC-compliant", "IPC-2221 compliant", "IEC 60664-1 compliant",
-// "IPC-2152-compliant", "IPC-2221B compliant", "production safe"/"production-safe".
-// Does not match "not compliant", "non-compliant" or "Not assessed for compliance".
-// Also matches wording variants ("compliant with IPC-2221", "complies with IEC ...", "conforms to ...",
-// "meets IPC-...", "IPC certified", "certified to IEC ..."), "fab-ready"/"fab ready", and template-built
-// strings such as `${std} compliant` / `${standard}-compliant`.
-export const FORBIDDEN_PHRASES = new RegExp(
-  [
-    String.raw`\b(?:IPC|IEC)\b[-\s]*(?:[0-9][0-9A-Za-z.-]*[-\s]*)*compliant\b`,
-    String.raw`\bproduction[-\s]safe\b`,
-    String.raw`\b(?:compliant\s+with|complies\s+with|conforms?\s+to|meets)\s+(?:IPC|IEC)\b`,
-    String.raw`\b(?:IPC|IEC)[-\s]+certified\b`,
-    String.raw`\bcertified\s+to\s+(?:IPC|IEC)\b`,
-    String.raw`\bfab[-\s]ready\b`,
-    String.raw`\$\{[^}]*(?:std|standard|ipc|iec)[^}]*\}[-\s]*compliant\b`,
-  ].join('|'),
-  'gi',
-);
+// CLAUDE.md rule 2: only the gate (and its test, which asserts on the label text) may contain
+// compliance/safety claims. Detection is rule-based, per line, case-insensitive (see detectForbidden):
+//  R1 claim words (compliant, complies, comply with, conforms to, conformant, in compliance with,
+//     certified, approved by) are forbidden unless directly negated.
+//  R2 readiness words (production-ready/-safe, fab-ready, manufacturing-ready, safe to manufacture,
+//     guaranteed) are forbidden unless directly negated.
+//  R3 a line with an IPC/IEC token plus meets/meet/satisfies/satisfy/passes/approved/certified/qualified
+//     is forbidden unless that verb is directly negated.
+//  R4 template literals (`${x} compliant`) are covered by R1 because the word itself is present.
+// "Directly negated" = the match is immediately preceded by non- / not / cannot / never / no
+// (so "does not ", "do not " are covered by "not "). "compliance" alone is not flagged.
+// Policy: when in doubt prefer a false positive and reword the source; never widen the allow-list.
+const R1 = String.raw`\b(?:compliant|complies|comply\s+with|complying\s+with|complied\s+with|conforms?\s+to|conformant|in\s+compliance\s+with|certified|approved\s+by)\b`;
+const R2 = String.raw`\b(?:production[-\s]*(?:ready|safe)|fab[-\s]*ready|manufacturing[-\s]*ready|safe\s+to\s+manufacture|guaranteed)\b`;
+const R3_VERB = String.raw`\b(?:meets?|satisf(?:y|ies)|passes|approved|certified|qualified)\b`;
+const R3_TOKEN = /\b(?:IPC|IEC)\b/i;
+const NEGATION = /(?:\bnon-|\bnot\s+|\bcannot\s+|\bnever\s+|\bno\s+)$/i;
+
+/** @returns {string[]} the un-negated forbidden phrases found on one line of text */
+export function detectForbidden(text) {
+  const found = [];
+  const scan = (re) => {
+    for (const m of text.matchAll(new RegExp(re, 'gi'))) {
+      if (NEGATION.test(text.slice(0, m.index))) continue;
+      found.push(m[0]);
+    }
+  };
+  scan(R1);
+  scan(R2);
+  if (R3_TOKEN.test(text)) scan(R3_VERB);
+  return found;
+}
 export const ALLOWED_PHRASE_FILES = ['src/core/gate.ts', 'src/core/gate.test.ts'];
 export const SCAN_ROOTS = ['src', 'index.html', 'public'];
 export const EXCLUDED_DIRS = new Set(['node_modules', 'dist', 'coverage', 'docs', '.claude', '.git', 'fixtures']);
@@ -62,7 +75,7 @@ export function scanForbiddenPhrases(root, opts = {}) {
       readFileSync(file, 'utf8')
         .split(/\r?\n/)
         .forEach((text, i) => {
-          for (const m of text.matchAll(FORBIDDEN_PHRASES)) hits.push({ file: rel, line: i + 1, phrase: m[0] });
+          for (const phrase of detectForbidden(text)) hits.push({ file: rel, line: i + 1, phrase });
         });
     }
   }

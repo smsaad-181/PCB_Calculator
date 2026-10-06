@@ -14,7 +14,9 @@ Generate docs/golden-vectors.json:  python3 tools/reference/gen_golden.py   (CI:
 import json, math, sys
 
 # ---- constants (verify in docs/sources/LEDGER.md) ----
-RHO_CU_20C = 1.7241e-8       # ohm*m, 100 % IACS copper @20C (S-004, VERIFIED; = 1/58 uohm*m)
+RHO_CU_20C = 1.7241e-8       # ohm*m, 100 % IACS copper @20C (S-004, VERIFIED)
+# NOTE: 1.7241e-8 is the 5-significant-figure rounding of the exact IACS value 1/58e6 ohm*m (S-004).
+# Phase 1 should use the exact value (OPEN_RISKS R-11).
 ALPHA_CU = 0.00393           # 1/K at 20C, 100 % IACS copper (S-004, VERIFIED)
 # Foil thickness: CHOSEN CONVENTION, not a standard. 1 oz/ft2 = 35 um nominal (S-003, status CONFLICT).
 # Alternatives in S-003: 1.35 mil (34.29 um, reported IPC-4562A, secondhand); mass/8890 kg/m3 (34.33 um, S-003d).
@@ -24,7 +26,8 @@ K_EXT, K_INT = 0.048, 0.024  # IPC-2221 legacy coefficients (verify!)
 B_DT, C_AREA = 0.44, 0.725   # IPC-2221 exponents (verify!)
 MU0 = 4e-7 * math.pi
 K_CU_THERMAL = 385.0         # W/m.K (assumption, editable)
-# TODO(standards-researcher): K_CU_THERMAL is UNLEDGERED (no row in docs/sources/LEDGER.md). Add one.
+# K_CU_THERMAL: ledger S-007 (CONFLICT). 385 W/m.K has no source; pure Cu 401, C11000 391-394
+# (OPEN_RISKS R-10).
 
 # ---- units (S-003, S-005, S-006) ----
 OZ_KG = 0.028349523125       # avoirdupois ounce, exact by definition (S-006)
@@ -88,8 +91,8 @@ GOLDEN = [
   ("trace_R_same_30C_ohm",           trace_R(0.1, 0.3e-3, 35e-6, 30),    0.17065306000000002, 1e-9, ("S-004", "S-003"), "convention: 35 um/oz"),
   ("via_area_mm2_0.3fin_25um",       via_area_m2(0.3e-3, 25e-6) * 1e6,   0.025525440310417067, 1e-9, (), "pure geometry, no constants"),
   ("via_R_mohm_1.6mm",               via_R(0.3e-3, 25e-6, 1.6e-3) * 1e3, 1.0807100549306556,  1e-9, ("S-004",), ""),
-  # TODO(standards-researcher): k_Cu = 385 W/m.K (K_CU_THERMAL) is UNLEDGERED -- it has no row in
-  # docs/sources/LEDGER.md. Add a row (source, edition, status); until then this vector is flagged UNLEDGERED.
+  # k_Cu = 385 W/m.K (K_CU_THERMAL): ledger S-007 (CONFLICT; 385 has no source, pure Cu 401, C11000 391-394;
+  # OPEN_RISKS R-10). The vector's note/ids below are data, left unchanged so the generated JSON is unchanged.
   ("via_theta_KperW_1.6mm",          via_theta(0.3e-3, 25e-6, 1.6e-3),   162.81184987622464, 1e-9, (), "UNLEDGERED: k_Cu = 385 W/m.K has no ledger row"),
   ("skin_depth_um_10MHz",            skin_depth_m(10e6) * 1e6,           20.89783796937823,  1e-9, ("S-004", "S-013"), "mu_r = 1, mu0 = 4e-7*pi"),
   ("annular_ring_mm_0.6pad_0.3hole", annular_ring(0.6, 0.3),             0.15,               1e-9, (), "pure geometry, no constants"),

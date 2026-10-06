@@ -8,8 +8,8 @@ import type { SolveOutcome } from './rootfind';
  * OR bracket width <= xtol_eff, with xtol_eff = xtol * (1 + |x|)  (absolute+relative combo).
  * Property/golden tests that need the root pinned to 1e-9 pass { ftol: 0 } so the
  * residual criterion cannot stop early on a flat function. Tests for bracket width
- * allow a factor-of-10 slack on xtol_eff because Brent's final bracket is only
- * guaranteed to be of that order, not exactly <= xtol_eff.
+ * allow a factor-of-10 slack on xtol_eff because Brent's final bracket is
+ * only of that order, not exactly <= xtol_eff.
  *
  * All numbers below are test numbers only; none are physical claims.
  */

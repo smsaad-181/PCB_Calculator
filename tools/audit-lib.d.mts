@@ -9,7 +9,7 @@ export interface Ledger {
   rows: number;
   errors: string[];
 }
-export const FORBIDDEN_PHRASES: RegExp;
+export function detectForbidden(text: string): string[];
 export const ALLOWED_PHRASE_FILES: string[];
 export const SCAN_ROOTS: string[];
 export const EXCLUDED_DIRS: Set<string>;
