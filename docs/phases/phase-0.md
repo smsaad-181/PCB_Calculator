@@ -15,9 +15,9 @@ S-001 IPC-2221 coefficients/validity · S-002 IPC-2152 nature (chart vs equation
 9. Ledger rows S-001…S-006 researched and statuses recorded. Also research S-002/S-011 using the `twc` lead (see `standards-researcher`).
 10. Build `tests/crosscheck.test.ts` runner for `tests/crosscheck/*.json` (skips `_*` files and null outputs; reports counts).
 
-## Exit criteria
-- [ ] All gates green locally and in Actions; live Pages URL loads
-- [ ] Units: ≥ 95 % branch coverage, property tests pass, ΔT/T distinction proven by tests
-- [ ] Oracle self-check passes in CI
-- [ ] Ledger S-001..S-006 have a status; any non-VERIFIED shown as UNVERIFIED in the app
-- [ ] `calc-validator`, `phase-validator`, `pcb-domain-reviewer` reports PASS/PASS-WITH-CONDITIONS
+## Exit criteria (status 2026-10-06)
+- [ ] All gates green locally and in Actions; live Pages URL loads — green locally (662 tests; typecheck, lint, coverage, build, size, audit, oracle, golden check); **Actions run and live Pages URL not yet observed** (human step, OPEN_RISKS R-18)
+- [x] Units: ≥ 95 % branch coverage (99.56 %), property tests pass, ΔT/T distinction proven by tests
+- [ ] Oracle self-check passes in CI — passes locally and is wired into the workflow; CI run not yet observed (R-18)
+- [x] Ledger S-001..S-006 have a status; any non-VERIFIED shown as UNVERIFIED/CONFLICT/PAYWALLED in the app
+- [x] `calc-validator`, `phase-validator`, `pcb-domain-reviewer` reports PASS-WITH-CONDITIONS (conditions logged in OPEN_RISKS: C-1..C-5, R-8..R-20, P-1..P-7; domain-review MAJORs deferred to Phase 1 task 0 pending human confirmation)
