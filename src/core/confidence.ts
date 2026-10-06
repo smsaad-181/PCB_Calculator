@@ -1,5 +1,5 @@
 export type AccuracyClass = 'exact' | 'analytical' | 'empirical' | 'estimate';
-export type DataStatus = 'VERIFIED' | 'UNVERIFIED' | 'PAYWALLED';
+export type DataStatus = 'VERIFIED' | 'UNVERIFIED' | 'PAYWALLED' | 'CONFLICT';
 export type ConfidenceLevel = 'high' | 'medium' | 'low';
 
 export interface ConfidenceFactors {
@@ -28,6 +28,7 @@ export const WEIGHT_DATA_STATUS: Readonly<Record<DataStatus, number>> = {
   VERIFIED: 0,
   UNVERIFIED: 1,
   PAYWALLED: 2,
+  CONFLICT: 2,
 };
 /** score 0 -> high; 1..MEDIUM_MAX_SCORE -> medium; above -> low. */
 export const MEDIUM_MAX_SCORE = 2;
@@ -35,7 +36,7 @@ export const MEDIUM_MAX_SCORE = 2;
 export const CONFIDENCE_RULE_TEXT =
   'Confidence score = 2 x (inputs outside validity range) + min(defaulted assumptions, 2) ' +
   '+ accuracy class (exact 0, analytical 0, empirical 1, estimate 2) ' +
-  '+ data status (VERIFIED 0, UNVERIFIED 1, PAYWALLED 2). ' +
+  '+ data status (VERIFIED 0, UNVERIFIED 1, PAYWALLED 2, CONFLICT 2). ' +
   'Score 0 = high; 1-2 = medium; 3 or more = low.';
 
 export function confidenceScore(f: ConfidenceFactors): number {
@@ -64,6 +65,8 @@ export function rateConfidence(f: ConfidenceFactors): Confidence {
     reasons.push('Underlying data is UNVERIFIED in the source ledger.');
   } else if (f.dataStatus === 'PAYWALLED') {
     reasons.push('Underlying data is PAYWALLED and must be verified by the user.');
+  } else if (f.dataStatus === 'CONFLICT') {
+    reasons.push('Underlying data is in CONFLICT between sources in the ledger; the value is unresolved.');
   }
   const s = confidenceScore(f);
   const level: ConfidenceLevel = s === 0 ? 'high' : s <= MEDIUM_MAX_SCORE ? 'medium' : 'low';

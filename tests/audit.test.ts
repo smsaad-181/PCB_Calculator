@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
   FORBIDDEN_PHRASES,
@@ -40,14 +41,51 @@ describe('compliance phrase grep', () => {
   ])('matches variant "%s"', (s) => {
     expect(matches(s)).toBe(true);
   });
+  // m-4: wording variants and template-built strings (the template literals are written as plain
+  // strings here; the detector sees the source text of other files, where they appear verbatim).
+  it.each([
+    'compliant with IPC-2221',
+    'Compliant with IPC-2221B',
+    'complies with IEC 60664-1',
+    'Complies with IPC-2152',
+    'conforms to IPC-2221',
+    'conforms to IEC 60664-1',
+    'meets IPC-2152',
+    'Meets IPC-2221 requirements',
+    'IPC certified',
+    'IPC-certified',
+    'certified to IEC 60664-1',
+    'Certified to IPC-6012',
+    'fab-ready',
+    'Fab ready',
+    'fab ready output',
+    'label = `${std} compliant`',
+    'return `${standard} compliant (per data)`',
+    'const s = `${std}-compliant`',
+    '`${standard} Compliant`',
+  ])('matches wording variant "%s"', (s) => {
+    expect(matches(s)).toBe(true);
+  });
   it.each([
     'Not assessed for compliance',
+    'Not assessed for compliance — mandatory inputs not provided: width',
+    'does not certify compliance',
+    'This tool does not certify compliance with any standard.',
+    'Estimates only. Not a compliance certification. Verify IPC/IEC values against the licensed standard.',
     'not compliant',
+    'non-compliant',
     'IPC-2221 non-compliant',
     'compliant with nothing',
     'safe for production use? unknown',
+    'fabrication ready? ask your fab',
+    'the meeting minutes',
+    'conformal coating',
   ])('does not match "%s"', (s) => {
     expect(matches(s)).toBe(false);
+  });
+  it('the repository itself (src, index.html, public) has no hits with the widened detector', () => {
+    const root = fileURLToPath(new URL('..', import.meta.url));
+    expect(scanForbiddenPhrases(root)).toEqual([]);
   });
 });
 

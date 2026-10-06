@@ -8,8 +8,21 @@ import { fileURLToPath } from 'node:url';
 // Matches "IPC compliant", "IPC-compliant", "IPC-2221 compliant", "IEC 60664-1 compliant",
 // "IPC-2152-compliant", "IPC-2221B compliant", "production safe"/"production-safe".
 // Does not match "not compliant", "non-compliant" or "Not assessed for compliance".
-export const FORBIDDEN_PHRASES =
-  /\b(?:IPC|IEC)\b[-\s]*(?:[0-9][0-9A-Za-z.-]*[-\s]*)*compliant\b|\bproduction[-\s]safe\b/gi;
+// Also matches wording variants ("compliant with IPC-2221", "complies with IEC ...", "conforms to ...",
+// "meets IPC-...", "IPC certified", "certified to IEC ..."), "fab-ready"/"fab ready", and template-built
+// strings such as `${std} compliant` / `${standard}-compliant`.
+export const FORBIDDEN_PHRASES = new RegExp(
+  [
+    String.raw`\b(?:IPC|IEC)\b[-\s]*(?:[0-9][0-9A-Za-z.-]*[-\s]*)*compliant\b`,
+    String.raw`\bproduction[-\s]safe\b`,
+    String.raw`\b(?:compliant\s+with|complies\s+with|conforms?\s+to|meets)\s+(?:IPC|IEC)\b`,
+    String.raw`\b(?:IPC|IEC)[-\s]+certified\b`,
+    String.raw`\bcertified\s+to\s+(?:IPC|IEC)\b`,
+    String.raw`\bfab[-\s]ready\b`,
+    String.raw`\$\{[^}]*(?:std|standard|ipc|iec)[^}]*\}[-\s]*compliant\b`,
+  ].join('|'),
+  'gi',
+);
 export const ALLOWED_PHRASE_FILES = ['src/core/gate.ts', 'src/core/gate.test.ts'];
 export const SCAN_ROOTS = ['src', 'index.html', 'public'];
 export const EXCLUDED_DIRS = new Set(['node_modules', 'dist', 'coverage', 'docs', '.claude', '.git', 'fixtures']);
