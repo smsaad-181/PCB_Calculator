@@ -88,10 +88,33 @@ describe('m-1 converged criterion on success outcomes', () => {
         expect(Math.abs(r.fx)).toBeLessThanOrEqual(1e-3);
       }
     });
-    it(`m-1 ${name}: smooth f with ftol 0 reports 'bracket'`, () => {
-      const r = solver((x) => x * x * x - 2, 0, 3, { ftol: 0 });
+    it(`m-1 ${name}: smooth f with ftol 0: converged is 'residual' iff fx === 0 or |fx| <= ftol`, () => {
+      const ftol = 0;
+      const r = solver((x) => x * x * x - 2, 0, 3, { ftol });
       expect(r.ok).toBe(true);
-      if (r.ok) expect(r.converged).toBe('bracket');
+      if (r.ok) {
+        expect(r.converged).toBe(r.fx === 0 || Math.abs(r.fx) <= ftol ? 'residual' : 'bracket');
+      }
+    });
+    it(`m-1 ${name}: property, converged consistent with fx and ftol on random smooth functions`, () => {
+      fc.assert(
+        fc.property(
+          fc.double({ min: 0.1, max: 10, noNaN: true, noDefaultInfinity: true }),
+          fc.double({ min: 0.1, max: 10, noNaN: true, noDefaultInfinity: true }),
+          fc.double({ min: -50, max: 50, noNaN: true, noDefaultInfinity: true }),
+          fc.constantFrom(0, 1e-12, 1e-6, 1e-3, 1e-1),
+          (a, b, c, ftol) => {
+            // a*x^3 + b*x - c is strictly increasing; bracket always contains the root.
+            const f = (x: number): number => a * x * x * x + b * x - c;
+            const r = solver(f, -10, 10, { ftol });
+            expect(r.ok).toBe(true);
+            if (r.ok) {
+              expect(r.converged).toBe(r.fx === 0 || Math.abs(r.fx) <= ftol ? 'residual' : 'bracket');
+            }
+          },
+        ),
+        { numRuns: 300 },
+      );
     });
   }
 });
