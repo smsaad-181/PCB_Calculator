@@ -80,8 +80,9 @@ describe('field-aware temperature difference (expectedDim TEMPERATURE_DIFFERENCE
         expect(f.ok && c.ok && k.ok).toBe(true);
         if (f.ok && c.ok && k.ok) {
           expect(relErr(f.value.si, (v * 5) / 9)).toBeLessThanOrEqual(1e-12);
-          expect(c.value.si).toBe(v);
-          expect(k.value.si).toBe(v);
+          // The text "-0" prints as "0", so a negative zero cannot survive the text round trip: normalise it.
+          expect(c.value.si).toBe(v + 0);
+          expect(k.value.si).toBe(v + 0);
           expect(sameDim(f.value, q(1, DIM.TEMPERATURE_DIFFERENCE))).toBe(true);
         }
       }),

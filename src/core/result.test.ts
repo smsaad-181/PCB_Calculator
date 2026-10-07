@@ -33,7 +33,7 @@ function baseResult(): CalcResult {
     results: [{ name: 'y', value: q(2, DIM.LENGTH), role: 'primary' }],
     validityChecks: [],
     warnings: [],
-    confidence: { level: 'high', reasons: [] },
+    confidence: { level: 'high', reasons: [], score: 0 },
     recommendation: 'none',
     dataStatus: 'VERIFIED',
   };
@@ -155,6 +155,7 @@ describe('assertNoNonFinite', () => {
 
 const dvOk = (): DesignValue => ({
   name: 'current limit',
+  direction: 'max-limit',
   calculated: q(10, DIM.CURRENT),
   recommended: q(7, DIM.CURRENT),
   derating: { factor: 0.7, rationale: 'test derating' },
@@ -278,16 +279,78 @@ describe('checkDesignValue (recommended = calculated x factor)', () => {
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.value.derating.factor).toBe(0.7);
   });
-  it('accepts factor exactly 1 (no derating)', () => {
+  const dvMin = (): DesignValue => ({
+    name: 'minimum trace width',
+    direction: 'min-requirement',
+    calculated: q(0.5e-3, DIM.LENGTH),
+    recommended: q(0.75e-3, DIM.LENGTH),
+    derating: { factor: 1.5, rationale: 'test margin' },
+  });
+  it('accepts a consistent min-requirement design value (margin up)', () => {
+    const r = checkDesignValue(dvMin());
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.value.direction).toBe('min-requirement');
+  });
+  it('accepts factor exactly 1 for max-limit (no derating)', () => {
     const dv = dvOk();
     dv.derating.factor = 1;
     dv.recommended = q(10, DIM.CURRENT);
     expect(checkDesignValue(dv).ok).toBe(true);
   });
-  it.each([0, -0.5, 1.0000001, 2, NaN, Infinity, -Infinity])('rejects factor %s (error mentions "factor")', (f) => {
-    const dv = dvOk();
-    dv.derating.factor = f;
-    expect(bad(dv)).toContain('factor');
+  it('accepts factor exactly 1 for min-requirement (no margin)', () => {
+    const dv = dvMin();
+    dv.derating.factor = 1;
+    dv.recommended = q(0.5e-3, DIM.LENGTH);
+    expect(checkDesignValue(dv).ok).toBe(true);
+  });
+  it.each([0, -0.5, 1.0000001, 2, NaN, Infinity, -Infinity])(
+    'rejects max-limit factor %s (error mentions "factor" and "max-limit")',
+    (f) => {
+      const dv = dvOk();
+      dv.derating.factor = f;
+      const msg = bad(dv);
+      expect(msg).toContain('factor');
+      expect(msg).toContain('max-limit');
+    },
+  );
+  it.each([0, -0.5, 0.9999999, 0.5, NaN, Infinity, -Infinity])(
+    'rejects min-requirement factor %s (error mentions "factor" and "min-requirement")',
+    (f) => {
+      const dv = dvMin();
+      dv.derating.factor = f;
+      const msg = bad(dv);
+      expect(msg).toContain('factor');
+      expect(msg).toContain('min-requirement');
+    },
+  );
+  it('rejects a margin-up factor on max-limit and a derating factor on min-requirement even when recommended is consistent', () => {
+    const up = dvOk();
+    up.derating.factor = 1.5;
+    up.recommended = q(15, DIM.CURRENT);
+    expect(bad(up)).toContain('factor');
+    const down = dvMin();
+    down.derating.factor = 0.5;
+    down.recommended = q(0.25e-3, DIM.LENGTH);
+    expect(bad(down)).toContain('factor');
+  });
+  it.each([undefined, '', 'MAX-LIMIT', 'both', 'min', null, 3])('rejects missing/unknown direction %j (error mentions "direction")', (d) => {
+    const dv = { ...dvOk(), direction: d } as unknown as DesignValue;
+    expect(bad(dv)).toContain('direction');
+  });
+  it('rejects an object with the direction key absent (error mentions "direction")', () => {
+    const { direction: _d, ...rest } = dvOk();
+    void _d;
+    expect(bad(rest as unknown as DesignValue)).toContain('direction');
+  });
+  it('type-level: direction is required', () => {
+    // @ts-expect-error direction is required
+    const noDir: DesignValue = {
+      name: 'n',
+      calculated: q(1, DIM.CURRENT),
+      recommended: q(1, DIM.CURRENT),
+      derating: { factor: 1, rationale: 'r' },
+    };
+    expect(noDir).toBeDefined();
   });
   it('rejects a recommended value that is not calculated x factor (error mentions "recommended")', () => {
     const dv = dvOk();
@@ -320,21 +383,25 @@ describe('checkDesignValue (recommended = calculated x factor)', () => {
     dv.recommended = { si: v, dim: DIM.CURRENT } as Quantity;
     expect(checkDesignValue(dv).ok).toBe(false);
   });
-  it('accepts every factor in (0,1] when recommended is computed from it (property)', () => {
+  it('accepts every valid direction/factor pair and rejects the opposite-side factor (property)', () => {
+    const calc = fc.double({ min: 1e-6, max: 1e6, noNaN: true });
+    const down = fc.double({ min: 1e-6, max: 1, noNaN: true });
+    const up = fc.double({ min: 1, max: 1e6, noNaN: true });
+    const mk = (direction: DesignValue['direction'], c: number, f: number): DesignValue => ({
+      name: 'n',
+      direction,
+      calculated: q(c, DIM.CURRENT),
+      recommended: q(c * f, DIM.CURRENT),
+      derating: { factor: f, rationale: 'r' },
+    });
     fc.assert(
-      fc.property(
-        fc.double({ min: 1e-6, max: 1, noNaN: true }),
-        fc.double({ min: 1e-6, max: 1e6, noNaN: true }),
-        (f, c) => {
-          const dv: DesignValue = {
-            name: 'n',
-            calculated: q(c, DIM.CURRENT),
-            recommended: q(c * f, DIM.CURRENT),
-            derating: { factor: f, rationale: 'r' },
-          };
-          expect(checkDesignValue(dv).ok).toBe(true);
-        },
-      ),
+      fc.property(down, up, calc, (fd, fu, c) => {
+        expect(checkDesignValue(mk('max-limit', c, fd)).ok).toBe(true);
+        expect(checkDesignValue(mk('min-requirement', c, fu)).ok).toBe(true);
+        // opposite side (strictly) is rejected even though recommended is consistent with the factor
+        if (fu > 1) expect(checkDesignValue(mk('max-limit', c, fu)).ok).toBe(false);
+        if (fd < 1) expect(checkDesignValue(mk('min-requirement', c, fd)).ok).toBe(false);
+      }),
     );
   });
 });
