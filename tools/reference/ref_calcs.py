@@ -38,16 +38,32 @@ def awg_diameter_mm(n):      # S-005; n: 0000=-3, 000=-2, 00=-1
 def awg_area_mm2(n):
     return math.pi * awg_diameter_mm(n) ** 2 / 4.0
 
+MIL_UM = 25.4                # 1 mil = 25.4 um exactly (S-006)
+
+def _ipc2221_k(layer):
+    if layer == "outer":
+        return K_EXT
+    if layer == "inner":
+        return K_INT
+    raise ValueError("layer must be 'outer' or 'inner', got " + repr(layer))
+
 def ipc2221_area_mil2(I, dT, k):
+    """A [mil2] = (I / (k * dT^0.44))^(1/0.725)  (S-001; I in A, dT in degC rise)."""
     return (I / (k * dT ** B_DT)) ** (1.0 / C_AREA)
 
-def ipc2221_width_mil(I, dT, oz, external=True):
-    A = ipc2221_area_mil2(I, dT, K_EXT if external else K_INT)
-    return A / (oz * MIL_PER_OZ)
+def ipc2221_width_mil(I, dT, layer, thickness_um):
+    """Minimum width [mil] for current I [A] at rise dT [degC]; copper thickness in um (S-001, S-006)."""
+    return ipc2221_area_mil2(I, dT, _ipc2221_k(layer)) / (thickness_um / MIL_UM)
 
-def ipc2221_current(width_mil, oz, dT, external=True):
-    A = width_mil * oz * MIL_PER_OZ
-    return (K_EXT if external else K_INT) * dT ** B_DT * A ** C_AREA
+def ipc2221_current_A(width_mil, dT, layer, thickness_um):
+    """I [A] = k * dT^0.44 * (w * t)^0.725, w in mil, t in mil (thickness_um / 25.4)."""
+    A = width_mil * (thickness_um / MIL_UM)
+    return _ipc2221_k(layer) * dT ** B_DT * A ** C_AREA
+
+def ipc2221_dT_C(I, width_mil, layer, thickness_um):
+    """dT [degC] = (I / (k * A^0.725))^(1/0.44), A = w * t in mil2."""
+    A = width_mil * (thickness_um / MIL_UM)
+    return (I / (_ipc2221_k(layer) * A ** C_AREA)) ** (1.0 / B_DT)
 
 def trace_R(L_m, w_m, t_m, T_c=20.0, rho20=RHO_CU_20C, alpha=ALPHA_CU):
     return rho20 * (1 + alpha * (T_c - 20.0)) * L_m / (w_m * t_m)
@@ -102,9 +118,33 @@ def self_heating_converge(I, w_m, t_m, L_m, theta_per_len=None, dT_target=None):
 # S-001/S-003, which is a ledger matter, not an arithmetic tolerance).
 # docs/golden-vectors.json is GENERATED from this list by tools/reference/gen_golden.py (never edit by hand).
 GOLDEN = [
-  ("ipc2221_ext_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, True),  11.82624097768917,   1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
-  ("ipc2221_ext_3A_dT10_width_mil",  ipc2221_width_mil(3, 10, 1, True),  53.820162727525585,  1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
-  ("ipc2221_int_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, 1, False), 30.76525444522158,   1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("ipc2221_ext_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, "outer", 35.0),  11.82624097768917,   1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("ipc2221_ext_3A_dT10_width_mil",  ipc2221_width_mil(3, 10, "outer", 35.0),  53.820162727525585,  1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("ipc2221_int_1A_dT10_width_mil",  ipc2221_width_mil(1, 10, "inner", 35.0), 30.76525444522158,   1e-6, ("S-001", "S-003"), "convention: 35 um/oz"),
+  ("ipc2221_width_mil_outer_1A_dT10C_0.5oz", ipc2221_width_mil(1, 10, "outer", 35.0 * 0.5), 23.65248195537834, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 0.5 oz at 35 um/oz"),
+  ("ipc2221_width_mil_outer_1A_dT10C_2oz", ipc2221_width_mil(1, 10, "outer", 35.0 * 2), 5.913120488844585, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 2 oz at 35 um/oz"),
+  ("ipc2221_width_mil_outer_1A_dT10C_3oz", ipc2221_width_mil(1, 10, "outer", 35.0 * 3), 3.9420803258963892, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 3 oz at 35 um/oz"),
+  ("ipc2221_width_mil_inner_3A_dT10C_1oz", ipc2221_width_mil(3, 10, "inner", 35.0 * 1), 140.00991555298867, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; inner; 1 oz at 35 um/oz"),
+  ("ipc2221_width_mil_outer_10A_dT30C_2oz", ipc2221_width_mil(10, 30, "outer", 35.0 * 2), 72.70492471716675, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 2 oz at 35 um/oz"),
+  ("ipc2221_width_mil_outer_20A_dT50C_3oz", ipc2221_width_mil(20, 50, "outer", 35.0 * 3), 92.47984986023936, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 3 oz at 35 um/oz"),
+  ("ipc2221_width_mil_inner_5A_dT20C_0.5oz", ipc2221_width_mil(5, 20, "inner", 35.0 * 0.5), 371.9572244351801, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; inner; 0.5 oz at 35 um/oz"),
+  ("ipc2221_width_mil_inner_2A_dT20C_2oz", ipc2221_width_mil(2, 20, "inner", 35.0 * 2), 26.275454465722817, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; inner; 2 oz at 35 um/oz"),
+  ("ipc2221_width_mil_outer_35A_dT100C_3oz", ipc2221_width_mil(35, 100, "outer", 35.0 * 3), 131.3947292703504, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 3 oz at 35 um/oz"),
+  ("ipc2221_width_mil_outer_0.5A_dT10C_1oz", ipc2221_width_mil(0.5, 10, "outer", 35.0 * 1), 4.546036695760122, 1e-9, ("S-001", "S-003", "S-006"), "width [mil] from I and dT; outer; 1 oz at 35 um/oz"),
+  ("ipc2221_current_A_outer_w20mil_dT10C_1oz", ipc2221_current_A(20, 10, "outer", 35.0 * 1), 1.4636352884345563, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; outer; 1 oz at 35 um/oz"),
+  ("ipc2221_current_A_outer_w50mil_dT30C_2oz", ipc2221_current_A(50, 30, "outer", 35.0 * 2), 7.622886914429655, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; outer; 2 oz at 35 um/oz"),
+  ("ipc2221_current_A_outer_w100mil_dT50C_3oz", ipc2221_current_A(100, 50, "outer", 35.0 * 3), 21.166343340289462, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; outer; 3 oz at 35 um/oz"),
+  ("ipc2221_current_A_inner_w30mil_dT20C_0.5oz", ipc2221_current_A(30, 20, "inner", 35.0 * 0.5), 0.8058894867745958, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; inner; 0.5 oz at 35 um/oz"),
+  ("ipc2221_current_A_inner_w200mil_dT40C_2oz", ipc2221_current_A(200, 40, "inner", 35.0 * 2), 11.818327461436601, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; inner; 2 oz at 35 um/oz"),
+  ("ipc2221_current_A_outer_w10mil_dT10C_0.5oz", ipc2221_current_A(10, 10, "outer", 35.0 * 0.5), 0.5357218724695709, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; outer; 0.5 oz at 35 um/oz"),
+  ("ipc2221_current_A_outer_w400mil_dT100C_3oz", ipc2221_current_A(400, 100, "outer", 35.0 * 3), 78.44992421193986, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; outer; 3 oz at 35 um/oz"),
+  ("ipc2221_current_A_inner_w12mil_dT10C_1oz", ipc2221_current_A(12, 10, "inner", 35.0 * 1), 0.5053153984819593, 1e-9, ("S-001", "S-003", "S-006"), "current [A] from width [mil] and dT; inner; 1 oz at 35 um/oz"),
+  ("ipc2221_dT_C_outer_1A_w12mil_1oz", ipc2221_dT_C(1, 12, "outer", 35.0 * 1), 9.76253121548664, 1e-9, ("S-001", "S-003", "S-006"), "temperature rise [degC] from I and width [mil]; outer; 1 oz at 35 um/oz"),
+  ("ipc2221_dT_C_outer_3A_w40mil_1oz", ipc2221_dT_C(3, 40, "outer", 35.0 * 1), 16.306747805554735, 1e-9, ("S-001", "S-003", "S-006"), "temperature rise [degC] from I and width [mil]; outer; 1 oz at 35 um/oz"),
+  ("ipc2221_dT_C_outer_10A_w150mil_2oz", ipc2221_dT_C(10, 150, "outer", 35.0 * 2), 9.09632210112523, 1e-9, ("S-001", "S-003", "S-006"), "temperature rise [degC] from I and width [mil]; outer; 2 oz at 35 um/oz"),
+  ("ipc2221_dT_C_inner_5A_w60mil_1oz", ipc2221_dT_C(5, 60, "inner", 35.0 * 1), 128.99645317208393, 1e-9, ("S-001", "S-003", "S-006"), "temperature rise [degC] from I and width [mil]; inner; 1 oz at 35 um/oz"),
+  ("ipc2221_dT_C_outer_2A_w20mil_0.5oz", ipc2221_dT_C(2, 20, "outer", 35.0 * 0.5), 63.70750767082846, 1e-9, ("S-001", "S-003", "S-006"), "temperature rise [degC] from I and width [mil]; outer; 0.5 oz at 35 um/oz"),
+  ("ipc2221_dT_C_inner_8A_w100mil_2oz", ipc2221_dT_C(8, 100, "inner", 35.0 * 2), 51.6327494460789, 1e-9, ("S-001", "S-003", "S-006"), "temperature rise [degC] from I and width [mil]; inner; 2 oz at 35 um/oz"),
   ("trace_R_100x0.3mm_35um_20C_ohm", trace_R(0.1, 0.3e-3, 35e-6, 20),    0.1642036124794746,  1e-9, ("S-004", "S-003"), "convention: 35 um/oz"),
   ("trace_R_same_30C_ohm",           trace_R(0.1, 0.3e-3, 35e-6, 30),    0.17065681444991793, 1e-9, ("S-004", "S-003"), "convention: 35 um/oz"),
   ("via_area_mm2_0.3fin_25um",       via_area_m2(0.3e-3, 25e-6) * 1e6,   0.025525440310417067, 1e-9, (), "pure geometry, no constants"),
