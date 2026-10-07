@@ -17,8 +17,16 @@ export const CATEGORIES: readonly { id: Category; title: string; phase: number }
   { id: 'circuit', title: 'Circuit values', phase: 1 },
 ];
 
-/** Phase 0: no real calculators yet. Each phase appends entries with a dynamic import. */
-export const REGISTRY: readonly CalculatorEntry[] = [];
+/** Each calculator is a lazy import, so it ships as its own code-split chunk. */
+export const REGISTRY: readonly CalculatorEntry[] = [
+  {
+    id: 'copper-converter',
+    title: 'Copper weight and thickness converter',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/CopperConverter'),
+  },
+];
 
 export function findCalculator(id: string, registry: readonly CalculatorEntry[] = REGISTRY): CalculatorEntry | undefined {
   return registry.find((e) => e.id === id);
