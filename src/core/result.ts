@@ -1,4 +1,4 @@
-import { sameDim } from './units';
+import { DIM, sameDim } from './units';
 import type { Quantity } from './units';
 import type { Confidence, DataStatus } from './confidence';
 
@@ -29,12 +29,50 @@ export interface CalcWarning {
 
 export type DesignDirection = 'max-limit' | 'min-requirement';
 
+/** What a reported number means: a required minimum, a capacity ceiling, a nominal value, or a model prediction. */
+export type Bound = 'min-requirement' | 'max-capacity' | 'nominal' | 'prediction';
+const BOUNDS: readonly string[] = ['min-requirement', 'max-capacity', 'nominal', 'prediction'];
+
+export type ElementKind = 'trace' | 'via' | 'pad' | 'connector' | 'spoke' | 'pour-neck' | 'other';
+const ELEMENT_KINDS: readonly string[] = ['trace', 'via', 'pad', 'connector', 'spoke', 'pour-neck', 'other'];
+
+/** One element of a current path (trace segment, via, pad ...) with its load against its limit. */
+export interface ElementResult {
+  id: string;
+  name: string;
+  kind: ElementKind;
+  load: Quantity;
+  limit: Quantity;
+  /** load / limit; above 1 means over the limit. */
+  utilisation: number;
+  /** limit - load; negative when over the limit. */
+  margin: Quantity;
+}
+
+export type CopperBasisKind = 'nominal' | 'finished' | 'measured';
+
+export interface CopperBasis {
+  layer: 'outer' | 'inner';
+  basis: CopperBasisKind;
+  thickness: Quantity;
+  source: string;
+}
+
+export interface CalcExport {
+  id: string;
+  kind: 'net-class';
+  values: Record<string, Quantity>;
+  note: string;
+}
+
 export interface DesignValue {
   name: string;
   direction: DesignDirection;
   calculated: Quantity;
   recommended: Quantity;
   derating: { factor: number; rationale: string };
+  /** Set only where a zero or negative calculated value is meaningful; waives only the positivity rule. */
+  allowNonPositive?: boolean;
 }
 
 export interface Envelope {
@@ -52,16 +90,27 @@ export interface CalcResult {
   inputs: CalcInput[];
   assumptions: string[];
   steps: { label: string; expr: string; value: Quantity }[];
-  results: { name: string; value: Quantity; role: 'primary' | 'secondary' }[];
+  results: { name: string; value: Quantity; role: 'primary' | 'secondary'; bound: Bound }[];
   validityChecks: { name: string; ok: boolean; detail: string }[];
   warnings: CalcWarning[];
   confidence: Confidence;
   recommendation: string;
   dataStatus: DataStatus;
-  designValue?: DesignValue;
+  designValues: DesignValue[];
   envelope?: Envelope[];
-  fabProfile?: { id: string; fabricator: string; profileDate: string; status: DataStatus };
+  fabProfile?: {
+    id: string;
+    fabricator: string;
+    profileDate: string;
+    status: DataStatus;
+    /** Whole days between the profile date and the evaluation date. */
+    ageDays: number;
+    stale: boolean;
+  };
+  elements?: ElementResult[];
   limitingElement?: { id: string; name: string; reason: string };
+  copperBasis?: CopperBasis;
+  exports?: CalcExport[];
 }
 
 export type CalcOutcome = Result<CalcResult, CalcError>;
@@ -127,6 +176,12 @@ export function checkDesignValue(dv: DesignValue): Result<DesignValue, string> {
     return fail('calculated and recommended values must be finite.');
   }
   if (!sameDim(c, r)) return fail('calculated and recommended must have the same dimension.');
+  if (c.dim.kind === 'absTemp') {
+    return fail('an absolute temperature cannot be derated by a factor; use a temperature difference.');
+  }
+  if (c.si <= 0 && dv.allowNonPositive !== true) {
+    return fail('calculated value is non-positive; set allowNonPositive only where that is meaningful.');
+  }
   if (dv.derating.rationale.trim() === '') return fail('derating rationale must not be empty.');
   const expected = c.si * f;
   if (Math.abs(r.si - expected) > 1e-12 * Math.max(Math.abs(expected), Math.abs(r.si))) {
@@ -148,23 +203,160 @@ export function checkEnvelope(e: Envelope): Result<Envelope, string> {
   return { ok: true, value: e };
 }
 
-/** Throws if any Quantity in inputs, steps or results is NaN or infinite. Zero and negatives are allowed. */
-export function assertNoNonFinite(r: CalcResult): void {
-  const check = (where: string, name: string, v: Quantity): void => {
-    if (!Number.isFinite(v.si)) {
-      throw new Error(`Non-finite value (${String(v.si)}) in ${where} "${name}"`);
+const REL_TOL = 1e-9;
+const isFiniteQ = (x: Quantity): boolean => Number.isFinite(x.si);
+const SEVERITIES: readonly string[] = ['info', 'caution', 'warning', 'critical'];
+const LEVELS: readonly string[] = ['high', 'medium', 'low'];
+const DATA_STATUSES: readonly string[] = ['VERIFIED', 'UNVERIFIED', 'PAYWALLED', 'CONFLICT'];
+
+/** Elements ordered by utilisation descending, ties by id ascending. Returns a new array. */
+export function rankElements(es: readonly ElementResult[]): ElementResult[] {
+  return [...es].sort((a, b) => b.utilisation - a.utilisation || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+}
+
+/** Validates every element and reports all problems; each message names the element id. Over-limit elements are valid. */
+export function checkElements(es: readonly ElementResult[]): Result<ElementResult[], string[]> {
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  for (const e of es) {
+    const tag = `Element "${String(e.id)}"`;
+    const add = (m: string): void => {
+      errors.push(`${tag}: ${m}`);
+    };
+    if (typeof e.id !== 'string' || e.id.trim() === '') add('id must not be empty.');
+    else if (seen.has(e.id)) add('duplicate id.');
+    else seen.add(e.id);
+    if (!ELEMENT_KINDS.includes(e.kind)) add(`kind "${String(e.kind)}" is not one of ${ELEMENT_KINDS.join(', ')}.`);
+    const loadOk = isFiniteQ(e.load);
+    const limitOk = isFiniteQ(e.limit) && e.limit.si > 0;
+    const marginOk = isFiniteQ(e.margin);
+    if (!loadOk) add('load must be finite.');
+    if (!limitOk) add('limit must be finite and greater than zero.');
+    if (!marginOk) add('margin must be finite.');
+    const dimOk = sameDim(e.load, e.limit) && sameDim(e.limit, e.margin);
+    if (!dimOk) add('load, limit and margin must have the same dimension.');
+    if (loadOk && limitOk && dimOk) {
+      const u = e.load.si / e.limit.si;
+      if (!Number.isFinite(e.utilisation) || Math.abs(e.utilisation - u) > REL_TOL * Math.abs(u)) {
+        add(`utilisation ${String(e.utilisation)} does not equal load / limit (${String(u)}).`);
+      }
+      if (marginOk) {
+        const m = e.limit.si - e.load.si;
+        if (Math.abs(e.margin.si - m) > REL_TOL * Math.max(Math.abs(m), Math.abs(e.limit.si))) {
+          add(`margin ${String(e.margin.si)} does not equal limit - load (${String(m)}).`);
+        }
+      }
     }
-  };
-  for (const i of r.inputs) check('inputs', i.name, i.value);
-  for (const s of r.steps) check('steps', s.label, s.value);
-  for (const o of r.results) check('results', o.name, o.value);
-  if (r.designValue) {
-    check('designValue', r.designValue.name, r.designValue.calculated);
-    check('designValue', r.designValue.name, r.designValue.recommended);
+  }
+  return errors.length > 0 ? { ok: false, error: errors } : { ok: true, value: [...es] };
+}
+
+export function checkCopperBasis(b: CopperBasis): Result<CopperBasis, string> {
+  const fail = (m: string): Result<CopperBasis, string> => ({ ok: false, error: `Copper basis: ${m}` });
+  const layer: unknown = (b as { layer?: unknown }).layer;
+  if (layer !== 'outer' && layer !== 'inner') return fail('layer must be "outer" or "inner".');
+  const basis: unknown = (b as { basis?: unknown }).basis;
+  if (basis !== 'nominal' && basis !== 'finished' && basis !== 'measured') {
+    return fail('basis must be "nominal", "finished" or "measured".');
+  }
+  const t = b.thickness;
+  const isLength = sameDim(t, { si: 1, dim: DIM.LENGTH } as Quantity);
+  if (!Number.isFinite(t.si) || t.si <= 0 || !isLength) {
+    return fail('thickness must be a finite length greater than zero.');
+  }
+  if (typeof b.source !== 'string' || b.source.trim() === '') return fail('source must not be empty.');
+  return { ok: true, value: b };
+}
+
+/** Every Quantity in the result with a human-readable location, for finiteness checks. */
+function* quantities(r: CalcResult): Generator<[string, Quantity]> {
+  for (const i of r.inputs) yield [`inputs "${i.name}"`, i.value];
+  for (const s of r.steps) yield [`steps "${s.label}"`, s.value];
+  for (const o of r.results) yield [`results "${o.name}"`, o.value];
+  for (const d of r.designValues) {
+    yield [`designValues "${d.name}"`, d.calculated];
+    yield [`designValues "${d.name}"`, d.recommended];
   }
   for (const e of r.envelope ?? []) {
-    check('envelope', e.name, e.min);
-    check('envelope', e.name, e.typ);
-    check('envelope', e.name, e.max);
+    yield [`envelope "${e.name}"`, e.min];
+    yield [`envelope "${e.name}"`, e.typ];
+    yield [`envelope "${e.name}"`, e.max];
   }
+  for (const e of r.elements ?? []) {
+    yield [`elements "${e.id}"`, e.load];
+    yield [`elements "${e.id}"`, e.limit];
+    yield [`elements "${e.id}"`, e.margin];
+  }
+  if (r.copperBasis) yield ['copperBasis (copper thickness)', r.copperBasis.thickness];
+  for (const x of r.exports ?? []) {
+    for (const [k, v] of Object.entries(x.values)) yield [`exports "${x.id}" value "${k}"`, v];
+  }
+}
+
+/** Throws if any Quantity, derating factor or confidence score in the result is NaN or infinite. Zero and negatives are allowed. */
+export function assertNoNonFinite(r: CalcResult): void {
+  for (const [where, v] of quantities(r)) {
+    if (!Number.isFinite(v.si)) throw new Error(`Non-finite value (${String(v.si)}) in ${where}`);
+  }
+  for (const d of r.designValues) {
+    if (!Number.isFinite(d.derating.factor)) {
+      throw new Error(`Non-finite value (${String(d.derating.factor)}) in designValues "${d.name}" derating factor`);
+    }
+  }
+  if (!Number.isFinite(r.confidence.score)) {
+    throw new Error(`Non-finite value (${String(r.confidence.score)}) in confidence score`);
+  }
+}
+
+/** Full schema check. Never throws; returns every problem as a string. */
+export function assertCalcResult(r: CalcResult): Result<CalcResult, string[]> {
+  const errors: string[] = [];
+  try {
+    for (const [where, v] of quantities(r)) {
+      if (!Number.isFinite(v.si)) errors.push(`Non-finite value (${String(v.si)}) in ${where}.`);
+    }
+    for (const o of r.results) {
+      const b: unknown = (o as { bound?: unknown }).bound;
+      if (b === undefined) errors.push(`Result "${o.name}" is missing its bound.`);
+      else if (typeof b !== 'string' || !BOUNDS.includes(b)) errors.push(`Result "${o.name}" has unknown bound "${String(b)}".`);
+    }
+    if (!Number.isFinite(r.confidence.score)) errors.push(`Confidence score is not finite (${String(r.confidence.score)}).`);
+    if (!LEVELS.includes(r.confidence.level)) errors.push(`Confidence level "${String(r.confidence.level)}" is not high, medium or low.`);
+    if (!DATA_STATUSES.includes(r.dataStatus)) errors.push(`Unknown dataStatus "${String(r.dataStatus)}".`);
+    for (const d of r.designValues) {
+      const c = checkDesignValue(d);
+      if (!c.ok) errors.push(c.error);
+    }
+    for (const e of r.envelope ?? []) {
+      const c = checkEnvelope(e);
+      if (!c.ok) errors.push(c.error);
+    }
+    if (r.elements) {
+      const c = checkElements(r.elements);
+      if (!c.ok) errors.push(...c.error);
+    }
+    if (r.copperBasis) {
+      const c = checkCopperBasis(r.copperBasis);
+      if (!c.ok) errors.push(c.error);
+    }
+    for (const w of r.warnings) {
+      if (!SEVERITIES.includes(w.severity)) errors.push(`Warning has unknown severity "${String(w.severity)}": ${w.message}`);
+    }
+    if (r.elements && r.elements.length > 0) {
+      const top = rankElements(r.elements)[0];
+      if (r.limitingElement === undefined) {
+        errors.push(`limitingElement is absent but elements are present; it must be "${String(top?.id)}".`);
+      } else if (top && r.limitingElement.id !== top.id) {
+        errors.push(`limitingElement "${r.limitingElement.id}" is not the top-ranked element "${top.id}".`);
+      }
+    }
+    if (r.fabProfile) {
+      const a = r.fabProfile.ageDays;
+      if (!Number.isInteger(a) || a < 0) errors.push(`fabProfile.ageDays (${String(a)}) must be a non-negative whole number.`);
+      if (typeof r.fabProfile.stale !== 'boolean') errors.push('fabProfile.stale must be a boolean.');
+    }
+  } catch (e) {
+    errors.push(`Result could not be fully checked: ${e instanceof Error ? e.message : String(e)}`);
+  }
+  return errors.length > 0 ? { ok: false, error: errors } : { ok: true, value: r };
 }

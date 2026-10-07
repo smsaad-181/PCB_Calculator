@@ -4,14 +4,19 @@ export { LEDGER_STATUS, type LedgerStatus } from './ledger';
 export { abs, add, compare, div, mul, neg, pow, q, sameDim, sub, type Quantity } from './quantity';
 export { fromUnit, toUnit, unitInfo } from './units-table';
 export { parseQuantity, type ParseResult } from './parse';
+export { describeParsed, parseFraction, parseQuantityDetailed, type ParseDetailed } from './parse';
 export { formatQuantity, type FormatOptions } from './format';
 export {
   DEFAULT_DISPLAY_PREFS,
+  formatDual,
   formatFor,
+  roundDirectionFor,
   sigFigsFor,
   type AccuracyClass,
   type DisplayPrefs,
+  type FormatDualOptions,
   type FormatForOptions,
+  type RoundDirection,
 } from './display';
 export {
   FOIL_CONVENTIONS,

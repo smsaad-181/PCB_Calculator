@@ -60,8 +60,9 @@ describe('imperial / metric parity', () => {
         const x = q(v, DIM.LENGTH);
         const a = si(formatFor(x, { prefs: { length: 'mil', temperature: 'C', area: 'mm2' } }), DIM.LENGTH);
         const b = si(formatFor(x, { prefs: { length: 'mm', temperature: 'C', area: 'mm2' } }), DIM.LENGTH);
-        expect(relErr(a, v)).toBeLessThanOrEqual(6e-6);
-        expect(relErr(b, v)).toBeLessThanOrEqual(6e-6);
+        // G-1: geometry prints at fab resolution (mil 0.01, mm 0.001), so the bound is absolute, not 6 significant figures
+        expect(Math.abs(a - v)).toBeLessThanOrEqual(0.5 * 0.01 * 25.4e-6 * (1 + 1e-9) + 1e-12 * v);
+        expect(Math.abs(b - v)).toBeLessThanOrEqual(0.5 * 1e-6 * (1 + 1e-9) + 1e-12 * v);
       }),
     );
   });

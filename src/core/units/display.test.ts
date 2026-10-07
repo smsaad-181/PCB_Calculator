@@ -54,7 +54,8 @@ describe('formatFor: unit chosen by dimension', () => {
     expect(formatFor(q(298.15, DIM.ABS_TEMPERATURE), { prefs: MM })).toBe(`25 ${DEG}C`);
   });
   it('absolute temperature per prefs', () => {
-    expect(formatFor(q(298.15, DIM.ABS_TEMPERATURE), { prefs: UM_K })).toBe('298.15 K');
+    // G-1: absolute temperature prints 1 decimal; input moved off the 298.15 tie (was '298.15 K' at 6 sf)
+    expect(formatFor(q(298.1, DIM.ABS_TEMPERATURE), { prefs: UM_K })).toBe('298.1 K');
     expect(formatFor(q(298.15, DIM.ABS_TEMPERATURE), { prefs: MIL })).toBe(`77 ${DEG}F`);
   });
   it('temperature difference shows with a delta, per prefs (dK = dC)', () => {
@@ -70,16 +71,17 @@ describe('formatFor: unit chosen by dimension', () => {
     expect(formatFor(w, { prefs: UM_K })).toBe(`254 ${MICRO}m`);
     expect(formatFor(w)).toBe('0.254 mm');
   });
-  it('35 um copper: 0.035 mm, 1.37795 mil (6 sf) or 1.38 mil (empirical)', () => {
+  it('35 um copper: 0.035 mm, 1.38 mil at fab resolution (G-1: 0.01 mil; accuracy class no longer limits geometry)', () => {
     const t = q(35e-6, DIM.LENGTH);
     expect(formatFor(t, { prefs: MM })).toBe('0.035 mm');
-    expect(formatFor(t, { prefs: MIL })).toBe('1.37795 mil');
+    expect(formatFor(t, { prefs: MIL })).toBe('1.38 mil');
     expect(formatFor(t, { prefs: MIL, accuracyClass: 'empirical' })).toBe('1.38 mil');
+    expect(formatFor(t, { prefs: MIL, accuracyClass: 'estimate' })).toBe('1.38 mil');
   });
   it('area per prefs: 6.4516e-10 m2 is 1 mil2 (area prefs mil2), 1 mm2 = 1e-6 m2', () => {
     expect(formatFor(q(6.4516e-10, DIM.AREA), { prefs: MIL })).toBe(`1 mil${SQ}`);
     expect(formatFor(q(1e-6, DIM.AREA), { prefs: MM })).toBe(`1 mm${SQ}`);
-    expect(formatFor(q(8.89e-9, DIM.AREA), { prefs: MM })).toBe(`0.00889 mm${SQ}`);
+    expect(formatFor(q(8.89e-9, DIM.AREA), { prefs: MM })).toBe(`0.0089 mm${SQ}`); // G-1: mm2 prints 4 decimals (was 6 sf: 0.00889)
   });
   it('resistance uses engineering prefixes', () => {
     expect(formatFor(q(0.193941, DIM.RESISTANCE))).toBe(`193.941 m${OHM}`);
@@ -110,7 +112,7 @@ describe('formatFor: explicit unit and significant figures', () => {
   it('explicit unit overrides prefs', () => {
     expect(formatFor(q(0.0254, DIM.LENGTH), { unit: 'mil' })).toBe('1000 mil');
     expect(formatFor(q(0.0254, DIM.LENGTH), { unit: 'mm', prefs: MIL })).toBe('25.4 mm');
-    expect(formatFor(q(298.15, DIM.ABS_TEMPERATURE), { unit: 'K' })).toBe('298.15 K');
+    expect(formatFor(q(298.1, DIM.ABS_TEMPERATURE), { unit: 'K' })).toBe('298.1 K'); // G-1: 1 decimal (input moved off the tie)
   });
   it('default is 6 significant figures; accuracy class sets it otherwise', () => {
     const r = q(1234.5678, DIM.RESISTANCE);
@@ -120,8 +122,10 @@ describe('formatFor: explicit unit and significant figures', () => {
     expect(formatFor(r, { accuracyClass: 'empirical' })).toBe(`1.23 k${OHM}`);
     expect(formatFor(r, { accuracyClass: 'estimate' })).toBe(`1.2 k${OHM}`);
   });
-  it('accuracy class also applies with an explicit unit', () => {
-    expect(formatFor(q(0.0314, DIM.LENGTH), { unit: 'mil', accuracyClass: 'empirical' })).toBe('1240 mil');
+  it('accuracy class applies to non-geometry dims with an explicit unit; geometry prints at fab resolution (G-1)', () => {
+    // was '1240 mil' (3 sf). Deliberate contract change: the class no longer limits geometry digits.
+    expect(formatFor(q(0.0314, DIM.LENGTH), { unit: 'mil', accuracyClass: 'empirical' })).toBe('1236.22 mil');
+    expect(formatFor(q(1234.5678, DIM.RESISTANCE), { unit: 'Ω', accuracyClass: 'empirical' })).toBe(`1230 ${OHM}`);
   });
   it('an estimate never shows more than 2 significant figures (false-precision guard)', () => {
     fc.assert(
@@ -195,6 +199,13 @@ describe('formatFor: round trip through parseQuantity within the printed precisi
     ['DIMENSIONLESS', DIM.DIMENSIONLESS, [0.25, 0.05, 12]],
     ['TEMPERATURE_DIFFERENCE', DIM.TEMPERATURE_DIFFERENCE, [10, 55.5, 0.5]],
   ];
+  /** Half the printed resolution in SI for fixed-decimal (G-1) dimensions, or undefined for sig-fig dimensions. */
+  function halfResolutionSi(dim: Dim, prefs: DisplayPrefs): number | undefined {
+    if (dim.kind === 'absTemp' || dim.kind === 'deltaT') return 0.5 * 0.1 * (prefs.temperature === 'F' ? 5 / 9 : 1);
+    if (sameDim(q(1, dim), q(1, DIM.LENGTH))) return 0.5 * (prefs.length === 'mil' ? 0.01 * 25.4e-6 : prefs.length === 'um' ? 0.1e-6 : 1e-6);
+    if (sameDim(q(1, dim), q(1, DIM.AREA))) return 0.5 * (prefs.area === 'mil2' ? 0.01 * 6.4516e-10 : 1e-4 * 1e-6);
+    return undefined;
+  }
   for (const [name, dim, values] of RT) {
     it(`${name}: parse(formatFor(x), dim) = x for every pref set and accuracy class`, () => {
       for (const prefs of ALL_PREFS) {
@@ -207,23 +218,29 @@ describe('formatFor: round trip through parseQuantity within the printed precisi
             expect(r.ok, `${text}${r.ok ? '' : ': ' + r.error.message}`).toBe(true);
             if (r.ok) {
               expect(sameDim(r.value, x)).toBe(true);
-              // half a unit in the last printed digit, relative to a leading digit of 1
-              const tol = 0.5 * Math.pow(10, 1 - sig) * (1 + 1e-9);
-              expect(Math.abs(r.value.si - v) / v, `${text} vs ${String(v)}`).toBeLessThanOrEqual(tol);
+              const half = halfResolutionSi(dim, prefs);
+              if (half !== undefined) {
+                // G-1: geometry and temperature difference print at fab resolution, independent of accuracy class
+                expect(Math.abs(r.value.si - v), `${text} vs ${String(v)}`).toBeLessThanOrEqual(half * (1 + 1e-9) + 1e-12 * v);
+              } else {
+                // half a unit in the last printed digit, relative to a leading digit of 1
+                const tol = 0.5 * Math.pow(10, 1 - sig) * (1 + 1e-9);
+                expect(Math.abs(r.value.si - v) / v, `${text} vs ${String(v)}`).toBeLessThanOrEqual(tol);
+              }
             }
           }
         }
       }
     });
   }
-  it('ABS_TEMPERATURE: parse(formatFor(T), ABS_TEMPERATURE) = T within 1e-3 K at 6 sf (250..400 K)', () => {
+  it('ABS_TEMPERATURE: parse(formatFor(T), ABS_TEMPERATURE) = T within half the 0.1 degree print resolution (250..400 K)', () => {
     for (const prefs of ALL_PREFS) {
       for (const k of [250, 273.15, 298.15, 358.15, 398.15]) {
         const x = q(k, DIM.ABS_TEMPERATURE);
         const text = formatFor(x, { prefs });
         const r = parseQuantity(text, DIM.ABS_TEMPERATURE);
         expect(r.ok, text).toBe(true);
-        if (r.ok) expect(Math.abs(r.value.si - k), text).toBeLessThanOrEqual(1e-3);
+        if (r.ok) expect(Math.abs(r.value.si - k), text).toBeLessThanOrEqual(0.05 + 1e-9); // was 1e-3 K (6 sf); G-1: 1 decimal
       }
     }
   });

@@ -50,15 +50,28 @@ export function worstDataStatus(statuses: readonly LedgerStatus[]): DataStatus {
   return worst;
 }
 
-/** Worst data status over the given ledger ids. Unknown or empty id lists throw. */
-export function dataStatusForLedgerIds(ids: readonly string[], ledger: readonly LedgerRow[] = LEDGER): DataStatus {
+/**
+ * Worst data status over the given ledger ids. Unknown or empty id lists throw.
+ * `opts.exclude` drops ids from the rating (for example a convention row that is surfaced separately); every id,
+ * excluded or not, must exist in the ledger, and excluding every id throws rather than rating VERIFIED.
+ */
+export function dataStatusForLedgerIds(
+  ids: readonly string[],
+  ledger: readonly LedgerRow[] = LEDGER,
+  opts?: { readonly exclude?: readonly string[] },
+): DataStatus {
   if (ids.length === 0) {
     throw new DataStatusError('dataStatusForLedgerIds requires at least one ledger id.');
   }
-  const statuses = ids.map((id) => {
+  const exclude = new Set(opts?.exclude ?? []);
+  const rows = ids.map((id) => {
     const row = ledger.find((r) => r.id === id);
     if (row === undefined) throw new DataStatusError(`Unknown ledger id: ${id}`);
-    return row.status;
+    return row;
   });
-  return worstDataStatus(statuses);
+  const kept = rows.filter((r) => !exclude.has(r.id));
+  if (kept.length === 0) {
+    throw new DataStatusError('Every ledger id was excluded; nothing is left to rate.');
+  }
+  return worstDataStatus(kept.map((r) => r.status));
 }

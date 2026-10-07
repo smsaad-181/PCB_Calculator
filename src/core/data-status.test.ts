@@ -108,3 +108,39 @@ describe('dataStatusForLedgerIds', () => {
     expect(LEDGER.length).toBeGreaterThan(0);
   });
 });
+
+describe('dataStatusForLedgerIds { exclude } (foil CONFLICT is not a data-status input, D-2)', () => {
+  it('FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE is exactly ["S-003"]', async () => {
+    const c = await import('./data/constants');
+    expect([...c.FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE]).toEqual(['S-003']);
+  });
+  it('not excluding S-003 yields CONFLICT; excluding it yields VERIFIED (real ledger)', () => {
+    expect(dataStatusForLedgerIds(['S-003', 'S-006'])).toBe('CONFLICT');
+    expect(dataStatusForLedgerIds(['S-003', 'S-006'], undefined, {})).toBe('CONFLICT');
+    expect(dataStatusForLedgerIds(['S-003', 'S-006'], undefined, { exclude: [] })).toBe('CONFLICT');
+    expect(dataStatusForLedgerIds(['S-003', 'S-006'], undefined, { exclude: ['S-003'] })).toBe('VERIFIED');
+  });
+  it('excluding only removes the named ids; other worse rows still count', () => {
+    expect(dataStatusForLedgerIds(['S-003', 'S-006', 'S-001'], undefined, { exclude: ['S-003'] })).toBe('PAYWALLED');
+  });
+  it('works with an injected ledger', () => {
+    const rows: readonly LedgerRow[] = [
+      { id: 'T-1', item: 'a', edition: 'x', status: 'VERIFIED' },
+      { id: 'T-2', item: 'b', edition: 'x', status: 'CONFLICT' },
+    ];
+    expect(dataStatusForLedgerIds(['T-1', 'T-2'], rows, { exclude: ['T-2'] })).toBe('VERIFIED');
+  });
+  it('excluding every id leaves nothing to rate and throws a typed error (never VERIFIED by default)', () => {
+    expect(() => dataStatusForLedgerIds(['S-003'], undefined, { exclude: ['S-003'] })).toThrow(DataStatusError);
+  });
+  it('an unknown id still throws even when others are excluded', () => {
+    expect(() => dataStatusForLedgerIds(['S-006', 'NOPE'], undefined, { exclude: ['S-003'] })).toThrow(DataStatusError);
+  });
+  it('does not mutate the id or exclude lists', () => {
+    const ids = ['S-003', 'S-006'];
+    const ex = ['S-003'];
+    dataStatusForLedgerIds(ids, undefined, { exclude: ex });
+    expect(ids).toEqual(['S-003', 'S-006']);
+    expect(ex).toEqual(['S-003']);
+  });
+});

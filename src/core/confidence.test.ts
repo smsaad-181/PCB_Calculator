@@ -29,6 +29,7 @@ import {
  *  - 'score 0 -> high with no reasons' now also expects score: 0 (result gained `score`).
  *  - model score() no longer caps defaults; level model applies the override.
  *  - arbitraries gain safetyRelevantDefaults; CONFLICT added to the data status arbitrary.
+ *  - G-3: forced-to-low sentence no longer repeats names; arbitraries use uniqueArray (lists are sets).
  */
 type Acc = 'exact' | 'analytical' | 'empirical' | 'estimate';
 type DS = 'VERIFIED' | 'UNVERIFIED' | 'PAYWALLED' | 'CONFLICT';
@@ -65,9 +66,9 @@ const clean: F = {
 };
 
 const arbF = fc.record({
-  outOfRangeInputs: fc.array(fc.constantFrom('width', 'current', 'dT', 'thickness'), { maxLength: 4 }),
-  defaultedAssumptions: fc.array(fc.constantFrom('alpha', 'ambient', 'theta', 'rho'), { maxLength: 6 }),
-  safetyRelevantDefaults: fc.array(fc.constantFrom('maxTemp', 'derating', 'creepage'), { maxLength: 3 }),
+  outOfRangeInputs: fc.uniqueArray(fc.constantFrom('width', 'current', 'dT', 'thickness'), { maxLength: 4 }),
+  defaultedAssumptions: fc.uniqueArray(fc.constantFrom('alpha', 'ambient', 'theta', 'rho'), { maxLength: 4 }),
+  safetyRelevantDefaults: fc.uniqueArray(fc.constantFrom('maxTemp', 'derating', 'creepage'), { maxLength: 3 }),
   accuracyClass: fc.constantFrom<Acc>('exact', 'analytical', 'empirical', 'estimate'),
   dataStatus: fc.constantFrom<DS>('VERIFIED', 'UNVERIFIED', 'PAYWALLED', 'CONFLICT'),
 }) as fc.Arbitrary<FA>;
@@ -212,13 +213,18 @@ describe('out-of-range override', () => {
   it('analytical + VERIFIED + 1 out-of-range -> low', () => {
     expect(rateConfidence({ ...clean, accuracyClass: 'analytical', outOfRangeInputs: ['w/h'] }).level).toBe('low');
   });
-  it('reasons include one explicit forced-to-low sentence naming every out-of-range input', () => {
+  it('reasons include one explicit forced-to-low sentence that states the count and does not repeat the names (G-3)', () => {
     const r = rateConfidence({ ...clean, outOfRangeInputs: ['width', 'current'] });
     const forced = r.reasons.filter((x) => /forced to low/i.test(x));
     expect(forced).toHaveLength(1);
     expect(forced[0]).toMatch(/outside the model'?s validity range/i);
-    expect(forced[0]).toContain('width');
-    expect(forced[0]).toContain('current');
+    expect(forced[0]).toBe("Confidence level forced to low: 2 input(s) are outside the model's validity range.");
+    expect(forced[0]).not.toContain('width');
+    expect(forced[0]).not.toContain('current');
+    // the names are still listed, individually, in the other reasons
+    const joined = r.reasons.filter((x) => !/forced to low/i.test(x)).join(' | ');
+    expect(joined).toContain('width');
+    expect(joined).toContain('current');
   });
   it('no forced-to-low sentence when nothing is out of range, even when level is low', () => {
     const r = rateConfidence({ ...clean, accuracyClass: 'estimate', dataStatus: 'PAYWALLED' });

@@ -11,12 +11,11 @@ import {
   guardPositiveFiniteNumber,
   highestWarningSeverity,
 } from './result';
-import type { CalcError, CalcOutcome, CalcResult } from './result';
+import type { CalcError, CalcOutcome, CalcResult, DesignValue } from './result';
 
 type Input = CalcResult['inputs'][number];
 type Warning = CalcResult['warnings'][number];
 type Severity = Warning['severity'];
-type DesignValue = NonNullable<CalcResult['designValue']>;
 type Envelope = NonNullable<CalcResult['envelope']>[number];
 
 // Test-only numbers; nothing here is a physical claim.
@@ -30,12 +29,13 @@ function baseResult(): CalcResult {
     inputs: [{ name: 'x', value: q(1, DIM.LENGTH), source: 'user' }],
     assumptions: [],
     steps: [{ label: 's1', expr: 'x', value: q(1, DIM.LENGTH) }],
-    results: [{ name: 'y', value: q(2, DIM.LENGTH), role: 'primary' }],
+    results: [{ name: 'y', value: q(2, DIM.LENGTH), role: 'primary', bound: 'nominal' }],
     validityChecks: [],
     warnings: [],
     confidence: { level: 'high', reasons: [], score: 0 },
     recommendation: 'none',
     dataStatus: 'VERIFIED',
+    designValues: [],
   };
 }
 
@@ -132,18 +132,18 @@ describe('assertNoNonFinite', () => {
   });
   it.each([NaN, Infinity, -Infinity])('throws for %s in results', (v) => {
     const r = baseResult();
-    r.results[0] = { name: 'y', value: nonFiniteQ(v), role: 'primary' };
+    r.results[0] = { name: 'y', value: nonFiniteQ(v), role: 'primary', bound: 'nominal' };
     expect(() => assertNoNonFinite(r)).toThrow();
   });
   it('error message identifies the offending location', () => {
     const r = baseResult();
-    r.results[0] = { name: 'ampacity', value: nonFiniteQ(NaN), role: 'primary' };
+    r.results[0] = { name: 'ampacity', value: nonFiniteQ(NaN), role: 'primary', bound: 'nominal' };
     expect(() => assertNoNonFinite(r)).toThrow(/ampacity/);
   });
   it('finite zero and negative values are not "non-finite"', () => {
     const r = baseResult();
-    r.results.push({ name: 'neg', value: q(-5, DIM.LENGTH), role: 'secondary' });
-    r.results.push({ name: 'zero', value: q(0, DIM.LENGTH), role: 'secondary' });
+    r.results.push({ name: 'neg', value: q(-5, DIM.LENGTH), role: 'secondary', bound: 'nominal' });
+    r.results.push({ name: 'zero', value: q(0, DIM.LENGTH), role: 'secondary', bound: 'nominal' });
     expect(() => assertNoNonFinite(r)).not.toThrow();
   });
 });
@@ -181,9 +181,16 @@ function fullResult(): CalcResult {
       { severity: 'caution', message: 'check', code: 'W-TEST' },
       { severity: 'info', message: 'fyi' },
     ],
-    designValue: dvOk(),
+    designValues: [dvOk()],
     envelope: [envOk()],
-    fabProfile: { id: 'jlcpcb-2026-10-06', fabricator: 'JLCPCB', profileDate: '2026-10-06', status: 'UNVERIFIED' },
+    fabProfile: {
+      id: 'jlcpcb-2026-10-06',
+      fabricator: 'JLCPCB',
+      profileDate: '2026-10-06',
+      status: 'UNVERIFIED',
+      ageDays: 1,
+      stale: false,
+    },
     limitingElement: { id: 'seg-2', name: 'neck', reason: 'narrowest segment' },
   };
 }
@@ -200,7 +207,7 @@ describe('CalcResult new shape (provenance, severity, optional blocks)', () => {
   });
   it('optional blocks may be absent', () => {
     const r = baseResult();
-    expect(r.designValue).toBeUndefined();
+    expect(r.designValues).toEqual([]);
     expect(r.envelope).toBeUndefined();
     expect(r.fabProfile).toBeUndefined();
     expect(r.limitingElement).toBeUndefined();
@@ -461,15 +468,15 @@ describe('checkEnvelope (min <= typ <= max, same dimension)', () => {
   });
 });
 
-describe('assertNoNonFinite covers designValue and envelope', () => {
-  it.each([NaN, Infinity, -Infinity])('throws for %s in designValue.calculated', (v) => {
+describe('assertNoNonFinite covers designValues and envelope', () => {
+  it.each([NaN, Infinity, -Infinity])('throws for %s in designValues[].calculated', (v) => {
     const r = fullResult();
-    r.designValue = { ...dvOk(), name: 'ampacity limit', calculated: nonFiniteQ(v) };
+    r.designValues = [{ ...dvOk(), name: 'ampacity limit', calculated: nonFiniteQ(v) }];
     expect(() => assertNoNonFinite(r)).toThrow(/ampacity limit/);
   });
-  it.each([NaN, Infinity, -Infinity])('throws for %s in designValue.recommended', (v) => {
+  it.each([NaN, Infinity, -Infinity])('throws for %s in designValues[].recommended', (v) => {
     const r = fullResult();
-    r.designValue = { ...dvOk(), name: 'ampacity limit', recommended: nonFiniteQ(v) };
+    r.designValues = [{ ...dvOk(), name: 'ampacity limit', recommended: nonFiniteQ(v) }];
     expect(() => assertNoNonFinite(r)).toThrow(/ampacity limit/);
   });
   it.each(['min', 'typ', 'max'] as const)('throws for a non-finite envelope %s and names the envelope', (k) => {
@@ -483,5 +490,73 @@ describe('assertNoNonFinite covers designValue and envelope', () => {
     const r = fullResult();
     r.envelope = [envOk(), { ...envOk(), name: 'second', max: nonFiniteQ(NaN) }];
     expect(() => assertNoNonFinite(r)).toThrow(/second/);
+  });
+});
+
+// Gate G-2/G-3 contract additions (domain review D-4, calc m-4).
+describe('assertNoNonFinite covers derating.factor and confidence.score (calc m-4)', () => {
+  it.each([NaN, Infinity, -Infinity])('throws for %s in designValues[].derating.factor', (v) => {
+    const r = fullResult();
+    r.designValues = [{ ...dvOk(), name: 'ampacity limit', derating: { factor: v, rationale: 'r' } }];
+    expect(() => assertNoNonFinite(r)).toThrow(/ampacity limit/);
+  });
+  it.each([NaN, Infinity, -Infinity])('throws for %s in confidence.score', (v) => {
+    const r = fullResult();
+    r.confidence = { level: 'low', reasons: ['x'], score: v };
+    expect(() => assertNoNonFinite(r)).toThrow(/score/i);
+  });
+});
+
+describe('checkDesignValue new rules (D-4)', () => {
+  const err = (dv: DesignValue): string => {
+    const r = checkDesignValue(dv);
+    expect(r.ok).toBe(false);
+    return r.ok ? '' : String(r.error).toLowerCase();
+  };
+  it('rejects absolute temperature values (error contains "absolute temperature")', () => {
+    const dv: DesignValue = {
+      name: 'max temp',
+      direction: 'max-limit',
+      calculated: q(400, DIM.ABS_TEMPERATURE),
+      recommended: q(280, DIM.ABS_TEMPERATURE),
+      derating: { factor: 0.7, rationale: 'r' },
+    };
+    expect(err(dv)).toContain('absolute temperature');
+    expect(err({ ...dv, direction: 'min-requirement', derating: { factor: 1, rationale: 'r' }, recommended: q(400, DIM.ABS_TEMPERATURE) })).toContain(
+      'absolute temperature',
+    );
+  });
+  it('still accepts a temperature DIFFERENCE design value', () => {
+    const dv: DesignValue = {
+      name: 'rise',
+      direction: 'max-limit',
+      calculated: q(40, DIM.TEMPERATURE_DIFFERENCE),
+      recommended: q(28, DIM.TEMPERATURE_DIFFERENCE),
+      derating: { factor: 0.7, rationale: 'r' },
+    };
+    expect(checkDesignValue(dv).ok).toBe(true);
+  });
+  const nonPos = (direction: DesignValue['direction'], c: number): DesignValue => {
+    const f = direction === 'max-limit' ? 0.5 : 2;
+    return {
+      name: 'v',
+      direction,
+      calculated: q(c, DIM.CURRENT),
+      recommended: q(c * f, DIM.CURRENT),
+      derating: { factor: f, rationale: 'r' },
+    };
+  };
+  it.each([
+    ['max-limit', 0],
+    ['max-limit', -3],
+    ['min-requirement', 0],
+    ['min-requirement', -3],
+  ] as const)('rejects non-positive calculated (%s, %s) unless allowNonPositive', (d, c) => {
+    expect(err(nonPos(d, c))).toContain('non-positive');
+    expect(checkDesignValue({ ...nonPos(d, c), allowNonPositive: true } as DesignValue).ok).toBe(true);
+  });
+  it('allowNonPositive does not waive the other rules', () => {
+    const dv = { ...nonPos('max-limit', -3), allowNonPositive: true, derating: { factor: 2, rationale: 'r' } } as DesignValue;
+    expect(checkDesignValue(dv).ok).toBe(false);
   });
 });
