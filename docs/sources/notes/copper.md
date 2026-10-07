@@ -58,10 +58,10 @@ Both are nominal labels. Their half-ounce values disagree (17.5 vs 18 µm), so n
 | 385.0 | no temperature or purity | HyperPhysics table (from Young, University Physics 7th ed.); its own cal column (0.99) converts to ≈ 414 |
 
 Conclusions:
-- The oracle's 385 W/m·K is not adequately sourced and matches none of the HPL values at 273 to 373 K.
+- The earlier oracle value 385 W/m·K was not adequately sourced and matches none of the HPL values at 273 to 373 K. It was replaced in Phase 1 task 0g. Both 2026-10-07 validators observed that PPPL's 385.00 at 300 K is the specific-heat column (J/(kg·K)), a plausible origin of the error.
 - Pure Cu at 300 K = 401 W/m·K is well supported. ETP at 20 °C is 391 to 394 (one manufacturer and one distributor, 0.8 % apart).
 - Plated via copper was not researched.
-- Do not average. The orchestrator must pick a material class and record it as an assumption.
+- Do not average. Chosen (Phase 1 task 0g, `src/core/data/constants.ts`): default `'pure-401'`, with `'c11000-391'` selectable, recorded as an assumption; the row stays CONFLICT. The default awaits the human's confirmation (R-10). The highest k gives the lowest via θ, which is the non-conservative direction.
 
 ## User must verify
 - IPC-4562A (with Amendment 1, 2013): the foil designation vs area weight (g/m²) vs nominal thickness table. Confirm 1 oz = 305 g/m² and 34.3 µm, and whether a density is stated.

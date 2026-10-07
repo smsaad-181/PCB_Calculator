@@ -23,6 +23,7 @@ export const FOOT_M = 0.3048; // exact [S-006]
 export const OUNCE_KG = 0.028349523125; // exact [S-006]
 export const OZ_PER_FT2_KG_M2 = OUNCE_KG / (FOOT_M * FOOT_M); // [S-006]
 export const KELVIN_AT_0C = 273.15; // [S-006]
+export const MIL_M = INCH_M / 1000; // exact [S-006]
 
 const NO_LEDGER: readonly string[] = [];
 const S006: readonly string[] = ['S-006'];
@@ -49,18 +50,20 @@ function def(
   }
 }
 
-const OHM_SYMBOLS = ['Ω', 'Ω', 'ohm'] as const; // Greek capital omega, OHM SIGN, ascii
+const OHM_SYMBOLS = ['Ω', 'Ω', 'ohm', 'Ohm', 'ohms', 'Ohms'] as const; // Greek capital omega, OHM SIGN, ascii spellings
 
 // Length
 def(['m'], DIM.LENGTH, 1, { prefixable: true });
 def(['cm'], DIM.LENGTH, 1e-2);
 def(['in', 'inch'], DIM.LENGTH, INCH_M, { ledgerIds: S006 });
-def(['mil'], DIM.LENGTH, INCH_M / 1000, { ledgerIds: S006 }); // 1 mil = 25.4 um exactly
+def(['mil', 'mils', 'thou'], DIM.LENGTH, MIL_M, { ledgerIds: S006 }); // 1 mil = 25.4 um exactly
 def(['ft'], DIM.LENGTH, FOOT_M, { ledgerIds: S006 });
 // Area
 def(['m2', 'm²'], DIM.AREA, 1);
 def(['cm2', 'cm²'], DIM.AREA, 1e-4);
 def(['mm2', 'mm²'], DIM.AREA, 1e-6);
+def(['mil2', 'mil²', 'sq mil', 'sqmil'], DIM.AREA, MIL_M * MIL_M, { ledgerIds: S006 });
+def(['in2', 'in²', 'sq in'], DIM.AREA, INCH_M * INCH_M, { ledgerIds: S006 });
 // Mass, time, electrical, frequency
 def(['g'], DIM.MASS, 1e-3, { prefixable: true });
 def(['oz'], DIM.MASS, OUNCE_KG, { ledgerIds: S006 });
@@ -82,6 +85,16 @@ def(['Δ°C', 'ΔdegC', 'ddegC'], DIM.TEMPERATURE_DIFFERENCE, 1, { ledgerIds: S0
 def(['Δ°F', 'ΔdegF', 'ddegF'], DIM.TEMPERATURE_DIFFERENCE, 5 / 9, { ledgerIds: S006 });
 // Areal mass (copper foil weight is oz/ft2) [S-006 factors; S-003 for the foil-thickness convention]
 def(['oz/ft2', 'oz/ft²'], DIM.AREAL_MASS, OZ_PER_FT2_KG_M2, { ledgerIds: S006_S003 });
+// Compound units (no prefixes; the unit text is matched exactly)
+def(['K/W', '°C/W', 'degC/W'], DIM.THERMAL_RESISTANCE, 1);
+def(['W/mK', 'W/(mK)', 'W/m·K', 'W/(m·K)', 'W/m.K'], DIM.THERMAL_CONDUCTIVITY, 1);
+def(['/K', '1/K', '/°C', '1/°C', '/degC', '1/degC'], DIM.PER_KELVIN, 1);
+def(['ppm/K', 'ppm/°C', 'ppm/degC'], DIM.PER_KELVIN, 1e-6);
+def(['%'], DIM.DIMENSIONLESS, 0.01);
+def(['ppm'], DIM.DIMENSIONLESS, 1e-6);
+def(['A/m2', 'A/m²'], DIM.CURRENT_DENSITY, 1);
+def(['A/cm2', 'A/cm²'], DIM.CURRENT_DENSITY, 1e4);
+def(['A/mm2', 'A/mm²'], DIM.CURRENT_DENSITY, 1e6);
 def(['kg/m2', 'kg/m²'], DIM.AREAL_MASS, 1);
 def(['g/m2', 'g/m²'], DIM.AREAL_MASS, 1e-3);
 
@@ -100,6 +113,35 @@ export const PREFIX_SCALE: ReadonlyMap<string, number> = new Map([
 
 const prefixed = new Map<string, UnitDef>(); // hits only (bounded), misses are never cached
 
+/** Length factors allowed after the separator in a resistivity unit (ohm.m, uohm.cm). */
+const RESISTIVITY_LENGTH = new Map<string, number>([
+  ['m', 1],
+  ['cm', 1e-2],
+  ['mm', 1e-3],
+]);
+
+function isResistivitySeparator(c: string): boolean {
+  return c === '·' || c === '.' || c === '*' || c === '-' || c === ' ';
+}
+
+/** "ohm.m", "µΩ·cm", "Ω m": a resistance unit, one separator, then a length unit. Undefined if the text is not of that form. */
+function resolveResistivity(name: string): UnitDef | undefined {
+  for (let i = 1; i < name.length - 1; i++) {
+    if (!isResistivitySeparator(name.charAt(i))) continue;
+    const per = RESISTIVITY_LENGTH.get(name.slice(i + 1));
+    if (per === undefined) continue;
+    const left = resolveUnit(name.slice(0, i));
+    if (left === undefined || left.dim !== DIM.RESISTANCE) continue;
+    return { ...left, symbol: name, dim: DIM.RESISTIVITY, scale: left.scale * per, ledgerIds: NO_LEDGER };
+  }
+  return undefined;
+}
+
+/** All unit definitions without prefixes (used for spelling suggestions). */
+export function baseUnits(): IterableIterator<UnitDef> {
+  return DEFS.values();
+}
+
 /** Resolve a unit string to its definition, or undefined. Case-sensitive. */
 export function resolveUnit(name: string): UnitDef | undefined {
   const direct = DEFS.get(name);
@@ -108,12 +150,15 @@ export function resolveUnit(name: string): UnitDef | undefined {
   if (cached) return cached;
   if (name.length < 2) return undefined;
   const scale = PREFIX_SCALE.get(name.charAt(0));
-  if (scale === undefined) return undefined;
-  const base = DEFS.get(name.slice(1));
-  if (!base || !base.prefixable) return undefined;
-  const made: UnitDef = { ...base, symbol: name, scale: scale * base.scale };
-  prefixed.set(name, made);
-  return made;
+  const base = scale === undefined ? undefined : DEFS.get(name.slice(1));
+  if (scale !== undefined && base?.prefixable) {
+    const made: UnitDef = { ...base, symbol: name, scale: scale * base.scale };
+    prefixed.set(name, made);
+    return made;
+  }
+  const compound = resolveResistivity(name);
+  if (compound) prefixed.set(name, compound);
+  return compound;
 }
 
 /** Public metadata for UI badges: dimension and ledger rows backing the unit's definition. */

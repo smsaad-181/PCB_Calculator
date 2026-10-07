@@ -15,7 +15,7 @@ Full original feature list: `MASTER_PROMPT_ORIGINAL.md`. This file corrects and 
 | Section 15 truncated | Phase 4 scope to be confirmed by the human. |
 
 ## Result schema
-See skill `calc-module-pattern` (`CalcResult`). Every calculator returns it. UI shows **quick answer first**, details on expand.
+The source of truth is `src/core/result.ts` (`CalcResult`); skill `calc-module-pattern` documents it and must be kept in step. Every calculator returns it. Besides method, reference, formula, steps, results, validity checks and recommendation, it carries per-input provenance (`inputs[].source`: user / default / fab-profile / preset), warnings with a severity (info / caution / warning / critical), a calculated limit vs a recommended design value with a stated derating (`designValue`), min/typ/max `envelope[]`, the `fabProfile` used, the `limitingElement`, and `dataStatus` derived from the ledger via `src/core/data-status.ts`. Confidence is rule-based (`src/core/confidence.ts`, `CONFIDENCE_RULE_TEXT`): it returns level, reasons and a numeric score; any out-of-range input forces "low"; defaulted assumptions are uncapped; safety-relevant defaults weigh double. UI shows **quick answer first**, details on expand, and never shows a confidence level without its reasons and score.
 
 ## Non-functional requirements
 - Closed-form calc < 1 ms; self-heating solver ≤ 50 iterations; envelope via corners (≤ 6 inputs) else Monte Carlo (5-10k samples) in a Web Worker.
@@ -38,6 +38,10 @@ Vite, TypeScript strict, Preact, Vitest, fast-check, ESLint. `src/core` pure. Py
 
 ## Repo layout
 ```
-src/core/{units,solvers,calculators,data}  src/workers  src/ui  src/state
+src/core/{units,solvers,calculators,data,fab}  src/workers  src/ui  src/state
 tests/  tools/reference/  docs/  .claude/  .github/
 ```
+- `src/core/result.ts` (CalcResult, guards, design-value/envelope checks), `confidence.ts` (rule-based confidence), `data-status.ts` (ledger status → dataStatus), `gate.ts` (the only place compliance wording may come from).
+- `src/core/units`: dimensions, quantities, field-aware parser, display formatting, foil conventions, AWG.
+- `src/core/data`: `constants.ts` (ledger-tagged physical constants and the foil/k assumptions), `ledger.ts` (mirror of `docs/sources/LEDGER.md`: ids and statuses, test-enforced, plus short item text shown on the About page), `fab-profiles/*.json` (date-stamped example and template fab profiles; data only, never imported by production code as defaults).
+- `src/core/fab`: `profile.ts` (`FabProfile` type, validator with no defaults, staleness).
