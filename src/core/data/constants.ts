@@ -1,6 +1,7 @@
-import { DIM, FOIL_CONVENTIONS, foilThickness, fromUnit, q, type FoilConvention, type Quantity } from '../units';
+import { DIM, FOIL_CONVENTIONS, foilThickness, fromUnit, q, toUnit, type FoilConvention, type Quantity } from '../units';
 import { LEDGER, type LedgerStatus } from './ledger';
 import type { CopperBasis } from '../result';
+import { finishedVsNominal } from './finished-copper';
 
 function ledgerStatus(id: string): LedgerStatus {
   const row = LEDGER.find((r) => r.id === id);
@@ -91,6 +92,7 @@ export function copperBasisFromFoil(
     layer,
     basis: 'nominal',
     thickness: t,
+    weightOzFt2: Number(toUnit(weight, 'oz/ft2').toFixed(9)),
     source: `Nominal thickness from foil weight using the ${convention} convention (1 oz/ft2 = ${oneOzUm.toFixed(2)} um). Conventions differ by up to ${foilSpreadPercent().toFixed(2)} %, and finished copper differs from nominal.`,
   };
 }
@@ -100,13 +102,33 @@ export interface CopperBasisFactors {
   readonly safetyRelevantDefaults: string[];
 }
 
-const NOMINAL_COPPER_DEFAULT =
-  'Nominal copper thickness used instead of finished copper: finished thickness is roughly -29 % to +37 % of nominal (secondhand figure from IPC-6012 minimums, not read from the standard), so current capacity and resistance are uncertain by that range.';
+const signedRounded = (v: number): string => {
+  const r = Math.round(v);
+  return r === 0 ? '0' : `${r < 0 ? '-' : '+'}${String(Math.abs(r))}`;
+};
+
+/** Per layer and weight text from ledger S-009 (secondhand minimums, not typical values), against the actual nominal thickness. */
+function nominalCopperText(basis: CopperBasis): string {
+  const lead = 'Nominal copper thickness used instead of finished copper';
+  const nominalUm = basis.thickness.si * 1e6;
+  const f = basis.weightOzFt2 === undefined ? undefined : finishedVsNominal(basis.layer, basis.weightOzFt2, nominalUm);
+  if (f === undefined || basis.weightOzFt2 === undefined) {
+    return `${lead}: there is no S-009 figure for this weight, so the finished thickness is unknown and current capacity and resistance are uncertain; thinner than nominal is the non-conservative direction for current capacity and heating.`;
+  }
+  const w = String(basis.weightOzFt2);
+  const nom = `${nominalUm.toFixed(1)} um`;
+  const figure = `the finished ${basis.layer}-layer minimum for ${w} oz/ft2 is ${f.minimumUm.toFixed(1)} um (${f.class}), ${signedRounded(f.percentVsNominal)} % against the nominal ${nom} used here (secondhand figure from IPC-6012 minimums, ledger S-009, not read from the standard; these are minimums, not typical values)`;
+  const direction =
+    basis.layer === 'inner'
+      ? 'thinner than nominal is the non-conservative direction for current capacity and heating'
+      : 'thicker than nominal lowers resistance but plated outer copper is not uniform';
+  return `${lead}: ${figure}; ${direction}.`;
+}
 
 /** Confidence factors implied by a copper basis. Only a nominal basis is a safety-relevant default. */
 export function copperBasisFactors(basis: CopperBasis): CopperBasisFactors {
   return {
     defaultedAssumptions: [],
-    safetyRelevantDefaults: basis.basis === 'nominal' ? [NOMINAL_COPPER_DEFAULT] : [],
+    safetyRelevantDefaults: basis.basis === 'nominal' ? [nominalCopperText(basis)] : [],
   };
 }

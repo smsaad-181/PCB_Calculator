@@ -4,7 +4,7 @@ import * as units from './units';
 import { DIM, q } from './units';
 import type { Quantity } from './units';
 import * as res from './result';
-import { assertCalcResult, assertNoNonFinite, checkCopperBasis, checkElements, rankElements } from './result';
+import { FAB_PROFILE_MAX_AGE_DAYS, assertCalcResult, assertNoNonFinite, checkCopperBasis, checkElements, rankElements } from './result';
 import type { Bound, CalcResult, CopperBasis, ElementResult } from './result';
 
 // Gate G-2/G-3: result schema v2 (bound, designValues, elements, copperBasis, exports, fabProfile age) and
@@ -55,7 +55,9 @@ function good(): CalcResult {
     limitingElement: { id: 'b', name: 'element b', reason: 'highest utilisation' },
     copperBasis: cb(),
     exports: [{ id: 'nc-1', kind: 'net-class', values: { width: q(0.2e-3, DIM.LENGTH) }, note: 'n' }],
-    fabProfile: { id: 'p', fabricator: 'F', profileDate: '2026-10-06', status: 'UNVERIFIED', ageDays: 3, stale: false },
+    // CHANGED (contract A6): status was 'UNVERIFIED' with dataStatus 'VERIFIED', which is now an error (fab profile
+    // status must not be better than the result's dataStatus). The fixture is now a VERIFIED profile.
+    fabProfile: { id: 'p', fabricator: 'F', profileDate: '2026-10-06', status: 'VERIFIED', ageDays: 3, stale: false },
   };
 }
 
@@ -457,5 +459,277 @@ describe('schema exports exist', () => {
     for (const n of ['assertCalcResult', 'checkElements', 'rankElements', 'checkCopperBasis']) {
       expect(typeof (res as unknown as Record<string, unknown>)[n]).toBe('function');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------------------------------------
+// Contract A (domain review G3-a/b/e): confidence, validity checks, primary result, negative minimum, fab profile.
+// ---------------------------------------------------------------------------------------------------------
+type Conf = CalcResult['confidence'];
+const withConf = (c: Conf, mut?: (r: CalcResult) => void): CalcResult => {
+  const r = good();
+  r.confidence = c;
+  mut?.(r);
+  return r;
+};
+const failedCheck = (r: CalcResult): void => {
+  r.validityChecks = [{ name: 'current in range', ok: false, detail: '40 A > 35 A' }];
+};
+
+describe('assertCalcResult A1: a failed validity check forces confidence low', () => {
+  it.each([
+    ['high', 0, []],
+    ['medium', 1, ['r']],
+  ] as const)('failed check with level %s is an error containing "validity check"', (level, score, reasons) => {
+    const r = withConf({ level, reasons: [...reasons], score }, failedCheck);
+    expect(joined(errorsOf(r))).toContain('validity check');
+  });
+  it('failed check with level low is accepted (even when the score alone would say medium)', () => {
+    expect(assertCalcResult(withConf({ level: 'low', reasons: ['current = 40 A (allowed: <= 35 A)'], score: 1 }, failedCheck)).ok).toBe(true);
+    expect(assertCalcResult(withConf({ level: 'low', reasons: ['r'], score: 2 }, failedCheck)).ok).toBe(true);
+  });
+  it('all checks ok: no validity-check error at any level', () => {
+    const r = withConf({ level: 'high', reasons: [], score: 0 }, (x) => {
+      x.validityChecks = [{ name: 'c', ok: true, detail: 'fine' }];
+    });
+    expect(assertCalcResult(r).ok).toBe(true);
+  });
+  it('one failed check among several ok ones still counts', () => {
+    const r = withConf({ level: 'medium', reasons: ['r'], score: 1 }, (x) => {
+      x.validityChecks = [
+        { name: 'a', ok: true, detail: '' },
+        { name: 'b', ok: false, detail: 'bad' },
+        { name: 'c', ok: true, detail: '' },
+      ];
+    });
+    expect(joined(errorsOf(r))).toContain('validity check');
+  });
+});
+
+describe('assertCalcResult A2: level must match the score', () => {
+  it.each([
+    [0, 'high', []],
+    [1, 'medium', ['r']],
+    [2, 'medium', ['r']],
+    [3, 'low', ['r']],
+    [7, 'low', ['r']],
+  ] as const)('score %s with level %s is accepted', (score, level, reasons) => {
+    expect(assertCalcResult(withConf({ level, reasons: [...reasons], score })).ok).toBe(true);
+  });
+  it.each([
+    [0, 'medium'],
+    [0, 'low'],
+    [1, 'high'],
+    [1, 'low'],
+    [2, 'high'],
+    [2, 'low'],
+    [3, 'high'],
+    [3, 'medium'],
+    [7, 'high'],
+  ] as const)('score %s with level %s (no failed check) is an error naming "level" and "score"', (score, level) => {
+    const e = joined(errorsOf(withConf({ level, reasons: ['r'], score })));
+    expect(e).toContain('level');
+    expect(e).toContain('score');
+  });
+  it('score 0 with level low is accepted when a validity check failed', () => {
+    expect(assertCalcResult(withConf({ level: 'low', reasons: ['r'], score: 0 }, failedCheck)).ok).toBe(true);
+  });
+  it('a failed check does not excuse level high on a high score (both errors reported)', () => {
+    const e = joined(errorsOf(withConf({ level: 'high', reasons: [], score: 7 }, failedCheck)));
+    expect(e).toContain('validity check');
+  });
+  it('property: the level rateConfidence-style thresholds give is always accepted; any other level is rejected', () => {
+    const levelFor = (s: number): Conf['level'] => (s === 0 ? 'high' : s <= 2 ? 'medium' : 'low');
+    fc.assert(
+      fc.property(fc.integer({ min: 0, max: 20 }), fc.constantFrom<Conf['level']>('high', 'medium', 'low'), (score, level) => {
+        const out = assertCalcResult(withConf({ level, reasons: level === 'high' ? [] : ['r'], score }));
+        expect(out.ok).toBe(level === levelFor(score));
+      }),
+    );
+  });
+});
+
+describe('assertCalcResult A3: reasons are non-empty unless the level is high', () => {
+  it.each([
+    ['medium', 1],
+    ['low', 3],
+  ] as const)('level %s with empty reasons is an error containing "reasons"', (level, score) => {
+    expect(joined(errorsOf(withConf({ level, reasons: [], score })))).toContain('reasons');
+  });
+  it('level high with empty reasons is accepted', () => {
+    expect(assertCalcResult(withConf({ level: 'high', reasons: [], score: 0 })).ok).toBe(true);
+  });
+  it('level low forced by a failed check still needs reasons', () => {
+    expect(joined(errorsOf(withConf({ level: 'low', reasons: [], score: 2 }, failedCheck)))).toContain('reasons');
+  });
+});
+
+describe('assertCalcResult A4: at least one primary result', () => {
+  it('no results at all', () => {
+    const r = good();
+    r.results = [];
+    expect(joined(errorsOf(r))).toContain('primary');
+  });
+  it('only secondary results', () => {
+    const r = good();
+    r.results = [{ name: 'y', value: q(2, DIM.LENGTH), role: 'secondary', bound: 'nominal' }];
+    expect(joined(errorsOf(r))).toContain('primary');
+  });
+  it('one primary among secondaries is accepted; two primaries are accepted', () => {
+    const r = good();
+    r.results = [
+      { name: 's', value: q(2, DIM.LENGTH), role: 'secondary', bound: 'nominal' },
+      { name: 'p1', value: q(2, DIM.LENGTH), role: 'primary', bound: 'nominal' },
+      { name: 'p2', value: q(3, DIM.CURRENT), role: 'primary', bound: 'max-capacity' },
+    ];
+    expect(assertCalcResult(r).ok).toBe(true);
+  });
+});
+
+describe('assertCalcResult A5: no negative minimum requirement', () => {
+  const withMin = (si: number, dim: Quantity['dim']): CalcResult => {
+    const r = good();
+    r.results = [
+      { name: 'trace width', value: q(si, dim), role: 'primary', bound: 'min-requirement' },
+      { name: 'ampacity', value: q(3, DIM.CURRENT), role: 'secondary', bound: 'max-capacity' },
+    ];
+    return r;
+  };
+  it.each([-1e-6, -0.001, -5])('min-requirement length %s is an error containing "negative minimum" naming the result', (v) => {
+    const e = joined(errorsOf(withMin(v, DIM.LENGTH)));
+    expect(e).toContain('negative minimum');
+    expect(e).toContain('trace width');
+  });
+  it('min-requirement current and area are covered too', () => {
+    expect(joined(errorsOf(withMin(-1, DIM.CURRENT)))).toContain('negative minimum');
+    expect(joined(errorsOf(withMin(-1, DIM.AREA)))).toContain('negative minimum');
+  });
+  it('a positive minimum, and a zero minimum, are not "negative"', () => {
+    expect(assertCalcResult(withMin(0.2e-3, DIM.LENGTH)).ok).toBe(true);
+    expect(assertCalcResult(withMin(0, DIM.LENGTH)).ok).toBe(true);
+  });
+  it('a negative min-requirement temperature difference is allowed (temperature dimensions are exempt)', () => {
+    const r = good();
+    r.results = [{ name: 'margin', value: q(-5, DIM.TEMPERATURE_DIFFERENCE), role: 'primary', bound: 'min-requirement' }];
+    const out = assertCalcResult(r);
+    expect(out.ok ? '' : joined(out.error)).not.toContain('negative minimum');
+  });
+  it.each(['max-capacity', 'nominal', 'prediction'] as const)('a negative %s value is not flagged by this rule', (bound) => {
+    const r = good();
+    r.results = [{ name: 'v', value: q(-2, DIM.LENGTH), role: 'primary', bound }];
+    const out = assertCalcResult(r);
+    expect(out.ok ? '' : joined(out.error)).not.toContain('negative minimum');
+  });
+});
+
+describe('assertCalcResult A6: fab profile age, status and staleness', () => {
+  const fp = (r: CalcResult): NonNullable<CalcResult['fabProfile']> => {
+    if (!r.fabProfile) throw new Error('fixture');
+    return r.fabProfile;
+  };
+  it('FAB_PROFILE_MAX_AGE_DAYS is 365', () => {
+    expect(FAB_PROFILE_MAX_AGE_DAYS).toBe(365);
+  });
+  it.each([
+    [0, false],
+    [364, false],
+    [365, false],
+    [366, true],
+    [900, true],
+  ])('ageDays %s with stale %s is consistent', (ageDays, stale) => {
+    const r = good();
+    r.fabProfile = { ...fp(r), ageDays, stale };
+    r.confidence = { level: 'medium', reasons: ['r'], score: 1 };
+    expect(assertCalcResult(r).ok).toBe(true);
+  });
+  it.each([
+    [365, true],
+    [10, true],
+    [366, false],
+    [900, false],
+  ])('ageDays %s with stale %s is an error containing "stale"', (ageDays, stale) => {
+    const r = good();
+    r.fabProfile = { ...fp(r), ageDays, stale };
+    expect(joined(errorsOf(r))).toContain('stale');
+  });
+  it('a stale profile forbids confidence high (error contains "stale")', () => {
+    const r = good();
+    r.fabProfile = { ...fp(r), ageDays: 400, stale: true };
+    r.confidence = { level: 'high', reasons: [], score: 0 };
+    expect(joined(errorsOf(r))).toContain('stale');
+  });
+  it('a stale profile with medium or low confidence is accepted', () => {
+    const r = good();
+    r.fabProfile = { ...fp(r), ageDays: 400, stale: true };
+    expect(assertCalcResult(r).ok).toBe(true);
+    r.confidence = { level: 'low', reasons: ['r'], score: 3 };
+    expect(assertCalcResult(r).ok).toBe(true);
+  });
+  it('a non-stale VERIFIED profile may coexist with level high', () => {
+    const r = good();
+    r.confidence = { level: 'high', reasons: [], score: 0 };
+    expect(assertCalcResult(r).ok).toBe(true);
+  });
+  it.each(['UNVERIFIED', 'PAYWALLED', 'CONFLICT'] as const)(
+    'fab profile status %s with result.dataStatus VERIFIED is an error containing "fab profile"',
+    (status) => {
+      const r = good();
+      r.fabProfile = { ...fp(r), status };
+      r.dataStatus = 'VERIFIED';
+      expect(joined(errorsOf(r))).toContain('fab profile');
+    },
+  );
+  it.each(['UNVERIFIED', 'PAYWALLED', 'CONFLICT'] as const)(
+    'fab profile status %s with result.dataStatus %s is accepted (confidence consistent)',
+    (status) => {
+      const r = good();
+      r.fabProfile = { ...fp(r), status };
+      r.dataStatus = status;
+      r.confidence = { level: 'medium', reasons: ['r'], score: 1 };
+      expect(assertCalcResult(r).ok).toBe(true);
+    },
+  );
+});
+
+describe('assertCalcResult: a legitimate fully populated trace-width-like result passes', () => {
+  function traceWidthLike(): CalcResult {
+    const r = good();
+    r.results = [
+      { name: 'minimum trace width', value: q(0.31e-3, DIM.LENGTH), role: 'primary', bound: 'min-requirement' },
+      { name: 'current capacity at this width', value: q(3.2, DIM.CURRENT), role: 'secondary', bound: 'max-capacity' },
+    ];
+    r.designValues = [
+      {
+        name: 'recommended trace width',
+        direction: 'min-requirement',
+        calculated: q(0.31e-3, DIM.LENGTH),
+        recommended: q(0.31e-3 * 1.25, DIM.LENGTH),
+        derating: { factor: 1.25, rationale: 'test margin' },
+      },
+      {
+        name: 'recommended continuous current',
+        direction: 'max-limit',
+        calculated: q(3.2, DIM.CURRENT),
+        recommended: q(3.2 * 0.8, DIM.CURRENT),
+        derating: { factor: 0.8, rationale: 'test margin' },
+      },
+    ];
+    r.fabProfile = { id: 'p', fabricator: 'F', profileDate: '2026-09-26', status: 'VERIFIED', ageDays: 10, stale: false };
+    r.dataStatus = 'VERIFIED';
+    r.confidence = { level: 'medium', reasons: ['Safety-relevant assumption in effect: maxTemp.'], score: 2 };
+    return r;
+  }
+  it('is ok', () => {
+    const out = assertCalcResult(traceWidthLike());
+    expect(out.ok, out.ok ? '' : out.error.join('; ')).toBe(true);
+  });
+  it('has the blocks the fixture claims (guards against the fixture rotting)', () => {
+    const r = traceWidthLike();
+    expect(r.results.map((x) => x.bound)).toEqual(['min-requirement', 'max-capacity']);
+    expect(r.designValues.map((d) => d.direction)).toEqual(['min-requirement', 'max-limit']);
+    expect(r.envelope).toBeDefined();
+    expect(r.elements?.length).toBeGreaterThan(0);
+    expect(r.copperBasis).toBeDefined();
+    expect(r.fabProfile?.ageDays).toBe(10);
   });
 });

@@ -224,15 +224,17 @@ describe('CalcResult new shape (provenance, severity, optional blocks)', () => {
 
 describe('defaultedInputNames', () => {
   const mk = (name: string, source: Input['source']): Input => ({ name, value: q(1, DIM.LENGTH), source });
-  it('lists every input whose source is not user, in order (presets and fab-profile included)', () => {
-    expect(defaultedInputNames(fullResult().inputs)).toEqual(['k', 'plating', 'foil']);
+  // CHANGED (contract B): fab-profile inputs are no longer "defaulted" (agrees with confidenceFactorsFromInputs).
+  it("lists inputs whose source is 'default' or 'preset', in order; fab-profile and user are excluded", () => {
+    expect(defaultedInputNames(fullResult().inputs)).toEqual(['k', 'foil']);
   });
   it('is empty for empty or all-user inputs', () => {
     expect(defaultedInputNames([])).toEqual([]);
     expect(defaultedInputNames([mk('a', 'user'), mk('b', 'user')])).toEqual([]);
   });
-  it('lists all names when none came from the user', () => {
-    expect(defaultedInputNames([mk('a', 'default'), mk('b', 'preset'), mk('c', 'fab-profile')])).toEqual(['a', 'b', 'c']);
+  it('fab-profile inputs are never listed (changed from: all non-user inputs)', () => {
+    expect(defaultedInputNames([mk('a', 'default'), mk('b', 'preset'), mk('c', 'fab-profile')])).toEqual(['a', 'b']);
+    expect(defaultedInputNames([mk('c', 'fab-profile')])).toEqual([]);
   });
   it('does not mutate its argument', () => {
     const inputs = fullResult().inputs;
@@ -240,12 +242,12 @@ describe('defaultedInputNames', () => {
     defaultedInputNames(inputs);
     expect(inputs).toEqual(copy);
   });
-  it('count equals the number of non-user inputs (property)', () => {
+  it('count equals the number of default/preset inputs (property; was: non-user)', () => {
     const src = fc.constantFrom<Input['source']>('user', 'default', 'fab-profile', 'preset');
     fc.assert(
       fc.property(fc.array(src, { maxLength: 20 }), (sources) => {
         const inputs = sources.map((s, i) => mk(`n${String(i)}`, s));
-        expect(defaultedInputNames(inputs)).toHaveLength(sources.filter((s) => s !== 'user').length);
+        expect(defaultedInputNames(inputs)).toHaveLength(sources.filter((s) => s === 'default' || s === 'preset').length);
       }),
     );
   });

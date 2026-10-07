@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
 import * as conf from './confidence';
-import { confidenceFactorsFromInputs, confidenceScore, rateConfidence } from './confidence';
+import { confidenceFactorsFromInputs, confidenceScore, provenanceNames, rateConfidence } from './confidence';
 import { DIM, q } from './units';
+import { defaultedInputNames } from './result';
 import type { CalcInput } from './result';
 
 // Gate G-3 (domain review m-E, calc m-2/m-5): data-status spellings, structured out-of-range, disjoint lists,
@@ -153,9 +154,17 @@ describe('confidenceFactorsFromInputs', () => {
     expect([...f.defaultedAssumptions]).toEqual([]);
     expect([...(f.safetyRelevantDefaults ?? [])]).toEqual([]);
   });
-  it('a fab-profile input named safety-relevant is not a default either', () => {
-    const f = confidenceFactorsFromInputs({ ...base, inputs: [inp('plating', 'fab-profile')], safetyRelevant: ['plating'] });
-    expect([...(f.safetyRelevantDefaults ?? [])]).toEqual([]);
+  // CHANGED (contract B): was "is not a default either" (no throw). A fab-profile value is not defaulted, so naming it
+  // safety-relevant is a caller error and is rejected, with a message that says why.
+  it('a fab-profile input named safety-relevant is rejected with ConfidenceInputError (it is not defaulted)', () => {
+    const call = (): unknown => confidenceFactorsFromInputs({ ...base, inputs: [inp('plating', 'fab-profile')], safetyRelevant: ['plating'] });
+    expect(call).toThrow(conf.ConfidenceInputError);
+    expect(call).toThrow(/plating/);
+    expect(call).toThrow(/fab[- ]profile/i);
+    expect(call).toThrow(/not defaulted|not a default/i);
+  });
+  it('the unknown-name message names the offending name and says it is not one of the inputs', () => {
+    expect(() => confidenceFactorsFromInputs({ ...base, inputs: [inp('a', 'default')], safetyRelevant: ['typo'] })).toThrow(/typo.*not one of the inputs/);
   });
   it('an unknown name in safetyRelevant throws ConfidenceInputError', () => {
     expect(() => confidenceFactorsFromInputs({ ...base, inputs: [inp('a', 'default')], safetyRelevant: ['typo'] })).toThrow(
@@ -204,5 +213,36 @@ describe('confidenceFactorsFromInputs', () => {
     confidenceFactorsFromInputs({ ...base, inputs, safetyRelevant });
     expect(inputs).toEqual(copy);
     expect(safetyRelevant).toEqual(['a']);
+  });
+});
+
+describe('provenanceNames (UI display; contract B)', () => {
+  const mkInputs = (sources: Src[]): CalcInput[] => sources.map((s, i) => inp(`n${String(i)}`, s));
+  it('groups input names by provenance in input order; user inputs appear in no group', () => {
+    const inputs = [inp('a', 'user'), inp('b', 'default'), inp('c', 'preset'), inp('d', 'fab-profile'), inp('e', 'default'), inp('f', 'fab-profile')];
+    expect(provenanceNames(inputs)).toEqual({ fabProfile: ['d', 'f'], preset: ['c'], default: ['b', 'e'] });
+  });
+  it('empty and all-user inputs give three empty lists', () => {
+    expect(provenanceNames([])).toEqual({ fabProfile: [], preset: [], default: [] });
+    expect(provenanceNames([inp('a', 'user')])).toEqual({ fabProfile: [], preset: [], default: [] });
+  });
+  it('agrees with confidenceFactorsFromInputs and defaultedInputNames: default + preset are exactly the defaulted ones (property)', () => {
+    const src = fc.constantFrom<Src>('user', 'default', 'fab-profile', 'preset');
+    fc.assert(
+      fc.property(fc.array(src, { maxLength: 15 }), (sources) => {
+        const inputs = mkInputs(sources);
+        const p = provenanceNames(inputs);
+        const f = confidenceFactorsFromInputs({ accuracyClass: 'exact', dataStatus: 'VERIFIED', inputs });
+        expect([...p.default, ...p.preset].sort()).toEqual([...f.defaultedAssumptions].sort());
+        expect([...defaultedInputNames(inputs)].sort()).toEqual([...f.defaultedAssumptions].sort());
+        expect(p.fabProfile).toHaveLength(sources.filter((s) => s === 'fab-profile').length);
+      }),
+    );
+  });
+  it('does not mutate its argument', () => {
+    const inputs = mkInputs(['default', 'fab-profile']);
+    const copy = inputs.map((i) => ({ ...i }));
+    provenanceNames(inputs);
+    expect(inputs).toEqual(copy);
   });
 });

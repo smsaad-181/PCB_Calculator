@@ -56,6 +56,8 @@ export interface CopperBasis {
   basis: CopperBasisKind;
   thickness: Quantity;
   source: string;
+  /** Foil weight in oz/ft2 when the basis came from a foil weight; lets finished-copper text be per weight. */
+  weightOzFt2?: number;
 }
 
 export interface CalcExport {
@@ -141,9 +143,9 @@ export function guardPositiveFinite(name: string, qty: Quantity): Result<Quantit
   return bad === null ? { ok: true, value: qty } : { ok: false, error: invalid(name, bad) };
 }
 
-/** Names of inputs not supplied by the user (default, fab profile, preset), in order. */
+/** Names of inputs the user did not supply and that are assumptions (source default or preset), in order. Fab-profile values are excluded. */
 export function defaultedInputNames(inputs: readonly CalcInput[]): string[] {
-  return inputs.filter((i) => i.source !== 'user').map((i) => i.name);
+  return inputs.filter((i) => i.source === 'default' || i.source === 'preset').map((i) => i.name);
 }
 
 const SEVERITY_RANK: Readonly<Record<WarningSeverity, number>> = { info: 0, caution: 1, warning: 2, critical: 3 };
@@ -203,6 +205,8 @@ export function checkEnvelope(e: Envelope): Result<Envelope, string> {
   return { ok: true, value: e };
 }
 
+/** A fab profile older than this many days is stale. */
+export const FAB_PROFILE_MAX_AGE_DAYS = 365;
 const REL_TOL = 1e-9;
 const isFiniteQ = (x: Quantity): boolean => Number.isFinite(x.si);
 const SEVERITIES: readonly string[] = ['info', 'caution', 'warning', 'critical'];
@@ -354,6 +358,38 @@ export function assertCalcResult(r: CalcResult): Result<CalcResult, string[]> {
       const a = r.fabProfile.ageDays;
       if (!Number.isInteger(a) || a < 0) errors.push(`fabProfile.ageDays (${String(a)}) must be a non-negative whole number.`);
       if (typeof r.fabProfile.stale !== 'boolean') errors.push('fabProfile.stale must be a boolean.');
+      else if (Number.isFinite(a) && r.fabProfile.stale !== a > FAB_PROFILE_MAX_AGE_DAYS) {
+        errors.push(
+          `fabProfile.stale is ${String(r.fabProfile.stale)} but ageDays ${String(a)} ${a > FAB_PROFILE_MAX_AGE_DAYS ? 'exceeds' : 'does not exceed'} ${String(FAB_PROFILE_MAX_AGE_DAYS)}; stale must equal (ageDays > ${String(FAB_PROFILE_MAX_AGE_DAYS)}).`,
+        );
+      }
+      if (r.fabProfile.stale === true && r.confidence.level === 'high') {
+        errors.push('A stale fab profile is in use but confidence level is high; stale data cannot rate high.');
+      }
+      if (r.fabProfile.status !== 'VERIFIED' && r.dataStatus === 'VERIFIED') {
+        errors.push(`The fab profile status is ${String(r.fabProfile.status)} but dataStatus is VERIFIED; dataStatus must be the same non-VERIFIED status.`);
+      }
+    }
+    const failed = r.validityChecks.filter((c) => !c.ok);
+    const lvl = r.confidence.level;
+    if (failed.length > 0 && lvl !== 'low') {
+      errors.push(`Validity check failed ("${failed.map((c) => c.name).join('", "')}") but confidence level is ${String(lvl)}; it must be low.`);
+    }
+    const sc = r.confidence.score;
+    if (Number.isFinite(sc) && LEVELS.includes(lvl)) {
+      const expected = sc === 0 ? 'high' : sc <= 2 ? 'medium' : 'low';
+      if (lvl !== expected && !(lvl === 'low' && failed.length > 0)) {
+        errors.push(`Confidence level "${lvl}" does not match score ${String(sc)} (expected ${expected}).`);
+      }
+    }
+    if (r.confidence.reasons.length === 0 && lvl !== 'high') {
+      errors.push(`Confidence level is ${String(lvl)} but reasons is empty; every non-high level needs reasons.`);
+    }
+    if (!r.results.some((o) => o.role === 'primary')) errors.push('No result has role "primary"; exactly one headline result is required.');
+    for (const o of r.results) {
+      if (o.bound === 'min-requirement' && Number.isFinite(o.value.si) && o.value.si < 0 && o.value.dim.kind !== 'absTemp' && o.value.dim.kind !== 'deltaT') {
+        errors.push(`Result "${o.name}" is a min-requirement with a negative minimum (${String(o.value.si)}).`);
+      }
     }
   } catch (e) {
     errors.push(`Result could not be fully checked: ${e instanceof Error ? e.message : String(e)}`);

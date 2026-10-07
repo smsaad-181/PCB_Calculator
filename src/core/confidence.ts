@@ -74,9 +74,8 @@ function normalizeDataStatus(s: unknown): DataStatus {
 }
 
 const oorName = (e: OutOfRangeInput): string => (typeof e === 'string' ? e : e.name);
-/** A bare name is the whole reason; names too short to read as a sentence get a suffix (reasons must be readable). */
-const oorText = (e: OutOfRangeInput): string =>
-  typeof e === 'string' ? (e.trim().length > 3 ? e : `${e} (outside validity range)`) : `${e.name} = ${e.value} (allowed: ${e.bound})`;
+/** A bare name is the whole reason; the structured form adds the value and the allowed range. */
+const oorText = (e: OutOfRangeInput): string => (typeof e === 'string' ? e : `${e.name} = ${e.value} (allowed: ${e.bound})`);
 
 /** Defaulted assumptions that are not also safety-relevant (a shared name counts once, at the safety weight). */
 function ordinaryDefaults(f: ConfidenceFactors): string[] {
@@ -117,9 +116,8 @@ export function rateConfidence(f: ConfidenceFactors): Confidence {
   if (defaulted.length > 0) {
     reasons.push(`Defaulted assumptions used: ${defaulted.join(', ')}.`);
   }
-  const safety = f.safetyRelevantDefaults ?? [];
-  if (safety.length > 0) {
-    reasons.push(`Safety-relevant values were defaulted, not user-supplied: ${safety.join(', ')}.`);
+  for (const item of f.safetyRelevantDefaults ?? []) {
+    reasons.push(`Safety-relevant assumption in effect: ${item.trim().replace(/\.+$/, '')}.`);
   }
   if (f.accuracyClass === 'empirical') {
     reasons.push('Method is empirical (curve-fit accuracy class).');
@@ -148,12 +146,31 @@ export interface ConfidenceFromInputsArgs {
   readonly dataStatus: DataStatus;
 }
 
+export interface ProvenanceNames {
+  readonly fabProfile: string[];
+  readonly preset: string[];
+  readonly default: string[];
+}
+
+/** Names of non-user inputs grouped by source, in input order. User inputs belong to no group. */
+export function provenanceNames(inputs: readonly CalcInput[]): ProvenanceNames {
+  const pick = (src: CalcInput['source']): string[] => inputs.filter((i) => i.source === src).map((i) => i.name);
+  return { fabProfile: pick('fab-profile'), preset: pick('preset'), default: pick('default') };
+}
+
 /** Derive confidence factors from input provenance so a calculator cannot default an input and still rate high. */
 export function confidenceFactorsFromInputs(a: ConfidenceFromInputsArgs): ConfidenceFactors {
   const names = new Set(a.inputs.map((i) => i.name));
   const safetyNames = new Set(a.safetyRelevant ?? []);
   for (const n of safetyNames) {
     if (!names.has(n)) throw new ConfidenceInputError(`safetyRelevant names "${n}", which is not one of the inputs.`);
+  }
+  for (const i of a.inputs) {
+    if (i.source === 'fab-profile' && safetyNames.has(i.name)) {
+      throw new ConfidenceInputError(
+        `safetyRelevant names "${i.name}", which is a fab profile input; a fab-profile value is not defaulted, so it is not a default and cannot be safety-relevant.`,
+      );
+    }
   }
   const defaultedInputs = a.inputs.filter((i) => i.source === 'default' || i.source === 'preset');
   return {
