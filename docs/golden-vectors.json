@@ -130,9 +130,9 @@
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
-        "S-013": "UNVERIFIED"
+        "S-013": "VERIFIED"
       },
-      "status": "UNVERIFIED",
+      "status": "VERIFIED",
       "note": "mu_r = 1, mu0 = 4e-7*pi"
     },
     {
@@ -174,6 +174,294 @@
       },
       "status": "VERIFIED",
       "note": ""
+    },
+    {
+      "name": "copper_um_1oz_nominal-35um",
+      "oracle_value": 35.0,
+      "pinned_expected": 35.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "chosen convention 35 um per oz/ft2"
+    },
+    {
+      "name": "copper_um_2oz_nominal-35um",
+      "oracle_value": 70.0,
+      "pinned_expected": 70.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "chosen convention 35 um per oz/ft2"
+    },
+    {
+      "name": "copper_um_0.5oz_nominal-35um",
+      "oracle_value": 17.5,
+      "pinned_expected": 17.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "chosen convention 35 um per oz/ft2"
+    },
+    {
+      "name": "copper_um_1oz_nominal-1.35mil",
+      "oracle_value": 34.29,
+      "pinned_expected": 34.29,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "1.35 mil x 25.4 um/mil, reported IPC-4562A (secondhand)"
+    },
+    {
+      "name": "copper_um_2oz_nominal-1.35mil",
+      "oracle_value": 68.58,
+      "pinned_expected": 68.58,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "1.35 mil x 25.4 um/mil, reported IPC-4562A (secondhand)"
+    },
+    {
+      "name": "copper_um_0.5oz_nominal-1.35mil",
+      "oracle_value": 17.145,
+      "pinned_expected": 17.145,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "1.35 mil x 25.4 um/mil, reported IPC-4562A (secondhand)"
+    },
+    {
+      "name": "copper_um_1oz_mass-density",
+      "oracle_value": 34.32527865848601,
+      "pinned_expected": 34.32527865848601,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "areal mass (0.028349523125/0.09290304 kg/m2) / 8890 kg/m3"
+    },
+    {
+      "name": "copper_um_2oz_mass-density",
+      "oracle_value": 68.65055731697203,
+      "pinned_expected": 68.65055731697203,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "areal mass / 8890 kg/m3"
+    },
+    {
+      "name": "copper_um_0.5oz_mass-density",
+      "oracle_value": 17.162639329243007,
+      "pinned_expected": 17.162639329243007,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "areal mass / 8890 kg/m3"
+    },
+    {
+      "name": "copper_oz_35um_nominal-35um",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_17.5um_nominal-35um",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_70um_nominal-35um",
+      "oracle_value": 2.0,
+      "pinned_expected": 2.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_35um_nominal-1.35mil",
+      "oracle_value": 1.020705745115194,
+      "pinned_expected": 1.020705745115194,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_17.5um_nominal-1.35mil",
+      "oracle_value": 0.510352872557597,
+      "pinned_expected": 0.510352872557597,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_70um_nominal-1.35mil",
+      "oracle_value": 2.041411490230388,
+      "pinned_expected": 2.041411490230388,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_35um_mass-density",
+      "oracle_value": 1.019656689410362,
+      "pinned_expected": 1.019656689410362,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_17.5um_mass-density",
+      "oracle_value": 0.509828344705181,
+      "pinned_expected": 0.509828344705181,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_70um_mass-density",
+      "oracle_value": 2.039313378820724,
+      "pinned_expected": 2.039313378820724,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
     },
     {
       "name": "awg_36_diameter_mm",

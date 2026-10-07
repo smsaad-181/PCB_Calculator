@@ -54,12 +54,18 @@ export function copperThermalConductivity(material: CopperKMaterial): CopperTher
 export const DEFAULT_FOIL_CONVENTION: FoilConvention = 'nominal-35um';
 
 /** Spread of the three foil thickness conventions at 1 oz/ft2, as a percent of the smallest. */
+/** The spread depends only on the fixed convention table, so it is computed once on first use. */
+let cachedFoilSpreadPercent: number | undefined;
+
 export function foilSpreadPercent(): number {
-  const oneOz = fromUnit(1, 'oz/ft2');
-  const t = (Object.keys(FOIL_CONVENTIONS) as FoilConvention[]).map((c) => foilThickness(oneOz, c).thickness.si);
-  const lo = Math.min(...t);
-  const hi = Math.max(...t);
-  return ((hi - lo) / lo) * 100;
+  if (cachedFoilSpreadPercent === undefined) {
+    const oneOz = fromUnit(1, 'oz/ft2');
+    const t = (Object.keys(FOIL_CONVENTIONS) as FoilConvention[]).map((c) => foilThickness(oneOz, c).thickness.si);
+    const lo = Math.min(...t);
+    const hi = Math.max(...t);
+    cachedFoilSpreadPercent = ((hi - lo) / lo) * 100;
+  }
+  return cachedFoilSpreadPercent;
 }
 
 export function foilAssumptionText(): string {
