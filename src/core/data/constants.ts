@@ -1,5 +1,7 @@
-import { DIM, FOIL_CONVENTIONS, foilThickness, fromUnit, q, type FoilConvention, type Quantity } from '../units';
+import { DIM, FOIL_CONVENTIONS, foilThickness, fromUnit, q, toUnit, type FoilConvention, type Quantity } from '../units';
 import { LEDGER, type LedgerStatus } from './ledger';
+import type { CopperBasis } from '../result';
+import { finishedVsNominal } from './finished-copper';
 
 function ledgerStatus(id: string): LedgerStatus {
   const row = LEDGER.find((r) => r.id === id);
@@ -46,22 +48,87 @@ export function copperThermalConductivity(material: CopperKMaterial): CopperTher
     value: q(e.k, DIM.THERMAL_CONDUCTIVITY),
     ledgerId: 'S-007',
     status,
-    assumption: `Assumed ${e.label} thermal conductivity ${String(e.k)} W/m.K (ledger S-007, status ${status}; sources disagree by a few percent).`,
+    assumption: `Assumed ${e.label} thermal conductivity ${String(e.k)} W/m.K (ledger S-007, status ${status}; sources disagree by a few percent). The highest conductivity is the non-conservative choice for via temperature rise, because it understates the rise.`,
   };
 }
 
 export const DEFAULT_FOIL_CONVENTION: FoilConvention = 'nominal-35um';
 
 /** Spread of the three foil thickness conventions at 1 oz/ft2, as a percent of the smallest. */
+/** The spread depends only on the fixed convention table, so it is computed once on first use. */
+let cachedFoilSpreadPercent: number | undefined;
+
 export function foilSpreadPercent(): number {
-  const oneOz = fromUnit(1, 'oz/ft2');
-  const t = (Object.keys(FOIL_CONVENTIONS) as FoilConvention[]).map((c) => foilThickness(oneOz, c).thickness.si);
-  const lo = Math.min(...t);
-  const hi = Math.max(...t);
-  return ((hi - lo) / lo) * 100;
+  if (cachedFoilSpreadPercent === undefined) {
+    const oneOz = fromUnit(1, 'oz/ft2');
+    const t = (Object.keys(FOIL_CONVENTIONS) as FoilConvention[]).map((c) => foilThickness(oneOz, c).thickness.si);
+    const lo = Math.min(...t);
+    const hi = Math.max(...t);
+    cachedFoilSpreadPercent = ((hi - lo) / lo) * 100;
+  }
+  return cachedFoilSpreadPercent;
 }
 
 export function foilAssumptionText(): string {
   const info = FOIL_CONVENTIONS[DEFAULT_FOIL_CONVENTION];
   return `Assumed foil thickness convention: 1 oz/ft2 = ${String(info.value)} um (${info.label.split(':')[0] ?? ''}). Other conventions differ by up to ${foilSpreadPercent().toFixed(2)} %, so copper thickness and everything derived from it carries that spread (ledger S-003, status ${info.status}).`;
+}
+
+/** Ledger rows rated separately (the foil convention is shown as its own assumption), so they do not set dataStatus. */
+export const FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE: readonly string[] = ['S-003'];
+
+/** Nominal copper basis from a foil weight; the source text names the convention and the spread, never a standard. */
+export function copperBasisFromFoil(
+  layer: 'outer' | 'inner',
+  weight: Quantity,
+  convention: FoilConvention = DEFAULT_FOIL_CONVENTION,
+): CopperBasis {
+  if (layer !== 'outer' && layer !== 'inner') {
+    throw new Error(`Unknown copper layer "${String(layer)}"; expected outer or inner.`);
+  }
+  const t = foilThickness(weight, convention).thickness; // throws for non-areal-mass, non-finite, non-positive
+  const oneOzUm = foilThickness(fromUnit(1, 'oz/ft2'), convention).thickness.si * 1e6;
+  return {
+    layer,
+    basis: 'nominal',
+    thickness: t,
+    weightOzFt2: Number(toUnit(weight, 'oz/ft2').toFixed(9)),
+    source: `Nominal thickness from foil weight using the ${convention} convention (1 oz/ft2 = ${oneOzUm.toFixed(2)} um). Conventions differ by up to ${foilSpreadPercent().toFixed(2)} %, and finished copper differs from nominal.`,
+  };
+}
+
+export interface CopperBasisFactors {
+  readonly defaultedAssumptions: string[];
+  readonly safetyRelevantDefaults: string[];
+}
+
+const signedRounded = (v: number): string => {
+  const r = Math.round(v);
+  return r === 0 ? '0' : `${r < 0 ? '-' : '+'}${String(Math.abs(r))}`;
+};
+
+/** Per layer and weight text from ledger S-009 (secondhand minimums, not typical values), against the actual nominal thickness. */
+function nominalCopperText(basis: CopperBasis): string {
+  const lead = 'Nominal copper thickness used instead of finished copper';
+  const nominalUm = basis.thickness.si * 1e6;
+  const f = basis.weightOzFt2 === undefined ? undefined : finishedVsNominal(basis.layer, basis.weightOzFt2, nominalUm);
+  if (f === undefined || basis.weightOzFt2 === undefined) {
+    return `${lead}: there is no S-009 figure for this weight, so the finished thickness is unknown and current capacity and resistance are uncertain; thinner than nominal is the non-conservative direction for current capacity and heating.`;
+  }
+  const w = String(basis.weightOzFt2);
+  const nom = `${nominalUm.toFixed(1)} um`;
+  const figure = `the finished ${basis.layer}-layer minimum for ${w} oz/ft2 is ${f.minimumUm.toFixed(1)} um (${f.class}), ${signedRounded(f.percentVsNominal)} % against the nominal ${nom} used here (secondhand figure from IPC-6012 minimums, ledger S-009, not read from the standard; these are minimums, not typical values)`;
+  const direction =
+    basis.layer === 'inner'
+      ? 'thinner than nominal is the non-conservative direction for current capacity and heating'
+      : 'thicker than nominal lowers resistance but plated outer copper is not uniform';
+  return `${lead}: ${figure}; ${direction}.`;
+}
+
+/** Confidence factors implied by a copper basis. Only a nominal basis is a safety-relevant default. */
+export function copperBasisFactors(basis: CopperBasis): CopperBasisFactors {
+  return {
+    defaultedAssumptions: [],
+    safetyRelevantDefaults: basis.basis === 'nominal' ? [nominalCopperText(basis)] : [],
+  };
 }

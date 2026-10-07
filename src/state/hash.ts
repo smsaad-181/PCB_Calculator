@@ -149,6 +149,23 @@ export const RESERVED_STATE_KEYS = {
   },
 } as const satisfies Record<string, ReservedKeySpec>;
 
+/**
+ * Calculator-local state keys, documented here so two calculators cannot silently collide with a reserved key.
+ * Values are validated by the owning calculator's view-model (unknown values fall back to defaults with a notice),
+ * not by sanitizeReservedState. A local key must never reuse a reserved key or `v`.
+ */
+export const CALCULATOR_STATE_KEYS = {
+  'copper-converter': {
+    by: 'Which quantity is entered: "weight" or "thickness" (the other is solved).',
+    w: 'Entered copper weight text, for example "1 oz" (at most 40 characters).',
+    t: 'Entered copper thickness text, for example "35 um" (at most 40 characters).',
+    ly: 'Copper layer: "outer" or "inner". Absent means not chosen (never defaulted).',
+    conv: 'Foil convention id: nominal-35um, nominal-1.35mil or mass-density. Absent means the default assumption (fc is not used: a um-per-oz number cannot tell the 34.29 and 34.33 um conventions apart).',
+    pl: 'Entered plating thickness text (outer layer only, at most 40 characters).',
+    tb: 'Thickness basis: nominal, finished or measured (thickness entry only).',
+  },
+} as const satisfies Record<string, Record<string, string>>;
+
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {
   const out: Record<string, string> = Object.create(null) as Record<string, string>;
   const notes: string[] = [];

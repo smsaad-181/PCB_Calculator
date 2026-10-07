@@ -15,13 +15,39 @@ Full original feature list: `MASTER_PROMPT_ORIGINAL.md`. This file corrects and 
 | Section 15 truncated | Phase 4 scope to be confirmed by the human. |
 
 ## Result schema
-The source of truth is `src/core/result.ts` (`CalcResult`); skill `calc-module-pattern` documents it and must be kept in step. Every calculator returns it. Besides method, reference, formula, steps, results, validity checks and recommendation, it carries per-input provenance (`inputs[].source`: user / default / fab-profile / preset), warnings with a severity (info / caution / warning / critical), a calculated limit vs a recommended design value with a stated derating (`designValue`), min/typ/max `envelope[]`, the `fabProfile` used, the `limitingElement`, and `dataStatus` derived from the ledger via `src/core/data-status.ts`. Confidence is rule-based (`src/core/confidence.ts`, `CONFIDENCE_RULE_TEXT`): it returns level, reasons and a numeric score; any out-of-range input forces "low"; defaulted assumptions are uncapped; safety-relevant defaults weigh double. UI shows **quick answer first**, details on expand, and never shows a confidence level without its reasons and score.
+The source of truth is `src/core/result.ts` (`CalcResult`). Skill `calc-module-pattern` documents it and must be kept in step. Every calculator returns it. Besides method, reference, formula, steps, validity checks and recommendation, it carries:
+- **`results[]`** with a role and a required **`bound`**: `min-requirement`, `max-capacity`, `nominal` or `prediction`. The bound sets the print direction.
+- **Per-input provenance** (`inputs[].source`: user / default / fab-profile / preset).
+- **Warnings** with a severity (info / caution / warning / critical).
+- **`designValues[]`:** each separates the calculated limit from the recommended design value with a stated derating. `max-limit` factors are in (0, 1], `min-requirement` factors are ≥ 1, and absolute temperatures cannot be derated.
+- **`envelope[]`:** min/typ/max.
+- **`fabProfile`:** with `ageDays` and `stale`; stale means older than 365 days.
+- **`elements[]`:** path elements with utilisation and margin. `limitingElement` is the top element of `rankElements`.
+- **`copperBasis`:** layer (required), nominal/finished/measured basis, thickness and source.
+- **`exports[]`:** net-class values.
+- **`dataStatus`:** derived from the ledger via `src/core/data-status.ts`. Copper calculators exclude the separately shown foil-convention row S-003.
+
+`assertCalcResult` checks the whole schema and returns every problem without throwing. It also ties confidence to validity checks, score, reasons and fab-profile status. Every calculator runs it before returning, and its tests run it on every output.
+
+Confidence is rule-based (`src/core/confidence.ts`, `CONFIDENCE_RULE_TEXT`). It returns a level, reasons and a numeric score:
+- Factors are built from `inputs[].source` by `confidenceFactorsFromInputs`. Default and preset inputs count as defaulted; fab-profile inputs do not.
+- Any out-of-range input or failed validity check forces "low".
+- Defaulted assumptions are uncapped. Safety-relevant defaults weigh double, including a nominal (not finished) copper basis.
+
+The reference calculator is `src/core/calculators/copper-converter/`. The UI shows the **quick answer first**, with details on expand, and never shows a confidence level without its reasons and score.
 
 ## Non-functional requirements
 - Closed-form calc < 1 ms; self-heating solver ≤ 50 iterations; envelope via corners (≤ 6 inputs) else Monte Carlo (5-10k samples) in a Web Worker.
 - Bundle ≤ 150 KB gzip JS total, code-split per calculator. Load < 1 s broadband.
 - Offline capable. No runtime network calls. Hash-routed. State in URL hash (schema-versioned).
 - Per-calculator error boundary. Input guards. Never display NaN.
+- **Headline formatting:** every headline number is printed through `src/core/format-result.ts`. This covers results, design values, margins and utilisation. The four helpers are `formatResult`, `formatDesignValue`, `formatMargin` and `formatUtilisation`.
+  - The rounding direction comes from the result's `bound`. Minimums and predictions round up, capacities and margins round down, and utilisation rounds up.
+  - `accuracyClass` is required, and there is no `'nearest'` override.
+  - Geometry prints as mm and mil, each rounded from SI at fab resolution.
+  - Direct `formatFor`/`formatDual` is only for input echoes and non-headline text.
+  - Comparisons use SI values, never printed strings.
+- Every input shows its parsed echo (`describeParsed`) and parse warnings (`parseQuantityDetailed`). Fraction inputs use `parseFraction`.
 - Accessibility: keyboard operable, labels, contrast.
 
 ## Scope by phase
@@ -41,7 +67,15 @@ Vite, TypeScript strict, Preact, Vitest, fast-check, ESLint. `src/core` pure. Py
 src/core/{units,solvers,calculators,data,fab}  src/workers  src/ui  src/state
 tests/  tools/reference/  docs/  .claude/  .github/
 ```
-- `src/core/result.ts` (CalcResult, guards, design-value/envelope checks), `confidence.ts` (rule-based confidence), `data-status.ts` (ledger status → dataStatus), `gate.ts` (the only place compliance wording may come from).
-- `src/core/units`: dimensions, quantities, field-aware parser, display formatting, foil conventions, AWG.
-- `src/core/data`: `constants.ts` (ledger-tagged physical constants and the foil/k assumptions), `ledger.ts` (mirror of `docs/sources/LEDGER.md`: ids and statuses, test-enforced, plus short item text shown on the About page), `fab-profiles/*.json` (date-stamped example and template fab profiles; data only, never imported by production code as defaults).
+- `src/core/result.ts`: CalcResult, guards, design-value, envelope, element and copper-basis checks, `rankElements`, `assertCalcResult`.
+- `src/core/confidence.ts`: rule-based confidence and `confidenceFactorsFromInputs`.
+- `src/core/data-status.ts`: ledger status → dataStatus, with an `exclude` option.
+- `src/core/format-result.ts`: bound-aware headline formatters.
+- `src/core/gate.ts`: the only place compliance wording may come from.
+- `src/core/units`: dimensions, quantities, field-aware parser (detailed warnings, fractions, parsed echo), directional display formatting and `formatDual`, foil conventions, AWG.
+- `src/core/calculators/copper-converter/`: `meta.ts`, `guards.ts`, `calc.ts` and `calc.test.ts`. This is the reference calculator layout.
+- `src/core/data`:
+  - `constants.ts`: ledger-tagged physical constants; the foil/k assumptions; `copperBasisFromFoil`, `copperBasisFactors` and `FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE`.
+  - `finished-copper.ts`: S-009 secondhand IPC-6012 finished-copper minimums by layer and weight, plus `finishedVsNominal`.
+  - `ledger.ts` (mirror of `docs/sources/LEDGER.md`: ids and statuses, test-enforced, plus short item text shown on the About page), `fab-profiles/*.json` (date-stamped example and template fab profiles; data only, never imported by production code as defaults).
 - `src/core/fab`: `profile.ts` (`FabProfile` type, validator with no defaults, staleness).

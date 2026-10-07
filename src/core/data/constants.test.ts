@@ -8,6 +8,8 @@ import {
   copperThermalConductivity,
   foilAssumptionText,
   foilSpreadPercent,
+  copperBasisFactors,
+  copperBasisFromFoil,
 } from './constants';
 import { DIM, FOIL_CONVENTIONS, div, foilThickness, fromUnit, mul, q, sameDim } from '../units';
 import type { FoilConvention } from '../units';
@@ -83,6 +85,11 @@ describe('copperThermalConductivity [S-007, CONFLICT row]', () => {
   it('the unsourced oracle value 385 never appears in any returned object', () => {
     for (const m of ['pure-401', 'c11000-391'] as const) {
       expect(JSON.stringify(copperThermalConductivity(m))).not.toMatch(/\b385\b/);
+    }
+  });
+  it('assumption text says the highest conductivity is the non-conservative direction for via temperature rise (G-2/m-E)', () => {
+    for (const m of ['pure-401', 'c11000-391'] as const) {
+      expect(copperThermalConductivity(m).assumption).toMatch(/non-conservative/i);
     }
   });
   it('throws on an unknown material instead of falling back to a default', () => {
@@ -207,5 +214,12 @@ describe('constants reproduce the oracle golden vectors at the recorded toleranc
     ]) {
       expect(vec(n).rel_tol).toBeLessThanOrEqual(1e-9);
     }
+  });
+});
+
+describe('copper basis helpers are exported from constants (detailed tests in copper-basis.test.ts)', () => {
+  it('exports copperBasisFromFoil and copperBasisFactors', () => {
+    expect(typeof copperBasisFromFoil).toBe('function');
+    expect(typeof copperBasisFactors).toBe('function');
   });
 });

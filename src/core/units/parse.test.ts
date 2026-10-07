@@ -24,8 +24,10 @@ describe('parseQuantity: accepted forms', () => {
     expectParsed('0.3 mm', 0.3e-3, DIM.LENGTH);
     expectParsed('0.3 mm', 0.3e-3, DIM.LENGTH, DIM.LENGTH);
   });
-  it('length: "35u" with expectedDim LENGTH is 35 um', () => {
-    expectParsed('35u', 35e-6, DIM.LENGTH, DIM.LENGTH);
+  it('length: "35u" with expectedDim LENGTH is now REJECTED (gate G-4: bare prefix); "35um" is 35 um', () => {
+    const r = parseQuantity('35u', DIM.LENGTH);
+    expect(r.ok).toBe(false);
+    expectParsed('35um', 35e-6, DIM.LENGTH, DIM.LENGTH);
   });
   it('resistance: "1.5k" with expectedDim RESISTANCE is 1500 ohm', () => {
     expectParsed('1.5k', 1500, DIM.RESISTANCE, DIM.RESISTANCE);

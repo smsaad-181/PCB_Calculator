@@ -29,6 +29,10 @@ import {
  *  - 'score 0 -> high with no reasons' now also expects score: 0 (result gained `score`).
  *  - model score() no longer caps defaults; level model applies the override.
  *  - arbitraries gain safetyRelevantDefaults; CONFLICT added to the data status arbitrary.
+ *  - G3-f/G2-b: every out-of-range reason line is `name` or `name = value (allowed: bound)` with no suffix, so the
+ *    "reasons longer than 3 characters" requirement is relaxed to >= 1 character; safety defaults use the wording
+ *    `Safety-relevant assumption in effect: <text>.` (tested in the new describe at the end of this file).
+ *  - G-3: forced-to-low sentence no longer repeats names; arbitraries use uniqueArray (lists are sets).
  */
 type Acc = 'exact' | 'analytical' | 'empirical' | 'estimate';
 type DS = 'VERIFIED' | 'UNVERIFIED' | 'PAYWALLED' | 'CONFLICT';
@@ -65,9 +69,9 @@ const clean: F = {
 };
 
 const arbF = fc.record({
-  outOfRangeInputs: fc.array(fc.constantFrom('width', 'current', 'dT', 'thickness'), { maxLength: 4 }),
-  defaultedAssumptions: fc.array(fc.constantFrom('alpha', 'ambient', 'theta', 'rho'), { maxLength: 6 }),
-  safetyRelevantDefaults: fc.array(fc.constantFrom('maxTemp', 'derating', 'creepage'), { maxLength: 3 }),
+  outOfRangeInputs: fc.uniqueArray(fc.constantFrom('width', 'current', 'dT', 'thickness'), { maxLength: 4 }),
+  defaultedAssumptions: fc.uniqueArray(fc.constantFrom('alpha', 'ambient', 'theta', 'rho'), { maxLength: 4 }),
+  safetyRelevantDefaults: fc.uniqueArray(fc.constantFrom('maxTemp', 'derating', 'creepage'), { maxLength: 3 }),
   accuracyClass: fc.constantFrom<Acc>('exact', 'analytical', 'empirical', 'estimate'),
   dataStatus: fc.constantFrom<DS>('VERIFIED', 'UNVERIFIED', 'PAYWALLED', 'CONFLICT'),
 }) as fc.Arbitrary<FA>;
@@ -212,13 +216,18 @@ describe('out-of-range override', () => {
   it('analytical + VERIFIED + 1 out-of-range -> low', () => {
     expect(rateConfidence({ ...clean, accuracyClass: 'analytical', outOfRangeInputs: ['w/h'] }).level).toBe('low');
   });
-  it('reasons include one explicit forced-to-low sentence naming every out-of-range input', () => {
+  it('reasons include one explicit forced-to-low sentence that states the count and does not repeat the names (G-3)', () => {
     const r = rateConfidence({ ...clean, outOfRangeInputs: ['width', 'current'] });
     const forced = r.reasons.filter((x) => /forced to low/i.test(x));
     expect(forced).toHaveLength(1);
     expect(forced[0]).toMatch(/outside the model'?s validity range/i);
-    expect(forced[0]).toContain('width');
-    expect(forced[0]).toContain('current');
+    expect(forced[0]).toBe("Confidence level forced to low: 2 input(s) are outside the model's validity range.");
+    expect(forced[0]).not.toContain('width');
+    expect(forced[0]).not.toContain('current');
+    // the names are still listed, individually, in the other reasons
+    const joined = r.reasons.filter((x) => !/forced to low/i.test(x)).join(' | ');
+    expect(joined).toContain('width');
+    expect(joined).toContain('current');
   });
   it('no forced-to-low sentence when nothing is out of range, even when level is low', () => {
     const r = rateConfidence({ ...clean, accuracyClass: 'estimate', dataStatus: 'PAYWALLED' });
@@ -260,7 +269,7 @@ describe('rateConfidence reasons', () => {
       fc.property(arbF, (f) => {
         for (const s of rateConfidence(f).reasons) {
           expect(typeof s).toBe('string');
-          expect(s.trim().length).toBeGreaterThan(3);
+          expect(s.trim().length).toBeGreaterThanOrEqual(1); // was > 3: short names are no longer padded with a suffix (G3-f)
         }
       }),
     );
@@ -341,6 +350,77 @@ describe('rateConfidence properties', () => {
         const rg = rateConfidence(g);
         expect(RANK[rg.level]).toBeLessThanOrEqual(RANK[rf.level]);
         expect(rg.score).toBeGreaterThanOrEqual(rf.score);
+      }),
+    );
+  });
+});
+
+describe('reason wording (G2-b, G3-f)', () => {
+  const clean2 = { outOfRangeInputs: [] as string[], defaultedAssumptions: [] as string[], accuracyClass: 'exact' as const, dataStatus: 'VERIFIED' as const };
+  const PREFIX = 'Safety-relevant assumption in effect: ';
+  const safetyLines = (r: { reasons: string[] }): string[] => r.reasons.filter((x) => x.startsWith(PREFIX));
+
+  it('a safety-relevant default that is a sentence (ending with a full stop) gets exactly one full stop at the end', () => {
+    const text = 'Nominal copper thickness used instead of finished copper.';
+    const lines = safetyLines(rateConfidence({ ...clean2, safetyRelevantDefaults: [text] }));
+    expect(lines).toEqual([`${PREFIX}${text}`]);
+    expect(lines[0]?.endsWith('..')).toBe(false);
+  });
+  it('a sentence without a trailing full stop gets one added', () => {
+    const lines = safetyLines(rateConfidence({ ...clean2, safetyRelevantDefaults: ['Nominal copper used'] }));
+    expect(lines).toEqual([`${PREFIX}Nominal copper used.`]);
+  });
+  it('a bare name (maxTemp) uses the same wording', () => {
+    expect(safetyLines(rateConfidence({ ...clean2, safetyRelevantDefaults: ['maxTemp'] }))).toEqual([`${PREFIX}maxTemp.`]);
+  });
+  it('one reason per safety-relevant item', () => {
+    const r = rateConfidence({ ...clean2, safetyRelevantDefaults: ['maxTemp', 'Derating factor is fixed.'] });
+    expect(safetyLines(r)).toEqual([`${PREFIX}maxTemp.`, `${PREFIX}Derating factor is fixed.`]);
+  });
+  it('the old "defaulted, not user-supplied" phrase never appears', () => {
+    const r = rateConfidence({ ...clean2, safetyRelevantDefaults: ['maxTemp', 'A sentence.'], defaultedAssumptions: ['alpha'] });
+    expect(r.reasons.join(' | ')).not.toMatch(/defaulted, not user-supplied/i);
+  });
+  it('no reason contains a doubled full stop, for any factors (property)', () => {
+    fc.assert(
+      fc.property(arbF, fc.constantFrom('A sentence.', 'Another one', 'x'), (f, extra) => {
+        const r = rateConfidence({ ...f, safetyRelevantDefaults: [...f.safetyRelevantDefaults, extra] });
+        for (const x of r.reasons) expect(x).not.toContain('..');
+        for (const x of safetyLines(r)) expect(x.endsWith('.')).toBe(true);
+      }),
+    );
+  });
+  it('plain defaulted names keep the word "defaulted"', () => {
+    const r = rateConfidence({ ...clean2, defaultedAssumptions: ['ambient', 'alpha'] });
+    const line = r.reasons.find((x) => x.includes('ambient'));
+    expect(line).toMatch(/defaulted/i);
+    expect(line).toContain('alpha');
+  });
+  it.each(['w', 'dT', 'abc', 'abcd', 'current', 'a much longer input name'])(
+    'bare out-of-range name %j is its own reason with no suffix',
+    (name) => {
+      const r = rateConfidence({ ...clean2, outOfRangeInputs: [name] });
+      expect(r.reasons).toContain(name);
+      expect(r.reasons.join(' | ')).not.toMatch(/outside validity range\)/i);
+    },
+  );
+  it('short and long structured entries are formatted identically', () => {
+    const r = rateConfidence({
+      ...clean2,
+      outOfRangeInputs: [
+        { name: 'w', value: '1', bound: '2-3' },
+        { name: 'thickness', value: '1 um', bound: '2-3 um' },
+      ],
+    });
+    expect(r.reasons).toContain('w = 1 (allowed: 2-3)');
+    expect(r.reasons).toContain('thickness = 1 um (allowed: 2-3 um)');
+  });
+  it('no per-input out-of-range reason carries a suffix (property)', () => {
+    fc.assert(
+      fc.property(fc.uniqueArray(fc.constantFrom('a', 'ab', 'abc', 'abcd', 'width'), { minLength: 1 }), (names) => {
+        const r = rateConfidence({ ...clean2, outOfRangeInputs: names });
+        const per = r.reasons.filter((x) => !/forced to low/i.test(x));
+        expect([...per].sort()).toEqual([...names].sort());
       }),
     );
   });

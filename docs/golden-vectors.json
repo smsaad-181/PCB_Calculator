@@ -50,6 +50,438 @@
       "note": "convention: 35 um/oz"
     },
     {
+      "name": "ipc2221_width_mil_outer_1A_dT10C_0.5oz",
+      "oracle_value": 23.65248195537834,
+      "pinned_expected": 23.65248195537834,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 0.5 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_outer_1A_dT10C_2oz",
+      "oracle_value": 5.913120488844585,
+      "pinned_expected": 5.913120488844585,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 2 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_outer_1A_dT10C_3oz",
+      "oracle_value": 3.9420803258963892,
+      "pinned_expected": 3.9420803258963892,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 3 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_inner_3A_dT10C_1oz",
+      "oracle_value": 140.00991555298867,
+      "pinned_expected": 140.00991555298867,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; inner; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_outer_10A_dT30C_2oz",
+      "oracle_value": 72.70492471716675,
+      "pinned_expected": 72.70492471716675,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 2 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_outer_20A_dT50C_3oz",
+      "oracle_value": 92.47984986023936,
+      "pinned_expected": 92.47984986023936,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 3 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_inner_5A_dT20C_0.5oz",
+      "oracle_value": 371.9572244351801,
+      "pinned_expected": 371.9572244351801,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; inner; 0.5 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_inner_2A_dT20C_2oz",
+      "oracle_value": 26.275454465722817,
+      "pinned_expected": 26.275454465722817,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; inner; 2 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_outer_35A_dT100C_3oz",
+      "oracle_value": 131.3947292703504,
+      "pinned_expected": 131.3947292703504,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 3 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_width_mil_outer_0.5A_dT10C_1oz",
+      "oracle_value": 4.546036695760122,
+      "pinned_expected": 4.546036695760122,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width [mil] from I and dT; outer; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_outer_w20mil_dT10C_1oz",
+      "oracle_value": 1.4636352884345563,
+      "pinned_expected": 1.4636352884345563,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; outer; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_outer_w50mil_dT30C_2oz",
+      "oracle_value": 7.622886914429655,
+      "pinned_expected": 7.622886914429655,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; outer; 2 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_outer_w100mil_dT50C_3oz",
+      "oracle_value": 21.166343340289462,
+      "pinned_expected": 21.166343340289462,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; outer; 3 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_inner_w30mil_dT20C_0.5oz",
+      "oracle_value": 0.8058894867745958,
+      "pinned_expected": 0.8058894867745958,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; inner; 0.5 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_inner_w200mil_dT40C_2oz",
+      "oracle_value": 11.818327461436601,
+      "pinned_expected": 11.818327461436601,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; inner; 2 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_outer_w10mil_dT10C_0.5oz",
+      "oracle_value": 0.5357218724695709,
+      "pinned_expected": 0.5357218724695709,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; outer; 0.5 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_outer_w400mil_dT100C_3oz",
+      "oracle_value": 78.44992421193986,
+      "pinned_expected": 78.44992421193986,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; outer; 3 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_current_A_inner_w12mil_dT10C_1oz",
+      "oracle_value": 0.5053153984819593,
+      "pinned_expected": 0.5053153984819593,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "current [A] from width [mil] and dT; inner; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_dT_C_outer_1A_w12mil_1oz",
+      "oracle_value": 9.76253121548664,
+      "pinned_expected": 9.76253121548664,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "temperature rise [degC] from I and width [mil]; outer; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_dT_C_outer_3A_w40mil_1oz",
+      "oracle_value": 16.306747805554735,
+      "pinned_expected": 16.306747805554735,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "temperature rise [degC] from I and width [mil]; outer; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_dT_C_outer_10A_w150mil_2oz",
+      "oracle_value": 9.09632210112523,
+      "pinned_expected": 9.09632210112523,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "temperature rise [degC] from I and width [mil]; outer; 2 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_dT_C_inner_5A_w60mil_1oz",
+      "oracle_value": 128.99645317208393,
+      "pinned_expected": 128.99645317208393,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "temperature rise [degC] from I and width [mil]; inner; 1 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_dT_C_outer_2A_w20mil_0.5oz",
+      "oracle_value": 63.70750767082846,
+      "pinned_expected": 63.70750767082846,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "temperature rise [degC] from I and width [mil]; outer; 0.5 oz at 35 um/oz"
+    },
+    {
+      "name": "ipc2221_dT_C_inner_8A_w100mil_2oz",
+      "oracle_value": 51.6327494460789,
+      "pinned_expected": 51.6327494460789,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "temperature rise [degC] from I and width [mil]; inner; 2 oz at 35 um/oz"
+    },
+    {
       "name": "trace_R_100x0.3mm_35um_20C_ohm",
       "oracle_value": 0.1642036124794746,
       "pinned_expected": 0.1642036124794746,
@@ -130,9 +562,9 @@
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
-        "S-013": "UNVERIFIED"
+        "S-013": "VERIFIED"
       },
-      "status": "UNVERIFIED",
+      "status": "VERIFIED",
       "note": "mu_r = 1, mu0 = 4e-7*pi"
     },
     {
@@ -174,6 +606,294 @@
       },
       "status": "VERIFIED",
       "note": ""
+    },
+    {
+      "name": "copper_um_1oz_nominal-35um",
+      "oracle_value": 35.0,
+      "pinned_expected": 35.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "chosen convention 35 um per oz/ft2"
+    },
+    {
+      "name": "copper_um_2oz_nominal-35um",
+      "oracle_value": 70.0,
+      "pinned_expected": 70.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "chosen convention 35 um per oz/ft2"
+    },
+    {
+      "name": "copper_um_0.5oz_nominal-35um",
+      "oracle_value": 17.5,
+      "pinned_expected": 17.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "chosen convention 35 um per oz/ft2"
+    },
+    {
+      "name": "copper_um_1oz_nominal-1.35mil",
+      "oracle_value": 34.29,
+      "pinned_expected": 34.29,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "1.35 mil x 25.4 um/mil, reported IPC-4562A (secondhand)"
+    },
+    {
+      "name": "copper_um_2oz_nominal-1.35mil",
+      "oracle_value": 68.58,
+      "pinned_expected": 68.58,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "1.35 mil x 25.4 um/mil, reported IPC-4562A (secondhand)"
+    },
+    {
+      "name": "copper_um_0.5oz_nominal-1.35mil",
+      "oracle_value": 17.145,
+      "pinned_expected": 17.145,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "1.35 mil x 25.4 um/mil, reported IPC-4562A (secondhand)"
+    },
+    {
+      "name": "copper_um_1oz_mass-density",
+      "oracle_value": 34.32527865848601,
+      "pinned_expected": 34.32527865848601,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "areal mass (0.028349523125/0.09290304 kg/m2) / 8890 kg/m3"
+    },
+    {
+      "name": "copper_um_2oz_mass-density",
+      "oracle_value": 68.65055731697203,
+      "pinned_expected": 68.65055731697203,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "areal mass / 8890 kg/m3"
+    },
+    {
+      "name": "copper_um_0.5oz_mass-density",
+      "oracle_value": 17.162639329243007,
+      "pinned_expected": 17.162639329243007,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "areal mass / 8890 kg/m3"
+    },
+    {
+      "name": "copper_oz_35um_nominal-35um",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_17.5um_nominal-35um",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_70um_nominal-35um",
+      "oracle_value": 2.0,
+      "pinned_expected": 2.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_35um_nominal-1.35mil",
+      "oracle_value": 1.020705745115194,
+      "pinned_expected": 1.020705745115194,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_17.5um_nominal-1.35mil",
+      "oracle_value": 0.510352872557597,
+      "pinned_expected": 0.510352872557597,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_70um_nominal-1.35mil",
+      "oracle_value": 2.041411490230388,
+      "pinned_expected": 2.041411490230388,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_35um_mass-density",
+      "oracle_value": 1.019656689410362,
+      "pinned_expected": 1.019656689410362,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_17.5um_mass-density",
+      "oracle_value": 0.509828344705181,
+      "pinned_expected": 0.509828344705181,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
+    },
+    {
+      "name": "copper_oz_70um_mass-density",
+      "oracle_value": 2.039313378820724,
+      "pinned_expected": 2.039313378820724,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003",
+        "S-003d",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-003": "CONFLICT",
+        "S-003d": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "thickness -> weight"
     },
     {
       "name": "awg_36_diameter_mm",

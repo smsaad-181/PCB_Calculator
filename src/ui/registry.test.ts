@@ -3,9 +3,17 @@ import { CATEGORIES, REGISTRY, calculatorsIn, findCalculator, type CalculatorEnt
 import { badgeText } from './components/UnverifiedBadge';
 
 describe('registry', () => {
-  it('has no invented calculators in phase 0', () => {
-    expect(REGISTRY).toHaveLength(0);
+  it('lists the copper converter under Trace as a lazy phase-1 entry', () => {
+    const e = findCalculator('copper-converter');
+    expect(e).toBeDefined();
+    expect(e?.category).toBe('trace');
+    expect(e?.phase).toBe(1);
+    expect(calculatorsIn('trace').map((x) => x.id)).toContain('copper-converter');
+    expect(REGISTRY.map((x) => x.id)).toEqual([...new Set(REGISTRY.map((x) => x.id))]);
     expect(findCalculator('anything')).toBeUndefined();
+  });
+  it('registry ids are valid route ids', () => {
+    for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);
   });
   it('has the four categories', () => {
     expect(CATEGORIES.map((c) => c.id)).toEqual(['routing', 'trace', 'load', 'circuit']);
