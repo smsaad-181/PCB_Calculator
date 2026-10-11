@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CATEGORIES, REGISTRY, calculatorsIn, findCalculator, type CalculatorEntry } from './registry';
+import { CALCULATOR_STATE_KEYS } from '../state/hash';
 import { badgeText } from './components/UnverifiedBadge';
 
 describe('registry', () => {
@@ -20,6 +21,17 @@ describe('registry', () => {
     expect(calculatorsIn('trace').map((x) => x.id)).toEqual(expect.arrayContaining(['copper-converter', 'trace-width']));
     expect(e?.title).toMatch(/legacy/i);
     expect(typeof e?.load).toBe('function');
+  });
+  it('lists trace resistance under Trace as a lazy phase-1 entry', () => {
+    const e = findCalculator('trace-resistance');
+    expect(e).toBeDefined();
+    expect(e?.category).toBe('trace');
+    expect(e?.phase).toBe(1);
+    expect(calculatorsIn('trace').map((x) => x.id)).toEqual(expect.arrayContaining(['copper-converter', 'trace-width', 'trace-resistance']));
+    expect(typeof e?.load).toBe('function');
+  });
+  it('every registry entry has a hash-state key table', () => {
+    for (const x of REGISTRY.filter((r) => r.category === 'trace')) expect(Object.keys(CALCULATOR_STATE_KEYS)).toContain(x.id);
   });
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);

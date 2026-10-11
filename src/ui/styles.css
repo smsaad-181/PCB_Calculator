@@ -126,3 +126,9 @@ input, select { max-width: 100%; }
 .check.fail .muted { color: var(--err-fg); }
 .check-hint { font-weight: 700; }
 .check-detail { font-size: 0.875rem; }
+
+/* ---- Trace resistance additions ---- */
+.callout { border: 3px solid var(--warn-border); background: var(--warn-bg); color: var(--warn-fg); border-radius: 6px; padding: 0.25rem 1rem; margin: 0.75rem 0; }
+.callout p { margin: 0.5rem 0; }
+.advanced { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 6px; padding: 0 0.75rem 0.5rem; background: var(--bg); }
+.advanced > summary { padding: 0.25rem 0; }

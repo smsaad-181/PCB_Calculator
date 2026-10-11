@@ -180,6 +180,22 @@ export const CALCULATOR_STATE_KEYS = {
     cd: 'Entered current derating on the current limit, a plain factor above 0 and at most 1, for example "0.7". Absent means the 0.8 engineering default.',
     mt: 'Entered optional maximum allowed conductor temperature text, for example "105 °C".',
   },
+  'trace-resistance': {
+    l: 'Entered trace length text, for example "100 mm", "4 in" or "250 mil" (at most 40 characters).',
+    w: 'Entered trace width text, for example "0.254 mm" or "10 mil" (at most 40 characters).',
+    ly: 'Copper layer: "outer" or "inner". Absent means not chosen: there is no default and no result without it.',
+    cs: 'How copper is specified: "weight" or "thickness". Absent means weight.',
+    cw: 'Entered copper weight text, for example "1 oz" (at most 40 characters).',
+    ct: 'Entered copper thickness text, for example "35 um" or "1.4 mil" (at most 40 characters).',
+    cb: 'Thickness basis when copper is given as a thickness: nominal, finished or measured. Absent means nominal.',
+    conv: 'Foil convention id: nominal-35um, nominal-1.35mil or mass-density. Absent means the default assumption.',
+    am: 'Entered ambient temperature text, for example "40 °C". Absent means the 25 °C engineering default.',
+    dt: 'Entered temperature RISE text, for example "20 °C" or "20 K" (a difference, not an absolute temperature; supplied by you, no self-heating iteration; at most 40 characters). Absent means the conductor is at ambient.',
+    rho: 'Entered resistivity override text at 20 °C, for example "1.72e-8 Ω·m" (at most 40 characters). Absent means the ledger value for annealed copper; it is never prefilled.',
+    al: 'Entered temperature coefficient override text, for example "3930 ppm/K" (at most 40 characters). Absent means the ledger value for copper; it is never prefilled.',
+    f: 'Entered frequency text for the skin-depth check, for example "1 GHz" (at most 40 characters). Absent means no skin-depth check.',
+    i: 'Entered current text for the voltage drop and power loss, for example "2 A" (at most 40 characters). Absent means neither is shown.',
+  },
 } as const satisfies Record<string, Record<string, string>>;
 
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {

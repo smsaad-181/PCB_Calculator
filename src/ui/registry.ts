@@ -33,6 +33,13 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     phase: 1,
     load: () => import('./calculators/TraceWidth'),
   },
+  {
+    id: 'trace-resistance',
+    title: 'Trace resistance, voltage drop and power loss',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/TraceResistance'),
+  },
 ];
 
 export function findCalculator(id: string, registry: readonly CalculatorEntry[] = REGISTRY): CalculatorEntry | undefined {

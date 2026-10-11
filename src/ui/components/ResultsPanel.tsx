@@ -1,4 +1,5 @@
 import { AssumptionsList } from './AssumptionsList';
+import { Callout, type CalloutView } from './Callout';
 import { ConfidenceBadge } from './ConfidenceBadge';
 import { DesignValuesPanel } from './DesignValuesPanel';
 import { FormulaPanel } from './FormulaPanel';
@@ -13,25 +14,30 @@ interface Props {
   readonly view: ResultView;
   /** What a failed validity check means for this calculator (shown under each failed check). */
   readonly failedCheckHint?: string;
+  /** Per-check replacement for `failedCheckHint`, matched by the validity check's name. */
+  readonly failedHintFor?: (name: string) => string | undefined;
+  /** A prominent notice shown directly under the headline (for example a method limit that makes the headline optimistic). */
+  readonly callout?: CalloutView;
 }
 
 const DEFAULT_FAILED_HINT = 'This input or result is outside the stated range, so the result is less reliable. See the confidence reasons.';
 
 /** Quick answer first (headline, status, confidence with reasons, warnings); details are in an expandable section. */
-export function ResultsPanel({ view, failedCheckHint }: Props) {
+export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout }: Props) {
   const v = view;
   return (
     <div class="results">
       <p class="answer-label">{v.headline.label}</p>
       <p class="answer">{v.headline.text}</p>
       <p class="muted">{v.headline.meaning}</p>
+      {callout !== undefined && <Callout heading={callout.heading} text={callout.text} />}
       {v.ledger.unverifiedIds.length > 0 && (
         <p class="unverified-line">
           <span class="pill-unverified">UNVERIFIED</span> <UnverifiedBadge status={v.ledger.worst} ledgerIds={v.ledger.unverifiedIds} />
         </p>
       )}
       <DesignValuesPanel values={v.designValues} />
-      <ValidityChecksList checks={v.details.validity} failedHint={failedCheckHint ?? DEFAULT_FAILED_HINT} />
+      <ValidityChecksList checks={v.details.validity} failedHint={failedCheckHint ?? DEFAULT_FAILED_HINT} {...(failedHintFor !== undefined ? { hintFor: failedHintFor } : {})} />
       <WarningList warnings={v.warnings} />
       <ConfidenceBadge confidence={v.confidence} />
       {v.rows.length > 0 && (
