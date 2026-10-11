@@ -26,6 +26,13 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     phase: 1,
     load: () => import('./calculators/CopperConverter'),
   },
+  {
+    id: 'trace-width',
+    title: 'Trace width, current and temperature rise (legacy IPC-2221)',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/TraceWidth'),
+  },
 ];
 
 export function findCalculator(id: string, registry: readonly CalculatorEntry[] = REGISTRY): CalculatorEntry | undefined {

@@ -164,6 +164,22 @@ export const CALCULATOR_STATE_KEYS = {
     pl: 'Entered plating thickness text (outer layer only, at most 40 characters).',
     tb: 'Thickness basis: nominal, finished or measured (thickness entry only).',
   },
+  'trace-width': {
+    sf: 'Solve for: "width", "current" or "rise" (temperature rise). Absent means width. The other two quantities are entered.',
+    w: 'Entered trace width text, for example "0.3 mm" or "12 mil" (at most 40 characters; used when solving current or rise).',
+    i: 'Entered current text, for example "1 A" or "500 mA" (at most 40 characters; used when solving width or rise).',
+    dt: 'Entered temperature RISE text, for example "10 °C" or "10 K" (a difference, not an absolute temperature; at most 40 characters; used when solving width or current).',
+    ly: 'Copper layer: "outer" or "inner". Absent means not chosen: there is no default and no result without it.',
+    cs: 'How copper is specified: "weight" or "thickness". Absent means weight.',
+    cw: 'Entered copper weight text, for example "1 oz" (at most 40 characters).',
+    ct: 'Entered copper thickness text, for example "35 um" (at most 40 characters).',
+    cb: 'Thickness basis when copper is given as a thickness: nominal, finished or measured. Absent means nominal.',
+    conv: 'Foil convention id: nominal-35um, nominal-1.35mil or mass-density. Absent means the default assumption.',
+    am: 'Entered ambient temperature text, for example "40 °C". Absent means the 25 °C engineering default.',
+    dm: 'Entered design margin on the minimum width, a plain factor of at least 1, for example "1.5". Absent means the 1.25 engineering default.',
+    cd: 'Entered current derating on the current limit, a plain factor above 0 and at most 1, for example "0.7". Absent means the 0.8 engineering default.',
+    mt: 'Entered optional maximum allowed conductor temperature text, for example "105 °C".',
+  },
 } as const satisfies Record<string, Record<string, string>>;
 
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {

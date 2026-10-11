@@ -18,6 +18,8 @@ interface Props {
   /** Shown instead of the help text when the field is disabled. */
   readonly disabledReason?: string;
   readonly required?: boolean;
+  /** Shown while the field is empty and a default applies, for example "25 °C (engineering default, not from a standard)". */
+  readonly defaultText?: string;
   /** An error found after parsing (for example by the calculator's own guards). */
   readonly externalError?: string | undefined;
 }
@@ -62,6 +64,12 @@ export function QuantityField(p: Props) {
       <p id={helpId} class="help">
         {p.disabled === true ? (p.disabledReason ?? 'Not used here.') : p.help}
       </p>
+      {view?.status === 'empty' && p.defaultText !== undefined && (
+        <p class="default-tag">
+          <span aria-hidden="true">{'⚑ '}</span>
+          <strong>Default in use:</strong> {p.defaultText}
+        </p>
+      )}
       {view?.status === 'ok' && (
         <p id={echoId} class="echo">
           <span class="visually-hidden">Understood as </span>

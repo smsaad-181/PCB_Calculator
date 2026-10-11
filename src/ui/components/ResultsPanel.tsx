@@ -1,18 +1,24 @@
 import { AssumptionsList } from './AssumptionsList';
 import { ConfidenceBadge } from './ConfidenceBadge';
+import { DesignValuesPanel } from './DesignValuesPanel';
 import { FormulaPanel } from './FormulaPanel';
 import { InputsProvenance } from './InputsProvenance';
 import { StepsList } from './StepsList';
 import { UnverifiedBadge } from './UnverifiedBadge';
+import { ValidityChecksList } from './ValidityChecksList';
 import { WarningList } from './WarningList';
 import type { ResultView } from './view';
 
 interface Props {
   readonly view: ResultView;
+  /** What a failed validity check means for this calculator (shown under each failed check). */
+  readonly failedCheckHint?: string;
 }
 
+const DEFAULT_FAILED_HINT = 'This input or result is outside the stated range, so the result is less reliable. See the confidence reasons.';
+
 /** Quick answer first (headline, status, confidence with reasons, warnings); details are in an expandable section. */
-export function ResultsPanel({ view }: Props) {
+export function ResultsPanel({ view, failedCheckHint }: Props) {
   const v = view;
   return (
     <div class="results">
@@ -24,6 +30,10 @@ export function ResultsPanel({ view }: Props) {
           <span class="pill-unverified">UNVERIFIED</span> <UnverifiedBadge status={v.ledger.worst} ledgerIds={v.ledger.unverifiedIds} />
         </p>
       )}
+      <DesignValuesPanel values={v.designValues} />
+      <ValidityChecksList checks={v.details.validity} failedHint={failedCheckHint ?? DEFAULT_FAILED_HINT} />
+      <WarningList warnings={v.warnings} />
+      <ConfidenceBadge confidence={v.confidence} />
       {v.rows.length > 0 && (
         <dl class="rows">
           {v.rows.map((r) => (
@@ -34,27 +44,14 @@ export function ResultsPanel({ view }: Props) {
           ))}
         </dl>
       )}
-      <ConfidenceBadge confidence={v.confidence} />
-      <WarningList warnings={v.warnings} />
       <p class="recommendation">
         <strong>Recommendation:</strong> {v.recommendation}
       </p>
       <details class="more">
-        <summary>Details: formula, steps, assumptions, validity, sources</summary>
+        <summary>Details: formula, steps, assumptions, sources, inputs</summary>
         <FormulaPanel details={v.details} ledger={v.ledger} />
         <StepsList steps={v.details.steps} />
         <AssumptionsList assumptions={v.details.assumptions} />
-        <section aria-labelledby="validity-h">
-          <h3 id="validity-h">Validity checks</h3>
-          <ul>
-            {v.details.validity.map((c) => (
-              <li key={c.name}>
-                <span aria-hidden="true">{c.ok ? '✔ ' : '✖ '}</span>
-                <strong>{c.ok ? 'Within range' : 'Outside range'}:</strong> {c.name}. <span class="muted">{c.detail}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
         <InputsProvenance inputs={v.details.inputs} />
       </details>
     </div>

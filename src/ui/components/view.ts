@@ -2,7 +2,7 @@
 // No engineering math lives here. Every headline number is printed through src/core/format-result.ts.
 import { CONFIDENCE_RULE_TEXT, type ConfidenceLevel, type AccuracyClass } from '../../core/confidence';
 import { LEDGER, type LedgerStatus } from '../../core/data/ledger';
-import { formatDesignValue, formatResult } from '../../core/format-result';
+import { formatDesignValue, formatResult, type HeadlineOpts } from '../../core/format-result';
 import type { Bound, CalcInput, CalcResult, InputSource, WarningSeverity } from '../../core/result';
 import {
   DEFAULT_DISPLAY_PREFS,
@@ -87,13 +87,23 @@ const SEVERITY_ORDER: readonly WarningSeverity[] = ['critical', 'warning', 'caut
 const SEVERITY_LABEL: Readonly<Record<WarningSeverity, string>> = { critical: 'Critical', warning: 'Warning', caution: 'Caution', info: 'Note' };
 const SEVERITY_ICON: Readonly<Record<WarningSeverity, string>> = { critical: '⛔', warning: '⚠', caution: '▲', info: 'ℹ' };
 
-/** Most severe first; equal severities keep their original order. */
-export function orderWarnings(ws: readonly { severity: WarningSeverity; message: string }[]): WarningView[] {
-  return SEVERITY_ORDER.flatMap((sev) =>
-    ws
-      .filter((w) => w.severity === sev)
-      .map((w) => ({ severity: sev, label: SEVERITY_LABEL[sev], icon: SEVERITY_ICON[sev], message: w.message })),
-  );
+/**
+ * Most severe first; equal severities keep their original order. Warnings whose `code` is in `pinFirst` come before
+ * everything else (for example a mandatory method caution that must be read first), in their original order.
+ */
+export function orderWarnings(
+  ws: readonly { severity: WarningSeverity; message: string; code?: string }[],
+  pinFirst: readonly string[] = [],
+): WarningView[] {
+  const pinned = (w: { code?: string }): boolean => w.code !== undefined && pinFirst.includes(w.code);
+  const view = (w: { severity: WarningSeverity; message: string }): WarningView => ({
+    severity: w.severity,
+    label: SEVERITY_LABEL[w.severity],
+    icon: SEVERITY_ICON[w.severity],
+    message: w.message,
+  });
+  const rest = SEVERITY_ORDER.flatMap((sev) => ws.filter((w) => !pinned(w) && w.severity === sev).map(view));
+  return [...ws.filter(pinned).map(view), ...rest];
 }
 
 // ---------------------------------------------------------------------------
@@ -111,9 +121,22 @@ export interface ResultRowView {
   readonly text: string;
 }
 
+/** A calculated limit next to the recommended design value, both printed through formatDesignValue. */
+export interface DesignValueView {
+  readonly name: string;
+  readonly direction: 'min-requirement' | 'max-limit';
+  readonly calculatedLabel: string;
+  readonly calculated: string;
+  readonly recommendedLabel: string;
+  readonly recommended: string;
+  /** The calculator's own sentence on where the factor comes from. */
+  readonly rationale: string;
+}
+
 export interface ResultView {
   readonly headline: { readonly label: string; readonly text: string; readonly meaning: string };
   readonly rows: readonly ResultRowView[];
+  readonly designValues: readonly DesignValueView[];
   readonly ledger: LedgerView;
   readonly confidence: { readonly level: ConfidenceLevel; readonly score: number; readonly reasons: readonly string[]; readonly ruleText: string };
   readonly warnings: readonly WarningView[];
@@ -140,6 +163,18 @@ export interface BuildOptions {
   readonly skip?: readonly string[];
   /** Extra provenance rows (choices that are not quantities: layer, convention). */
   readonly extraProvenance?: readonly ProvenanceRow[];
+  /** How LENGTH values print by default: 'geometry' (mm and mil, default) or 'thickness' (µm and mil). */
+  readonly lengthRole?: 'geometry' | 'thickness';
+  /** Per-name override of `lengthRole`, matched against result names, input names and step labels. */
+  readonly lengthRoleByName?: Readonly<Record<string, 'geometry' | 'thickness'>>;
+  /** Per design value name: what the factor is called ("margin", "derating") and whether it is an engineering default. */
+  readonly designNotes?: Readonly<Record<string, { readonly noun: string; readonly defaulted: boolean }>>;
+  /** Extra result rows with text already built through format-result by the caller. */
+  readonly extraRows?: readonly ResultRowView[];
+  /** Input names left out of the provenance table (inputs the chosen solve does not use). */
+  readonly skipInputs?: readonly string[];
+  /** Warning codes shown before all other warnings. */
+  readonly pinWarningCodes?: readonly string[];
 }
 
 const MEANING: Readonly<Record<Bound, string>> = {
@@ -151,42 +186,57 @@ const MEANING: Readonly<Record<Bound, string>> = {
 
 const capitalise = (s: string): string => (s === '' ? s : s.charAt(0).toUpperCase() + s.slice(1));
 
-function inputRow(i: CalcInput, headlineOpts: { accuracyClass: AccuracyClass; prefs?: DisplayPrefs }): ProvenanceRow {
+function inputRow(i: CalcInput, label: string, headlineOpts: HeadlineOpts): ProvenanceRow {
   const value = formatResult({ value: i.value, bound: 'nominal' }, headlineOpts);
-  return i.sourceDetail === undefined
-    ? { label: capitalise(i.name), value, source: i.source }
-    : { label: capitalise(i.name), value, source: i.source, detail: i.sourceDetail };
+  return i.sourceDetail === undefined ? { label, value, source: i.source } : { label, value, source: i.source, detail: i.sourceDetail };
 }
 
 /** Builds every display string for a result. All numbers go through format-result (no direct formatFor, no override). */
 export function buildResultView(r: CalcResult, o: BuildOptions): ResultView {
-  const opts = o.prefs === undefined ? { accuracyClass: o.accuracyClass } : { accuracyClass: o.accuracyClass, prefs: o.prefs };
+  const optsFor = (name: string): HeadlineOpts => {
+    const role = o.lengthRoleByName?.[name] ?? o.lengthRole ?? 'geometry';
+    const base: HeadlineOpts = { accuracyClass: o.accuracyClass, lengthRole: role };
+    return o.prefs === undefined ? base : { ...base, prefs: o.prefs };
+  };
   const label = (n: string): string => o.labels?.[n] ?? capitalise(n);
   const head = r.results.find((x) => x.name === o.headline) ?? r.results.find((x) => x.role === 'primary') ?? r.results[0];
   if (head === undefined) throw new Error('The result has no entries to show.');
   const skip = new Set(o.skip ?? []);
   const rows: ResultRowView[] = r.results
     .filter((x) => x !== head && !skip.has(x.name))
-    .map((x) => ({ label: label(x.name), text: formatResult(x, opts) }));
-  for (const dv of r.designValues) {
-    rows.push({ label: `${capitalise(dv.name)} (calculated)`, text: formatDesignValue(dv, 'calculated', opts) });
-    rows.push({ label: `${capitalise(dv.name)} (recommended, derated)`, text: formatDesignValue(dv, 'recommended', opts) });
-  }
+    .map((x) => ({ label: label(x.name), text: formatResult(x, optsFor(x.name)) }));
+  rows.push(...(o.extraRows ?? []));
+  const designValues: DesignValueView[] = r.designValues.map((dv) => {
+    const dvOpts = optsFor(dv.name);
+    const note = o.designNotes?.[dv.name];
+    const factor = String(dv.derating.factor);
+    const how = note === undefined ? `calculated × ${factor}` : `calculated × ${factor} ${note.noun}, ${note.defaulted ? 'engineering default' : 'set by you'}`;
+    return {
+      name: label(dv.name),
+      direction: dv.direction,
+      calculatedLabel: 'Calculated',
+      calculated: formatDesignValue(dv, 'calculated', dvOpts),
+      recommendedLabel: `Recommended (${how})`,
+      recommended: formatDesignValue(dv, 'recommended', dvOpts),
+      rationale: dv.derating.rationale,
+    };
+  });
   return {
-    headline: { label: label(head.name), text: formatResult(head, opts), meaning: MEANING[head.bound] },
+    headline: { label: label(head.name), text: formatResult(head, optsFor(head.name)), meaning: MEANING[head.bound] },
     rows,
+    designValues,
     ledger: ledgerView(r.reference.ledgerIds),
     confidence: { level: r.confidence.level, score: r.confidence.score, reasons: [...r.confidence.reasons], ruleText: CONFIDENCE_RULE_TEXT },
-    warnings: orderWarnings(r.warnings),
+    warnings: orderWarnings(r.warnings, o.pinWarningCodes ?? []),
     recommendation: r.recommendation,
     details: {
       method: r.method,
       reference: `${r.reference.standard}, edition: ${r.reference.edition}`,
       formula: r.formula,
-      steps: r.steps.map((s) => ({ label: s.label, expr: s.expr, text: formatResult({ value: s.value, bound: 'nominal' }, opts) })),
+      steps: r.steps.map((s) => ({ label: s.label, expr: s.expr, text: formatResult({ value: s.value, bound: 'nominal' }, optsFor(s.label)) })),
       assumptions: [...r.assumptions],
       validity: r.validityChecks.map((v) => ({ ...v })),
-      inputs: [...r.inputs.map((i) => inputRow(i, opts)), ...(o.extraProvenance ?? [])],
+      inputs: [...r.inputs.filter((i) => !(o.skipInputs ?? []).includes(i.name)).map((i) => inputRow(i, label(i.name), optsFor(i.name))), ...(o.extraProvenance ?? [])],
     },
   };
 }

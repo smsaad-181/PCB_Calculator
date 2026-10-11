@@ -63,6 +63,24 @@ describe('orderWarnings', () => {
   });
 });
 
+describe('orderWarnings with pinned codes', () => {
+  it('puts a pinned code first, then the rest by severity', () => {
+    const w = orderWarnings(
+      [
+        { severity: 'warning', message: 'w' },
+        { severity: 'caution', message: 'pin', code: 'LEGACY' },
+        { severity: 'critical', message: 'x' },
+      ],
+      ['LEGACY'],
+    );
+    expect(w.map((x) => x.message)).toEqual(['pin', 'x', 'w']);
+  });
+  it('does nothing special without pinned codes', () => {
+    const w = orderWarnings([{ severity: 'caution', message: 'c', code: 'LEGACY' }, { severity: 'warning', message: 'w' }]);
+    expect(w.map((x) => x.message)).toEqual(['w', 'c']);
+  });
+});
+
 describe('local state keys', () => {
   it('never collide with reserved keys or the version key', () => {
     for (const keys of Object.values(CALCULATOR_STATE_KEYS)) {

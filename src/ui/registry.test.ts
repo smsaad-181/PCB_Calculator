@@ -12,6 +12,15 @@ describe('registry', () => {
     expect(REGISTRY.map((x) => x.id)).toEqual([...new Set(REGISTRY.map((x) => x.id))]);
     expect(findCalculator('anything')).toBeUndefined();
   });
+  it('lists trace width under Trace as a lazy phase-1 entry', () => {
+    const e = findCalculator('trace-width');
+    expect(e).toBeDefined();
+    expect(e?.category).toBe('trace');
+    expect(e?.phase).toBe(1);
+    expect(calculatorsIn('trace').map((x) => x.id)).toEqual(expect.arrayContaining(['copper-converter', 'trace-width']));
+    expect(e?.title).toMatch(/legacy/i);
+    expect(typeof e?.load).toBe('function');
+  });
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);
   });

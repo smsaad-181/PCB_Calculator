@@ -51,7 +51,7 @@ const LABELS: Readonly<Record<string, string>> = {
 const SKIP: readonly string[] = ['convention spread'];
 
 // ---------------------------------------------------------------------------
-// Display preferences. The headline length is always dual (mm and mil); this chooses the echo unit.
+// Display preferences. Headline thickness is always dual (µm and mil); this chooses the echo unit.
 // ---------------------------------------------------------------------------
 export function headlinePrefs(units: Units): DisplayPrefs {
   return units === 'imperial' ? { ...DEFAULT_DISPLAY_PREFS, length: 'mil', area: 'mil2' } : { ...DEFAULT_DISPLAY_PREFS };
@@ -241,6 +241,8 @@ export function computeView(s: ConverterState): ConverterView {
     headline,
     accuracyClass: meta.accuracyClass,
     prefs: headlinePrefs(s.units),
+    // Copper and plating are tens of micrometres: every length prints as a thickness, "34.29 µm (1.35 mil)".
+    lengthRole: 'thickness',
     labels: LABELS,
     skip: SKIP,
     extraProvenance: provenance(s),
