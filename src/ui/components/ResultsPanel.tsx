@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import { AssumptionsList } from './AssumptionsList';
 import { Callout, type CalloutView } from './Callout';
 import { ConfidenceBadge } from './ConfidenceBadge';
@@ -18,12 +19,14 @@ interface Props {
   readonly failedHintFor?: (name: string) => string | undefined;
   /** A prominent notice shown directly under the headline (for example a method limit that makes the headline optimistic). */
   readonly callout?: CalloutView;
+  /** Extra content directly under the headline and its callout (for example a min/typ/max row). */
+  readonly afterHeadline?: ComponentChildren;
 }
 
 const DEFAULT_FAILED_HINT = 'This input or result is outside the stated range, so the result is less reliable. See the confidence reasons.';
 
 /** Quick answer first (headline, status, confidence with reasons, warnings); details are in an expandable section. */
-export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout }: Props) {
+export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, afterHeadline }: Props) {
   const v = view;
   return (
     <div class="results">
@@ -31,6 +34,7 @@ export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout }: 
       <p class="answer">{v.headline.text}</p>
       <p class="muted">{v.headline.meaning}</p>
       {callout !== undefined && <Callout heading={callout.heading} text={callout.text} />}
+      {afterHeadline}
       {v.ledger.unverifiedIds.length > 0 && (
         <p class="unverified-line">
           <span class="pill-unverified">UNVERIFIED</span> <UnverifiedBadge status={v.ledger.worst} ledgerIds={v.ledger.unverifiedIds} />

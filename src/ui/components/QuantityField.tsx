@@ -1,5 +1,5 @@
 import type { Dim, DisplayPrefs } from '../../core/units';
-import { MAX_FIELD_CHARS, parseField } from './view';
+import { MAX_FIELD_CHARS, parseField, type FieldView } from './view';
 
 interface Props {
   readonly id: string;
@@ -22,6 +22,8 @@ interface Props {
   readonly defaultText?: string;
   /** An error found after parsing (for example by the calculator's own guards). */
   readonly externalError?: string | undefined;
+  /** Replaces the default quantity parser (for example a percent or fraction field). It must return the same FieldView shape. */
+  readonly parser?: (text: string) => FieldView;
 }
 
 /**
@@ -33,9 +35,11 @@ export function QuantityField(p: Props) {
   const view =
     p.disabled === true
       ? undefined
-      : p.echoPrefs === undefined
-        ? parseField(p.text, p.expectedDim)
-        : parseField(p.text, p.expectedDim, p.echoPrefs);
+      : p.parser !== undefined
+        ? p.parser(p.text)
+        : p.echoPrefs === undefined
+          ? parseField(p.text, p.expectedDim)
+          : parseField(p.text, p.expectedDim, p.echoPrefs);
   const error = view?.status === 'error' ? view.message : view?.status === 'ok' ? p.externalError : undefined;
   const helpId = `${p.id}-help`;
   const echoId = `${p.id}-echo`;

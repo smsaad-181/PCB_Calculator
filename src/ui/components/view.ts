@@ -6,8 +6,11 @@ import { formatDesignValue, formatResult, type HeadlineOpts } from '../../core/f
 import type { Bound, CalcInput, CalcResult, InputSource, WarningSeverity } from '../../core/result';
 import {
   DEFAULT_DISPLAY_PREFS,
+  DIM,
   describeParsed,
+  parseFraction,
   parseQuantityDetailed,
+  q,
   type Dim,
   type DisplayPrefs,
   type Quantity,
@@ -32,6 +35,16 @@ export function parseField(text: string, expectedDim: Dim, echoPrefs: DisplayPre
   if (!r.ok) return { status: 'error', message: r.error.message };
   if (!Number.isFinite(r.value.si)) return { status: 'error', message: 'The value is not a finite number.' };
   return { status: 'ok', value: r.value, echo: describeParsed(r.value, expectedDim, echoPrefs), warnings: r.warnings };
+}
+
+/** Parses a fraction or percent ("25%", "0.25"). A bare number above 1 is refused with the parser's "write 5% or 0.05" hint. */
+export function parseFractionField(text: string): FieldView {
+  if (text.trim() === '') return { status: 'empty' };
+  if (text.length > MAX_FIELD_CHARS) return { status: 'error', message: `Too long (at most ${String(MAX_FIELD_CHARS)} characters).` };
+  const r = parseFraction(text);
+  if (!r.ok) return { status: 'error', message: r.error.message };
+  const value = q(r.value, DIM.DIMENSIONLESS);
+  return { status: 'ok', value, echo: describeParsed(value, DIM.DIMENSIONLESS), warnings: [] };
 }
 
 // ---------------------------------------------------------------------------

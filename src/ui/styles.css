@@ -132,3 +132,27 @@ input, select { max-width: 100%; }
 .callout p { margin: 0.5rem 0; }
 .advanced { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 6px; padding: 0 0.75rem 0.5rem; background: var(--bg); }
 .advanced > summary { padding: 0.25rem 0; }
+
+/* ---- Circuit values (Ohm's law, divider, E-series) ---- */
+.calc-stack { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+.calc-stack[data-pending="true"] .results, .calc-stack[data-pending="true"] .needs { opacity: 0.55; }
+.count-state { margin: 0.25rem 0 0.75rem; padding: 0.25rem 0.6rem; border-left: 5px solid var(--muted); background: var(--bg); color: var(--fg); }
+.count-state.count-ok { border-left-color: var(--link); }
+.count-state.count-over { border-left-color: var(--err-fg); background: var(--err-bg); color: var(--err-fg); }
+.schematic { margin: 0.5rem 0; }
+.schematic svg { display: block; width: 100%; max-width: 22rem; height: auto; margin: 0 auto; }
+.schem-wire { stroke: var(--fg); stroke-width: 2; fill: none; }
+.schem-box { stroke: var(--fg); stroke-width: 2; fill: var(--bg); }
+.schem-unknown { stroke: var(--link); stroke-width: 4; }
+.schem-terminal { stroke: var(--fg); stroke-width: 2; fill: var(--bg); }
+.schem-dot { fill: var(--fg); }
+.schem-text { fill: var(--fg); font-size: 14px; font-weight: 600; }
+.schem-sub { fill: var(--muted); font-size: 12px; }
+.schem-end { text-anchor: end; }
+.schem-legend ul { margin: 0.25rem 0; padding-left: 1.25rem; font-size: 0.875rem; }
+.envelope h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.envelope td { font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
+td.num { font-variant-numeric: tabular-nums; }
+ul.decade { list-style: none; padding: 0; margin: 0.25rem 0; display: grid; gap: 0.25rem; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+ul.decade li { border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.4rem; background: var(--bg); color: var(--fg); font-variant-numeric: tabular-nums; }
+ul.decade li.chosen { border: 3px solid var(--link); font-weight: 700; }

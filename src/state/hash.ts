@@ -196,6 +196,31 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text for the skin-depth check, for example "1 GHz" (at most 40 characters). Absent means no skin-depth check.',
     i: 'Entered current text for the voltage drop and power loss, for example "2 A" (at most 40 characters). Absent means neither is shown.',
   },
+  'ohm-power': {
+    vo: 'Entered voltage text, for example "5 V" (at most 40 characters). Absent means not given. Give exactly two of vo, i, r, p; the other two are solved.',
+    i: 'Entered current text, for example "50 mA" (at most 40 characters). Absent means not given.',
+    r: 'Entered resistance text, for example "100 Ω" or "4k7" (at most 40 characters). Absent means not given.',
+    p: 'Entered power text, for example "250 mW" (at most 40 characters). Absent means not given.',
+  },
+  'resistor-divider': {
+    sf: 'Solve for: "vout" (output voltage), "r1" (top resistor) or "r2" (bottom resistor). Absent means vout.',
+    vi: 'Entered input voltage text, for example "12 V" (at most 40 characters).',
+    r1: 'Entered R1 text, the TOP resistor from Vin to the Vout node, for example "10k" (at most 40 characters; used when solving vout or r2).',
+    r2: 'Entered R2 text, the BOTTOM resistor from the Vout node to ground, for example "4.7k" (at most 40 characters; used when solving vout or r1).',
+    tg: 'Entered target output voltage text, for example "3.3 V" (at most 40 characters; used when solving a resistor).',
+    rl: 'Entered optional load resistance text across R2, for example "100k" (at most 40 characters). Absent means no load.',
+    tol: 'Entered optional resistor tolerance, a percent or fraction such as "1%" or "0.01" (at most 40 characters). Absent means no tolerance envelope.',
+    vtol: 'Entered optional input voltage tolerance, a percent or fraction such as "5%" (at most 40 characters). Absent means none.',
+    se: 'E-series the solved resistor is snapped to: "E24", "E96" or "E192". Absent means none (exact value). Only used when solving a resistor.',
+    sn: 'Snap direction: "nearest", "up" or "down". Absent means nearest. Only used when a series is chosen.',
+  },
+  'e-series': {
+    nt: 'Entered target resistance text for the nearest-value lookup, for example "4k7" or "2.2k" (at most 40 characters).',
+    ns: 'E-series for the lookup: E3, E6, E12, E24, E48, E96 or E192. Absent means E24.',
+    pt: 'Entered target text for the two-resistor search: a resistance for series and parallel, a fraction or percent such as "0.25" or "25%" for a divider ratio (at most 40 characters).',
+    pk: 'Two-resistor topology: "series", "parallel" or "divider-ratio". Absent means series.',
+    ps: 'E-series for the two-resistor search: E3, E6, E12, E24, E48, E96 or E192. Absent means E24.',
+  },
 } as const satisfies Record<string, Record<string, string>>;
 
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {
