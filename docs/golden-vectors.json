@@ -1530,6 +1530,5378 @@
       },
       "status": "VERIFIED",
       "note": "P = I^2 R(T)"
+    },
+    {
+      "name": "ohm_VI_c0_ohm",
+      "oracle_value": 24.0,
+      "pinned_expected": 24.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VI_c0_W",
+      "oracle_value": 6.0,
+      "pinned_expected": 6.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VI_c1_ohm",
+      "oracle_value": 165.0,
+      "pinned_expected": 165.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VI_c1_W",
+      "oracle_value": 0.066,
+      "pinned_expected": 0.066,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VR_c2_A",
+      "oracle_value": 0.015151515151515152,
+      "pinned_expected": 0.015151515151515152,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VR_c2_W",
+      "oracle_value": 0.07575757575757576,
+      "pinned_expected": 0.07575757575757576,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VR_c3_A",
+      "oracle_value": 0.005106382978723404,
+      "pinned_expected": 0.005106382978723404,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VR_c3_W",
+      "oracle_value": 0.1225531914893617,
+      "pinned_expected": 0.1225531914893617,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VP_c4_A",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VP_c4_ohm",
+      "oracle_value": 24.0,
+      "pinned_expected": 24.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VP_c5_A",
+      "oracle_value": 4.3478260869565215,
+      "pinned_expected": 4.3478260869565215,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_VP_c5_ohm",
+      "oracle_value": 52.9,
+      "pinned_expected": 52.9,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IR_c6_V",
+      "oracle_value": 3.0,
+      "pinned_expected": 3.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IR_c6_W",
+      "oracle_value": 0.060000000000000005,
+      "pinned_expected": 0.060000000000000005,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IR_c7_V",
+      "oracle_value": 0.15000000000000002,
+      "pinned_expected": 0.15000000000000002,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IR_c7_W",
+      "oracle_value": 0.45,
+      "pinned_expected": 0.45,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IP_c8_V",
+      "oracle_value": 5.0,
+      "pinned_expected": 5.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IP_c8_ohm",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IP_c9_V",
+      "oracle_value": 250.0,
+      "pinned_expected": 250.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_IP_c9_ohm",
+      "oracle_value": 250000.0,
+      "pinned_expected": 250000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_RP_c10_V",
+      "oracle_value": 5.0,
+      "pinned_expected": 5.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_RP_c10_A",
+      "oracle_value": 0.05,
+      "pinned_expected": 0.05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_RP_c11_V",
+      "oracle_value": 68.55654600401044,
+      "pinned_expected": 68.55654600401044,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "ohm_RP_c11_A",
+      "oracle_value": 0.014586499149789456,
+      "pinned_expected": 0.014586499149789456,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"
+    },
+    {
+      "name": "divider_unloaded_c0_vout_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin R2/(R1 + R2)"
+    },
+    {
+      "name": "divider_unloaded_c1_vout_V",
+      "oracle_value": 2.1052631578947367,
+      "pinned_expected": 2.1052631578947367,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin R2/(R1 + R2)"
+    },
+    {
+      "name": "divider_unloaded_c2_vout_V",
+      "oracle_value": 1.03125,
+      "pinned_expected": 1.03125,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin R2/(R1 + R2)"
+    },
+    {
+      "name": "divider_unloaded_c3_vout_V",
+      "oracle_value": 1.5280898876404494,
+      "pinned_expected": 1.5280898876404494,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin R2/(R1 + R2)"
+    },
+    {
+      "name": "divider_unloaded_c4_vout_V",
+      "oracle_value": 1.0040053404539386,
+      "pinned_expected": 1.0040053404539386,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin R2/(R1 + R2)"
+    },
+    {
+      "name": "divider_unloaded_c5_vout_V",
+      "oracle_value": 1.2,
+      "pinned_expected": 1.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin R2/(R1 + R2)"
+    },
+    {
+      "name": "divider_loaded_c0_vout_V",
+      "oracle_value": 2.380952380952381,
+      "pinned_expected": 2.380952380952381,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin Re/(R1 + Re), Re = R2 || RL"
+    },
+    {
+      "name": "divider_loaded_c1_vout_V",
+      "oracle_value": 1.1538461538461537,
+      "pinned_expected": 1.1538461538461537,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin Re/(R1 + Re), Re = R2 || RL"
+    },
+    {
+      "name": "divider_loaded_c2_vout_V",
+      "oracle_value": 0.8996519721577725,
+      "pinned_expected": 0.8996519721577725,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin Re/(R1 + Re), Re = R2 || RL"
+    },
+    {
+      "name": "divider_loaded_c3_vout_V",
+      "oracle_value": 1.5184220320059545,
+      "pinned_expected": 1.5184220320059545,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin Re/(R1 + Re), Re = R2 || RL"
+    },
+    {
+      "name": "divider_loaded_c4_vout_V",
+      "oracle_value": 1.6666666666666667,
+      "pinned_expected": 1.6666666666666667,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Vout = Vin Re/(R1 + Re), Re = R2 || RL"
+    },
+    {
+      "name": "divider_solve_r1_c0_ohm",
+      "oracle_value": 26363.636363636364,
+      "pinned_expected": 26363.636363636364,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R1 = Re (Vin - Vt)/Vt, Re = R2 (|| RL when loaded); exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r1_c1_ohm",
+      "oracle_value": 17777.777777777777,
+      "pinned_expected": 17777.777777777777,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R1 = Re (Vin - Vt)/Vt, Re = R2 (|| RL when loaded); exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r1_c2_ohm",
+      "oracle_value": 17860.0,
+      "pinned_expected": 17860.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R1 = Re (Vin - Vt)/Vt, Re = R2 (|| RL when loaded); exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r1_c3_ohm",
+      "oracle_value": 16400.0,
+      "pinned_expected": 16400.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R1 = Re (Vin - Vt)/Vt, Re = R2 (|| RL when loaded); exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r1_c4_ohm",
+      "oracle_value": 23966.942148760325,
+      "pinned_expected": 23966.942148760325,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R1 = Re (Vin - Vt)/Vt, Re = R2 (|| RL when loaded); exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r2_c0_ohm",
+      "oracle_value": 17827.586206896554,
+      "pinned_expected": 17827.586206896554,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Re = R1 Vt/(Vin - Vt); R2 = Re RL/(RL - Re) when loaded; exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r2_c1_ohm",
+      "oracle_value": 19411.76470588235,
+      "pinned_expected": 19411.76470588235,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Re = R1 Vt/(Vin - Vt); R2 = Re RL/(RL - Re) when loaded; exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r2_c2_ohm",
+      "oracle_value": 26315.78947368421,
+      "pinned_expected": 26315.78947368421,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Re = R1 Vt/(Vin - Vt); R2 = Re RL/(RL - Re) when loaded; exact, unsnapped"
+    },
+    {
+      "name": "divider_solve_r2_c3_ohm",
+      "oracle_value": 11111.111111111111,
+      "pinned_expected": 11111.111111111111,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Re = R1 Vt/(Vin - Vt); R2 = Re RL/(RL - Re) when loaded; exact, unsnapped"
+    },
+    {
+      "name": "divider_power_c0_i_A",
+      "oracle_value": 0.0002105263157894737,
+      "pinned_expected": 0.0002105263157894737,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c0_p_r1_W",
+      "oracle_value": 0.0020831024930747922,
+      "pinned_expected": 0.0020831024930747922,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c0_p_r2_W",
+      "oracle_value": 0.0004432132963988919,
+      "pinned_expected": 0.0004432132963988919,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c0_p_total_W",
+      "oracle_value": 0.0025263157894736842,
+      "pinned_expected": 0.0025263157894736842,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c0_rout_ohm",
+      "oracle_value": 8245.61403508772,
+      "pinned_expected": 8245.61403508772,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c1_i_A",
+      "oracle_value": 0.0002139384116693679,
+      "pinned_expected": 0.0002139384116693679,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c1_p_r1_W",
+      "oracle_value": 0.002151173267417761,
+      "pinned_expected": 0.002151173267417761,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c1_p_r2_W",
+      "oracle_value": 0.00037826152055877633,
+      "pinned_expected": 0.00037826152055877633,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c1_p_total_W",
+      "oracle_value": 0.002567260940032415,
+      "pinned_expected": 0.002567260940032415,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c1_rout_ohm",
+      "oracle_value": 8245.61403508772,
+      "pinned_expected": 8245.61403508772,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c1_p_load_W",
+      "oracle_value": 3.7826152055877634e-05,
+      "pinned_expected": 3.7826152055877634e-05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P(RL) = Vout^2/RL"
+    },
+    {
+      "name": "divider_power_c2_i_A",
+      "oracle_value": 0.007575757575757576,
+      "pinned_expected": 0.007575757575757576,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c2_p_r1_W",
+      "oracle_value": 0.01893939393939394,
+      "pinned_expected": 0.01893939393939394,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c2_p_r2_W",
+      "oracle_value": 0.01893939393939394,
+      "pinned_expected": 0.01893939393939394,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c2_p_total_W",
+      "oracle_value": 0.03787878787878788,
+      "pinned_expected": 0.03787878787878788,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_power_c2_rout_ohm",
+      "oracle_value": 165.0,
+      "pinned_expected": 165.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"
+    },
+    {
+      "name": "divider_snap_c0_E24_nearest_ohm",
+      "oracle_value": 27000.0,
+      "pinned_expected": 27000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E24 (nearest); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E24_nearest_vout_V",
+      "oracle_value": 3.2432432432432434,
+      "pinned_expected": 3.2432432432432434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E24_nearest_err_frac",
+      "oracle_value": -0.01719901719901709,
+      "pinned_expected": -0.01719901719901709,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E24_up_ohm",
+      "oracle_value": 27000.0,
+      "pinned_expected": 27000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E24 (up); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E24_up_vout_V",
+      "oracle_value": 3.2432432432432434,
+      "pinned_expected": 3.2432432432432434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E24_up_err_frac",
+      "oracle_value": -0.01719901719901709,
+      "pinned_expected": -0.01719901719901709,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E24_down_ohm",
+      "oracle_value": 24000.0,
+      "pinned_expected": 24000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E24 (down); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E24_down_vout_V",
+      "oracle_value": 3.5294117647058822,
+      "pinned_expected": 3.5294117647058822,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E24_down_err_frac",
+      "oracle_value": 0.06951871657754014,
+      "pinned_expected": 0.06951871657754014,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E96_nearest_ohm",
+      "oracle_value": 26100.0,
+      "pinned_expected": 26100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E96 (nearest); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E96_nearest_vout_V",
+      "oracle_value": 3.3240997229916895,
+      "pinned_expected": 3.3240997229916895,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E96_nearest_err_frac",
+      "oracle_value": 0.0073029463611180975,
+      "pinned_expected": 0.0073029463611180975,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E96_up_ohm",
+      "oracle_value": 26700.0,
+      "pinned_expected": 26700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E96 (up); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E96_up_vout_V",
+      "oracle_value": 3.2697547683923704,
+      "pinned_expected": 3.2697547683923704,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E96_up_err_frac",
+      "oracle_value": -0.009165221699281629,
+      "pinned_expected": -0.009165221699281629,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E96_down_ohm",
+      "oracle_value": 26100.0,
+      "pinned_expected": 26100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E96 (down); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E96_down_vout_V",
+      "oracle_value": 3.3240997229916895,
+      "pinned_expected": 3.3240997229916895,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E96_down_err_frac",
+      "oracle_value": 0.0073029463611180975,
+      "pinned_expected": 0.0073029463611180975,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E192_nearest_ohm",
+      "oracle_value": 26400.0,
+      "pinned_expected": 26400.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E192 (nearest); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E192_nearest_vout_V",
+      "oracle_value": 3.2967032967032965,
+      "pinned_expected": 3.2967032967032965,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E192_nearest_err_frac",
+      "oracle_value": -0.0009990009990009955,
+      "pinned_expected": -0.0009990009990009955,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E192_up_ohm",
+      "oracle_value": 26400.0,
+      "pinned_expected": 26400.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E192 (up); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E192_up_vout_V",
+      "oracle_value": 3.2967032967032965,
+      "pinned_expected": 3.2967032967032965,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E192_up_err_frac",
+      "oracle_value": -0.0009990009990009955,
+      "pinned_expected": -0.0009990009990009955,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c0_E192_down_ohm",
+      "oracle_value": 26100.0,
+      "pinned_expected": 26100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r1 snapped to E192 (down); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c0_E192_down_vout_V",
+      "oracle_value": 3.3240997229916895,
+      "pinned_expected": 3.3240997229916895,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c0_E192_down_err_frac",
+      "oracle_value": 0.0073029463611180975,
+      "pinned_expected": 0.0073029463611180975,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E24_nearest_ohm",
+      "oracle_value": 18000.0,
+      "pinned_expected": 18000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E24 (nearest); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E24_nearest_vout_V",
+      "oracle_value": 3.3230769230769233,
+      "pinned_expected": 3.3230769230769233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E24_nearest_err_frac",
+      "oracle_value": 0.006993006993007103,
+      "pinned_expected": 0.006993006993007103,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E24_up_ohm",
+      "oracle_value": 18000.0,
+      "pinned_expected": 18000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E24 (up); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E24_up_vout_V",
+      "oracle_value": 3.3230769230769233,
+      "pinned_expected": 3.3230769230769233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E24_up_err_frac",
+      "oracle_value": 0.006993006993007103,
+      "pinned_expected": 0.006993006993007103,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E24_down_ohm",
+      "oracle_value": 16000.0,
+      "pinned_expected": 16000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E24 (down); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E24_down_vout_V",
+      "oracle_value": 3.0476190476190474,
+      "pinned_expected": 3.0476190476190474,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E24_down_err_frac",
+      "oracle_value": -0.07647907647907648,
+      "pinned_expected": -0.07647907647907648,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E96_nearest_ohm",
+      "oracle_value": 17800.0,
+      "pinned_expected": 17800.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E96 (nearest); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E96_nearest_vout_V",
+      "oracle_value": 3.2962962962962963,
+      "pinned_expected": 3.2962962962962963,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E96_nearest_err_frac",
+      "oracle_value": -0.0011223344556677403,
+      "pinned_expected": -0.0011223344556677403,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E96_up_ohm",
+      "oracle_value": 18200.0,
+      "pinned_expected": 18200.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E96 (up); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E96_up_vout_V",
+      "oracle_value": 3.3496932515337425,
+      "pinned_expected": 3.3496932515337425,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E96_up_err_frac",
+      "oracle_value": 0.015058561070831126,
+      "pinned_expected": 0.015058561070831126,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E96_down_ohm",
+      "oracle_value": 17800.0,
+      "pinned_expected": 17800.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E96 (down); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E96_down_vout_V",
+      "oracle_value": 3.2962962962962963,
+      "pinned_expected": 3.2962962962962963,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E96_down_err_frac",
+      "oracle_value": -0.0011223344556677403,
+      "pinned_expected": -0.0011223344556677403,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E192_nearest_ohm",
+      "oracle_value": 17800.0,
+      "pinned_expected": 17800.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E192 (nearest); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E192_nearest_vout_V",
+      "oracle_value": 3.2962962962962963,
+      "pinned_expected": 3.2962962962962963,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E192_nearest_err_frac",
+      "oracle_value": -0.0011223344556677403,
+      "pinned_expected": -0.0011223344556677403,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E192_up_ohm",
+      "oracle_value": 18000.0,
+      "pinned_expected": 18000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E192 (up); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E192_up_vout_V",
+      "oracle_value": 3.3230769230769233,
+      "pinned_expected": 3.3230769230769233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E192_up_err_frac",
+      "oracle_value": 0.006993006993007103,
+      "pinned_expected": 0.006993006993007103,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_snap_c1_E192_down_ohm",
+      "oracle_value": 17800.0,
+      "pinned_expected": 17800.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "solved r2 snapped to E192 (down); exact solve, then nearest/up/down in exact decimal arithmetic"
+    },
+    {
+      "name": "divider_snap_c1_E192_down_vout_V",
+      "oracle_value": 3.2962962962962963,
+      "pinned_expected": 3.2962962962962963,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Vout with the snapped resistor"
+    },
+    {
+      "name": "divider_snap_c1_E192_down_err_frac",
+      "oracle_value": -0.0011223344556677403,
+      "pinned_expected": -0.0011223344556677403,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(Vout - target)/target as a fraction"
+    },
+    {
+      "name": "divider_env_c0_min_V",
+      "oracle_value": 2.475,
+      "pinned_expected": 2.475,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c0_max_V",
+      "oracle_value": 2.525,
+      "pinned_expected": 2.525,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c1_min_V",
+      "oracle_value": 1.9371282922684792,
+      "pinned_expected": 1.9371282922684792,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c1_max_V",
+      "oracle_value": 2.28467815049864,
+      "pinned_expected": 2.28467815049864,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c2_min_V",
+      "oracle_value": 1.8742695236408713,
+      "pinned_expected": 1.8742695236408713,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c2_max_V",
+      "oracle_value": 2.017264167876899,
+      "pinned_expected": 2.017264167876899,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c3_min_V",
+      "oracle_value": 0.8983437926140315,
+      "pinned_expected": 0.8983437926140315,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c3_max_V",
+      "oracle_value": 0.9009613420488201,
+      "pinned_expected": 0.9009613420488201,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c4_min_V",
+      "oracle_value": 2.1375,
+      "pinned_expected": 2.1375,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "divider_env_c4_max_V",
+      "oracle_value": 2.8875,
+      "pinned_expected": 2.8875,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+    },
+    {
+      "name": "eseries_E3_size",
+      "oracle_value": 3.0,
+      "pinned_expected": 3.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E3_mantissa_sum",
+      "oracle_value": 7.9,
+      "pinned_expected": 7.9,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E3_formula_deviation_count",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E6_size",
+      "oracle_value": 6.0,
+      "pinned_expected": 6.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E6_mantissa_sum",
+      "oracle_value": 19.5,
+      "pinned_expected": 19.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E6_formula_deviation_count",
+      "oracle_value": 2.0,
+      "pinned_expected": 2.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E12_size",
+      "oracle_value": 12.0,
+      "pinned_expected": 12.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E12_mantissa_sum",
+      "oracle_value": 42.9,
+      "pinned_expected": 42.9,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E12_formula_deviation_count",
+      "oracle_value": 5.0,
+      "pinned_expected": 5.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E24_size",
+      "oracle_value": 24.0,
+      "pinned_expected": 24.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E24_mantissa_sum",
+      "oracle_value": 90.1,
+      "pinned_expected": 90.1,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E24_formula_deviation_count",
+      "oracle_value": 8.0,
+      "pinned_expected": 8.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E48_size",
+      "oracle_value": 48.0,
+      "pinned_expected": 48.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E48_mantissa_sum",
+      "oracle_value": 183.13,
+      "pinned_expected": 183.13,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E48_formula_deviation_count",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E96_size",
+      "oracle_value": 96.0,
+      "pinned_expected": 96.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E96_mantissa_sum",
+      "oracle_value": 370.7,
+      "pinned_expected": 370.7,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E96_formula_deviation_count",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E192_size",
+      "oracle_value": 192.0,
+      "pinned_expected": 192.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "series size"
+    },
+    {
+      "name": "eseries_E192_mantissa_sum",
+      "oracle_value": 745.99,
+      "pinned_expected": 745.99,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"
+    },
+    {
+      "name": "eseries_E192_formula_deviation_count",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"
+    },
+    {
+      "name": "eseries_E24_max_nearest_error_pct",
+      "oracle_value": 7.142857142857143,
+      "pinned_expected": 7.142857142857143,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "largest |error %| of the nearest rule, at the midpoint of the widest relative gap"
+    },
+    {
+      "name": "eseries_E96_max_nearest_error_pct",
+      "oracle_value": 1.4814814814814814,
+      "pinned_expected": 1.4814814814814814,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "largest |error %| of the nearest rule, at the midpoint of the widest relative gap"
+    },
+    {
+      "name": "eseries_E192_max_nearest_error_pct",
+      "oracle_value": 0.970873786407767,
+      "pinned_expected": 0.970873786407767,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "largest |error %| of the nearest rule, at the midpoint of the widest relative gap"
+    },
+    {
+      "name": "eseries_nearest_t0_E24_nearest_value",
+      "oracle_value": 10.0,
+      "pinned_expected": 10.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E24_nearest_err_pct",
+      "oracle_value": 2.0408163265306123,
+      "pinned_expected": 2.0408163265306123,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E24_up_value",
+      "oracle_value": 10.0,
+      "pinned_expected": 10.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E24_up_err_pct",
+      "oracle_value": 2.0408163265306123,
+      "pinned_expected": 2.0408163265306123,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E24_down_value",
+      "oracle_value": 9.1,
+      "pinned_expected": 9.1,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E24_down_err_pct",
+      "oracle_value": -7.142857142857143,
+      "pinned_expected": -7.142857142857143,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E96_nearest_value",
+      "oracle_value": 9.76,
+      "pinned_expected": 9.76,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E96_nearest_err_pct",
+      "oracle_value": -0.40816326530612246,
+      "pinned_expected": -0.40816326530612246,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E96_up_value",
+      "oracle_value": 10.0,
+      "pinned_expected": 10.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E96_up_err_pct",
+      "oracle_value": 2.0408163265306123,
+      "pinned_expected": 2.0408163265306123,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E96_down_value",
+      "oracle_value": 9.76,
+      "pinned_expected": 9.76,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E96_down_err_pct",
+      "oracle_value": -0.40816326530612246,
+      "pinned_expected": -0.40816326530612246,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E192_nearest_value",
+      "oracle_value": 9.76,
+      "pinned_expected": 9.76,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E192_nearest_err_pct",
+      "oracle_value": -0.40816326530612246,
+      "pinned_expected": -0.40816326530612246,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E192_up_value",
+      "oracle_value": 9.88,
+      "pinned_expected": 9.88,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E192_up_err_pct",
+      "oracle_value": 0.8163265306122449,
+      "pinned_expected": 0.8163265306122449,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t0_E192_down_value",
+      "oracle_value": 9.76,
+      "pinned_expected": 9.76,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t0_E192_down_err_pct",
+      "oracle_value": -0.40816326530612246,
+      "pinned_expected": -0.40816326530612246,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E24_nearest_value",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E24_nearest_err_pct",
+      "oracle_value": 3.0927835051546393,
+      "pinned_expected": 3.0927835051546393,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E24_up_value",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E24_up_err_pct",
+      "oracle_value": 3.0927835051546393,
+      "pinned_expected": 3.0927835051546393,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E24_down_value",
+      "oracle_value": 0.91,
+      "pinned_expected": 0.91,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E24_down_err_pct",
+      "oracle_value": -6.185567010309279,
+      "pinned_expected": -6.185567010309279,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E96_nearest_value",
+      "oracle_value": 0.976,
+      "pinned_expected": 0.976,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E96_nearest_err_pct",
+      "oracle_value": 0.6185567010309279,
+      "pinned_expected": 0.6185567010309279,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E96_up_value",
+      "oracle_value": 0.976,
+      "pinned_expected": 0.976,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E96_up_err_pct",
+      "oracle_value": 0.6185567010309279,
+      "pinned_expected": 0.6185567010309279,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E96_down_value",
+      "oracle_value": 0.953,
+      "pinned_expected": 0.953,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E96_down_err_pct",
+      "oracle_value": -1.7525773195876289,
+      "pinned_expected": -1.7525773195876289,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E192_nearest_value",
+      "oracle_value": 0.965,
+      "pinned_expected": 0.965,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E192_nearest_err_pct",
+      "oracle_value": -0.5154639175257731,
+      "pinned_expected": -0.5154639175257731,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E192_up_value",
+      "oracle_value": 0.976,
+      "pinned_expected": 0.976,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E192_up_err_pct",
+      "oracle_value": 0.6185567010309279,
+      "pinned_expected": 0.6185567010309279,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t1_E192_down_value",
+      "oracle_value": 0.965,
+      "pinned_expected": 0.965,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t1_E192_down_err_pct",
+      "oracle_value": -0.5154639175257731,
+      "pinned_expected": -0.5154639175257731,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E24_nearest_value",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E24_nearest_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E24_up_value",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E24_up_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E24_down_value",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E24_down_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E96_nearest_value",
+      "oracle_value": 4750.0,
+      "pinned_expected": 4750.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E96_nearest_err_pct",
+      "oracle_value": 1.0638297872340425,
+      "pinned_expected": 1.0638297872340425,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E96_up_value",
+      "oracle_value": 4750.0,
+      "pinned_expected": 4750.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E96_up_err_pct",
+      "oracle_value": 1.0638297872340425,
+      "pinned_expected": 1.0638297872340425,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E96_down_value",
+      "oracle_value": 4640.0,
+      "pinned_expected": 4640.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E96_down_err_pct",
+      "oracle_value": -1.2765957446808511,
+      "pinned_expected": -1.2765957446808511,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E192_nearest_value",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E192_nearest_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E192_up_value",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E192_up_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t2_E192_down_value",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t2_E192_down_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E24_nearest_value",
+      "oracle_value": 27000.0,
+      "pinned_expected": 27000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E24_nearest_err_pct",
+      "oracle_value": 2.4137931034482745,
+      "pinned_expected": 2.4137931034482745,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E24_up_value",
+      "oracle_value": 27000.0,
+      "pinned_expected": 27000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E24_up_err_pct",
+      "oracle_value": 2.4137931034482745,
+      "pinned_expected": 2.4137931034482745,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E24_down_value",
+      "oracle_value": 24000.0,
+      "pinned_expected": 24000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E24_down_err_pct",
+      "oracle_value": -8.965517241379311,
+      "pinned_expected": -8.965517241379311,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E96_nearest_value",
+      "oracle_value": 26100.0,
+      "pinned_expected": 26100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E96_nearest_err_pct",
+      "oracle_value": -1.0000000000000013,
+      "pinned_expected": -1.0000000000000013,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E96_up_value",
+      "oracle_value": 26700.0,
+      "pinned_expected": 26700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E96_up_err_pct",
+      "oracle_value": 1.2758620689655158,
+      "pinned_expected": 1.2758620689655158,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E96_down_value",
+      "oracle_value": 26100.0,
+      "pinned_expected": 26100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E96_down_err_pct",
+      "oracle_value": -1.0000000000000013,
+      "pinned_expected": -1.0000000000000013,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E192_nearest_value",
+      "oracle_value": 26400.0,
+      "pinned_expected": 26400.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E192_nearest_err_pct",
+      "oracle_value": 0.13793103448275723,
+      "pinned_expected": 0.13793103448275723,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E192_up_value",
+      "oracle_value": 26400.0,
+      "pinned_expected": 26400.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E192_up_err_pct",
+      "oracle_value": 0.13793103448275723,
+      "pinned_expected": 0.13793103448275723,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t3_E192_down_value",
+      "oracle_value": 26100.0,
+      "pinned_expected": 26100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t3_E192_down_err_pct",
+      "oracle_value": -1.0000000000000013,
+      "pinned_expected": -1.0000000000000013,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E24_nearest_value",
+      "oracle_value": 1.2e-09,
+      "pinned_expected": 1.2e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E24_nearest_err_pct",
+      "oracle_value": -2.755267423014587,
+      "pinned_expected": -2.755267423014587,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E24_up_value",
+      "oracle_value": 1.3e-09,
+      "pinned_expected": 1.3e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E24_up_err_pct",
+      "oracle_value": 5.348460291734198,
+      "pinned_expected": 5.348460291734198,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E24_down_value",
+      "oracle_value": 1.2e-09,
+      "pinned_expected": 1.2e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E24_down_err_pct",
+      "oracle_value": -2.755267423014587,
+      "pinned_expected": -2.755267423014587,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E96_nearest_value",
+      "oracle_value": 1.24e-09,
+      "pinned_expected": 1.24e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E96_nearest_err_pct",
+      "oracle_value": 0.4862236628849271,
+      "pinned_expected": 0.4862236628849271,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E96_up_value",
+      "oracle_value": 1.24e-09,
+      "pinned_expected": 1.24e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E96_up_err_pct",
+      "oracle_value": 0.4862236628849271,
+      "pinned_expected": 0.4862236628849271,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E96_down_value",
+      "oracle_value": 1.21e-09,
+      "pinned_expected": 1.21e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E96_down_err_pct",
+      "oracle_value": -1.9448946515397083,
+      "pinned_expected": -1.9448946515397083,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E192_nearest_value",
+      "oracle_value": 1.23e-09,
+      "pinned_expected": 1.23e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E192_nearest_err_pct",
+      "oracle_value": -0.3241491085899514,
+      "pinned_expected": -0.3241491085899514,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E192_up_value",
+      "oracle_value": 1.24e-09,
+      "pinned_expected": 1.24e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E192_up_err_pct",
+      "oracle_value": 0.4862236628849271,
+      "pinned_expected": 0.4862236628849271,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t4_E192_down_value",
+      "oracle_value": 1.23e-09,
+      "pinned_expected": 1.23e-09,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t4_E192_down_err_pct",
+      "oracle_value": -0.3241491085899514,
+      "pinned_expected": -0.3241491085899514,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E24_nearest_value",
+      "oracle_value": 820000.0,
+      "pinned_expected": 820000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E24_nearest_err_pct",
+      "oracle_value": -4.651162790697675,
+      "pinned_expected": -4.651162790697675,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E24_up_value",
+      "oracle_value": 910000.0,
+      "pinned_expected": 910000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E24_up_err_pct",
+      "oracle_value": 5.813953488372093,
+      "pinned_expected": 5.813953488372093,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E24_down_value",
+      "oracle_value": 820000.0,
+      "pinned_expected": 820000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E24_down_err_pct",
+      "oracle_value": -4.651162790697675,
+      "pinned_expected": -4.651162790697675,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E96_nearest_value",
+      "oracle_value": 866000.0,
+      "pinned_expected": 866000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E96_nearest_err_pct",
+      "oracle_value": 0.6976744186046512,
+      "pinned_expected": 0.6976744186046512,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E96_up_value",
+      "oracle_value": 866000.0,
+      "pinned_expected": 866000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E96_up_err_pct",
+      "oracle_value": 0.6976744186046512,
+      "pinned_expected": 0.6976744186046512,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E96_down_value",
+      "oracle_value": 845000.0,
+      "pinned_expected": 845000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E96_down_err_pct",
+      "oracle_value": -1.744186046511628,
+      "pinned_expected": -1.744186046511628,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E192_nearest_value",
+      "oracle_value": 856000.0,
+      "pinned_expected": 856000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E192_nearest_err_pct",
+      "oracle_value": -0.46511627906976744,
+      "pinned_expected": -0.46511627906976744,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E192_up_value",
+      "oracle_value": 866000.0,
+      "pinned_expected": 866000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E192_up_err_pct",
+      "oracle_value": 0.6976744186046512,
+      "pinned_expected": 0.6976744186046512,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "eseries_nearest_t5_E192_down_value",
+      "oracle_value": 856000.0,
+      "pinned_expected": 856000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exact-decimal nearest search; a tie goes up"
+    },
+    {
+      "name": "eseries_nearest_t5_E192_down_err_pct",
+      "oracle_value": -0.46511627906976744,
+      "pinned_expected": -0.46511627906976744,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "(found - target)/target x 100"
+    },
+    {
+      "name": "pairs_c0_rank1_r1",
+      "oracle_value": 1000.0,
+      "pinned_expected": 1000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank1_r2",
+      "oracle_value": 2000.0,
+      "pinned_expected": 2000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank1_value",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank1_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank2_r1",
+      "oracle_value": 300.0,
+      "pinned_expected": 300.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank2_r2",
+      "oracle_value": 2700.0,
+      "pinned_expected": 2700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank2_value",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank2_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank3_r1",
+      "oracle_value": 1200.0,
+      "pinned_expected": 1200.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank3_r2",
+      "oracle_value": 1800.0,
+      "pinned_expected": 1800.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank3_value",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank3_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank4_r1",
+      "oracle_value": 1500.0,
+      "pinned_expected": 1500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank4_r2",
+      "oracle_value": 1500.0,
+      "pinned_expected": 1500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank4_value",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank4_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank5_r1",
+      "oracle_value": 10.0,
+      "pinned_expected": 10.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank5_r2",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank5_value",
+      "oracle_value": 3010.0,
+      "pinned_expected": 3010.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c0_rank5_err_pct",
+      "oracle_value": 0.3333333333333333,
+      "pinned_expected": 0.3333333333333333,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank1_r1",
+      "oracle_value": 845.0,
+      "pinned_expected": 845.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank1_r2",
+      "oracle_value": 11500.0,
+      "pinned_expected": 11500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank1_value",
+      "oracle_value": 12345.0,
+      "pinned_expected": 12345.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank1_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank2_r1",
+      "oracle_value": 243.0,
+      "pinned_expected": 243.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank2_r2",
+      "oracle_value": 12100.0,
+      "pinned_expected": 12100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank2_value",
+      "oracle_value": 12343.0,
+      "pinned_expected": 12343.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank2_err_pct",
+      "oracle_value": -0.016200891049007696,
+      "pinned_expected": -0.016200891049007696,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank3_r1",
+      "oracle_value": 249.0,
+      "pinned_expected": 249.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank3_r2",
+      "oracle_value": 12100.0,
+      "pinned_expected": 12100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank3_value",
+      "oracle_value": 12349.0,
+      "pinned_expected": 12349.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank3_err_pct",
+      "oracle_value": 0.03240178209801539,
+      "pinned_expected": 0.03240178209801539,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank4_r1",
+      "oracle_value": 549.0,
+      "pinned_expected": 549.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank4_r2",
+      "oracle_value": 11800.0,
+      "pinned_expected": 11800.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank4_value",
+      "oracle_value": 12349.0,
+      "pinned_expected": 12349.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank4_err_pct",
+      "oracle_value": 0.03240178209801539,
+      "pinned_expected": 0.03240178209801539,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank5_r1",
+      "oracle_value": 1050.0,
+      "pinned_expected": 1050.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank5_r2",
+      "oracle_value": 11300.0,
+      "pinned_expected": 11300.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank5_value",
+      "oracle_value": 12350.0,
+      "pinned_expected": 12350.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c1_rank5_err_pct",
+      "oracle_value": 0.04050222762251924,
+      "pinned_expected": 0.04050222762251924,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (series, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank1_r1",
+      "oracle_value": 1240.0,
+      "pinned_expected": 1240.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank1_r2",
+      "oracle_value": 255000.0,
+      "pinned_expected": 255000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank1_value",
+      "oracle_value": 1233.9993755853886,
+      "pinned_expected": 1233.9993755853886,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank1_err_pct",
+      "oracle_value": -5.060085991101333e-05,
+      "pinned_expected": -5.060085991101333e-05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank2_r1",
+      "oracle_value": 1300.0,
+      "pinned_expected": 1300.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank2_r2",
+      "oracle_value": 24300.0,
+      "pinned_expected": 24300.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank2_value",
+      "oracle_value": 1233.984375,
+      "pinned_expected": 1233.984375,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank2_err_pct",
+      "oracle_value": -0.0012662074554294976,
+      "pinned_expected": -0.0012662074554294976,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank3_r1",
+      "oracle_value": 1240.0,
+      "pinned_expected": 1240.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank3_r2",
+      "oracle_value": 261000.0,
+      "pinned_expected": 261000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank3_value",
+      "oracle_value": 1234.136668700427,
+      "pinned_expected": 1234.136668700427,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank3_err_pct",
+      "oracle_value": 0.011075259353897058,
+      "pinned_expected": 0.011075259353897058,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank4_r1",
+      "oracle_value": 1240.0,
+      "pinned_expected": 1240.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank4_r2",
+      "oracle_value": 249000.0,
+      "pinned_expected": 249000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank4_value",
+      "oracle_value": 1233.8554987212276,
+      "pinned_expected": 1233.8554987212276,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank4_err_pct",
+      "oracle_value": -0.01170999017604364,
+      "pinned_expected": -0.01170999017604364,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank5_r1",
+      "oracle_value": 1470.0,
+      "pinned_expected": 1470.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank5_r2",
+      "oracle_value": 7680.0,
+      "pinned_expected": 7680.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank5_value",
+      "oracle_value": 1233.8360655737704,
+      "pinned_expected": 1233.8360655737704,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c2_rank5_err_pct",
+      "oracle_value": -0.013284799532375057,
+      "pinned_expected": -0.013284799532375057,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank1_r1",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank1_r2",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank1_value",
+      "oracle_value": 1500.0,
+      "pinned_expected": 1500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank1_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank2_r1",
+      "oracle_value": 1600.0,
+      "pinned_expected": 1600.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank2_r2",
+      "oracle_value": 24000.0,
+      "pinned_expected": 24000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank2_value",
+      "oracle_value": 1500.0,
+      "pinned_expected": 1500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank2_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank3_r1",
+      "oracle_value": 2200.0,
+      "pinned_expected": 2200.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank3_r2",
+      "oracle_value": 4700.0,
+      "pinned_expected": 4700.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank3_value",
+      "oracle_value": 1498.5507246376812,
+      "pinned_expected": 1498.5507246376812,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank3_err_pct",
+      "oracle_value": -0.0966183574879227,
+      "pinned_expected": -0.0966183574879227,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank4_r1",
+      "oracle_value": 1500.0,
+      "pinned_expected": 1500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank4_r2",
+      "oracle_value": 910000.0,
+      "pinned_expected": 910000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank4_value",
+      "oracle_value": 1497.5315414152496,
+      "pinned_expected": 1497.5315414152496,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank4_err_pct",
+      "oracle_value": -0.16456390565002743,
+      "pinned_expected": -0.16456390565002743,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank5_r1",
+      "oracle_value": 1500.0,
+      "pinned_expected": 1500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank5_r2",
+      "oracle_value": 820000.0,
+      "pinned_expected": 820000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank5_value",
+      "oracle_value": 1497.2611077297627,
+      "pinned_expected": 1497.2611077297627,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c3_rank5_err_pct",
+      "oracle_value": -0.18259281801582472,
+      "pinned_expected": -0.18259281801582472,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (parallel, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank1_r1",
+      "oracle_value": 10200.0,
+      "pinned_expected": 10200.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank1_r2",
+      "oracle_value": 2550.0,
+      "pinned_expected": 2550.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank1_value",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank1_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank2_r1",
+      "oracle_value": 102000.0,
+      "pinned_expected": 102000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank2_r2",
+      "oracle_value": 25500.0,
+      "pinned_expected": 25500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank2_value",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank2_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank3_r1",
+      "oracle_value": 16900.0,
+      "pinned_expected": 16900.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank3_r2",
+      "oracle_value": 4220.0,
+      "pinned_expected": 4220.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank3_value",
+      "oracle_value": 0.19981060606060605,
+      "pinned_expected": 0.19981060606060605,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank3_err_pct",
+      "oracle_value": -0.0946969696969697,
+      "pinned_expected": -0.0946969696969697,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank4_r1",
+      "oracle_value": 169000.0,
+      "pinned_expected": 169000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank4_r2",
+      "oracle_value": 42200.0,
+      "pinned_expected": 42200.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank4_value",
+      "oracle_value": 0.19981060606060605,
+      "pinned_expected": 0.19981060606060605,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank4_err_pct",
+      "oracle_value": -0.0946969696969697,
+      "pinned_expected": -0.0946969696969697,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank5_r1",
+      "oracle_value": 16500.0,
+      "pinned_expected": 16500.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank5_r2",
+      "oracle_value": 4120.0,
+      "pinned_expected": 4120.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank5_value",
+      "oracle_value": 0.19980601357904948,
+      "pinned_expected": 0.19980601357904948,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c4_rank5_err_pct",
+      "oracle_value": -0.09699321047526673,
+      "pinned_expected": -0.09699321047526673,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E96); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank1_r1",
+      "oracle_value": 3000.0,
+      "pinned_expected": 3000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank1_r2",
+      "oracle_value": 1000.0,
+      "pinned_expected": 1000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank1_value",
+      "oracle_value": 0.25,
+      "pinned_expected": 0.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank1_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank2_r1",
+      "oracle_value": 30000.0,
+      "pinned_expected": 30000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank2_r2",
+      "oracle_value": 10000.0,
+      "pinned_expected": 10000.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank2_value",
+      "oracle_value": 0.25,
+      "pinned_expected": 0.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank2_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank3_r1",
+      "oracle_value": 3300.0,
+      "pinned_expected": 3300.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank3_r2",
+      "oracle_value": 1100.0,
+      "pinned_expected": 1100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank3_value",
+      "oracle_value": 0.25,
+      "pinned_expected": 0.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank3_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank4_r1",
+      "oracle_value": 3600.0,
+      "pinned_expected": 3600.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank4_r2",
+      "oracle_value": 1200.0,
+      "pinned_expected": 1200.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank4_value",
+      "oracle_value": 0.25,
+      "pinned_expected": 0.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank4_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank5_r1",
+      "oracle_value": 3900.0,
+      "pinned_expected": 3900.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank5_r2",
+      "oracle_value": 1300.0,
+      "pinned_expected": 1300.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank5_value",
+      "oracle_value": 0.25,
+      "pinned_expected": 0.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "pairs_c5_rank5_err_pct",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-016"
+      ],
+      "ledger_status": {
+        "S-016": "PAYWALLED-USER-MUST-VERIFY"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
     }
   ]
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CATEGORIES, REGISTRY, calculatorsIn, findCalculator, type CalculatorEntry } from './registry';
+import { CALCULATOR_STATE_KEYS } from '../state/hash';
 import { badgeText } from './components/UnverifiedBadge';
 
 describe('registry', () => {
@@ -11,6 +12,43 @@ describe('registry', () => {
     expect(calculatorsIn('trace').map((x) => x.id)).toContain('copper-converter');
     expect(REGISTRY.map((x) => x.id)).toEqual([...new Set(REGISTRY.map((x) => x.id))]);
     expect(findCalculator('anything')).toBeUndefined();
+  });
+  it('lists trace width under Trace as a lazy phase-1 entry', () => {
+    const e = findCalculator('trace-width');
+    expect(e).toBeDefined();
+    expect(e?.category).toBe('trace');
+    expect(e?.phase).toBe(1);
+    expect(calculatorsIn('trace').map((x) => x.id)).toEqual(expect.arrayContaining(['copper-converter', 'trace-width']));
+    expect(e?.title).toMatch(/legacy/i);
+    expect(typeof e?.load).toBe('function');
+  });
+  it('lists trace resistance under Trace as a lazy phase-1 entry', () => {
+    const e = findCalculator('trace-resistance');
+    expect(e).toBeDefined();
+    expect(e?.category).toBe('trace');
+    expect(e?.phase).toBe(1);
+    expect(calculatorsIn('trace').map((x) => x.id)).toEqual(expect.arrayContaining(['copper-converter', 'trace-width', 'trace-resistance']));
+    expect(typeof e?.load).toBe('function');
+  });
+  it('lists the three circuit-value calculators under Circuit values as lazy phase-1 entries', () => {
+    for (const id of ['ohm-power', 'resistor-divider', 'e-series']) {
+      const e = findCalculator(id);
+      expect(e, id).toBeDefined();
+      expect(e?.category).toBe('circuit');
+      expect(e?.phase).toBe(1);
+      expect(typeof e?.load).toBe('function');
+      expect(e?.title.length).toBeGreaterThan(5);
+    }
+    expect(calculatorsIn('circuit').map((x) => x.id)).toEqual(['ohm-power', 'resistor-divider', 'e-series']);
+  });
+  it('the circuit-value loaders resolve to a component module with a default export', async () => {
+    for (const id of ['ohm-power', 'resistor-divider', 'e-series']) {
+      const m = await findCalculator(id)?.load();
+      expect(typeof m?.default, id).toBe('function');
+    }
+  });
+  it('every registry entry has a hash-state key table', () => {
+    for (const x of REGISTRY) expect(Object.keys(CALCULATOR_STATE_KEYS)).toContain(x.id);
   });
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);

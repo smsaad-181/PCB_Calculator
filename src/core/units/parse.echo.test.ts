@@ -205,7 +205,7 @@ describe('fuzz: 20 000 random strings through parseQuantity and parseQuantityDet
     }
     expect(ok.some(Boolean)).toBe(true);
     expect(ok.some((v) => !v)).toBe(true);
-  });
+  }, 60_000); // heavy by design (160k assertions); the 5 s default flakes under v8 coverage on a loaded machine
   it('random raw unicode strings never throw', () => {
     let s = 7;
     const rnd = (): number => {

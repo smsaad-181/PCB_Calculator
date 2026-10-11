@@ -51,7 +51,7 @@ describe('weight to thickness', () => {
     expect(v.status).toBe('ok');
     if (v.status !== 'ok') return;
     expect(v.result.headline.label).toBe('Copper thickness');
-    expect(v.result.headline.text).toBe('0.035 mm (1.38 mil)');
+    expect(v.result.headline.text).toBe('35 µm (1.38 mil)');
     expect(v.result.headline.meaning).toMatch(/Nominal/);
   });
   it('shows the UNVERIFIED data status (S-003 conflict, S-009 paywalled)', () => {
@@ -168,7 +168,7 @@ describe('headline formatting goes through format-result', () => {
   const v = computeView(st({ weight: '1.37 oz', layer: 'outer', plating: '25 um' }));
   it('every row and the headline equal formatResult output with the result bound', () => {
     if (v.status !== 'ok') throw new Error('expected ok');
-    const opts = { accuracyClass: meta.accuracyClass, prefs: headlinePrefs('metric') };
+    const opts = { accuracyClass: meta.accuracyClass, prefs: headlinePrefs('metric'), lengthRole: 'thickness' } as const;
     const byLabel = new Map(v.raw.results.map((r) => [r.name, formatResult(r, opts)]));
     const head = v.raw.results.find((r) => r.name === 'thickness');
     expect(v.result.headline.text).toBe(formatResult(head as NonNullable<typeof head>, opts));
@@ -176,15 +176,33 @@ describe('headline formatting goes through format-result', () => {
       expect([...byLabel.values()]).toContain(row.text);
     }
   });
-  it('the headline is dual mm (mil)', () => {
+  it('the headline is the thickness form: µm (mil)', () => {
     if (v.status !== 'ok') throw new Error('expected ok');
-    expect(v.result.headline.text).toMatch(/^[\d.]+ mm \([\d.]+ mil\)$/);
+    expect(v.result.headline.text).toMatch(/^[\d.]+ µm \([\d.]+ mil\)$/);
+  });
+  it('at 1 oz the three conventions print as three distinct strings: 35, 34.29 and 34.33 µm', () => {
+    const w = computeView(st({ weight: '1 oz', layer: 'outer' }));
+    if (w.status !== 'ok') throw new Error('expected ok');
+    const conv = w.result.rows.filter((r) => /^Thickness \(/.test(r.label));
+    expect(conv).toHaveLength(3);
+    const texts = conv.map((r) => r.text);
+    expect(new Set(texts).size).toBe(3);
+    const um = texts.map((t) => t.split(' ')[0]).sort();
+    expect(um).toEqual(['34.29', '34.33', '35']);
+    for (const t of texts) expect(t).toMatch(/^[\d.]+ µm \([\d.]+ mil\)$/);
+  });
+  it('the estimated finished thickness also prints as a thickness', () => {
+    const w = computeView(st({ weight: '1 oz', layer: 'outer', plating: '25 um' }));
+    if (w.status !== 'ok') throw new Error('expected ok');
+    const row = w.result.rows.find((r) => r.label.startsWith('Estimated finished thickness'));
+    expect(row?.text).toBe('60 µm (2.36 mil)');
   });
   it('the unit preference does not change the dual headline', () => {
     const a = computeView(st({ weight: '1 oz', layer: 'outer', units: 'metric' }));
     const b = computeView(st({ weight: '1 oz', layer: 'outer', units: 'imperial' }));
     if (a.status !== 'ok' || b.status !== 'ok') throw new Error('expected ok');
     expect(a.result.headline.text).toBe(b.result.headline.text);
+    expect(a.result.headline.text).toMatch(/µm/);
   });
   it('the echo unit follows the preference (um, or mil)', () => {
     expect(echoPrefs('metric').length).toBe('um');

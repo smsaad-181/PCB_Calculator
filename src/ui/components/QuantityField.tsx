@@ -1,5 +1,5 @@
 import type { Dim, DisplayPrefs } from '../../core/units';
-import { MAX_FIELD_CHARS, parseField } from './view';
+import { MAX_FIELD_CHARS, parseField, type FieldView } from './view';
 
 interface Props {
   readonly id: string;
@@ -18,8 +18,12 @@ interface Props {
   /** Shown instead of the help text when the field is disabled. */
   readonly disabledReason?: string;
   readonly required?: boolean;
+  /** Shown while the field is empty and a default applies, for example "25 °C (engineering default, not from a standard)". */
+  readonly defaultText?: string;
   /** An error found after parsing (for example by the calculator's own guards). */
   readonly externalError?: string | undefined;
+  /** Replaces the default quantity parser (for example a percent or fraction field). It must return the same FieldView shape. */
+  readonly parser?: (text: string) => FieldView;
 }
 
 /**
@@ -31,9 +35,11 @@ export function QuantityField(p: Props) {
   const view =
     p.disabled === true
       ? undefined
-      : p.echoPrefs === undefined
-        ? parseField(p.text, p.expectedDim)
-        : parseField(p.text, p.expectedDim, p.echoPrefs);
+      : p.parser !== undefined
+        ? p.parser(p.text)
+        : p.echoPrefs === undefined
+          ? parseField(p.text, p.expectedDim)
+          : parseField(p.text, p.expectedDim, p.echoPrefs);
   const error = view?.status === 'error' ? view.message : view?.status === 'ok' ? p.externalError : undefined;
   const helpId = `${p.id}-help`;
   const echoId = `${p.id}-echo`;
@@ -62,6 +68,12 @@ export function QuantityField(p: Props) {
       <p id={helpId} class="help">
         {p.disabled === true ? (p.disabledReason ?? 'Not used here.') : p.help}
       </p>
+      {view?.status === 'empty' && p.defaultText !== undefined && (
+        <p class="default-tag">
+          <span aria-hidden="true">{'⚑ '}</span>
+          <strong>Default in use:</strong> {p.defaultText}
+        </p>
+      )}
       {view?.status === 'ok' && (
         <p id={echoId} class="echo">
           <span class="visually-hidden">Understood as </span>

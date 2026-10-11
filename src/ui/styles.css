@@ -100,3 +100,59 @@ code { overflow-wrap: anywhere; }
 tr.assumed th, tr.assumed td { background: var(--warn-bg); color: var(--warn-fg); }
 .needs { border-left: 4px solid var(--muted); padding: 0.1rem 1rem; background: var(--bg); }
 input, select { max-width: 100%; }
+
+/* ---- Trace width page and its generic components ---- */
+.method-line { margin: 0 0 0.5rem; font-weight: 600; color: var(--muted); }
+.default-tag { margin: 0.25rem 0 0; font-size: 0.875rem; color: var(--warn-fg); background: var(--warn-bg); border-left: 4px solid var(--warn-border); padding: 0.15rem 0.5rem; }
+.radio-hint { color: var(--muted); font-style: italic; }
+.radio input:disabled + label { color: var(--muted); }
+.design-values { margin: 0.75rem 0; }
+.design-values h3, .validity h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.dv { border: 1px solid var(--border); border-radius: 6px; background: var(--bg); padding: 0.25rem 0.75rem 0.5rem; }
+.dv-name { margin: 0.25rem 0; }
+.dv-cols { display: grid; gap: 0.5rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 40rem) { .dv-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.dv-col { border: 1px solid var(--border); border-radius: 6px; padding: 0.25rem 0.75rem; min-width: 0; }
+.dv-recommended { border: 3px solid var(--link); }
+.dv-label { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.875rem; font-weight: 600; }
+.dv-value { margin: 0; font-size: 1.35rem; font-weight: 700; overflow-wrap: anywhere; }
+.dv-why { margin: 0.4rem 0 0; font-size: 0.875rem; }
+.validity-count { font-size: 0.875rem; font-weight: 600; color: var(--muted); }
+.validity-count.bad { color: var(--err-fg); background: var(--err-bg); border: 2px solid var(--err-fg); border-radius: 4px; padding: 0 0.4rem; }
+.checks { list-style: none; padding: 0; margin: 0.25rem 0 0.75rem; }
+.check { padding: 0.25rem 0.5rem; margin-bottom: 0.4rem; border-left: 5px solid var(--border); background: var(--bg); border-radius: 4px; }
+.check p { margin: 0.1rem 0; }
+.check.fail { border: 3px solid var(--err-fg); background: var(--err-bg); color: var(--err-fg); padding: 0.4rem 0.75rem; }
+.check.fail .muted { color: var(--err-fg); }
+.check-hint { font-weight: 700; }
+.check-detail { font-size: 0.875rem; }
+
+/* ---- Trace resistance additions ---- */
+.callout { border: 3px solid var(--warn-border); background: var(--warn-bg); color: var(--warn-fg); border-radius: 6px; padding: 0.25rem 1rem; margin: 0.75rem 0; }
+.callout p { margin: 0.5rem 0; }
+.advanced { margin: 0.75rem 0; border: 1px solid var(--border); border-radius: 6px; padding: 0 0.75rem 0.5rem; background: var(--bg); }
+.advanced > summary { padding: 0.25rem 0; }
+
+/* ---- Circuit values (Ohm's law, divider, E-series) ---- */
+.calc-stack { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1fr); }
+.calc-stack[data-pending="true"] .results, .calc-stack[data-pending="true"] .needs { opacity: 0.55; }
+.count-state { margin: 0.25rem 0 0.75rem; padding: 0.25rem 0.6rem; border-left: 5px solid var(--muted); background: var(--bg); color: var(--fg); }
+.count-state.count-ok { border-left-color: var(--link); }
+.count-state.count-over { border-left-color: var(--err-fg); background: var(--err-bg); color: var(--err-fg); }
+.schematic { margin: 0.5rem 0; }
+.schematic svg { display: block; width: 100%; max-width: 22rem; height: auto; margin: 0 auto; }
+.schem-wire { stroke: var(--fg); stroke-width: 2; fill: none; }
+.schem-box { stroke: var(--fg); stroke-width: 2; fill: var(--bg); }
+.schem-unknown { stroke: var(--link); stroke-width: 4; }
+.schem-terminal { stroke: var(--fg); stroke-width: 2; fill: var(--bg); }
+.schem-dot { fill: var(--fg); }
+.schem-text { fill: var(--fg); font-size: 14px; font-weight: 600; }
+.schem-sub { fill: var(--muted); font-size: 12px; }
+.schem-end { text-anchor: end; }
+.schem-legend ul { margin: 0.25rem 0; padding-left: 1.25rem; font-size: 0.875rem; }
+.envelope h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.envelope td { font-weight: 700; font-size: 1.1rem; overflow-wrap: anywhere; }
+td.num { font-variant-numeric: tabular-nums; }
+ul.decade { list-style: none; padding: 0; margin: 0.25rem 0; display: grid; gap: 0.25rem; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
+ul.decade li { border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.4rem; background: var(--bg); color: var(--fg); font-variant-numeric: tabular-nums; }
+ul.decade li.chosen { border: 3px solid var(--link); font-weight: 700; }

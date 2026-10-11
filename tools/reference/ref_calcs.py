@@ -299,6 +299,660 @@ GOLDEN.extend(
     (n, got, _TRACE_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _trace_vectors()
 )
 
+# ---- circuit values, first slice (Phase 1 task 8): Ohm/power, divider, E-series. Independent of src/. ----
+# These vectors test an implementation against formulas; they verify nothing in the ledger. S-016 (E-series,
+# PAYWALLED-USER-MUST-VERIFY) is read from docs/sources/LEDGER.md and compared with the 10^(n/N) definition; the
+# published lists themselves are NOT verified by this code.
+import os, re
+from decimal import Decimal, getcontext, ROUND_HALF_EVEN
+from fractions import Fraction
+
+def ohm_solve(v=None, i=None, r=None, p=None):
+    """Exactly two of V, I, R, P given -> all four (V = I R; P = V I = I^2 R = V^2 / R)."""
+    given = {k: x for k, x in (("v", v), ("i", i), ("r", r), ("p", p)) if x is not None}
+    if len(given) != 2:
+        raise ValueError("give exactly two of v, i, r, p")
+    keys = "".join(sorted(given))
+    if keys == "iv":
+        r = v / i
+        p = v * i
+    elif keys == "rv":
+        i = v / r
+        p = v * v / r
+    elif keys == "pv":
+        i = p / v
+        r = v * v / p
+    elif keys == "ir":
+        v = i * r
+        p = i * i * r
+    elif keys == "ip":
+        v = p / i
+        r = p / (i * i)
+    elif keys == "pr":
+        v = math.sqrt(p * r)
+        i = math.sqrt(p / r)
+    return {"v": v, "i": i, "r": r, "p": p}
+
+def par(a, b):
+    return a * b / (a + b)
+
+def divider_vout(vin, r1, r2, rl=None):
+    """Vout = Vin Re / (R1 + Re), Re = R2 || RL when a load RL is across R2 (Re = R2 unloaded)."""
+    r2e = r2 if rl is None else par(r2, rl)
+    return vin * r2e / (r1 + r2e)
+
+def divider_solve_r1(vin, target, r2, rl=None):
+    """R1 so that the (loaded) Vout equals target: R1 = Re (Vin - target) / target."""
+    r2e = r2 if rl is None else par(r2, rl)
+    return r2e * (vin - target) / target
+
+def divider_solve_r2(vin, target, r1, rl=None):
+    """R2 so that the (loaded) Vout equals target. Needs RL > Re (the required R2 || RL)."""
+    r2e = r1 * target / (vin - target)
+    if rl is None:
+        return r2e
+    if rl <= r2e:
+        raise ValueError("load too heavy: RL <= required Re")
+    return r2e * rl / (rl - r2e)
+
+def divider_currents_powers(vin, r1, r2, rl=None):
+    """Current through R1 and the powers; total power = Vin x I(R1), which includes the load."""
+    vout = divider_vout(vin, r1, r2, rl)
+    i1 = (vin - vout) / r1
+    out = {"vout": vout, "i": i1, "p_r1": i1 * i1 * r1, "p_r2": vout * vout / r2, "p_total": vin * i1, "rout": par(r1, r2)}
+    if rl is not None:
+        out["p_load"] = vout * vout / rl
+    return out
+
+def divider_envelope(vin, r1, r2, rl=None, tol=0.0, vin_tol=0.0):
+    """Corner analysis (Vout is monotonic in every input): (min, typ, max) over Vin(1+-vin_tol) and R(1+-tol) of r1, r2, rl."""
+    vs = (vin * (1 - vin_tol), vin * (1 + vin_tol))
+    a = (r1 * (1 - tol), r1 * (1 + tol))
+    b = (r2 * (1 - tol), r2 * (1 + tol))
+    c = (None,) if rl is None else (rl * (1 - tol), rl * (1 + tol))
+    vals = [divider_vout(x, y, z, w) for x in vs for y in a for z in b for w in c]
+    return min(vals), divider_vout(vin, r1, r2, rl), max(vals)
+
+# ---- E-series (S-016). Lists E3..E96 are read from the ledger text (not typed here); E48 = every second E96;
+# E192 = the 10^(n/192) definition rounded to 3 s.f. with the single published exception n = 185 (9.20; formula 9.19).
+getcontext().prec = 60
+_LN10 = Decimal(10).ln()
+_LEDGER_MD = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "docs", "sources", "LEDGER.md")
+
+def eseries_formula(n, N, sig):
+    """round_half_even(10^(n/N), sig significant figures) as a decimal string; exact-decimal arithmetic, no float."""
+    v = (Decimal(n) / Decimal(N) * _LN10).exp()
+    return str(v.quantize(Decimal(1).scaleb(-(sig - 1)), rounding=ROUND_HALF_EVEN))
+
+def _ledger_s016_row():
+    with open(_LEDGER_MD, encoding="utf-8") as fh:
+        for line in fh:
+            if line.startswith("| S-016"):
+                return line
+    raise RuntimeError("ledger row S-016 not found")
+
+_ES_SIZES = {"E3": 3, "E6": 6, "E12": 12, "E24": 24, "E48": 48, "E96": 96, "E192": 192}
+_ES_SIG = {"E3": 2, "E6": 2, "E12": 2, "E24": 2, "E48": 3, "E96": 3, "E192": 3}
+_ES_NEXT = {"E3": "E6", "E6": "E12", "E12": "E24", "E24": "E96", "E96": "E48"}
+_E192_PUBLISHED_EXCEPTIONS = {185: "9.20"}
+
+def eseries_strings(name):
+    """Mantissa strings (decade 1.0 .. 9.xx) of a series (E3-E96 from the ledger row S-016)."""
+    if name in _ES_NEXT:
+        m = re.search(name + r": ([0-9. ]+?)\. " + _ES_NEXT[name], _ledger_s016_row())
+        out = m.group(1).split()
+    elif name == "E48":
+        out = eseries_strings("E96")[::2]
+    elif name == "E192":
+        out = [_E192_PUBLISHED_EXCEPTIONS.get(n, eseries_formula(n, 192, 3)) for n in range(192)]
+    else:
+        raise ValueError("unknown series " + repr(name))
+    if len(out) != _ES_SIZES[name]:
+        raise RuntimeError("series %s has %d values, expected %d" % (name, len(out), _ES_SIZES[name]))
+    return out
+
+def eseries_formula_deviations(name):
+    """[(n, published, formula)] where the list differs from round(10^(n/N)) (2 s.f. for E3-E24, 3 s.f. for E48-E192)."""
+    N = _ES_SIZES[name]
+    sig = _ES_SIG[name]
+    return [(n, s, eseries_formula(n, N, sig)) for n, s in enumerate(eseries_strings(name))
+            if Decimal(s) != Decimal(eseries_formula(n, N, sig))]
+
+def eseries_values(name):
+    return [float(s) for s in eseries_strings(name)]
+
+def _decade_of(x):
+    """floor(log10(x)) for a positive Fraction, exact."""
+    d = 0
+    while x >= 10:
+        x /= 10
+        d += 1
+    while x < 1:
+        x *= 10
+        d -= 1
+    return d
+
+def eseries_nearest(value, name, mode="nearest"):
+    """Nearest series value to a positive float, in exact arithmetic on the shortest decimal repr of the double.
+    nearest: minimum |found - target|, a tie goes UP; up: smallest >= target; down: largest <= target.
+    Returns (found, mantissa, decade, error_percent), error_percent = (found - target)/target x 100."""
+    t = Fraction(repr(float(value)))
+    d0 = _decade_of(t)
+    cands = sorted((Fraction(s) * Fraction(10) ** d, float(s), d) for d in (d0 - 1, d0, d0 + 1) for s in eseries_strings(name))
+    if mode == "up":
+        c = next(x for x in cands if x[0] >= t)
+    elif mode == "down":
+        c = [x for x in cands if x[0] <= t][-1]
+    else:
+        best = min(abs(x[0] - t) for x in cands)
+        c = [x for x in cands if abs(x[0] - t) == best][-1]
+    return float(c[0]), c[1], c[2], float((c[0] - t) / t * 100)
+
+def eseries_max_nearest_error_pct(name):
+    """Largest |error %| the nearest rule can produce, at the midpoint of the widest relative gap (tie goes up)."""
+    vals = [Fraction(s) for s in eseries_strings(name)] + [Fraction(10)]
+    worst = Fraction(0)
+    for a, b in zip(vals, vals[1:]):
+        mid = (a + b) / 2
+        worst = max(worst, (b - mid) / mid)
+    return float(worst * 100)
+
+def _digits(s):
+    """Significant digits of a mantissa string, trailing zeros stripped: 1.00 -> 1, 4.70 -> 2, 4.75 -> 3."""
+    return len(s.replace(".", "").rstrip("0")) or 1
+
+def best_pairs(target, name, topology, n=5, decades=3, low_decade=None):
+    """Exhaustive two-resistor search in exact arithmetic. series: r1 + r2; parallel: r1 r2/(r1 + r2); divider-ratio: r2/(r1 + r2).
+    Window: `decades` decades of series values from low_decade (default: series dec(target) - decades + 1; parallel dec(target);
+    divider-ratio 3). series and parallel enumerate each unordered pair once (r1 <= r2); divider-ratio enumerates ordered pairs.
+    Order: |error| exact, then total significant digits (fewer first), then r1, then r2 ascending.
+    Returns [(r1, r2, value, error_percent)]."""
+    t = Fraction(repr(float(target)))
+    if low_decade is None:
+        low_decade = {"series": _decade_of(t) - decades + 1, "parallel": _decade_of(t), "divider-ratio": 3}[topology]
+    strs = eseries_strings(name)
+    vals = sorted((Fraction(s) * Fraction(10) ** d, _digits(s)) for d in range(low_decade, low_decade + decades) for s in strs)
+    rows = []
+    for ia, (a, da) in enumerate(vals):
+        for ib, (b, db) in enumerate(vals):
+            if topology != "divider-ratio" and ib < ia:
+                continue
+            v = a + b if topology == "series" else (a * b / (a + b) if topology == "parallel" else b / (a + b))
+            err = (v - t) / t
+            rows.append((abs(err), da + db, a, b, v, err))
+    rows.sort(key=lambda x: (x[0], x[1], x[2], x[3]))
+    return [(float(a), float(b), float(v), float(e * 100)) for _ae, _d, a, b, v, e in rows[:n]]
+
+# Case tables are mirrored in the TypeScript tests (vector names use the case index, so number formatting cannot drift).
+OHM_CASES = [  # (pair, givens); the vectors are the two quantities NOT given
+    ("VI", {"v": 12.0, "i": 0.5}), ("VI", {"v": 3.3, "i": 0.02}),
+    ("VR", {"v": 5.0, "r": 330.0}), ("VR", {"v": 24.0, "r": 4700.0}),
+    ("VP", {"v": 12.0, "p": 6.0}), ("VP", {"v": 230.0, "p": 1000.0}),
+    ("IR", {"i": 0.02, "r": 150.0}), ("IR", {"i": 3.0, "r": 0.05}),
+    ("IP", {"i": 2.0, "p": 10.0}), ("IP", {"i": 0.001, "p": 0.25}),
+    ("RP", {"r": 100.0, "p": 0.25}), ("RP", {"r": 4700.0, "p": 1.0}),
+]
+OHM_UNIT = {"v": "V", "i": "A", "r": "ohm", "p": "W"}
+DIV_UNLOADED = [(5.0, 10e3, 10e3), (12.0, 47e3, 10e3), (3.3, 2.2e3, 1e3), (24.0, 100e3, 6.8e3), (48.0, 220e3, 4.7e3), (1.8, 1e3, 2e3)]
+DIV_LOADED = [(5.0, 10e3, 10e3, 100e3), (12.0, 47e3, 10e3, 10e3), (3.3, 2.2e3, 1e3, 4.7e3), (24.0, 100e3, 6.8e3, 1e6), (5.0, 1e3, 1e3, 1e3)]
+DIV_SOLVE_R1 = [(12.0, 3.3, 10e3, None), (5.0, 1.8, 10e3, None), (24.0, 5.0, 4.7e3, None), (3.3, 1.25, 10e3, None), (12.0, 3.3, 10e3, 100e3)]
+DIV_SOLVE_R2 = [(12.0, 3.3, 47e3, None), (5.0, 3.3, 10e3, None), (24.0, 5.0, 100e3, None), (5.0, 2.5, 10e3, 100e3)]
+DIV_POWER = [(12.0, 47e3, 10e3, None), (12.0, 47e3, 10e3, 100e3), (5.0, 330.0, 330.0, None)]
+# snapping: (solveFor, vin, target, the given resistor); the ideal resistor is solved UNLOADED, then snapped
+DIV_SNAP_CASES = [("r1", 12.0, 3.3, 10e3), ("r2", 12.0, 3.3, 47e3)]
+DIV_SNAP_SERIES = ("E24", "E96", "E192")
+SNAP_MODES = ("nearest", "up", "down")
+# envelope: (vin, r1, r2, rl, tolerance, vin tolerance)
+DIV_ENV = [(5.0, 10e3, 10e3, None, 0.01, 0.0), (12.0, 47e3, 10e3, None, 0.05, 0.0), (12.0, 47e3, 10e3, 100e3, 0.01, 0.02),
+           (3.3, 2.2e3, 1e3, 4.7e3, 0.001, 0.0), (5.0, 10e3, 10e3, None, 0.1, 0.05)]
+NEAREST_TARGETS = [9.8, 0.97, 4700.0, 26363.636363636364, 1.234e-9, 8.6e5]
+PAIR_CASES = [  # (topology, series, target, n, decades)
+    ("series", "E24", 3000.0, 5, 3), ("series", "E96", 12345.0, 5, 3), ("parallel", "E96", 1234.0, 5, 3),
+    ("parallel", "E24", 1500.0, 5, 3), ("divider-ratio", "E96", 0.2, 5, 3), ("divider-ratio", "E24", 0.25, 5, 2),
+]
+
+def divider_snap(kind, vin, target, other, series, mode):
+    """Solve the ideal resistor unloaded, snap it, return (snapped ohm, Vout V, error fraction vs target)."""
+    ideal = divider_solve_r1(vin, target, other) if kind == "r1" else divider_solve_r2(vin, target, other)
+    snapped = eseries_nearest(ideal, series, mode)[0]
+    vout = divider_vout(vin, snapped, other) if kind == "r1" else divider_vout(vin, other, snapped)
+    return snapped, vout, (vout - target) / target
+
+def _circuit_vectors():
+    out = []
+    S6 = ("S-019",)
+    S616 = ("S-019", "S-016")
+    for ci, (pair, given) in enumerate(OHM_CASES):
+        sol = ohm_solve(**given)
+        for k in ("v", "i", "r", "p"):
+            if k not in given:
+                out.append(("ohm_%s_c%d_%s" % (pair, ci, OHM_UNIT[k]), sol[k], 1e-9, S6, "V = I R; P = V I = I^2 R = V^2/R; solved from the two givens"))
+    for ci, (vin, r1, r2) in enumerate(DIV_UNLOADED):
+        out.append(("divider_unloaded_c%d_vout_V" % ci, divider_vout(vin, r1, r2), 1e-9, S6, "Vout = Vin R2/(R1 + R2)"))
+    for ci, (vin, r1, r2, rl) in enumerate(DIV_LOADED):
+        out.append(("divider_loaded_c%d_vout_V" % ci, divider_vout(vin, r1, r2, rl), 1e-9, S6, "Vout = Vin Re/(R1 + Re), Re = R2 || RL"))
+    for ci, (vin, t, r2, rl) in enumerate(DIV_SOLVE_R1):
+        out.append(("divider_solve_r1_c%d_ohm" % ci, divider_solve_r1(vin, t, r2, rl), 1e-9, S6, "R1 = Re (Vin - Vt)/Vt, Re = R2 (|| RL when loaded); exact, unsnapped"))
+    for ci, (vin, t, r1, rl) in enumerate(DIV_SOLVE_R2):
+        out.append(("divider_solve_r2_c%d_ohm" % ci, divider_solve_r2(vin, t, r1, rl), 1e-9, S6, "Re = R1 Vt/(Vin - Vt); R2 = Re RL/(RL - Re) when loaded; exact, unsnapped"))
+    for ci, (vin, r1, r2, rl) in enumerate(DIV_POWER):
+        o = divider_currents_powers(vin, r1, r2, rl)
+        for key, unit in (("i", "A"), ("p_r1", "W"), ("p_r2", "W"), ("p_total", "W"), ("rout", "ohm")):
+            out.append(("divider_power_c%d_%s_%s" % (ci, key, unit), o[key], 1e-9, S6, "I(R1) = (Vin - Vout)/R1; P = I^2 R1 and Vout^2/R2; total = Vin I(R1) incl. the load; Rout = R1 || R2"))
+        if rl is not None:
+            out.append(("divider_power_c%d_p_load_W" % ci, o["p_load"], 1e-9, S6, "P(RL) = Vout^2/RL"))
+    for ci, (kind, vin, t, other) in enumerate(DIV_SNAP_CASES):
+        for s in DIV_SNAP_SERIES:
+            for m in SNAP_MODES:
+                sn, vo, ef = divider_snap(kind, vin, t, other, s, m)
+                note = "solved %s snapped to %s (%s); exact solve, then nearest/up/down in exact decimal arithmetic" % (kind, s, m)
+                out.append(("divider_snap_c%d_%s_%s_ohm" % (ci, s, m), sn, 1e-9, S616, note))
+                out.append(("divider_snap_c%d_%s_%s_vout_V" % (ci, s, m), vo, 1e-9, S616, "Vout with the snapped resistor"))
+                out.append(("divider_snap_c%d_%s_%s_err_frac" % (ci, s, m), ef, 1e-9, S616, "(Vout - target)/target as a fraction"))
+    for ci, (vin, r1, r2, rl, tol, vt) in enumerate(DIV_ENV):
+        lo, _typ, hi = divider_envelope(vin, r1, r2, rl, tol, vt)
+        out.append(("divider_env_c%d_min_V" % ci, lo, 1e-9, S6, "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"))
+        out.append(("divider_env_c%d_max_V" % ci, hi, 1e-9, S6, "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"))
+    for name in ("E3", "E6", "E12", "E24", "E48", "E96", "E192"):
+        lst = eseries_values(name)
+        out.append(("eseries_%s_size" % name, float(len(lst)), 1e-9, ("S-016",), "series size"))
+        out.append(("eseries_%s_mantissa_sum" % name, math.fsum(lst), 1e-9, ("S-016",), "checksum of the mantissas; E3-E96 from the ledger row, E192 from the definition with the published n = 185 exception"))
+        out.append(("eseries_%s_formula_deviation_count" % name, float(len(eseries_formula_deviations(name))), 1e-9, ("S-016",), "entries that differ from round(10^(n/N)) at 2 s.f. (E3-E24) or 3 s.f. (E48-E192)"))
+    for name in ("E24", "E96", "E192"):
+        out.append(("eseries_%s_max_nearest_error_pct" % name, eseries_max_nearest_error_pct(name), 1e-9, ("S-016",), "largest |error %| of the nearest rule, at the midpoint of the widest relative gap"))
+    for ti, t in enumerate(NEAREST_TARGETS):
+        for s in DIV_SNAP_SERIES:
+            for m in SNAP_MODES:
+                f, _man, _dec, e = eseries_nearest(t, s, m)
+                out.append(("eseries_nearest_t%d_%s_%s_value" % (ti, s, m), f, 1e-9, ("S-016",), "exact-decimal nearest search; a tie goes up"))
+                out.append(("eseries_nearest_t%d_%s_%s_err_pct" % (ti, s, m), e, 1e-9, ("S-016",), "(found - target)/target x 100"))
+    for ci, (topo, s, t, n, dec) in enumerate(PAIR_CASES):
+        for rank, (a, b, v, e) in enumerate(best_pairs(t, s, topo, n, dec), 1):
+            for nm, x in (("r1", a), ("r2", b), ("value", v), ("err_pct", e)):
+                out.append(("pairs_c%d_rank%d_%s" % (ci, rank, nm), x, 1e-9, ("S-016",), "exhaustive two-resistor search (%s, %s); order: |error|, then digits, then r1, then r2" % (topo, s)))
+    return out
+
+# Pinned literals recorded from this oracle (regression pins, same policy as _TRACE_PINNED).
+_CIRCUIT_PINNED = {
+    'ohm_VI_c0_ohm': 24.0,
+    'ohm_VI_c0_W': 6.0,
+    'ohm_VI_c1_ohm': 165.0,
+    'ohm_VI_c1_W': 0.066,
+    'ohm_VR_c2_A': 0.015151515151515152,
+    'ohm_VR_c2_W': 0.07575757575757576,
+    'ohm_VR_c3_A': 0.005106382978723404,
+    'ohm_VR_c3_W': 0.1225531914893617,
+    'ohm_VP_c4_A': 0.5,
+    'ohm_VP_c4_ohm': 24.0,
+    'ohm_VP_c5_A': 4.3478260869565215,
+    'ohm_VP_c5_ohm': 52.9,
+    'ohm_IR_c6_V': 3.0,
+    'ohm_IR_c6_W': 0.060000000000000005,
+    'ohm_IR_c7_V': 0.15000000000000002,
+    'ohm_IR_c7_W': 0.45,
+    'ohm_IP_c8_V': 5.0,
+    'ohm_IP_c8_ohm': 2.5,
+    'ohm_IP_c9_V': 250.0,
+    'ohm_IP_c9_ohm': 250000.0,
+    'ohm_RP_c10_V': 5.0,
+    'ohm_RP_c10_A': 0.05,
+    'ohm_RP_c11_V': 68.55654600401044,
+    'ohm_RP_c11_A': 0.014586499149789456,
+    'divider_unloaded_c0_vout_V': 2.5,
+    'divider_unloaded_c1_vout_V': 2.1052631578947367,
+    'divider_unloaded_c2_vout_V': 1.03125,
+    'divider_unloaded_c3_vout_V': 1.5280898876404494,
+    'divider_unloaded_c4_vout_V': 1.0040053404539386,
+    'divider_unloaded_c5_vout_V': 1.2,
+    'divider_loaded_c0_vout_V': 2.380952380952381,
+    'divider_loaded_c1_vout_V': 1.1538461538461537,
+    'divider_loaded_c2_vout_V': 0.8996519721577725,
+    'divider_loaded_c3_vout_V': 1.5184220320059545,
+    'divider_loaded_c4_vout_V': 1.6666666666666667,
+    'divider_solve_r1_c0_ohm': 26363.636363636364,
+    'divider_solve_r1_c1_ohm': 17777.777777777777,
+    'divider_solve_r1_c2_ohm': 17860.0,
+    'divider_solve_r1_c3_ohm': 16400.0,
+    'divider_solve_r1_c4_ohm': 23966.942148760325,
+    'divider_solve_r2_c0_ohm': 17827.586206896554,
+    'divider_solve_r2_c1_ohm': 19411.76470588235,
+    'divider_solve_r2_c2_ohm': 26315.78947368421,
+    'divider_solve_r2_c3_ohm': 11111.111111111111,
+    'divider_power_c0_i_A': 0.0002105263157894737,
+    'divider_power_c0_p_r1_W': 0.0020831024930747922,
+    'divider_power_c0_p_r2_W': 0.0004432132963988919,
+    'divider_power_c0_p_total_W': 0.0025263157894736842,
+    'divider_power_c0_rout_ohm': 8245.61403508772,
+    'divider_power_c1_i_A': 0.0002139384116693679,
+    'divider_power_c1_p_r1_W': 0.002151173267417761,
+    'divider_power_c1_p_r2_W': 0.00037826152055877633,
+    'divider_power_c1_p_total_W': 0.002567260940032415,
+    'divider_power_c1_rout_ohm': 8245.61403508772,
+    'divider_power_c1_p_load_W': 3.7826152055877634e-05,
+    'divider_power_c2_i_A': 0.007575757575757576,
+    'divider_power_c2_p_r1_W': 0.01893939393939394,
+    'divider_power_c2_p_r2_W': 0.01893939393939394,
+    'divider_power_c2_p_total_W': 0.03787878787878788,
+    'divider_power_c2_rout_ohm': 165.0,
+    'divider_snap_c0_E24_nearest_ohm': 27000.0,
+    'divider_snap_c0_E24_nearest_vout_V': 3.2432432432432434,
+    'divider_snap_c0_E24_nearest_err_frac': -0.01719901719901709,
+    'divider_snap_c0_E24_up_ohm': 27000.0,
+    'divider_snap_c0_E24_up_vout_V': 3.2432432432432434,
+    'divider_snap_c0_E24_up_err_frac': -0.01719901719901709,
+    'divider_snap_c0_E24_down_ohm': 24000.0,
+    'divider_snap_c0_E24_down_vout_V': 3.5294117647058822,
+    'divider_snap_c0_E24_down_err_frac': 0.06951871657754014,
+    'divider_snap_c0_E96_nearest_ohm': 26100.0,
+    'divider_snap_c0_E96_nearest_vout_V': 3.3240997229916895,
+    'divider_snap_c0_E96_nearest_err_frac': 0.0073029463611180975,
+    'divider_snap_c0_E96_up_ohm': 26700.0,
+    'divider_snap_c0_E96_up_vout_V': 3.2697547683923704,
+    'divider_snap_c0_E96_up_err_frac': -0.009165221699281629,
+    'divider_snap_c0_E96_down_ohm': 26100.0,
+    'divider_snap_c0_E96_down_vout_V': 3.3240997229916895,
+    'divider_snap_c0_E96_down_err_frac': 0.0073029463611180975,
+    'divider_snap_c0_E192_nearest_ohm': 26400.0,
+    'divider_snap_c0_E192_nearest_vout_V': 3.2967032967032965,
+    'divider_snap_c0_E192_nearest_err_frac': -0.0009990009990009955,
+    'divider_snap_c0_E192_up_ohm': 26400.0,
+    'divider_snap_c0_E192_up_vout_V': 3.2967032967032965,
+    'divider_snap_c0_E192_up_err_frac': -0.0009990009990009955,
+    'divider_snap_c0_E192_down_ohm': 26100.0,
+    'divider_snap_c0_E192_down_vout_V': 3.3240997229916895,
+    'divider_snap_c0_E192_down_err_frac': 0.0073029463611180975,
+    'divider_snap_c1_E24_nearest_ohm': 18000.0,
+    'divider_snap_c1_E24_nearest_vout_V': 3.3230769230769233,
+    'divider_snap_c1_E24_nearest_err_frac': 0.006993006993007103,
+    'divider_snap_c1_E24_up_ohm': 18000.0,
+    'divider_snap_c1_E24_up_vout_V': 3.3230769230769233,
+    'divider_snap_c1_E24_up_err_frac': 0.006993006993007103,
+    'divider_snap_c1_E24_down_ohm': 16000.0,
+    'divider_snap_c1_E24_down_vout_V': 3.0476190476190474,
+    'divider_snap_c1_E24_down_err_frac': -0.07647907647907648,
+    'divider_snap_c1_E96_nearest_ohm': 17800.0,
+    'divider_snap_c1_E96_nearest_vout_V': 3.2962962962962963,
+    'divider_snap_c1_E96_nearest_err_frac': -0.0011223344556677403,
+    'divider_snap_c1_E96_up_ohm': 18200.0,
+    'divider_snap_c1_E96_up_vout_V': 3.3496932515337425,
+    'divider_snap_c1_E96_up_err_frac': 0.015058561070831126,
+    'divider_snap_c1_E96_down_ohm': 17800.0,
+    'divider_snap_c1_E96_down_vout_V': 3.2962962962962963,
+    'divider_snap_c1_E96_down_err_frac': -0.0011223344556677403,
+    'divider_snap_c1_E192_nearest_ohm': 17800.0,
+    'divider_snap_c1_E192_nearest_vout_V': 3.2962962962962963,
+    'divider_snap_c1_E192_nearest_err_frac': -0.0011223344556677403,
+    'divider_snap_c1_E192_up_ohm': 18000.0,
+    'divider_snap_c1_E192_up_vout_V': 3.3230769230769233,
+    'divider_snap_c1_E192_up_err_frac': 0.006993006993007103,
+    'divider_snap_c1_E192_down_ohm': 17800.0,
+    'divider_snap_c1_E192_down_vout_V': 3.2962962962962963,
+    'divider_snap_c1_E192_down_err_frac': -0.0011223344556677403,
+    'divider_env_c0_min_V': 2.475,
+    'divider_env_c0_max_V': 2.525,
+    'divider_env_c1_min_V': 1.9371282922684792,
+    'divider_env_c1_max_V': 2.28467815049864,
+    'divider_env_c2_min_V': 1.8742695236408713,
+    'divider_env_c2_max_V': 2.017264167876899,
+    'divider_env_c3_min_V': 0.8983437926140315,
+    'divider_env_c3_max_V': 0.9009613420488201,
+    'divider_env_c4_min_V': 2.1375,
+    'divider_env_c4_max_V': 2.8875,
+    'eseries_E3_size': 3.0,
+    'eseries_E3_mantissa_sum': 7.9,
+    'eseries_E3_formula_deviation_count': 1.0,
+    'eseries_E6_size': 6.0,
+    'eseries_E6_mantissa_sum': 19.5,
+    'eseries_E6_formula_deviation_count': 2.0,
+    'eseries_E12_size': 12.0,
+    'eseries_E12_mantissa_sum': 42.9,
+    'eseries_E12_formula_deviation_count': 5.0,
+    'eseries_E24_size': 24.0,
+    'eseries_E24_mantissa_sum': 90.1,
+    'eseries_E24_formula_deviation_count': 8.0,
+    'eseries_E48_size': 48.0,
+    'eseries_E48_mantissa_sum': 183.13,
+    'eseries_E48_formula_deviation_count': 0.0,
+    'eseries_E96_size': 96.0,
+    'eseries_E96_mantissa_sum': 370.7,
+    'eseries_E96_formula_deviation_count': 0.0,
+    'eseries_E192_size': 192.0,
+    'eseries_E192_mantissa_sum': 745.99,
+    'eseries_E192_formula_deviation_count': 1.0,
+    'eseries_E24_max_nearest_error_pct': 7.142857142857143,
+    'eseries_E96_max_nearest_error_pct': 1.4814814814814814,
+    'eseries_E192_max_nearest_error_pct': 0.970873786407767,
+    'eseries_nearest_t0_E24_nearest_value': 10.0,
+    'eseries_nearest_t0_E24_nearest_err_pct': 2.0408163265306123,
+    'eseries_nearest_t0_E24_up_value': 10.0,
+    'eseries_nearest_t0_E24_up_err_pct': 2.0408163265306123,
+    'eseries_nearest_t0_E24_down_value': 9.1,
+    'eseries_nearest_t0_E24_down_err_pct': -7.142857142857143,
+    'eseries_nearest_t0_E96_nearest_value': 9.76,
+    'eseries_nearest_t0_E96_nearest_err_pct': -0.40816326530612246,
+    'eseries_nearest_t0_E96_up_value': 10.0,
+    'eseries_nearest_t0_E96_up_err_pct': 2.0408163265306123,
+    'eseries_nearest_t0_E96_down_value': 9.76,
+    'eseries_nearest_t0_E96_down_err_pct': -0.40816326530612246,
+    'eseries_nearest_t0_E192_nearest_value': 9.76,
+    'eseries_nearest_t0_E192_nearest_err_pct': -0.40816326530612246,
+    'eseries_nearest_t0_E192_up_value': 9.88,
+    'eseries_nearest_t0_E192_up_err_pct': 0.8163265306122449,
+    'eseries_nearest_t0_E192_down_value': 9.76,
+    'eseries_nearest_t0_E192_down_err_pct': -0.40816326530612246,
+    'eseries_nearest_t1_E24_nearest_value': 1.0,
+    'eseries_nearest_t1_E24_nearest_err_pct': 3.0927835051546393,
+    'eseries_nearest_t1_E24_up_value': 1.0,
+    'eseries_nearest_t1_E24_up_err_pct': 3.0927835051546393,
+    'eseries_nearest_t1_E24_down_value': 0.91,
+    'eseries_nearest_t1_E24_down_err_pct': -6.185567010309279,
+    'eseries_nearest_t1_E96_nearest_value': 0.976,
+    'eseries_nearest_t1_E96_nearest_err_pct': 0.6185567010309279,
+    'eseries_nearest_t1_E96_up_value': 0.976,
+    'eseries_nearest_t1_E96_up_err_pct': 0.6185567010309279,
+    'eseries_nearest_t1_E96_down_value': 0.953,
+    'eseries_nearest_t1_E96_down_err_pct': -1.7525773195876289,
+    'eseries_nearest_t1_E192_nearest_value': 0.965,
+    'eseries_nearest_t1_E192_nearest_err_pct': -0.5154639175257731,
+    'eseries_nearest_t1_E192_up_value': 0.976,
+    'eseries_nearest_t1_E192_up_err_pct': 0.6185567010309279,
+    'eseries_nearest_t1_E192_down_value': 0.965,
+    'eseries_nearest_t1_E192_down_err_pct': -0.5154639175257731,
+    'eseries_nearest_t2_E24_nearest_value': 4700.0,
+    'eseries_nearest_t2_E24_nearest_err_pct': 0.0,
+    'eseries_nearest_t2_E24_up_value': 4700.0,
+    'eseries_nearest_t2_E24_up_err_pct': 0.0,
+    'eseries_nearest_t2_E24_down_value': 4700.0,
+    'eseries_nearest_t2_E24_down_err_pct': 0.0,
+    'eseries_nearest_t2_E96_nearest_value': 4750.0,
+    'eseries_nearest_t2_E96_nearest_err_pct': 1.0638297872340425,
+    'eseries_nearest_t2_E96_up_value': 4750.0,
+    'eseries_nearest_t2_E96_up_err_pct': 1.0638297872340425,
+    'eseries_nearest_t2_E96_down_value': 4640.0,
+    'eseries_nearest_t2_E96_down_err_pct': -1.2765957446808511,
+    'eseries_nearest_t2_E192_nearest_value': 4700.0,
+    'eseries_nearest_t2_E192_nearest_err_pct': 0.0,
+    'eseries_nearest_t2_E192_up_value': 4700.0,
+    'eseries_nearest_t2_E192_up_err_pct': 0.0,
+    'eseries_nearest_t2_E192_down_value': 4700.0,
+    'eseries_nearest_t2_E192_down_err_pct': 0.0,
+    'eseries_nearest_t3_E24_nearest_value': 27000.0,
+    'eseries_nearest_t3_E24_nearest_err_pct': 2.4137931034482745,
+    'eseries_nearest_t3_E24_up_value': 27000.0,
+    'eseries_nearest_t3_E24_up_err_pct': 2.4137931034482745,
+    'eseries_nearest_t3_E24_down_value': 24000.0,
+    'eseries_nearest_t3_E24_down_err_pct': -8.965517241379311,
+    'eseries_nearest_t3_E96_nearest_value': 26100.0,
+    'eseries_nearest_t3_E96_nearest_err_pct': -1.0000000000000013,
+    'eseries_nearest_t3_E96_up_value': 26700.0,
+    'eseries_nearest_t3_E96_up_err_pct': 1.2758620689655158,
+    'eseries_nearest_t3_E96_down_value': 26100.0,
+    'eseries_nearest_t3_E96_down_err_pct': -1.0000000000000013,
+    'eseries_nearest_t3_E192_nearest_value': 26400.0,
+    'eseries_nearest_t3_E192_nearest_err_pct': 0.13793103448275723,
+    'eseries_nearest_t3_E192_up_value': 26400.0,
+    'eseries_nearest_t3_E192_up_err_pct': 0.13793103448275723,
+    'eseries_nearest_t3_E192_down_value': 26100.0,
+    'eseries_nearest_t3_E192_down_err_pct': -1.0000000000000013,
+    'eseries_nearest_t4_E24_nearest_value': 1.2e-09,
+    'eseries_nearest_t4_E24_nearest_err_pct': -2.755267423014587,
+    'eseries_nearest_t4_E24_up_value': 1.3e-09,
+    'eseries_nearest_t4_E24_up_err_pct': 5.348460291734198,
+    'eseries_nearest_t4_E24_down_value': 1.2e-09,
+    'eseries_nearest_t4_E24_down_err_pct': -2.755267423014587,
+    'eseries_nearest_t4_E96_nearest_value': 1.24e-09,
+    'eseries_nearest_t4_E96_nearest_err_pct': 0.4862236628849271,
+    'eseries_nearest_t4_E96_up_value': 1.24e-09,
+    'eseries_nearest_t4_E96_up_err_pct': 0.4862236628849271,
+    'eseries_nearest_t4_E96_down_value': 1.21e-09,
+    'eseries_nearest_t4_E96_down_err_pct': -1.9448946515397083,
+    'eseries_nearest_t4_E192_nearest_value': 1.23e-09,
+    'eseries_nearest_t4_E192_nearest_err_pct': -0.3241491085899514,
+    'eseries_nearest_t4_E192_up_value': 1.24e-09,
+    'eseries_nearest_t4_E192_up_err_pct': 0.4862236628849271,
+    'eseries_nearest_t4_E192_down_value': 1.23e-09,
+    'eseries_nearest_t4_E192_down_err_pct': -0.3241491085899514,
+    'eseries_nearest_t5_E24_nearest_value': 820000.0,
+    'eseries_nearest_t5_E24_nearest_err_pct': -4.651162790697675,
+    'eseries_nearest_t5_E24_up_value': 910000.0,
+    'eseries_nearest_t5_E24_up_err_pct': 5.813953488372093,
+    'eseries_nearest_t5_E24_down_value': 820000.0,
+    'eseries_nearest_t5_E24_down_err_pct': -4.651162790697675,
+    'eseries_nearest_t5_E96_nearest_value': 866000.0,
+    'eseries_nearest_t5_E96_nearest_err_pct': 0.6976744186046512,
+    'eseries_nearest_t5_E96_up_value': 866000.0,
+    'eseries_nearest_t5_E96_up_err_pct': 0.6976744186046512,
+    'eseries_nearest_t5_E96_down_value': 845000.0,
+    'eseries_nearest_t5_E96_down_err_pct': -1.744186046511628,
+    'eseries_nearest_t5_E192_nearest_value': 856000.0,
+    'eseries_nearest_t5_E192_nearest_err_pct': -0.46511627906976744,
+    'eseries_nearest_t5_E192_up_value': 866000.0,
+    'eseries_nearest_t5_E192_up_err_pct': 0.6976744186046512,
+    'eseries_nearest_t5_E192_down_value': 856000.0,
+    'eseries_nearest_t5_E192_down_err_pct': -0.46511627906976744,
+    'pairs_c0_rank1_r1': 1000.0,
+    'pairs_c0_rank1_r2': 2000.0,
+    'pairs_c0_rank1_value': 3000.0,
+    'pairs_c0_rank1_err_pct': 0.0,
+    'pairs_c0_rank2_r1': 300.0,
+    'pairs_c0_rank2_r2': 2700.0,
+    'pairs_c0_rank2_value': 3000.0,
+    'pairs_c0_rank2_err_pct': 0.0,
+    'pairs_c0_rank3_r1': 1200.0,
+    'pairs_c0_rank3_r2': 1800.0,
+    'pairs_c0_rank3_value': 3000.0,
+    'pairs_c0_rank3_err_pct': 0.0,
+    'pairs_c0_rank4_r1': 1500.0,
+    'pairs_c0_rank4_r2': 1500.0,
+    'pairs_c0_rank4_value': 3000.0,
+    'pairs_c0_rank4_err_pct': 0.0,
+    'pairs_c0_rank5_r1': 10.0,
+    'pairs_c0_rank5_r2': 3000.0,
+    'pairs_c0_rank5_value': 3010.0,
+    'pairs_c0_rank5_err_pct': 0.3333333333333333,
+    'pairs_c1_rank1_r1': 845.0,
+    'pairs_c1_rank1_r2': 11500.0,
+    'pairs_c1_rank1_value': 12345.0,
+    'pairs_c1_rank1_err_pct': 0.0,
+    'pairs_c1_rank2_r1': 243.0,
+    'pairs_c1_rank2_r2': 12100.0,
+    'pairs_c1_rank2_value': 12343.0,
+    'pairs_c1_rank2_err_pct': -0.016200891049007696,
+    'pairs_c1_rank3_r1': 249.0,
+    'pairs_c1_rank3_r2': 12100.0,
+    'pairs_c1_rank3_value': 12349.0,
+    'pairs_c1_rank3_err_pct': 0.03240178209801539,
+    'pairs_c1_rank4_r1': 549.0,
+    'pairs_c1_rank4_r2': 11800.0,
+    'pairs_c1_rank4_value': 12349.0,
+    'pairs_c1_rank4_err_pct': 0.03240178209801539,
+    'pairs_c1_rank5_r1': 1050.0,
+    'pairs_c1_rank5_r2': 11300.0,
+    'pairs_c1_rank5_value': 12350.0,
+    'pairs_c1_rank5_err_pct': 0.04050222762251924,
+    'pairs_c2_rank1_r1': 1240.0,
+    'pairs_c2_rank1_r2': 255000.0,
+    'pairs_c2_rank1_value': 1233.9993755853886,
+    'pairs_c2_rank1_err_pct': -5.060085991101333e-05,
+    'pairs_c2_rank2_r1': 1300.0,
+    'pairs_c2_rank2_r2': 24300.0,
+    'pairs_c2_rank2_value': 1233.984375,
+    'pairs_c2_rank2_err_pct': -0.0012662074554294976,
+    'pairs_c2_rank3_r1': 1240.0,
+    'pairs_c2_rank3_r2': 261000.0,
+    'pairs_c2_rank3_value': 1234.136668700427,
+    'pairs_c2_rank3_err_pct': 0.011075259353897058,
+    'pairs_c2_rank4_r1': 1240.0,
+    'pairs_c2_rank4_r2': 249000.0,
+    'pairs_c2_rank4_value': 1233.8554987212276,
+    'pairs_c2_rank4_err_pct': -0.01170999017604364,
+    'pairs_c2_rank5_r1': 1470.0,
+    'pairs_c2_rank5_r2': 7680.0,
+    'pairs_c2_rank5_value': 1233.8360655737704,
+    'pairs_c2_rank5_err_pct': -0.013284799532375057,
+    'pairs_c3_rank1_r1': 3000.0,
+    'pairs_c3_rank1_r2': 3000.0,
+    'pairs_c3_rank1_value': 1500.0,
+    'pairs_c3_rank1_err_pct': 0.0,
+    'pairs_c3_rank2_r1': 1600.0,
+    'pairs_c3_rank2_r2': 24000.0,
+    'pairs_c3_rank2_value': 1500.0,
+    'pairs_c3_rank2_err_pct': 0.0,
+    'pairs_c3_rank3_r1': 2200.0,
+    'pairs_c3_rank3_r2': 4700.0,
+    'pairs_c3_rank3_value': 1498.5507246376812,
+    'pairs_c3_rank3_err_pct': -0.0966183574879227,
+    'pairs_c3_rank4_r1': 1500.0,
+    'pairs_c3_rank4_r2': 910000.0,
+    'pairs_c3_rank4_value': 1497.5315414152496,
+    'pairs_c3_rank4_err_pct': -0.16456390565002743,
+    'pairs_c3_rank5_r1': 1500.0,
+    'pairs_c3_rank5_r2': 820000.0,
+    'pairs_c3_rank5_value': 1497.2611077297627,
+    'pairs_c3_rank5_err_pct': -0.18259281801582472,
+    'pairs_c4_rank1_r1': 10200.0,
+    'pairs_c4_rank1_r2': 2550.0,
+    'pairs_c4_rank1_value': 0.2,
+    'pairs_c4_rank1_err_pct': 0.0,
+    'pairs_c4_rank2_r1': 102000.0,
+    'pairs_c4_rank2_r2': 25500.0,
+    'pairs_c4_rank2_value': 0.2,
+    'pairs_c4_rank2_err_pct': 0.0,
+    'pairs_c4_rank3_r1': 16900.0,
+    'pairs_c4_rank3_r2': 4220.0,
+    'pairs_c4_rank3_value': 0.19981060606060605,
+    'pairs_c4_rank3_err_pct': -0.0946969696969697,
+    'pairs_c4_rank4_r1': 169000.0,
+    'pairs_c4_rank4_r2': 42200.0,
+    'pairs_c4_rank4_value': 0.19981060606060605,
+    'pairs_c4_rank4_err_pct': -0.0946969696969697,
+    'pairs_c4_rank5_r1': 16500.0,
+    'pairs_c4_rank5_r2': 4120.0,
+    'pairs_c4_rank5_value': 0.19980601357904948,
+    'pairs_c4_rank5_err_pct': -0.09699321047526673,
+    'pairs_c5_rank1_r1': 3000.0,
+    'pairs_c5_rank1_r2': 1000.0,
+    'pairs_c5_rank1_value': 0.25,
+    'pairs_c5_rank1_err_pct': 0.0,
+    'pairs_c5_rank2_r1': 30000.0,
+    'pairs_c5_rank2_r2': 10000.0,
+    'pairs_c5_rank2_value': 0.25,
+    'pairs_c5_rank2_err_pct': 0.0,
+    'pairs_c5_rank3_r1': 3300.0,
+    'pairs_c5_rank3_r2': 1100.0,
+    'pairs_c5_rank3_value': 0.25,
+    'pairs_c5_rank3_err_pct': 0.0,
+    'pairs_c5_rank4_r1': 3600.0,
+    'pairs_c5_rank4_r2': 1200.0,
+    'pairs_c5_rank4_value': 0.25,
+    'pairs_c5_rank4_err_pct': 0.0,
+    'pairs_c5_rank5_r1': 3900.0,
+    'pairs_c5_rank5_r2': 1300.0,
+    'pairs_c5_rank5_value': 0.25,
+    'pairs_c5_rank5_err_pct': 0.0,
+}
+GOLDEN.extend((n, got, _CIRCUIT_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _circuit_vectors())
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:

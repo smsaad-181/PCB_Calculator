@@ -1,10 +1,16 @@
 import type { Option } from './SelectField';
 
+export interface RadioOption extends Option {
+  /** A visible but unavailable choice. It cannot be selected; `hint` says why. */
+  readonly disabled?: boolean;
+  readonly hint?: string;
+}
+
 interface Props {
   readonly name: string;
   readonly legend: string;
   readonly value: string;
-  readonly options: readonly Option[];
+  readonly options: readonly RadioOption[];
   readonly onChange: (value: string) => void;
 }
 
@@ -17,8 +23,27 @@ export function RadioGroup(p: Props) {
         const id = `${p.name}-${o.value}`;
         return (
           <div class="radio" key={o.value}>
-            <input id={id} type="radio" name={p.name} value={o.value} checked={p.value === o.value} onChange={() => p.onChange(o.value)} />
-            <label for={id}>{o.label}</label>
+            <input
+              id={id}
+              type="radio"
+              name={p.name}
+              value={o.value}
+              checked={p.value === o.value}
+              disabled={o.disabled === true}
+              aria-describedby={o.hint !== undefined ? `${id}-hint` : undefined}
+              onChange={() => {
+                if (o.disabled !== true) p.onChange(o.value);
+              }}
+            />
+            <label for={id}>
+              {o.label}
+              {o.hint !== undefined && (
+                <span id={`${id}-hint`} class="radio-hint">
+                  {' '}
+                  {o.hint}
+                </span>
+              )}
+            </label>
           </div>
         );
       })}

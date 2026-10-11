@@ -27,6 +27,14 @@ const DELTA_ALIAS = new Map<string, string>([
   ['degC', 'Δ°C'],
   ['°F', 'Δ°F'],
   ['degF', 'Δ°F'],
+  ['C', 'Δ°C'], // bare, upper-case only: unambiguous inside a temperature field
+  ['F', 'Δ°F'],
+]);
+
+/** Bare upper-case C / F in an absolute-temperature field. Lower-case is never accepted (f collides with femto). */
+const ABS_ALIAS = new Map<string, string>([
+  ['C', '°C'],
+  ['F', '°F'],
 ]);
 
 /** Accepted unit spellings per field, for error messages. */
@@ -222,6 +230,9 @@ function resolveForField(unit: string, expectedDim: Dim | undefined): UnitDef | 
     if (expectedDim.kind === 'deltaT') {
       const alias = DELTA_ALIAS.get(unit);
       if (alias !== undefined) return resolveUnit(alias);
+    } else if (expectedDim.kind === 'absTemp') {
+      const alias = ABS_ALIAS.get(unit);
+      if (alias !== undefined) return resolveUnit(alias);
     } else if (expectedDim.kind === 'arealMass' && unit === 'oz') {
       return resolveUnit('oz/ft2');
     }
@@ -235,6 +246,8 @@ function resolveForField(unit: string, expectedDim: Dim | undefined): UnitDef | 
  * With `expectedDim`, "1m" for a resistance means milliohm (metre does not match the expected dimension).
  * Field awareness (parse only): in a temperature-difference field K, degC and degF are RISES (degF scaled by 5/9,
  * no offset); in a copper-weight (areal mass) field bare "oz" is oz/ft2; component codes (4k7, 4n7) need their field.
+ * In either temperature field a bare upper-case "C" or "F" means °C / °F (rise vs absolute as above); lower-case
+ * "c"/"f" are not accepted. Everywhere else "C"/"F" are unchanged (F stays farad).
  * "." is the only decimal separator; commas and space grouping are rejected, never reinterpreted.
  */
 export function parseQuantity(text: string, expectedDim?: Dim): ParseResult {
@@ -309,6 +322,13 @@ export function parseQuantity(text: string, expectedDim?: Dim): ParseResult {
           list === undefined
             ? `Unit "${unit}" does not match the expected dimension`
             : `Unit "${unit}" does not match the expected dimension. Accepted units here: ${list}`,
+        ),
+      );
+    }
+    if (expectedDim === undefined && unit === 'C') {
+      return fail(
+        new UnitError(
+          `Unit "C" is ambiguous without a field: it needs a temperature field, where "${s.trim()}" means °C. Write ${m[1] as string} °C or ${m[1] as string} degC`,
         ),
       );
     }

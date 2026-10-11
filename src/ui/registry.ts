@@ -26,6 +26,41 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     phase: 1,
     load: () => import('./calculators/CopperConverter'),
   },
+  {
+    id: 'trace-width',
+    title: 'Trace width, current and temperature rise (legacy IPC-2221)',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/TraceWidth'),
+  },
+  {
+    id: 'trace-resistance',
+    title: 'Trace resistance, voltage drop and power loss',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/TraceResistance'),
+  },
+  {
+    id: 'ohm-power',
+    title: "Ohm's law and power",
+    category: 'circuit',
+    phase: 1,
+    load: () => import('./calculators/OhmPower'),
+  },
+  {
+    id: 'resistor-divider',
+    title: 'Resistor divider (output, R1 or R2, load, tolerance, E-series)',
+    category: 'circuit',
+    phase: 1,
+    load: () => import('./calculators/ResistorDivider'),
+  },
+  {
+    id: 'e-series',
+    title: 'E-series nearest value and two-resistor search',
+    category: 'circuit',
+    phase: 1,
+    load: () => import('./calculators/ESeries'),
+  },
 ];
 
 export function findCalculator(id: string, registry: readonly CalculatorEntry[] = REGISTRY): CalculatorEntry | undefined {

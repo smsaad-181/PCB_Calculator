@@ -25,6 +25,8 @@ const LEDGER_ROWS: readonly LedgerRow[] = [
   { id: 'S-008', item: 'Fabricator capability data (JLCPCB published, example fab profile)', edition: 'jlcpcb.com capabilities, retrieved 2026-10-06', status: 'UNVERIFIED' },
   { id: 'S-009', item: 'Finished copper thickness vs nominal (IPC-6012 minimums, secondhand)', edition: 'NCAB FAQ, retrieved 2026-10-06; IPC-6012 not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-018', item: 'IPC-2152 finding that internal traces run cooler than IPC-2221 assumes (secondhand)', edition: 'Brooks & Adam, PCD&F 2015; IPC-2152 not read', status: 'UNVERIFIED' },
+  { id: 'S-019', item: 'Basic circuit relations (textbook)', edition: 'OpenStax University Physics Vol. 2 (2016); Fiore (LibreTexts); Kuphaldt, Lessons in Electric Circuits (LibreTexts); retrieved 2026-10-11', status: 'VERIFIED' },
+  { id: 'S-019b', item: 'LC characteristic impedance Z0 = √(L/C) (lumped tank)', edition: 'imperix TN125; HMC E84 notes; retrieved 2026-10-11', status: 'UNVERIFIED' },
   { id: 'S-010', item: 'IPC-2221 chart validity range', edition: 'IPC-2221B/C Figure 6-4, not read', status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-011a', item: 'IPC-2152 fit: Brooks & Adam, external traces', edition: 'PCD&F 2015-05-29', status: 'UNVERIFIED' },
   { id: 'S-011b', item: 'IPC-2152 fit: Brooks & Adam, internal traces', edition: 'PCD&F 2015 Appendix 1, not read', status: 'UNVERIFIED' },
