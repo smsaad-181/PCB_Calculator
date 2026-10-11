@@ -10,6 +10,7 @@ import {
   q,
   sameDim,
   formatDual,
+  formatDualThickness,
   formatFor,
   roundDirectionFor,
   type AccuracyClass,
@@ -20,6 +21,8 @@ import {
 export interface HeadlineOpts {
   readonly accuracyClass: AccuracyClass;
   readonly prefs?: DisplayPrefs;
+  /** How LENGTH values print: 'geometry' (default, mm and mil) or 'thickness' (µm and mil). Ignored for other dimensions. */
+  readonly lengthRole?: 'geometry' | 'thickness';
 }
 
 /** Design-value direction expressed as a result bound. */
@@ -38,6 +41,7 @@ const LENGTH_REF = q(1, DIM.LENGTH);
 const AREA_REF = q(1, DIM.AREA);
 
 function print(value: Quantity, round: 'up' | 'down' | 'nearest', opts: HeadlineOpts): string {
+  if (opts.lengthRole === 'thickness' && sameDim(value, LENGTH_REF)) return formatDualThickness(value, { round });
   const base = { round, accuracyClass: opts.accuracyClass };
   if (sameDim(value, LENGTH_REF) || sameDim(value, AREA_REF)) {
     return formatDual(value, opts.prefs === undefined ? base : { ...base, prefs: opts.prefs });
