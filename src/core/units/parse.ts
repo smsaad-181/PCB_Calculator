@@ -2,7 +2,7 @@ import { DIM, describeDim, dimEqual, isDimensionless, type Dim } from './dim';
 import { DimensionError, InvalidValueError, UnitError } from './errors';
 import { q, type Quantity } from './quantity';
 import { formatFor, type DisplayPrefs } from './display';
-import { PREFIX_SCALE, applyUnit, baseUnits, resolveUnit, type UnitDef } from './units-table';
+import { PREFIX_SCALE, applyPrefix, applyUnit, baseUnits, resolveUnit, type UnitDef } from './units-table';
 
 export type ParseResult =
   | { readonly ok: true; readonly value: Quantity }
@@ -27,18 +27,6 @@ const DELTA_ALIAS = new Map<string, string>([
   ['degC', 'Δ°C'],
   ['°F', 'Δ°F'],
   ['degF', 'Δ°F'],
-]);
-
-const CODE_SCALE = new Map<string, number>([
-  ['R', 1],
-  ['k', 1e3],
-  ['M', 1e6],
-  ['G', 1e9],
-  ['n', 1e-9],
-  ['u', 1e-6],
-  ['µ', 1e-6],
-  ['μ', 1e-6],
-  ['p', 1e-12],
 ]);
 
 /** Accepted unit spellings per field, for error messages. */
@@ -161,7 +149,8 @@ function parseCode(s: string, expectedDim: Dim | undefined): ParseResult | undef
       ? !res
       : dimEqual(expectedDim, DIM.INDUCTANCE) && !res && letter !== 'p';
   if (!fits) return undefined;
-  const si = Number(`${sign}${int === '' ? '0' : int}.${frac}`) * (CODE_SCALE.get(letter) as number);
+  const base = Number(`${sign}${int === '' ? '0' : int}.${frac}`);
+  const si = applyPrefix(base, letter) ?? base; // 'R' is the unit itself (no prefix)
   return { ok: true, value: q(si, expectedDim) };
 }
 
@@ -301,7 +290,7 @@ export function parseQuantity(text: string, expectedDim?: Dim): ParseResult {
     if (expectedDim !== undefined && expectedDim.kind === 'plain') {
       const scale = unit === 'R' && dimEqual(expectedDim, DIM.RESISTANCE) ? 1 : PREFIX_SCALE.get(unit);
       if (scale !== undefined && bareExamples(expectedDim) === undefined) {
-        const si = value * scale;
+        const si = unit === 'R' ? value : (applyPrefix(value, unit) as number);
         if (!Number.isFinite(si)) return fail(new InvalidValueError(`"${s.trim()}" overflows the representable range`));
         return { ok: true, value: q(si, expectedDim) };
       }

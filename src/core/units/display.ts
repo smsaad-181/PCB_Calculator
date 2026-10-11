@@ -182,7 +182,15 @@ function textOfSteps(n: number, dec: number): string {
  * Directional decimal text of v (display-unit value) at `dec` decimals. When v is on the grid within float noise,
  * the printed text is parsed back and, if it crosses the SI value, stepped one place the safe way (exactness).
  */
-function directedText(si: number, dim: Dim, v: number, dec: number, dir: 'up' | 'down', mk: (num: string) => string): string {
+function directedText(
+  si: number,
+  dim: Dim,
+  v: number,
+  dec: number,
+  dir: 'up' | 'down',
+  mk: (num: string) => string,
+  slack = 0,
+): string {
   const first = stepsOf(v, dec, dir);
   let n = first.n;
   let text = mk(textOfSteps(n, dec));
@@ -190,7 +198,7 @@ function directedText(si: number, dim: Dim, v: number, dec: number, dir: 'up' | 
     let step = 1;
     for (let i = 0; i < 64; i++) {
       const r = parseQuantity(text, dim);
-      if (!r.ok || (dir === 'up' ? r.value.si >= si : r.value.si <= si)) break;
+      if (!r.ok || (dir === 'up' ? r.value.si >= si - slack * Math.abs(si) : r.value.si <= si + slack * Math.abs(si))) break;
       n += dir === 'up' ? step : -step;
       step *= 2;
       text = mk(textOfSteps(n, dec));
@@ -218,7 +226,7 @@ function plainText(x: Quantity, v: number, decimals: number | undefined, sig: nu
   return text;
 }
 
-function plainRaw(x: Quantity, v: number, decimals: number | undefined, sig: number, dir: RoundDirection, label: string): string {
+function plainRaw(x: Quantity, v: number, decimals: number | undefined, sig: number, dir: RoundDirection, label: string, slack = 0): string {
   if (dir === 'nearest') {
     const n = decimals === undefined ? round(v, sig) : Number(v.toFixed(decimals));
     return `${String(n)} ${label}`;
@@ -227,7 +235,7 @@ function plainRaw(x: Quantity, v: number, decimals: number | undefined, sig: num
   if (v === 0) return mk('0');
   const dec = decimals ?? sig - 1 - decadeOf(Math.abs(v));
   if (dec > MAX_DEC || dec < -MAX_DEC) return mk(String(round(v, sig)));
-  return directedText(x.si, x.dim, v, dec, dir, mk);
+  return directedText(x.si, x.dim, v, dec, dir, mk, slack);
 }
 
 function engineering(x: Quantity, e: Engineering, sig: number, dir: RoundDirection): string {
@@ -294,4 +302,28 @@ export function formatDual(x: Quantity, opts: FormatDualOptions = {}): string {
   const metric: DisplayPrefs = { ...DEFAULT_DISPLAY_PREFS, length: 'mm', area: 'mm2' };
   const imperial: DisplayPrefs = { ...DEFAULT_DISPLAY_PREFS, length: 'mil', area: 'mil2' };
   return `${formatFor(x, { ...base, prefs: metric })} (${formatFor(x, { ...base, prefs: imperial })})`;
+}
+
+export interface FormatDualThicknessOptions {
+  readonly round?: RoundDirection;
+}
+
+const THICKNESS_SWITCH_SI = 1e-3;
+
+/**
+ * Length as a thickness headline "<µm> µm (<mil> mil)": both parts at 2 decimals (trailing zeros trimmed), each rounded
+ * independently from the SI value in the requested direction (default 'nearest'). From 1 mm up, or when the µm part
+ * would reach 1000 µm (by magnitude), the geometry form formatDual is printed instead, so "1000 µm" never appears.
+ * Throws InvalidValueError for non-length dimensions and non-finite values.
+ */
+export function formatDualThickness(x: Quantity, opts: FormatDualThicknessOptions = {}): string {
+  if (!dimEqual(x.dim, DIM.LENGTH)) throw new InvalidValueError('formatDualThickness needs a length');
+  if (!Number.isFinite(x.si)) throw new InvalidValueError('Cannot format a non-finite quantity');
+  const dir = opts.round ?? 'nearest';
+  const geometry = (): string => formatDual(x, { round: dir });
+  if (Math.abs(x.si) >= THICKNESS_SWITCH_SI) return geometry();
+  const um = plainRaw(x, toUnit(x, 'um'), 2, 6, dir, 'µm');
+  if (Math.abs(Number.parseFloat(um)) >= 1000) return geometry();
+  const mil = plainRaw(x, toUnit(x, 'mil'), 2, 6, dir, 'mil');
+  return `${um} (${mil})`;
 }

@@ -978,6 +978,558 @@
       },
       "status": "VERIFIED",
       "note": ""
+    },
+    {
+      "name": "trace_resistance_ohm_L10mm_w0.1mm_t17.5um_T20C",
+      "oracle_value": 0.09852216748768473,
+      "pinned_expected": 0.09852216748768473,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T20C",
+      "oracle_value": 0.1939412745820566,
+      "pinned_expected": 0.1939412745820566,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T25C",
+      "oracle_value": 0.19775222062759398,
+      "pinned_expected": 0.19775222062759398,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T55C",
+      "oracle_value": 0.2206178969008185,
+      "pinned_expected": 0.2206178969008185,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T85C",
+      "oracle_value": 0.24348357317404298,
+      "pinned_expected": 0.24348357317404298,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T125C",
+      "oracle_value": 0.27397114153834223,
+      "pinned_expected": 0.27397114153834223,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w1mm_t70um_T20C",
+      "oracle_value": 0.24630541871921188,
+      "pinned_expected": 0.24630541871921188,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w1mm_t70um_T85C",
+      "oracle_value": 0.30922413793103454,
+      "pinned_expected": 0.30922413793103454,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w5mm_t105um_T125C",
+      "oracle_value": 0.04639244663382595,
+      "pinned_expected": 0.04639244663382595,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L10mm_w5mm_t105um_T25C",
+      "oracle_value": 0.0003348604269293925,
+      "pinned_expected": 0.0003348604269293925,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L10mm_w0.1mm_t105um_T55C",
+      "oracle_value": 0.01867898193760263,
+      "pinned_expected": 0.01867898193760263,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w0.1mm_t17.5um_T125C",
+      "oracle_value": 13.917733990147784,
+      "pinned_expected": 13.917733990147784,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w1mm_t17.5um_T85C",
+      "oracle_value": 0.12368965517241383,
+      "pinned_expected": 0.12368965517241383,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w5mm_t70um_T55C",
+      "oracle_value": 0.005603694581280789,
+      "pinned_expected": 0.005603694581280789,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L10mm_w1mm_t35um_T125C",
+      "oracle_value": 0.006958866995073892,
+      "pinned_expected": 0.006958866995073892,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w0.254mm_t105um_T25C",
+      "oracle_value": 0.6591740687586466,
+      "pinned_expected": 0.6591740687586466,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.1mm_t70um_T20C",
+      "oracle_value": 0.24630541871921185,
+      "pinned_expected": 0.24630541871921185,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L10mm_w0.254mm_t17.5um_T85C",
+      "oracle_value": 0.04869671463480859,
+      "pinned_expected": 0.04869671463480859,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w5mm_t35um_T55C",
+      "oracle_value": 0.11207389162561578,
+      "pinned_expected": 0.11207389162561578,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w1mm_t105um_T125C",
+      "oracle_value": 0.023196223316912977,
+      "pinned_expected": 0.023196223316912977,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "R = rho(T) L/(w t), rho(T) = rho20 (1 + alpha (T - 20)); default rho20 = 1/58e6, alpha = 0.00393"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T25C_rho1.9uohmcm",
+      "oracle_value": 0.21792294713160856,
+      "pinned_expected": 0.21792294713160856,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006",
+        "S-012"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-012": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "user override of rho20 and/or alpha (explicit inputs; plated copper S-012 is UNVERIFIED); the oracle value tests arithmetic only"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T85C_rho1.9uohmcm_alpha0.00357",
+      "oracle_value": 0.26331777277840274,
+      "pinned_expected": 0.26331777277840274,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006",
+        "S-012"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-012": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "user override of rho20 and/or alpha (explicit inputs; plated copper S-012 is UNVERIFIED); the oracle value tests arithmetic only"
+    },
+    {
+      "name": "trace_resistance_ohm_L100mm_w0.254mm_t35um_T125C_alpha0.0039",
+      "oracle_value": 0.2733602265234088,
+      "pinned_expected": 0.2733602265234088,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "user override of rho20 and/or alpha (explicit inputs; plated copper S-012 is UNVERIFIED); the oracle value tests arithmetic only"
+    },
+    {
+      "name": "trace_resistance_ohm_L1000mm_w1mm_t70um_T55C_rho2.2uohmcm_alpha0.0035",
+      "oracle_value": 0.35278571428571437,
+      "pinned_expected": 0.35278571428571437,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006",
+        "S-012"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-012": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "user override of rho20 and/or alpha (explicit inputs; plated copper S-012 is UNVERIFIED); the oracle value tests arithmetic only"
+    },
+    {
+      "name": "trace_resistance_ohm_L10mm_w0.1mm_t17.5um_T20C_rho1.7uohmcm_alpha0.004",
+      "oracle_value": 0.09714285714285716,
+      "pinned_expected": 0.09714285714285716,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006",
+        "S-012"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-012": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "user override of rho20 and/or alpha (explicit inputs; plated copper S-012 is UNVERIFIED); the oracle value tests arithmetic only"
+    },
+    {
+      "name": "trace_skin_depth_um_f100000Hz_T55C",
+      "oracle_value": 222.89040956876843,
+      "pinned_expected": 222.89040956876843,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-013"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-013": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "delta = sqrt(rho(T)/(pi f mu0)), mu0 = 4e-7*pi; rho(T) linear from 20 C"
+    },
+    {
+      "name": "trace_skin_depth_um_f1000000Hz_T20C",
+      "oracle_value": 66.08549310080564,
+      "pinned_expected": 66.08549310080564,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-013"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-013": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "delta = sqrt(rho(T)/(pi f mu0)), mu0 = 4e-7*pi; rho(T) linear from 20 C"
+    },
+    {
+      "name": "trace_skin_depth_um_f10000000Hz_T85C",
+      "oracle_value": 23.415629911539728,
+      "pinned_expected": 23.415629911539728,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-013"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-013": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "delta = sqrt(rho(T)/(pi f mu0)), mu0 = 4e-7*pi; rho(T) linear from 20 C"
+    },
+    {
+      "name": "trace_skin_depth_um_f100000000Hz_T125C",
+      "oracle_value": 7.854588217447649,
+      "pinned_expected": 7.854588217447649,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-013"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-013": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "delta = sqrt(rho(T)/(pi f mu0)), mu0 = 4e-7*pi; rho(T) linear from 20 C"
+    },
+    {
+      "name": "trace_skin_depth_um_f1000000000Hz_T25C",
+      "oracle_value": 2.1102392504180014,
+      "pinned_expected": 2.1102392504180014,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-013"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-013": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "delta = sqrt(rho(T)/(pi f mu0)), mu0 = 4e-7*pi; rho(T) linear from 20 C"
+    },
+    {
+      "name": "trace_vdrop_V_I3A_L100mm_w0.254mm_t35um_T85C",
+      "oracle_value": 0.7304507195221289,
+      "pinned_expected": 0.7304507195221289,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R(T)"
+    },
+    {
+      "name": "trace_power_W_I3A_L100mm_w0.254mm_t35um_T85C",
+      "oracle_value": 2.191352158566387,
+      "pinned_expected": 2.191352158566387,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P = I^2 R(T)"
+    },
+    {
+      "name": "trace_vdrop_V_I10A_L1000mm_w1mm_t70um_T25C",
+      "oracle_value": 2.5114532019704434,
+      "pinned_expected": 2.5114532019704434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R(T)"
+    },
+    {
+      "name": "trace_power_W_I10A_L1000mm_w1mm_t70um_T25C",
+      "oracle_value": 25.114532019704434,
+      "pinned_expected": 25.114532019704434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P = I^2 R(T)"
     }
   ]
 }

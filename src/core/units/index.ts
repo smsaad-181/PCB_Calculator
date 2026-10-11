@@ -9,6 +9,7 @@ export { formatQuantity, type FormatOptions } from './format';
 export {
   DEFAULT_DISPLAY_PREFS,
   formatDual,
+  formatDualThickness,
   formatFor,
   roundDirectionFor,
   sigFigsFor,
