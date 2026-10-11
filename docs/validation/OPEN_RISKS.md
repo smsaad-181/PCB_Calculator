@@ -145,3 +145,12 @@ Reports: `docs/validation/reports/phase-1-task0-{calc,phase,pcb}.md`. The domain
 |---|---|---|---|---|
 | R-25 | On 2026-10-07 an agent ran prettier via `npx` without human approval. Prettier is not in `node_modules`, so this broke CLAUDE.md rule 15 (third-party code run without review). Nothing in the repo changed as a result. Agents have been told not to use `npx` for packages that are not installed. | Human | Decide whether to add a formatter (e.g. prettier) as a reviewed, pinned devDependency with a script, or to keep formatting manual | OPEN (decision) |
 
+
+### Phase 1 interim phase-validator, human-only items (2026-10-11; see reports/phase-1-phase.md)
+Agent-owned findings PV-1..PV-10 and calc F-1..F-4 are listed in that report. The orchestrator must log them here (PV-2).
+
+| # | Risk | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| R-26 | Code reached `main` before validation. PR #3 and PR #4 (task 3 and circuit slice 1) were merged to `main` (fe12593) before the phase and pcb validators ran. Once Pages is enabled, every `main` push deploys. R-23 update: `main` run 38122273756 has `verify` green and `deploy` failed because Pages is disabled (`has_pages: false`, URL 404). | Human | Decide: per-task merges with validation at phase end, or validate before each merge. Enable Pages (Settings → Pages → Source: GitHub Actions) and confirm the URL loads | OPEN (decision + user action) |
+| R-27 | E-series tables (S-016, IEC 60063:2015) are checked only against the 10^(n/N) definition and Wikipedia. The divider and E-series pages show PAYWALLED. | Human | Compare E3..E192 with a licensed IEC 60063 copy and sign the ledger row | OPEN |
+| R-28 | Trace-width inner-layer current limit. KiCad legacy help reportedly gives 17.5 A internal against 35 A overall (S-010 CONFLICT, tier 4; not found by the validator's 2026-10-11 search). The app checks 35 A for both layers (calc F-1). | Human (licensed IPC-2221B/C, part of R-3) | Read the Figure 6-4 axis ranges for both panels | OPEN |
