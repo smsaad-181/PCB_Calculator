@@ -7837,11 +7837,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -7855,11 +7857,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8233,11 +8237,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8251,11 +8257,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8395,11 +8403,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8413,11 +8423,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8431,11 +8443,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8449,11 +8463,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8467,11 +8483,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8485,11 +8503,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8503,11 +8523,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8521,11 +8543,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8539,11 +8563,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8575,11 +8601,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8593,11 +8621,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8629,11 +8659,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8647,11 +8679,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8683,11 +8717,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8701,11 +8737,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8737,11 +8775,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8755,11 +8795,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8917,11 +8959,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -8935,11 +8979,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9079,11 +9125,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9097,11 +9145,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9115,11 +9165,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9133,11 +9185,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9151,11 +9205,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9169,11 +9225,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9187,11 +9245,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9205,11 +9265,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9223,11 +9285,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9259,11 +9323,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9277,11 +9343,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9313,11 +9381,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9331,11 +9401,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9349,11 +9421,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9367,11 +9441,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9385,11 +9461,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9403,11 +9481,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9421,11 +9501,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9439,11 +9521,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9457,11 +9541,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9493,11 +9579,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9511,11 +9599,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9547,11 +9637,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9565,11 +9657,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9601,11 +9695,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9619,11 +9715,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9655,11 +9753,13 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
@@ -9673,15 +9773,405 @@
       "ledger_ids": [
         "S-004",
         "S-019",
+        "S-019h",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
+        "S-019h": "VERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "VERIFIED",
       "note": "I^2 x R_k"
+    },
+    {
+      "name": "via_task7a_area_mm2_d0.3mm_t25um_L1.6mm_N1_T20C_k401",
+      "oracle_value": 0.025525440310417067,
+      "pinned_expected": 0.025525440310417067,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "one barrel, pure geometry (finished hole d, test plating t)"
+    },
+    {
+      "name": "via_task7a_R_T_mohm_d0.3mm_t25um_L1.6mm_N1_T20C_k401",
+      "oracle_value": 1.0807338310749393,
+      "pinned_expected": 1.0807338310749393,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R(T)/N, pure-copper rho (S-012 plated copper unverified)"
+    },
+    {
+      "name": "via_task7a_R20_mohm_d0.3mm_t25um_L1.6mm_N1_T20C_k401",
+      "oracle_value": 1.0807338310749393,
+      "pinned_expected": 1.0807338310749393,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R20/N"
+    },
+    {
+      "name": "via_task7a_theta_KperW_d0.3mm_t25um_L1.6mm_N1_T20C_k401",
+      "oracle_value": 156.31561646470445,
+      "pinned_expected": 156.31561646470445,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "axial conduction only, ideal parallel theta/N"
+    },
+    {
+      "name": "via_task7a_area_mm2_d0.3mm_t25um_L1.6mm_N4_T85C_k391",
+      "oracle_value": 0.025525440310417067,
+      "pinned_expected": 0.025525440310417067,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "one barrel, pure geometry (finished hole d, test plating t)"
+    },
+    {
+      "name": "via_task7a_R_T_mohm_d0.3mm_t25um_L1.6mm_N4_T85C_k391",
+      "oracle_value": 0.33920182205575816,
+      "pinned_expected": 0.33920182205575816,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R(T)/N, pure-copper rho (S-012 plated copper unverified)"
+    },
+    {
+      "name": "via_task7a_R20_mohm_d0.3mm_t25um_L1.6mm_N4_T85C_k391",
+      "oracle_value": 0.2701834577687348,
+      "pinned_expected": 0.2701834577687348,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R20/N"
+    },
+    {
+      "name": "via_task7a_theta_KperW_d0.3mm_t25um_L1.6mm_N4_T85C_k391",
+      "oracle_value": 40.07836457950542,
+      "pinned_expected": 40.07836457950542,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "axial conduction only, ideal parallel theta/N"
+    },
+    {
+      "name": "via_task7a_vdrop_mV_d0.3mm_t25um_L1.6mm_N4_T85C_k391",
+      "oracle_value": 0.6784036441115163,
+      "pinned_expected": 0.6784036441115163,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I = 2 A through the whole array"
+    },
+    {
+      "name": "via_task7a_power_mW_d0.3mm_t25um_L1.6mm_N4_T85C_k391",
+      "oracle_value": 1.3568072882230326,
+      "pinned_expected": 1.3568072882230326,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P = I^2 R(T) for the whole array"
+    },
+    {
+      "name": "via_task7a_area_mm2_d0.2mm_t18um_L0.8mm_N1_T105C_k401",
+      "oracle_value": 0.012327609572686348,
+      "pinned_expected": 0.012327609572686348,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "one barrel, pure geometry (finished hole d, test plating t)"
+    },
+    {
+      "name": "via_task7a_R_T_mohm_d0.2mm_t18um_L0.8mm_N1_T105C_k401",
+      "oracle_value": 1.4926405274824635,
+      "pinned_expected": 1.4926405274824635,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R(T)/N, pure-copper rho (S-012 plated copper unverified)"
+    },
+    {
+      "name": "via_task7a_R20_mohm_d0.2mm_t18um_L0.8mm_N1_T105C_k401",
+      "oracle_value": 1.1188789981503418,
+      "pinned_expected": 1.1188789981503418,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R20/N"
+    },
+    {
+      "name": "via_task7a_theta_KperW_d0.2mm_t18um_L0.8mm_N1_T105C_k401",
+      "oracle_value": 161.8328725504235,
+      "pinned_expected": 161.8328725504235,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "axial conduction only, ideal parallel theta/N"
+    },
+    {
+      "name": "via_task7a_vdrop_mV_d0.2mm_t18um_L0.8mm_N1_T105C_k401",
+      "oracle_value": 0.7463202637412317,
+      "pinned_expected": 0.7463202637412317,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I = 0.5 A through the whole array"
+    },
+    {
+      "name": "via_task7a_power_mW_d0.2mm_t18um_L0.8mm_N1_T105C_k401",
+      "oracle_value": 0.37316013187061586,
+      "pinned_expected": 0.37316013187061586,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P = I^2 R(T) for the whole array"
+    },
+    {
+      "name": "via_task7a_area_mm2_d0.5mm_t35um_L2.4mm_N6_T55C_k401",
+      "oracle_value": 0.05882632243846887,
+      "pinned_expected": 0.05882632243846887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "one barrel, pure geometry (finished hole d, test plating t)"
+    },
+    {
+      "name": "via_task7a_R_T_mohm_d0.5mm_t35um_L2.4mm_N6_T55C_k401",
+      "oracle_value": 0.13336159883186635,
+      "pinned_expected": 0.13336159883186635,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R(T)/N, pure-copper rho (S-012 plated copper unverified)"
+    },
+    {
+      "name": "via_task7a_R20_mohm_d0.5mm_t35um_L2.4mm_N6_T55C_k401",
+      "oracle_value": 0.11723581278349642,
+      "pinned_expected": 0.11723581278349642,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R20/N"
+    },
+    {
+      "name": "via_task7a_theta_KperW_d0.5mm_t35um_L2.4mm_N6_T55C_k401",
+      "oracle_value": 16.95680085147828,
+      "pinned_expected": 16.95680085147828,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "axial conduction only, ideal parallel theta/N"
+    },
+    {
+      "name": "via_task7a_vdrop_mV_d0.5mm_t35um_L2.4mm_N6_T55C_k401",
+      "oracle_value": 0.4000847964955991,
+      "pinned_expected": 0.4000847964955991,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I = 3 A through the whole array"
+    },
+    {
+      "name": "via_task7a_power_mW_d0.5mm_t35um_L2.4mm_N6_T55C_k401",
+      "oracle_value": 1.2002543894867972,
+      "pinned_expected": 1.2002543894867972,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P = I^2 R(T) for the whole array"
+    },
+    {
+      "name": "via_task7a_area_mm2_d0.25mm_t20um_L1mm_N2_T25C_k391",
+      "oracle_value": 0.01696460032938488,
+      "pinned_expected": 0.01696460032938488,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "one barrel, pure geometry (finished hole d, test plating t)"
+    },
+    {
+      "name": "via_task7a_R_T_mohm_d0.25mm_t20um_L1mm_N2_T25C_k391",
+      "oracle_value": 0.5181428407523981,
+      "pinned_expected": 0.5181428407523981,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R(T)/N, pure-copper rho (S-012 plated copper unverified)"
+    },
+    {
+      "name": "via_task7a_R20_mohm_d0.25mm_t20um_L1mm_N2_T25C_k391",
+      "oracle_value": 0.5081575449932803,
+      "pinned_expected": 0.5081575449932803,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "ideal parallel R20/N"
+    },
+    {
+      "name": "via_task7a_theta_KperW_d0.25mm_t20um_L1mm_N2_T25C_k391",
+      "oracle_value": 75.37886856677815,
+      "pinned_expected": 75.37886856677815,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "axial conduction only, ideal parallel theta/N"
+    },
+    {
+      "name": "via_task7a_vdrop_mV_d0.25mm_t20um_L1mm_N2_T25C_k391",
+      "oracle_value": 0.5181428407523981,
+      "pinned_expected": 0.5181428407523981,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I = 1 A through the whole array"
+    },
+    {
+      "name": "via_task7a_power_mW_d0.25mm_t20um_L1mm_N2_T25C_k391",
+      "oracle_value": 0.5181428407523981,
+      "pinned_expected": 0.5181428407523981,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "P = I^2 R(T) for the whole array"
     }
   ]
 }

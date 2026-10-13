@@ -60,7 +60,7 @@ function Nearest({ view }: { view: NearestView }) {
         </table>
       </div>
       {view.exact && <p class="muted">The target is itself a value of this series, so all three rows agree.</p>}
-      <p class="muted">Error is (value − target) / target. Its size is printed rounded up to 0.1 %, so it is never understated.</p>
+      <p class="muted">Error is (value − target) / target. Its size is rounded away from zero, so it is never understated.</p>
       <details class="more">
         <summary>{view.decade.title}</summary>
         <ul class="decade">
@@ -110,7 +110,7 @@ function Pairs({ view, topology }: { view: PairsView; topology: ESeriesState['to
         </table>
       </div>
       <p class="muted">
-        <strong>Result</strong> is {view.resultHeading}. {view.window} Pairs are ordered by error, then by fewer significant digits. Error is printed rounded up to 0.1 %.
+        <strong>Result</strong> is {view.resultHeading}. {view.window} Pairs are ordered by error, then by fewer significant digits. Error size is rounded away from zero.
       </p>
     </div>
   );

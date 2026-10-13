@@ -99,11 +99,11 @@ The C1/C2/C3/CEr naming matches the convention of Polar Instruments' SI9000 fiel
 | Heavy copper, 2-layer | 2.5 oz "0.2/0.2mm(8mil/8mil)"; 3.5 oz "0.25/0.25mm(10mil/10mil)"; 4.5 oz "0.3/0.3mm(12mil/12mil)" |
 | Drill range | "0.15 – 6.3 mm" |
 | Min via hole / via diameter | 0.15 mm / 0.25 mm standard; 0.1 mm / 0.2 mm for boards ≤ 1 mm thick |
-| Via annular ring, 1–2 L | "Recommended 0.25 mm or above; absolute minimum 0.18 mm" |
-| Via annular ring, multilayer | "Recommended 0.20 mm or above; absolute minimum 0.15 mm" |
+| ~~Via~~ PTH annular ring, 1–2 L, 1 oz (corrected 2026-10-13: the page row is "PTH annular ring", not via; 2 oz is "0.254 mm or above"; see §9, S-019j) | "Recommended 0.25 mm or above; absolute minimum 0.18 mm" |
+| ~~Via~~ PTH annular ring, multilayer, 1 oz (corrected 2026-10-13, as above) | "Recommended 0.20 mm or above; absolute minimum 0.15 mm" |
 | NPTH ring | "≧0.45mm" |
 | Hole plating | "Average Hole Plating Thickness: 18μm" |
-| PTH size tolerance | "+0.13 / -0.08 mm" |
+| PTH size tolerance (2026-10-13: finished hole, plated pad holes only; vias "not controlled"; round NPTH not published; S-019i) | "+0.13 / -0.08 mm" |
 | Hole position tolerance | "±0.075 mm" |
 | Track width tolerance | "±20%" (0.1 mm → 0.08–0.12 mm) |
 | Impedance tolerance | "±10%" (4–32 L) |
@@ -111,9 +111,9 @@ The C1/C2/C3/CEr naming matches the convention of Polar Instruments' SI9000 fiel
 | Inner copper | "0.5 oz / 1 oz / 2 oz" |
 | Board thickness | "0.4 – 4.5 mm"; tolerance "± 10%" (≥ 1.0 mm), "± 0.1mm" (< 1.0 mm) |
 | Soldermask thickness | "≥ 10μm" |
-| Min hole to track | "0.2mm" |
+| Min hole to track (corrected 2026-10-13: 0.2 mm is "Via hole to Track"; "PTH to Track" is 0.28 mm minimum, 0.35 mm recommended; "NPTH to Track" 0.2 mm; see §9, S-019k) | "0.2mm" |
 | Pad to track (1 oz) | "0.1mm" |
-| Copper to routed edge | "≧0.2 mm" |
+| Copper to routed edge (V-cut edges: "≧0.4 mm", S-019k) | "≧0.2 mm" |
 | Dielectric min (backdrill) | "≥0.15mm" |
 
 ## 5) Disclaimers / accuracy statements
@@ -167,3 +167,93 @@ All would be source class (c) (fabricator documentation), describing JLCPCB's pr
 6. Capability limits: trace/space per copper weight, drill 0.15–6.3 mm, via 0.15/0.25 mm, annular ring 0.15–0.25 mm (by layer count), NPTH 0.45 mm, hole plating 18 µm average, PTH tolerance +0.13/−0.08 mm, track tolerance ±20%, impedance tolerance ±10%, thickness tolerance ±10% / ±0.1 mm.
 7. Target-Z0 accepted ranges (20–90 Ω SE, 50–150 Ω diff). These are UX defaults only, not physics.
 8. Material identities: NP-155F (4–8 L), S1000-2M (10+ L), and the Tg discrepancy reported by [GS].
+
+## 9) G-6 proposed profile fields
+
+Added 2026-10-13 (standards-researcher, gate G-6 in `docs/validation/OPEN_RISKS.md`). Sources: [CAP] re-read 2026-10-13 in several targeted fetches through a summarizing fetcher (they agreed; a browser re-read is still required, R-21), and the JLCPCB help article "Difference and Tolerance Explanation Between Via and Pad Holes in PCB" (https://jlcpcb.com/help/article/difference-and-tolerance-explanation-between-via-and-pad-holes, "Last updated on Apr 24, 2025"). Values and quotes are in ledger rows S-019i (holes, tolerances), S-019j (annular ring), S-019k (clearances), S-019l (trace/space), S-019m (plating, via treatments, not-published items). All UNVERIFIED (single publisher). The research note is `docs/sources/notes/jlcpcb-fab-limits.md`.
+
+### 9a. Audit of `src/core/data/fab-profiles/jlcpcb-2026-10-06.json` (read only, not edited)
+
+| Field | Profile value | Published scope (2026-10-13) | Finding |
+|---|---|---|---|
+| `minTraceWidth`, `minTraceSpace` | 3.5 mil | 1 oz multilayer "0.09 / 0.09 mm (3.5 / 3.5 mil)"; 1 oz 1- and 2-layer 0.10 mm (4 mil); 2 oz 0.16 mm (6.5 mil) 2-layer, 0.15 mm (6 mil) multilayer; 2.5/3.5/4.5 oz 2-layer 8/10/12 mil | **Non-conservative** for any 1-2 layer board (by 0.5 mil) and for any 2 oz layer (by 2.5 to 3 mil). Unscoped by layer count and copper weight. 3.5 mil = 0.0889 mm is 1.2 % below the published 0.09 mm (mm and mil disagree). Inner vs outer not published. |
+| `minDrill` | 0.15 mm | "Drill Diameter": 1-layer 0.3 mm; 2-layer and multilayer 0.15 mm; 0.1 mm only for board thickness ≤ 1 mm with ENIG/OSP; "Min. Non-plated holes" 0.50 mm | **Ambiguous** (drill bit vs designed finished hole is not published) and **non-conservative** for 1-layer boards and for NPTH (0.5 mm). One field cannot hold via / PTH / NPTH minima. |
+| `maxDrill` | 6.3 mm | "0.15 – 6.3 mm"; "Holes with diameter ≥ 6.3 mm are CNC routed" | Not a hard maximum: larger holes are routed. Rename or document as "largest drilled hole". |
+| `minAnnularRingRecommended` / `minAnnularRingAbsolute` | 0.2 / 0.15 mm | "PTH annular ring", multilayer 1 oz; 2-layer 1 oz 0.25 / 0.18 mm; 2 oz "0.254 mm or above" (both layer counts); 1-layer not published; NPTH pad ring ≧ 0.45 mm; via: "Via diameter should be 0.1mm(0.15mm preferred) larger than Via hole size" | **Wrong hole type for vias** and **non-conservative** for 2-layer (0.03 to 0.05 mm short) and for 2 oz (0.054 to 0.104 mm short). The name does not say PTH. Used for a via it is over-strict by 3x (via ring by JLCPCB's rule is 0.05 mm, researcher arithmetic). Ring reference (finished vs drilled hole) not published. |
+| `holePlatingAverage` | 18 µm | "Average Hole Plating Thickness" "18μm"; no minimum published | Correct as "average". Must never feed a worst-case (minimum) barrel check; there is no JLCPCB minimum (store as not published). |
+| `drillTolerancePlus` / `drillToleranceMinus` | +0.13 / −0.08 mm | "Through-holes: +0.13 / -0.08 mm", example gives the result as "finished hole size"; help article: pad holes controlled, "the diameter of via holes is not controlled"; round NPTH not published; non-plated slots ±0.2 mm | **Misnamed** (it is a finished-hole tolerance, not a drill tolerance) and **over-scoped** (applies to plated pad holes only, not vias, not round NPTH). |
+| `holePositionTolerance` | 0.075 mm | "±0.075 mm" | OK; record as symmetric ±. No hole-type or layer scope published. |
+| `copperToEdge` | 0.2 mm | routed edges and routed slots ≧ 0.2 mm; V-cut edges ≧ 0.4 mm | **Non-conservative** for V-cut panels (by 0.2 mm). Name does not say routed. |
+| `holeToTrack` | 0.2 mm | via hole 0.2; PTH 0.28 min (0.35 rec.); NPTH 0.2; inner layer via hole to copper 0.2; inner layer PTH pad hole to copper 0.3 | **Non-conservative** for PTH (0.08 mm below minimum, 0.15 mm below recommended) and for inner-layer PTH hole to copper (0.1 mm). One field for three hole types. |
+| `traceWidthTolerancePct` | 20 | "±20%" | OK; make the sign explicit (±). |
+| `impedanceTolerancePct` | 10 | "±10%" (±5 % on special request) | OK as the standard figure; layer-count range (2026-10-06: 4–32 layer) not re-read this pass. |
+| `copperWeightsOzFt2` | [1] | outer 2-layer 1/2/2.5/3.5/4.5 oz, multilayer 1/2 oz; inner 0.5/1/2 oz | Scope choice, stated in `notes`. Every other limit must then be the 1 oz value, which the annular ring and trace fields are only for multilayer. |
+| `finishedCopper*` | 1.6 / 0.6 / 1.2 mil | S-019c, not re-read in this pass | Unchanged. |
+| (missing) | — | via min hole/pad 0.15/0.25 mm, preferred via hole 0.2 mm, NPTH min 0.5 mm, via and pad hole-to-hole 0.2 / 0.45 mm, pad to track 0.1 mm (1 oz), SMD pad to pad 0.15 mm, NPTH pad ring 0.45 mm, plugged via ≤ 0.5 mm, via-in-pad 0.15–0.55 mm | Needed by task 7 (via) and net-class export (via sizes, clearances). |
+| (not published) | — | minimum plating, aspect ratio, pad size tolerance, registration, round NPTH tolerance, drill oversize, inner vs outer track minima | Must be stored as "not published", never defaulted. |
+
+Every value in the example profile is the **multilayer, 1 oz** figure where JLCPCB scopes it. For 2-layer and 2 oz boards the profile is non-conservative in trace/space, PTH annular ring and (independent of layers) PTH hole-to-track and V-cut edge clearance.
+
+### 9b. Proposed field list for the restructured profile
+
+Principle: one entry per published limit, each carrying its own scope, so a check can pick the entry matching the board and never fall back to a less strict one silently. Proposed entry shape (names are a proposal for calc-implementer; the schema is theirs):
+
+```
+{ key, kind: 'min' | 'recommended-min' | 'max' | 'tol-plus' | 'tol-minus' | 'tol-sym' | 'average',
+  value, unit, published: true | false,            // false = "not published", value null
+  holeType?: 'via' | 'pth' | 'npth' | 'pressfit' | 'slot-plated' | 'slot-npth',
+  sizeBasis?: 'finished' | 'drill' | 'designed-unstated',
+  layerCount: '1' | '2' | '1-2' | 'multilayer' | 'any',
+  copperOzFt2: number | 'any',
+  layerSide: 'inner' | 'outer' | 'unstated',
+  ledgerId, quote }
+```
+
+Fields (key, scope dimensions that must be filled; JLCPCB 2026-10-13 values in brackets, all UNVERIFIED):
+
+Holes and tolerances (S-019i)
+- `viaHoleMin_designedUnstated` by layerCount [1-layer n/a (NPTH only); 2-layer, multilayer 0.15 mm; 0.10 mm only for board ≤ 1 mm and ENIG/OSP, store as a separate conditional entry]
+- `viaHolePreferredMin` [0.2 mm, any]
+- `viaPadDiameterMin` by layerCount [0.25 mm]
+- `viaPadMinusHoleMin` and `viaPadMinusHolePreferred` (diameter difference, as published) [0.10 / 0.15 mm]
+- `pthHoleMin_drillDiameter` by layerCount [1-layer 0.3 mm; 2-layer, multilayer 0.15 mm]; sizeBasis 'designed-unstated'
+- `npthHoleMin` [0.50 mm]
+- `holeMaxDrilled` [6.3 mm; note "≥ 6.3 mm CNC routed"]
+- `pthFinishedHoleTolPlus` / `pthFinishedHoleTolMinus` (plated pad holes) [+0.13 / −0.08 mm]
+- `pressfitFinishedHoleTol` [±0.05 mm, finished 0.55–2.0 mm, multilayer ENIG only]
+- `viaFinishedHoleTol` [published: false; "not controlled"]
+- `npthFinishedHoleTol` (round) [published: false]
+- `slotPlatedTol` [+0.13 / −0.08 mm]; `slotNpthTol` [±0.2 mm]
+- `holePositionTol` [±0.075 mm]
+- `drillOversizeOverFinished` [published: false]
+
+Annular ring (S-019j)
+- `pthAnnularRingRecommendedMin` by layerCount × copperOzFt2 [2-layer 1 oz 0.25; multilayer 1 oz 0.20; 2 oz 0.254 both; 1-layer and > 2 oz: published false]
+- `pthAnnularRingAbsoluteMin` by layerCount × copperOzFt2 [2-layer 1 oz 0.18; multilayer 1 oz 0.15; 2 oz: only the 0.254 "or above" figure is published, store it as both, or absolute published false]
+- `pthAnnularRingReference` [published: false; finished vs drilled hole not stated]
+- `npthPadAnnularRingRecommendedMin` [0.45 mm]
+- `viaAnnularRingMin` [published: false as a ring; derive only from `viaPadMinusHoleMin`/2 and label it derived]
+- `layerSide` for all ring entries [unstated]
+
+Clearances (S-019k)
+- `viaHoleToTrackMin` [0.2 mm]; `pthHoleToTrackMin` [0.28 mm]; `pthHoleToTrackRecommended` [0.35 mm]; `npthHoleToTrackMin` [0.2 mm]; all layerSide 'unstated'
+- `innerViaHoleToCopperMin` [0.2 mm, inner]; `innerPthHoleToCopperMin` [0.3 mm, inner]
+- `viaHoleToHoleMin` [0.2 mm]; `padHoleToHoleMin` [0.45 mm]
+- `padToTrackMin` by copperOzFt2 [1 oz 0.1 mm; BGA local 0.09 mm as a separate conditional entry; 2 oz published false]
+- `smdPadToPadMin_differentNets` [0.15 mm]
+- `copperToRoutedEdgeMin` [0.2 mm]; `copperToRoutedSlotMin` [0.2 mm]; `copperToVcutEdgeMin` [0.4 mm]
+
+Traces (S-019l)
+- `traceWidthMin` and `traceSpaceMin` by layerCount × copperOzFt2, store mm and mil as published [1-2 layer 1 oz 0.10 mm (4 mil); multilayer 1 oz 0.09 mm (3.5 mil); 2-layer 2 oz 0.16 (6.5); multilayer 2 oz 0.15 (6); 2-layer 2.5/3.5/4.5 oz 0.2/0.25/0.3 mm]; layerSide 'unstated'; BGA fan-out 3 mil as a separate conditional entry, never the general minimum
+- `sameNetTrackSpacingMin` [0.25 mm]
+- `traceWidthTolPct` [±20 %]; `impedanceTolPct` [±10 %; ±5 % on request]
+
+Plating and via treatments (S-019m)
+- `holePlatingAverage` [18 µm]; `holePlatingMin` [published: false]
+- `pluggedViaMaxDiameter` [0.5 mm]; `pluggedViaToMaskOpeningMin` [0.35 mm]
+- `viaInPadDiameterRange` [0.15–0.55 mm; "via diameter" undefined]; `viaInPadDefaultFromLayerCount` [6]
+
+Not published (store with `published: false`, show "not published by fabricator")
+- `aspectRatioMax`, `padSizeTol`, `layerRegistrationTol`, `etchCompensation`, `tentedVia` options.
+
+Profile-level metadata to add: `retrievedOn` per entry (dates can differ), `readMethod` ('summarizing-fetcher' or 'browser'), and the board scope the example targets (`layerCount`, `copperOzFt2` per layer side) so the UI can refuse a check whose board is outside every entry.

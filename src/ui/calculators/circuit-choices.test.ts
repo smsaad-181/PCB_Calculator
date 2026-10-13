@@ -54,15 +54,15 @@ describe('catalog printing goes through format-result', () => {
 });
 
 describe('signedPercent', () => {
-  it('has an explicit sign, one decimal and rounds the size up', () => {
-    expect(signedPercent(0.0073)).toBe('+0.8 %');
-    expect(signedPercent(-0.0125)).toBe('−1.3 %');
-    expect(signedPercent(0.01)).toBe('+1.0 %');
+  it('goes through core formatSignedPercent: explicit sign, size rounded away from zero', () => {
+    expect(signedPercent(0.0073)).toBe('+0.7300 %');
+    expect(signedPercent(-0.0125)).toBe('-1.250 %');
+    expect(signedPercent(0.01)).toBe('+1.000 %');
   });
-  it('prints zero and float noise as 0.0 % without a sign', () => {
-    expect(signedPercent(0)).toBe('0.0 %');
-    expect(signedPercent(1e-15)).toBe('0.0 %');
-    expect(signedPercent(-NEGLIGIBLE_ERROR / 10)).toBe('0.0 %');
+  it('prints zero and float noise as 0 % without a sign', () => {
+    expect(signedPercent(0)).toBe('0 %');
+    expect(signedPercent(1e-15)).toBe('0 %');
+    expect(signedPercent(-NEGLIGIBLE_ERROR / 10)).toBe('0 %');
   });
   it('never prints NaN or Infinity', () => {
     expect(signedPercent(Number.NaN)).toBe('not available');
@@ -70,7 +70,7 @@ describe('signedPercent', () => {
   });
   it('never understates a size', () => {
     for (const f of [0.00001, 0.0004, 0.0049, 0.0051, 0.2, -0.00001, -0.0049]) {
-      const shown = Number(signedPercent(f).replace('−', '-').replace(' %', ''));
+      const shown = Number(signedPercent(f).replace(' %', ''));
       expect(Math.abs(shown)).toBeGreaterThanOrEqual(Math.abs(f) * 100 - 1e-9);
     }
   });

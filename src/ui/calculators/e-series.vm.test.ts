@@ -55,9 +55,9 @@ describe('nearest value', () => {
     const v = computeNearest(st({ nearestTarget: '4.7k', nearestSeries: 'E96' }));
     if (v.status !== 'ok') throw new Error(v.status);
     expect(v.rows.map((r) => [r.label, r.value, r.error])).toEqual([
-      ['Nearest', '4.75 kΩ', '+1.1 %'],
-      ['Next up (at or above the target)', '4.75 kΩ', '+1.1 %'],
-      ['Next down (at or below the target)', '4.64 kΩ', '−1.3 %'],
+      ['Nearest', '4.75 kΩ', '+1.064 %'],
+      ['Next up (at or above the target)', '4.75 kΩ', '+1.064 %'],
+      ['Next down (at or below the target)', '4.64 kΩ', '-1.277 %'],
     ]);
     expect(v.exact).toBe(false);
   });
@@ -65,7 +65,7 @@ describe('nearest value', () => {
     const v = computeNearest(st({ nearestTarget: '4k7', nearestSeries: 'E24' }));
     if (v.status !== 'ok') throw new Error(v.status);
     expect(v.rows.map((r) => r.value)).toEqual(['4.7 kΩ', '4.7 kΩ', '4.7 kΩ']);
-    expect(v.rows.map((r) => r.error)).toEqual(['0.0 %', '0.0 %', '0.0 %']);
+    expect(v.rows.map((r) => r.error)).toEqual(['0 %', '0 %', '0 %']);
     expect(v.exact).toBe(true);
   });
   it('component codes and prefixes are the same target', () => {
@@ -111,7 +111,7 @@ describe('nearest value', () => {
   });
   it('the summary is plain words', () => {
     expect(nearestSummary(computeNearest(st({ nearestTarget: '4.7k', nearestSeries: 'E96' })))).toMatch(
-      /^Nearest-value lookup: Nearest 4\.75 kΩ, error \+1\.1 %\. Next up/,
+      /^Nearest-value lookup: Nearest 4\.75 kΩ, error \+1.064 %. Next up/,
     );
     expect(nearestSummary(computeNearest(DEFAULT_STATE))).toMatch(/no result yet/);
   });
@@ -125,7 +125,7 @@ describe('two-resistor search', () => {
     const lib = bestPairs(3300, 'E24', 'series', PAIR_COUNT);
     if (!lib.ok) throw new Error('lib');
     expect(v.rows.map((r) => [ohms(r.r1), ohms(r.r2)])).toEqual(lib.value.map((p) => [p.r1, p.r2]));
-    expect(v.rows[0]?.error).toBe('0.0 %');
+    expect(v.rows[0]?.error).toBe('0 %');
     expect(v.resultHeading).toBe('R1 + R2');
     for (const r of v.rows) expect(ohms(r.value)).toBeGreaterThan(3000);
   });
@@ -178,7 +178,7 @@ describe('two-resistor search', () => {
     expect(b.needs[0]).toMatch(/ratio between 0 and 1/);
   });
   it('the summary names the best pair', () => {
-    expect(pairsSummary(computePairs(st({ pairTarget: '3.3k' })))).toMatch(/^Two-resistor search: 5 best pairs\. Best is R1 300 Ω and R2 3 kΩ, giving 3\.3 kΩ, error 0\.0 %\.$/);
+    expect(pairsSummary(computePairs(st({ pairTarget: '3.3k' })))).toMatch(/^Two-resistor search: 5 best pairs\. Best is R1 300 Ω and R2 3 kΩ, giving 3\.3 kΩ, error 0 %\.$/);
   });
   it('every series runs fast enough to type into (E192 divider ratio is the worst case)', () => {
     for (const series of ['E96', 'E192'] as const) {

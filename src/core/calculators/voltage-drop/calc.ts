@@ -76,7 +76,12 @@ const REL_TOL = 1e-9;
 const NEAR_MAX_FRACTION = 0.99;
 const V = meta.validity;
 const STATUS_TRACES = dataStatusForLedgerIds([...meta.reference.ledgerIds], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_NO_TRACES = dataStatusForLedgerIds(['S-019']);
+const NO_TRACE_IDS = ['S-019'];
+const NO_TRACE_IDS_CPL = ['S-019', 'S-019h'];
+const STATUS_NO_TRACES = dataStatusForLedgerIds(NO_TRACE_IDS);
+const STATUS_NO_TRACES_CPL = dataStatusForLedgerIds(NO_TRACE_IDS_CPL);
+const CPL_STABILITY =
+  'A constant-power load has negative incremental resistance (-V^2/P); this steady state can be unstable with input filtering; stability is not checked; P is the converter input power (ledger S-019h).';
 
 class RangeFailure extends Error {}
 const positive = (n: number, what: string): number => {
@@ -363,6 +368,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
       code: 'DROP_BUDGET_EXCEEDED',
     });
   }
+  if (load.field === 'loadPower') warnings.push({ severity: 'caution', message: CPL_STABILITY, code: 'CONSTANT_POWER_STABILITY' });
   if (load.field === 'loadPower' && loadPower >= s.maxDeliverablePower * NEAR_MAX_FRACTION) {
     warnings.push({
       severity: 'caution',
@@ -401,7 +407,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
   // Confidence.
   const defaultedAssumptions = defTemp.length > 0 ? ['conductor temperature (trace default 25 °C)'] : [];
   const safetyRelevantDefaults = [...new Set(traces.flatMap((t) => copperBasisFactors(t.basis).safetyRelevantDefaults))];
-  const dataStatus = traces.length > 0 ? STATUS_TRACES : STATUS_NO_TRACES;
+  const dataStatus = traces.length > 0 ? STATUS_TRACES : load.field === 'loadPower' ? STATUS_NO_TRACES_CPL : STATUS_NO_TRACES;
   const confidence = rateConfidence({
     outOfRangeInputs: outOfRange,
     defaultedAssumptions,
@@ -414,7 +420,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
   }
 
   const basisForResult = traces.find((t) => t.basis.basis === 'nominal')?.basis ?? traces[0]?.basis;
-  const ledgerIds = traces.length > 0 ? [...meta.reference.ledgerIds] : ['S-019'];
+  const ledgerIds = traces.length > 0 ? [...meta.reference.ledgerIds] : load.field === 'loadPower' ? [...NO_TRACE_IDS_CPL] : [...NO_TRACE_IDS];
   const result: CalcResult = {
     method: meta.method,
     reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds },

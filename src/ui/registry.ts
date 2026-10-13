@@ -48,6 +48,13 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/SelfHeating'),
   },
   {
+    id: 'voltage-drop',
+    title: 'Voltage drop and power loss (feed path)',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/VoltageDrop'),
+  },
+  {
     id: 'ohm-power',
     title: "Ohm's law and power",
     category: 'circuit',

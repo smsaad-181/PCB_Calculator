@@ -12,7 +12,7 @@ import { meta } from './meta';
 // Phase 1 task 5: voltage drop / power loss along a feed path. TESTS FIRST for the maths.
 // Expected numbers come from the independent oracle (tools/reference/ref_calcs.py: vd_solve, vectors vdrop_<case>_* in
 // docs/golden-vectors.json) or from the identities restated below. The implementation is never consulted. Nothing here
-// verifies S-019 or S-004: tests compare the implementation with the formulas, not the formulas with a standard.
+// verifies S-019, S-019h or S-004: tests compare the implementation with the formulas, not the formulas with a standard.
 //
 // CONTRACT pinned here:
 //  - Inputs: vsource, EXACTLY ONE of loadCurrent | loadPower | loadResistance | loadVoltage, returnPath (required),
@@ -393,6 +393,23 @@ describe('user-supplied resistances', () => {
     expect(r.confidence.level).toBe('high');
     expect(r.warnings.some((w) => w.code === 'USER_RESISTANCE')).toBe(true);
   });
+  it('a constant-power load on a resistance-only path cites S-019h as well, and is VERIFIED', () => {
+    const r = ok({ vsource: V(12), loadPower: q(10, DIM.POWER), returnPath: 'not-counted', elements: [ohm('connector', 0.05, 'datasheet typical 50 mohm')] });
+    expect(r.reference.ledgerIds).toEqual(['S-019', 'S-019h']);
+    expect(r.dataStatus).toBe('VERIFIED');
+  });
+  it('a constant-power load carries the stability caution citing S-019h; other load kinds do not', () => {
+    const base = { vsource: V(12), returnPath: 'not-counted' as const, elements: [ohm('connector', 0.05, 'datasheet typical 50 mohm')] };
+    const cp = ok({ ...base, loadPower: q(10, DIM.POWER) });
+    const w = cp.warnings.find((x) => x.code === 'CONSTANT_POWER_STABILITY');
+    expect(w?.severity).toBe('caution');
+    expect(w?.message).toContain('negative incremental resistance (-V^2/P)');
+    expect(w?.message).toContain('stability is not checked');
+    expect(w?.message).toContain('converter input power');
+    expect(w?.message).toContain('S-019h');
+    expect(ok({ ...base, loadResistance: R(10) }).warnings.some((x) => x.code === 'CONSTANT_POWER_STABILITY')).toBe(false);
+    expect(ok({ ...base, loadCurrent: q(1, DIM.CURRENT) }).warnings.some((x) => x.code === 'CONSTANT_POWER_STABILITY')).toBe(false);
+  });
   it('a source note and a label are required', () => {
     const base = { vsource: V(12), loadResistance: R(10), returnPath: 'not-counted' };
     expect(fail({ ...base, elements: [{ kind: 'resistance', label: 'x', resistance: R(1) }] }).field).toBe('elements[0].sourceNote');
@@ -596,7 +613,8 @@ describe('result structure', () => {
     const r = ok(CASES[2]?.inputs as Inputs);
     expect(r.formula).toBe(meta.formula);
     expect(r.method).toBe(meta.method);
-    expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-019', 'S-004']));
+    // S-019h: constant-power quadratic, P_max = V^2/(4 R), efficiency (VERIFIED), so dataStatus stays VERIFIED.
+    expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-019', 'S-019h', 'S-004']));
     expect(r.steps.length).toBeGreaterThan(3);
     expect(r.recommendation.length).toBeGreaterThan(0);
     expect(r.designValues).toEqual([]);

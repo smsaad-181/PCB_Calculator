@@ -80,7 +80,7 @@ describe('solve for a resistor', () => {
     const r = rows(v);
     expect(r['Ideal R1 before snapping']).toBe('26.3636 kΩ');
     expect(r['Output voltage (Vout)']).toBe('3.3241 V');
-    expect(r['Vout error vs target (magnitude rounded up)']).toBe('+0.8 %');
+    expect(r['Vout error vs target (size rounded away from zero)']).toBe('+0.7303 %');
     expect(r[R2_NAME]).toBe('10 kΩ');
   });
   it('shows the S-016 UNVERIFIED status and the paywalled reason in the confidence', () => {
