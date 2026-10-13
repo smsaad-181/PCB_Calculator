@@ -82,7 +82,7 @@ export default function ResistorDivider() {
   return (
     <div class="calc-layout">
       <p class="muted">
-        Output of a two-resistor divider (Vin, R1 on top, R2 at the bottom), or the resistor needed for a target output, with an optional load, tolerance envelope and E-series
+        Output of a two-resistor divider (Vin, R1 on top, R2 at the bottom), or the resistor needed for a target output, with an optional load, initial-tolerance corners and E-series
         snapping. Ideal resistors, DC.
       </p>
       <NoticeBanner notices={notices} onDismiss={() => setNotices([])} />
@@ -202,6 +202,20 @@ export default function ResistorDivider() {
             placeholder="1%"
             externalError={fe.tolerance}
           />
+          {withLoad && (
+            <QuantityField
+              id="ltol"
+              label="Load tolerance (optional)"
+              unitHint="percent, for example 5%"
+              text={state.loadTolerance}
+              onText={(loadTolerance) => patch({ loadTolerance })}
+              expectedDim={fieldDim('vin')}
+              parser={parseToleranceField}
+              help="Write 5% or 0.05. Adds the load to the initial-tolerance corners. Empty means the load is exact."
+              placeholder="5%"
+              externalError={fe.loadTolerance}
+            />
+          )}
           <QuantityField
             id="vtol"
             label="Input voltage tolerance (optional)"
@@ -213,6 +227,17 @@ export default function ResistorDivider() {
             help="Write 5% or 0.05. Empty means Vin is exact."
             placeholder="5%"
             externalError={fe.vinTolerance}
+          />
+          <QuantityField
+            id="ratedv"
+            label="Rated working voltage of the resistors (optional)"
+            unitHint="V"
+            text={state.ratedVoltage}
+            onText={(ratedVoltage) => patch({ ratedVoltage })}
+            expectedDim={fieldDim('ratedVoltage')}
+            help="From the resistor datasheet, for example 75 V. Compared with the voltage across each resistor. Empty means the voltage rating is not checked."
+            placeholder="75 V"
+            externalError={fe.ratedVoltage}
           />
           <ResetButton onReset={reset} />
         </form>

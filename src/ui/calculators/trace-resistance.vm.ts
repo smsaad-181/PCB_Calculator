@@ -10,6 +10,7 @@ import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../.
 import { echoPrefs, headlinePrefs, conventionSpreadText, type CopperLayer, type Units } from '../components/prefs';
 import { buildResultView, MAX_FIELD_CHARS, parseField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
 
+import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, weightSourceFromHash, type WeightSource } from './copper-source';
 export const CALCULATOR_ID = 'trace-resistance';
 
 export type CopperBy = 'weight' | 'thickness';
@@ -25,6 +26,8 @@ export interface TraceResistanceState {
   readonly copperWeight: string;
   readonly copperThickness: string;
   readonly basis: CopperBasisKind;
+  /** '' means not answered. Only meaningful when a copper weight is entered. */
+  readonly weightSource: WeightSource;
   /** '' means the default convention (an assumption). */
   readonly convention: FoilConvention | '';
   readonly ambient: string;
@@ -46,6 +49,7 @@ export const DEFAULT_STATE: TraceResistanceState = Object.freeze({
   copperWeight: '',
   copperThickness: '',
   basis: 'nominal',
+  weightSource: '',
   convention: '',
   ambient: '',
   deltaT: '',
@@ -109,6 +113,7 @@ export function toHashState(s: TraceResistanceState): Record<string, string> {
   if (s.layer !== '') out['ly'] = s.layer;
   if (s.copperBy !== DEFAULT_STATE.copperBy) out['cs'] = s.copperBy;
   if (s.basis !== DEFAULT_STATE.basis) out['cb'] = s.basis;
+  if (s.weightSource !== '') out['wsrc'] = s.weightSource;
   if (s.convention !== '') out['conv'] = s.convention;
   if (s.units !== DEFAULT_STATE.units) out['u'] = s.units;
   return out;
@@ -152,6 +157,7 @@ export function fromHashState(h: HashState): LoadedState {
     if (cb === 'nominal' || cb === 'finished' || cb === 'measured') s = { ...s, basis: cb };
     else notices.push('Thickness basis was not recognised: nominal is used instead.');
   }
+  s = { ...s, weightSource: weightSourceFromHash(get('wsrc'), notices) };
   const conv = get('conv');
   if (conv !== undefined) {
     if (has(FOIL_CONVENTIONS, conv)) s = { ...s, convention: conv as FoilConvention };
@@ -312,6 +318,13 @@ function provenance(s: TraceResistanceState): ProvenanceRow[] {
       ? { label: 'Foil convention', value: DEFAULT_FOIL_CONVENTION, source: 'default', detail: `conventions differ by up to ${conventionSpreadText()}` }
       : { label: 'Foil convention', value: s.convention, source: 'user' },
   );
+  if (s.copperBy === 'weight') {
+    rows.push(
+      s.weightSource === 'foil'
+        ? { label: 'Weight source', value: 'foil spec (base foil)', source: 'user' }
+        : { label: 'Weight source', value: 'not answered, treated as base foil', source: 'default' },
+    );
+  }
   if (s.copperBy === 'thickness') rows.push({ label: 'Thickness basis', value: s.basis, source: s.basis === 'nominal' ? 'default' : 'user' });
   return rows;
 }
@@ -344,6 +357,9 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
     }
   }
   if (problems.length > 0) return { status: 'error', problems, fieldErrors, notes };
+
+  if (s.copperBy === 'weight' && s.weightSource === 'finished') return { status: 'needs-input', needs: [FINISHED_NEEDS], notes };
+  if (s.copperBy === 'weight' && s.weightSource === '' && parsed.get('copperWeight')?.status === 'ok') notes.push(NOT_ANSWERED_NOTE);
 
   const needs: string[] = [];
   for (const k of active) {
@@ -394,6 +410,7 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
     labels: { ...RESULT_LABELS, [HEADLINE.name]: HEADLINE.label },
     extraRows: [{ label: 'Copper used', text: copperBasisLine(raw, prefs) }],
     pinWarningCodes: ['SKIN_EFFECT'],
+    rowWarnings: { 'voltage drop': 'VOLTAGE_DROP_SCOPE' },
     extraProvenance: provenance(s),
   });
   const skin = result.details.validity.find((c) => c.name === SKIN_CHECK_NAME);

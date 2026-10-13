@@ -21,6 +21,10 @@ export const LENGTH_LIMIT_KEYS = [
   'holePositionTolerance',
   'copperToEdge',
   'holeToTrack',
+  // Fabricator-published finished copper thickness per layer and ordered weight (ledger S-019c); "1 oz" is an order label, not a thickness.
+  'finishedCopperOuter1oz',
+  'finishedCopperInner0p5oz',
+  'finishedCopperInner1oz',
 ] as const;
 export const PCT_LIMIT_KEYS = ['traceWidthTolerancePct', 'impedanceTolerancePct', 'boardThicknessTolerancePct'] as const;
 

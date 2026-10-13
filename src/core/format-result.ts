@@ -54,6 +54,11 @@ export function formatResult(item: { value: Quantity; bound: Bound }, opts: Head
   return print(item.value, roundDirectionFor(item.bound), opts);
 }
 
+/** A step value printed with the same directional rounding as the headline it repeats (bound defaults to nominal when the step has none). */
+export function formatStep(step: { value: Quantity; bound?: Bound }, opts: HeadlineOpts): string {
+  return formatResult({ value: step.value, bound: step.bound ?? 'nominal' }, opts);
+}
+
 /** Calculated or recommended value of a design value, rounded in the direction of its design direction. */
 export function formatDesignValue(dv: DesignValue, which: 'calculated' | 'recommended', opts: HeadlineOpts): string {
   return formatResult({ value: dv[which], bound: boundForDesignDirection(dv.direction) }, opts);

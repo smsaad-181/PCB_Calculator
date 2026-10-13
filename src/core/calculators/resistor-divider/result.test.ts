@@ -79,8 +79,8 @@ describe('result metadata', () => {
     expect(none.dataStatus).toBe('VERIFIED');
   });
   it('inputs hold quantities only, all source user; series and snap are not inputs', () => {
-    const x = ok(solve1(12, 3.3, 10e3, { series: 'E96', snap: 'up', load: R(1e5), tolerance: frac(0.01), vinTolerance: frac(0.02) }));
-    expect(x.inputs.map((i) => i.name).sort()).toEqual(['load', 'r2', 'target', 'tolerance', 'vin', 'vinTolerance']);
+    const x = ok(solve1(12, 3.3, 10e3, { series: 'E96', snap: 'up', load: R(1e5), tolerance: frac(0.01), loadTolerance: frac(0.02), vinTolerance: frac(0.02) }));
+    expect(x.inputs.map((i) => i.name).sort()).toEqual(['load', 'loadTolerance', 'r2', 'target', 'tolerance', 'vin', 'vinTolerance']);
     for (const i of x.inputs) expect(i.source).toBe('user');
   });
   it('absent optional sections: no elements, fabProfile, exports, limitingElement, copperBasis', () => {
@@ -125,10 +125,10 @@ describe('result metadata', () => {
 });
 
 describe('warnings', () => {
-  it('a plain run carries exactly one warning: the info power-rating hint (code POWER_RATING)', () => {
+  it('a plain run carries only info warnings: power rating, resistor voltage not checked, creepage not checked (PCB-5)', () => {
     const r = ok(clean);
-    expect(r.warnings.map((w) => w.code)).toEqual(['POWER_RATING']);
-    expect(r.warnings[0]?.severity).toBe('info');
+    expect(r.warnings.map((w) => w.code)).toEqual(['POWER_RATING', 'RESISTOR_VOLTAGE_NOT_CHECKED', 'CREEPAGE_NOT_CHECKED']);
+    expect(r.warnings.every((w) => w.severity === 'info')).toBe(true);
     expect(r.warnings[0]?.message).toMatch(/power rating/i);
     expect(highestWarningSeverity(r.warnings)).toBe('info');
   });

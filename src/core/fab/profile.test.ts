@@ -347,7 +347,7 @@ describe('shipped example: src/core/data/fab-profiles/jlcpcb-2026-10-06.json', (
     const p = parseOk(raw());
     expect(p.status).toBe('UNVERIFIED');
     expect(p.bannerRequired).toBe(true);
-    expect(p.ledgerIds).toEqual(['S-008']);
+    expect(p.ledgerIds).toEqual(['S-008', 'S-019c']);
     expect(p.profileDate).toBe('2026-10-06');
     expect(p.id).toBe('jlcpcb-2026-10-06');
     expect(p.fabricator).toBe('JLCPCB');
@@ -381,6 +381,26 @@ describe('shipped example: src/core/data/fab-profiles/jlcpcb-2026-10-06.json', (
     expect(relErr(mm(l.copperToEdge), 0.2)).toBeLessThanOrEqual(1e-12);
     expect(l.copperWeightsOzFt2).toEqual([1]);
   });
+  it('finished copper (PCB-1, ledger S-019c): outer 1 oz 1.6 mil, inner 0.5 oz 0.6 mil, inner 1 oz 1.2 mil; notes say finished, dated, UNVERIFIED, pairing unconfirmed', () => {
+    const p = parseOk(raw());
+    const l = p.limits;
+    const mil = (x: ReturnType<typeof fromUnit> | undefined): number => toUnit(x ?? fromUnit(1, 'm'), 'mil');
+    expect(relErr(mil(l.finishedCopperOuter1oz), 1.6)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(mil(l.finishedCopperInner0p5oz), 0.6)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(mil(l.finishedCopperInner1oz), 1.2)).toBeLessThanOrEqual(1e-12);
+    const notes = p.notes ?? '';
+    expect(notes).not.toMatch(/base outer copper only/i);
+    expect(notes).toMatch(/finished/i);
+    expect(notes).toContain('S-019c');
+    expect(notes).toContain('2026-10-13');
+    expect(notes).toMatch(/UNVERIFIED/);
+    expect(notes).toMatch(/pairing/i);
+    expect(p.status).toBe('UNVERIFIED');
+  });
+  it('finished copper keys are lengths: a non-length unit or zero is rejected; a template stays empty', () => {
+    expect(errorsOf(withLimits({ finishedCopperOuter1oz: { value: 1.6, unit: 'A' } }))).toContain('finishedcopperouter1oz');
+    expect(errorsOf(withLimits({ finishedCopperInner1oz: { value: 0, unit: 'mil' } }))).toContain('finishedcopperinner1oz');
+  });
   it('lists no limit that the research note does not publish (board thickness tolerance is absent)', () => {
     const keys = Object.keys(parseOk(raw()).limits).sort();
     expect(keys).toEqual(
@@ -400,6 +420,9 @@ describe('shipped example: src/core/data/fab-profiles/jlcpcb-2026-10-06.json', (
         'traceWidthTolerancePct',
         'impedanceTolerancePct',
         'copperWeightsOzFt2',
+        'finishedCopperOuter1oz',
+        'finishedCopperInner0p5oz',
+        'finishedCopperInner1oz',
       ].sort(),
     );
   });

@@ -43,6 +43,8 @@ const RHO_CAUTION =
   'The resistivity you entered will replace the ledger value for annealed copper (S-004). The default does not cover plated copper, whose resistivity is a separate row (S-012, UNVERIFIED); replace it only with a value you can source.';
 const ALPHA_CAUTION =
   'The temperature coefficient you entered will replace the S-004 value; the result at any temperature other than 20 °C depends directly on it, so replace it only with a value you can source.';
+const VOLTAGE_DROP_SCOPE =
+  'Voltage drop and power loss cover this trace only: one conductor, one direction. They exclude the return path (about twice the drop for a trace return of equal size), vias, pads, connectors, solder joints and copper necking. Do not compare this figure with a rail budget; the future path calculator covers the whole path.';
 const SKIN_MESSAGE = 'DC formula is optimistic: skin depth is below half the copper thickness';
 
 const REL_TOL = 1e-9;
@@ -148,18 +150,18 @@ function build(raw: unknown): CalcOutcome {
   const steps: CalcResult['steps'] = [
     { label: 'Copper thickness', expr: 'weight x thickness per oz/ft2 of the chosen convention, or the entered thickness', value: thickness },
     { label: 'Cross-section area', expr: 'A = w x t', value: area },
-    { label: 'Conductor temperature', expr: 'T = ambient + deltaT', value: conductor },
+    { label: 'Conductor temperature', expr: 'T = ambient + deltaT', value: conductor, bound: 'prediction' },
     { label: 'Resistivity at 20 °C', expr: rhoOverride ? 'rho20 = user value' : 'rho20 = 1/58 ohm mm2/m (S-004)', value: q(rho20, DIM.RESISTIVITY) },
     { label: 'Resistivity at the conductor temperature', expr: 'rho(T) = rho20 x (1 + alpha x (T - 20 °C))', value: q(rhoT, DIM.RESISTIVITY) },
     { label: 'Resistance at 20 °C', expr: 'R20 = rho20 x L / A', value: q(r20, DIM.RESISTANCE) },
-    { label: 'Resistance at the conductor temperature', expr: 'R(T) = rho(T) x L / A', value: q(rT, DIM.RESISTANCE) },
+    { label: 'Resistance at the conductor temperature', expr: 'R(T) = rho(T) x L / A', value: q(rT, DIM.RESISTANCE), bound: 'prediction' },
   ];
   if (skinSi !== undefined) {
     steps.push({ label: 'Skin depth', expr: 'delta = sqrt(rho(T) / (pi x f x mu0))', value: q(skinSi, DIM.LENGTH) });
   }
   if (vDrop !== undefined && power !== undefined) {
-    steps.push({ label: 'Voltage drop', expr: 'V = I x R(T)', value: q(vDrop, DIM.VOLTAGE) });
-    steps.push({ label: 'Power loss', expr: 'P = I^2 x R(T)', value: q(power, DIM.POWER) });
+    steps.push({ label: 'Voltage drop', expr: 'V = I x R(T)', value: q(vDrop, DIM.VOLTAGE), bound: 'prediction' });
+    steps.push({ label: 'Power loss', expr: 'P = I^2 x R(T)', value: q(power, DIM.POWER), bound: 'prediction' });
   }
 
   // Results.
@@ -209,6 +211,7 @@ function build(raw: unknown): CalcOutcome {
 
   const warnings: CalcWarning[] = [{ severity: 'info', message: LINEAR_INFO, code: 'LINEAR_ALPHA' }];
   if (inp.deltaT !== undefined) warnings.push({ severity: 'info', message: DELTA_T_INFO, code: 'DELTA_T_SUPPLIED' });
+  if (vDrop !== undefined) warnings.push({ severity: 'caution', message: VOLTAGE_DROP_SCOPE, code: 'VOLTAGE_DROP_SCOPE' });
   if (rhoOverride) warnings.push({ severity: 'caution', message: RHO_CAUTION, code: 'RESISTIVITY_OVERRIDE' });
   if (alphaOverride) warnings.push({ severity: 'caution', message: ALPHA_CAUTION, code: 'ALPHA_OVERRIDE' });
 
@@ -246,6 +249,7 @@ function build(raw: unknown): CalcOutcome {
     ambientDefaulted
       ? `Ambient temperature ${String(meta.defaults.ambientC)} °C is an engineering default, not from a standard; it sets the conductor temperature.`
       : `Ambient temperature ${num(toUnit(ambient, 'degC'))} °C set by the user.`,
+    ...(vDrop !== undefined ? ['Voltage drop and power loss are for one conductor, one direction: they exclude the return path, vias, pads, connectors, solder joints and necking (the future path calculator covers the whole path).'] : []),
     'DC resistance of a uniform rectangular conductor; the cross-section is treated as an ideal rectangle (etch factor, plating and surface roughness are not modelled).',
   ];
 

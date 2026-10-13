@@ -3,10 +3,12 @@ import { FOIL_CONVENTIONS } from '../../core/units';
 import { parseHash, serializeHash, type Route } from '../../state/hash';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
+import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
 import { ResetButton } from '../components/ResetButton';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
 import { useRafValue } from '../hooks';
+import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
 import {
   BASES,
   CALCULATOR_ID,
@@ -233,6 +235,18 @@ export default function TraceWidth() {
             ]}
             onChange={(v) => set({ copperBy: v === 'thickness' ? 'thickness' : 'weight' })}
           />
+          {weightMode && (
+            <>
+              <RadioGroup
+                name="wsrc"
+                legend={WEIGHT_SOURCE_QUESTION}
+                value={state.weightSource}
+                options={WEIGHT_SOURCE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                onChange={(v) => set({ weightSource: isWeightSource(v) ? v : '' })}
+              />
+              {state.weightSource === 'finished' && <FinishedCopperGuidance />}
+            </>
+          )}
           {weightMode ? (
             <QuantityField
               id="cweight"
@@ -242,7 +256,7 @@ export default function TraceWidth() {
               onText={(copperWeight) => set({ copperWeight })}
               expectedDim={fieldDimWeight}
               echoPrefs={otherPrefs}
-              help="Examples: 1 oz, 0.5 oz, 2 oz/ft2. A bare oz means oz/ft². Nominal foil, not finished copper."
+              help="Examples: 1 oz, 0.5 oz, 2 oz/ft2. A bare oz means oz/ft². Answer the question above: base foil and finished copper differ."
               placeholder="1 oz"
               required
               externalError={fe.copperWeight}

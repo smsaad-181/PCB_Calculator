@@ -154,3 +154,36 @@ Agent-owned findings PV-1..PV-10 and calc F-1..F-4 are listed in that report. Th
 | R-26 | Code reached `main` before validation. PR #3 and PR #4 (task 3 and circuit slice 1) were merged to `main` (fe12593) before the phase and pcb validators ran. Once Pages is enabled, every `main` push deploys. R-23 update: `main` run 38122273756 has `verify` green and `deploy` failed because Pages is disabled (`has_pages: false`, URL 404). | Human | Decide: per-task merges with validation at phase end, or validate before each merge. Enable Pages (Settings → Pages → Source: GitHub Actions) and confirm the URL loads | OPEN (decision + user action) |
 | R-27 | E-series tables (S-016, IEC 60063:2015) are checked only against the 10^(n/N) definition and Wikipedia. The divider and E-series pages show PAYWALLED. | Human | Compare E3..E192 with a licensed IEC 60063 copy and sign the ledger row | OPEN |
 | R-28 | Trace-width inner-layer current limit. KiCad legacy help reportedly gives 17.5 A internal against 35 A overall (S-010 CONFLICT, tier 4; not found by the validator's 2026-10-11 search). The app checks 35 A for both layers (calc F-1). | Human (licensed IPC-2221B/C, part of R-3) | Read the Figure 6-4 axis ranges for both panels | OPEN |
+
+## Phase 1 interim fixes (logged 2026-10-13, branch phase-1-fixes)
+
+Reports: `phase-1-calc.md`, `phase-1-phase.md`, `phase-1-pcb.md` (all PASS-WITH-CONDITIONS, interim). Status updates to older rows: **G-5** mostly addressed (confidence reasons/score, parsed echo and banner are shown; remaining: bound-aware helpers on every field); **G4-c** implemented by 84a18f5 (µm headline); **R-23** superseded by R-26 (main CI verify green; deploy needs Pages); **R-13** now has per-calculator zero/NaN tests for all five Phase 1 calculators.
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| PV-1 | Flaky wall-clock assertions in `test:coverage` | test-engineer | Total-budget form in all five vm/hash tests | FIXED (this branch) |
+| PV-2 | OPEN_RISKS stale | orchestrator | This section | FIXED |
+| F-1 | Inner layer above 17.5 A (S-010 CONFLICT) | calc-implementer | Warning `INNER_CURRENT_ABOVE_17_5A`; limit itself still R-28 | FIXED (warning); R-28 open |
+| F-2 | Converter ignored `thicknessBasis` with a weight | calc-implementer | Reject | FIXED |
+| F-3 | Finished-copper cautions rest on paywalled S-009 but overall status shows VERIFIED | calc-implementer + ui-engineer | Status must reflect S-009 | OPEN |
+| F-4 | E-series "nearest" is arithmetic, not stated (E3: 3.3 → 2.2) | ui-engineer | Say so on the page, or offer geometric | OPEN |
+| PCB-1 | Weight meaning (finished vs base) | standards-researcher, calc, ui | S-019c row, profile corrected, UI question | IN PROGRESS; S-019c pairing of labels to values unconfirmed (human: check JLCPCB stackup page) |
+| PCB-2 | Outer caution / plating estimate wording | calc | Reword, upper-estimate label | FIXED |
+| PCB-3 | Width margin vs current derating inconsistent | calc | One margin basis plus round trip test | FIXED |
+| PCB-4 | Voltage-drop scope label | calc + ui | Caution under the result | FIXED |
+| PCB-5 | Divider resistor working voltage | calc + ui | Voltages shown, rated-voltage input, creepage note; no datasheet default (not read) | FIXED (core); UI IN PROGRESS |
+| PCB-6 | Inner finished-copper shortfall only in confidence text | calc | Per-layer finished thickness in stackup object | OPEN |
+| PCB-7 | Divider "worst case" applied tolerance to load | calc + ui | Renamed, own load tolerance | FIXED (core); UI IN PROGRESS |
+| PCB-8 | "Max conductor temperature" reads like a design pass; ambient ignored by legacy fit | calc + ui | Reword, state ambient not modelled | OPEN |
+| PCB-9 | Headline vs Steps rounding | calc + ui | `formatStep` | FIXED |
+| PCB-10 | Fab minimum width and width tolerance unused | calc | Use profile limits in a fab note | OPEN |
+| PCB-11 | Data badge lumped paywalled with conflict | ui | Grouped badges | FIXED |
+| PCB-12 | E-series pair search: single exact value and noise pairs | ui + calc | Say when one value hits, filter pairs | OPEN |
+| PCB-13 | Internal "R-8" shown to users; "KiCad-compatible" without cross-check record | ui | Tag removed; cross-check record still needed | PARTLY FIXED |
+| PV-3 | Task 2 advanced inputs (RMS peak/duty, adjacent plane, cooling) neither built nor deferred | orchestrator | Build or mark deferred in phase-1.md | OPEN |
+| PV-4 | E-series page returns no `CalcResult`; search on main thread; `src/workers/` empty | calc + ui | SPEC exception or wrap; worker | OPEN |
+| PV-5 | `package-lock.json` header stale | devops | Regenerate with approved `npm install` | OPEN |
+| PV-6 | RUNBOOK says every push runs verify (only main + PRs); setup-node 7.1.0 available | devops | Fix text; Dependabot bump | OPEN |
+| PV-8 | Mutable cache in `trace-width/calc.ts:50`; µ0 literal in trace-resistance not in constants | calc | Move/immutable | OPEN |
+| PV-9 | Three pages copy `useCalcState` logic | ui | Use the hook | OPEN |
+| PV-10 | Coverage excludes `src/state` and view-models (V-8) | test-engineer | Include them | OPEN |

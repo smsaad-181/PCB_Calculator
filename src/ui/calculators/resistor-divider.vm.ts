@@ -21,6 +21,8 @@ export interface DividerState {
   readonly load: string;
   readonly tolerance: string;
   readonly vinTolerance: string;
+  readonly loadTolerance: string;
+  readonly ratedVoltage: string;
   readonly series: SeriesChoice;
   readonly snap: SnapChoice;
 }
@@ -34,11 +36,13 @@ export const DEFAULT_STATE: DividerState = Object.freeze({
   load: '',
   tolerance: '',
   vinTolerance: '',
+  loadTolerance: '',
+  ratedVoltage: '',
   series: 'none',
   snap: DEFAULT_SNAP,
 });
 
-export const METHOD_TEXT = 'Method: two-resistor divider with an optional load, tolerance envelope and E-series snapping (ideal resistors, DC)';
+export const METHOD_TEXT = 'Method: two-resistor divider with an optional load, initial-tolerance corners and E-series snapping (ideal resistors, DC)';
 export const RANGE_HINT = 'Outside the stated plausibility range (an engineering range, not a standard), so the result is less reliable. See the confidence reasons.';
 
 /** The resistor names carry their position, because textbooks and datasheets name them differently. */
@@ -80,8 +84,8 @@ const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS. */
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS];
 
-type TextKey = 'vin' | 'r1' | 'r2' | 'target' | 'load' | 'tolerance' | 'vinTolerance';
-const TEXT_HASH_KEY: Readonly<Record<TextKey, string>> = { vin: 'vi', r1: 'r1', r2: 'r2', target: 'tg', load: 'rl', tolerance: 'tol', vinTolerance: 'vtol' };
+type TextKey = 'vin' | 'r1' | 'r2' | 'target' | 'load' | 'tolerance' | 'vinTolerance' | 'loadTolerance' | 'ratedVoltage';
+const TEXT_HASH_KEY: Readonly<Record<TextKey, string>> = { vin: 'vi', r1: 'r1', r2: 'r2', target: 'tg', load: 'rl', tolerance: 'tol', vinTolerance: 'vtol', loadTolerance: 'ltol', ratedVoltage: 'vr' };
 const TEXT_KEYS = Object.keys(TEXT_HASH_KEY) as TextKey[];
 
 export const FIELD_LABEL: Readonly<Record<TextKey, string>> = {
@@ -92,6 +96,8 @@ export const FIELD_LABEL: Readonly<Record<TextKey, string>> = {
   load: 'Load resistance (RL)',
   tolerance: 'Resistor tolerance',
   vinTolerance: 'Input voltage tolerance',
+  loadTolerance: 'Load tolerance',
+  ratedVoltage: 'Rated working voltage',
 };
 
 export function toHashState(s: DividerState): Record<string, string> {
@@ -138,7 +144,7 @@ export function fromHashState(h: HashState): LoadedState {
     }
     return v;
   };
-  s = { ...s, vin: text('vin'), r1: text('r1'), r2: text('r2'), target: text('target'), load: text('load'), tolerance: text('tolerance'), vinTolerance: text('vinTolerance') };
+  s = { ...s, vin: text('vin'), r1: text('r1'), r2: text('r2'), target: text('target'), load: text('load'), tolerance: text('tolerance'), vinTolerance: text('vinTolerance'), loadTolerance: text('loadTolerance'), ratedVoltage: text('ratedVoltage') };
   return { state: s, notices };
 }
 
@@ -148,26 +154,28 @@ export function fromHashState(h: HashState): LoadedState {
 export type FieldKey = TextKey;
 export type FieldErrors = Partial<Record<FieldKey, string>>;
 
-const FIELD_DIM: Readonly<Record<'vin' | 'r1' | 'r2' | 'target' | 'load', Dim>> = {
+const FIELD_DIM: Readonly<Record<'vin' | 'r1' | 'r2' | 'target' | 'load' | 'ratedVoltage', Dim>> = {
   vin: DIM.VOLTAGE,
   r1: DIM.RESISTANCE,
   r2: DIM.RESISTANCE,
   target: DIM.VOLTAGE,
   load: DIM.RESISTANCE,
+  ratedVoltage: DIM.VOLTAGE,
 };
 
-export function fieldDim(k: 'vin' | 'r1' | 'r2' | 'target' | 'load'): Dim {
+export function fieldDim(k: 'vin' | 'r1' | 'r2' | 'target' | 'load' | 'ratedVoltage'): Dim {
   return FIELD_DIM[k];
 }
 
 /** The fields the page shows and reads for this choice. The others are not read. */
-export function activeFields(solveFor: SolveFor): readonly FieldKey[] {
+/** The load tolerance is only read when a load is given (the calculator refuses it otherwise). */
+export function activeFields(solveFor: SolveFor, withLoad = true): readonly FieldKey[] {
   const main: FieldKey[] = solveFor === 'vout' ? ['vin', 'r1', 'r2'] : solveFor === 'r1' ? ['vin', 'target', 'r2'] : ['vin', 'target', 'r1'];
-  return [...main, 'load', 'tolerance', 'vinTolerance'];
+  return [...main, 'load', 'tolerance', ...(withLoad ? (['loadTolerance'] as const) : []), 'vinTolerance', 'ratedVoltage'];
 }
 
 export function parseFieldOf(s: DividerState, k: FieldKey): FieldView {
-  if (k === 'tolerance' || k === 'vinTolerance') return parseToleranceField(s[k]);
+  if (k === 'tolerance' || k === 'vinTolerance' || k === 'loadTolerance') return parseToleranceField(s[k]);
   return parseField(s[k], FIELD_DIM[k]);
 }
 
@@ -186,6 +194,8 @@ const CORE_FIELD: Readonly<Record<string, FieldKey>> = {
   load: 'load',
   tolerance: 'tolerance',
   vinTolerance: 'vinTolerance',
+  loadTolerance: 'loadTolerance',
+  ratedVoltage: 'ratedVoltage',
 };
 
 // ---------------------------------------------------------------------------
@@ -228,13 +238,17 @@ const RESULT_LABELS: Readonly<Record<string, string>> = {
   load: 'Load resistance (RL)',
   tolerance: 'Resistor tolerance (a fraction: 0.01 is 1 %)',
   vinTolerance: 'Input voltage tolerance (a fraction: 0.01 is 1 %)',
+  loadTolerance: 'Load tolerance (a fraction: 0.05 is 5 %)',
+  ratedVoltage: 'Rated working voltage',
+  'voltage across r1': 'Voltage across R1 (nominal)',
+  'voltage across r2': 'Voltage across R2 (nominal)',
 };
 
 const ERROR_NAME = 'vout error vs target';
 const TOLERANCE_NAME: Readonly<Record<string, string>> = { r1: 'R1', r2: 'R2', load: 'RL', vin: 'Vin' };
 
 export function computeView(s: DividerState): DividerView {
-  const active = activeFields(s.solveFor);
+  const active = activeFields(s.solveFor, s.load.trim() !== '');
   const parsed = new Map<FieldKey, FieldView>();
   for (const k of active) parsed.set(k, parseFieldOf(s, k));
 
@@ -271,6 +285,8 @@ export function computeView(s: DividerState): DividerView {
     ...optional('load', quantity('load')),
     ...optional('tolerance', quantity('tolerance')),
     ...optional('vinTolerance', quantity('vinTolerance')),
+    ...optional('loadTolerance', quantity('loadTolerance')),
+    ...optional('ratedVoltage', quantity('ratedVoltage')),
     ...(snapApplies(s.solveFor) ? { series: s.series, snap: s.snap } : {}),
   } satisfies Inputs;
   const out = compute(inputs);
@@ -298,6 +314,7 @@ export function computeView(s: DividerState): DividerView {
     labels,
     skip: [ERROR_NAME],
     extraRows,
+    pinWarningCodes: ['RESISTOR_VOLTAGE'],
   });
 
   const env = raw.envelope?.find((e) => e.name === 'vout');
@@ -305,12 +322,12 @@ export function computeView(s: DividerState): DividerView {
     env === undefined
       ? undefined
       : {
-          label: 'Output voltage with tolerances',
+          label: 'Output voltage, initial-tolerance corners',
           // Outward rounding: the minimum is printed rounded down and the maximum rounded up, so the printed range always contains the true one.
           min: formatResult({ value: env.min, bound: 'max-capacity' }, { accuracyClass: meta.accuracyClass }),
           typ: formatResult({ value: env.typ, bound: 'nominal' }, { accuracyClass: meta.accuracyClass }),
           max: formatResult({ value: env.max, bound: 'prediction' }, { accuracyClass: meta.accuracyClass }),
-          note: `Worst case over every combination of the tolerances on ${env.toleranceInputs.map((n) => TOLERANCE_NAME[n] ?? n).join(', ')} at their limits. The minimum is printed rounded down and the maximum rounded up.`,
+          note: `Initial-tolerance corners: every combination of the tolerances on ${env.toleranceInputs.map((n) => TOLERANCE_NAME[n] ?? n).join(', ')} at their limits. Temperature coefficient (TCR), leakage, ageing, self-heating and voltage coefficient are not included, so these are not limits over the life of the part. The minimum is printed rounded down and the maximum rounded up.`,
         };
   return envelope === undefined ? { status: 'ok', result, raw, fieldErrors } : { status: 'ok', result, raw, fieldErrors, envelope };
 }
@@ -318,7 +335,7 @@ export function computeView(s: DividerState): DividerView {
 export function liveSummary(v: DividerView): string {
   switch (v.status) {
     case 'ok':
-      return `Result: ${v.result.headline.label} ${v.result.headline.text}. ${v.envelope !== undefined ? `With tolerances ${v.envelope.min} to ${v.envelope.max}. ` : ''}Confidence ${v.result.confidence.level}. ${String(v.result.details.validity.filter((c) => !c.ok).length)} validity checks failed. ${String(v.result.warnings.filter((w) => w.severity !== 'info').length)} cautions.`;
+      return `Result: ${v.result.headline.label} ${v.result.headline.text}. ${v.envelope !== undefined ? `With initial-tolerance corners ${v.envelope.min} to ${v.envelope.max}. ` : ''}Confidence ${v.result.confidence.level}. ${String(v.result.details.validity.filter((c) => !c.ok).length)} validity checks failed. ${String(v.result.warnings.filter((w) => w.severity !== 'info').length)} cautions.`;
     case 'error':
       return `No result. ${v.problems.join(' ')}`;
     default:

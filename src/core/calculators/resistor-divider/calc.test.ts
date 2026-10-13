@@ -24,7 +24,7 @@ import { meta } from './meta';
 //   (default nearest); a solved resistor is snapped to the series (nearest/up/down of the exact solved value) and every
 //   other number (vout, currents, powers, envelope) is computed from the snapped value. 'series' and 'snap' are NOT inputs[]
 //   entries (inputs[] holds quantities only); the assumptions text states them.
-//  Results (names exact): 'vout', 'r1', 'r2', 'divider current', 'power in r1', 'power in r2', 'total power',
+//  Results (names exact): 'vout', 'r1', 'r2', 'divider current', 'power in r1', 'power in r2', 'total power', 'voltage across r1', 'voltage across r2',
 //   'output impedance' ALWAYS; plus 'vout unloaded' and 'power in load' when a load is given; plus 'vout error vs target' and
 //   'ideal r1' | 'ideal r2' (the exact solved value before snapping) when a series is used.
 //   Primary (exactly one): vout for solveFor vout, else the solved resistor ('r1' or 'r2'). Everything else secondary.
@@ -75,12 +75,14 @@ const DIV_SOLVE_R1: [number, number, number, number | undefined][] = [[12, 3.3, 
 const DIV_SOLVE_R2: [number, number, number, number | undefined][] = [[12, 3.3, 47e3, undefined], [5, 3.3, 10e3, undefined], [24, 5, 100e3, undefined], [5, 2.5, 10e3, 100e3]];
 const DIV_POWER: [number, number, number, number | undefined][] = [[12, 47e3, 10e3, undefined], [12, 47e3, 10e3, 100e3], [5, 330, 330, undefined]];
 const DIV_SNAP_CASES: ['r1' | 'r2', number, number, number][] = [['r1', 12, 3.3, 10e3], ['r2', 12, 3.3, 47e3]];
-const DIV_ENV: [number, number, number, number | undefined, number, number][] = [
-  [5, 10e3, 10e3, undefined, 0.01, 0],
-  [12, 47e3, 10e3, undefined, 0.05, 0],
-  [12, 47e3, 10e3, 100e3, 0.01, 0.02],
-  [3.3, 2.2e3, 1e3, 4.7e3, 0.001, 0],
-  [5, 10e3, 10e3, undefined, 0.1, 0.05],
+// (vin, r1, r2, load, resistor tolerance, vin tolerance, load tolerance); load tolerance 0 = not given (its own input, PCB-7)
+const DIV_ENV: [number, number, number, number | undefined, number, number, number][] = [
+  [5, 10e3, 10e3, undefined, 0.01, 0, 0],
+  [12, 47e3, 10e3, undefined, 0.05, 0, 0],
+  [12, 47e3, 10e3, 100e3, 0.01, 0.02, 0],
+  [3.3, 2.2e3, 1e3, 4.7e3, 0.001, 0, 0],
+  [5, 10e3, 10e3, undefined, 0.1, 0.05, 0],
+  [12, 47e3, 10e3, 100e3, 0.01, 0.02, 0.01],
 ];
 
 // Restated textbook formulas (test side).
@@ -110,7 +112,7 @@ const res = (r: CalcResult, name: string) => {
 const si = (r: CalcResult, name: string): number => res(r, name).value.si;
 const has = (r: CalcResult, name: string): boolean => r.results.some((o) => o.name === name);
 
-const BASE = ['vout', 'r1', 'r2', 'divider current', 'power in r1', 'power in r2', 'total power', 'output impedance'];
+const BASE = ['vout', 'r1', 'r2', 'divider current', 'power in r1', 'power in r2', 'total power', 'output impedance', 'voltage across r1', 'voltage across r2'];
 
 describe('golden vectors (oracle): unloaded and loaded forward divider', () => {
   it('vectors loaded: ledger S-019, VERIFIED, tolerance 1e-9', () => {
@@ -270,15 +272,15 @@ describe('golden vectors (oracle): snapping the solved resistor to E24 / E96 / E
 });
 
 describe('golden vectors (oracle): tolerance envelope by corner analysis', () => {
-  DIV_ENV.forEach(([vin, r1, r2, rl, tol, vtol], ci) => {
-    it(`case ${String(ci)}: ${String(vin)} V, ${String(r1)} / ${String(r2)}${rl === undefined ? '' : `, load ${String(rl)}`}, +-${String(tol * 100)} %${vtol > 0 ? `, Vin +-${String(vtol * 100)} %` : ''}`, () => {
-      const extra: Partial<Inputs> = { tolerance: frac(tol), ...withLoad(rl), ...(vtol > 0 ? { vinTolerance: frac(vtol) } : {}) };
+  DIV_ENV.forEach(([vin, r1, r2, rl, tol, vtol, ltol], ci) => {
+    it(`case ${String(ci)}: ${String(vin)} V, ${String(r1)} / ${String(r2)}${rl === undefined ? '' : `, load ${String(rl)}`}, +-${String(tol * 100)} %${vtol > 0 ? `, Vin +-${String(vtol * 100)} %` : ''}${ltol > 0 ? `, load +-${String(ltol * 100)} %` : ''}`, () => {
+      const extra: Partial<Inputs> = { tolerance: frac(tol), ...withLoad(rl), ...(vtol > 0 ? { vinTolerance: frac(vtol) } : {}), ...(ltol > 0 ? { loadTolerance: frac(ltol) } : {}) };
       const r = ok(fwd(vin, r1, r2, extra));
       expect(r.envelope).toBeDefined();
       expect(r.envelope).toHaveLength(1);
       const e = (r.envelope ?? [])[0];
       expect(e?.name).toBe('vout');
-      expect(e?.toleranceInputs).toEqual(['r1', 'r2', ...(rl === undefined ? [] : ['load']), ...(vtol > 0 ? ['vin'] : [])]);
+      expect(e?.toleranceInputs).toEqual(['r1', 'r2', ...(rl !== undefined && ltol > 0 ? ['load'] : []), ...(vtol > 0 ? ['vin'] : [])]);
       expect(err(e?.min.si ?? NaN, vec(`divider_env_c${String(ci)}_min_V`).pinned_expected)).toBeLessThanOrEqual(TOL);
       expect(err(e?.max.si ?? NaN, vec(`divider_env_c${String(ci)}_max_V`).pinned_expected)).toBeLessThanOrEqual(TOL);
       expect(err(e?.typ.si ?? NaN, si(r, 'vout'))).toBeLessThanOrEqual(1e-12);
@@ -407,7 +409,8 @@ describe('properties (fast-check)', () => {
   it('envelope: min <= typ <= max, typ is the nominal Vout, the corners match a restated corner search, and random points inside the tolerance box stay inside', () => {
     fc.assert(
       fc.property(vinArb, rArb, rArb, fc.option(rArb, { nil: undefined }), tolArb, tolArb, fc.array(fc.double({ min: -1, max: 1, noNaN: true }), { minLength: 4, maxLength: 4 }), (vin, r1, r2, rl, tol, vtol, u) => {
-        const extra: Partial<Inputs> = { tolerance: frac(tol), vinTolerance: frac(vtol), ...withLoad(rl) };
+        const lt = tol / 2;
+        const extra: Partial<Inputs> = { tolerance: frac(tol), vinTolerance: frac(vtol), ...withLoad(rl), ...(rl === undefined ? {} : { loadTolerance: frac(lt) }) };
         const r = ok(fwd(vin, r1, r2, extra));
         const e = r.envelope?.[0];
         expect(e).toBeDefined();
@@ -416,12 +419,12 @@ describe('properties (fast-check)', () => {
         expect(e.typ.si).toBeLessThanOrEqual(e.max.si);
         expect(err(e.typ.si, si(r, 'vout'))).toBeLessThanOrEqual(1e-12);
         const vals: number[] = [];
-        for (const a of [1 - vtol, 1 + vtol]) for (const b of [1 - tol, 1 + tol]) for (const c of [1 - tol, 1 + tol]) for (const d of rl === undefined ? [1] : [1 - tol, 1 + tol]) {
+        for (const a of [1 - vtol, 1 + vtol]) for (const b of [1 - tol, 1 + tol]) for (const c of [1 - tol, 1 + tol]) for (const d of rl === undefined ? [1] : [1 - lt, 1 + lt]) {
           vals.push(vdiv(vin * a, r1 * b, r2 * c, rl === undefined ? undefined : rl * d));
         }
         expect(err(e.min.si, Math.min(...vals))).toBeLessThanOrEqual(1e-9);
         expect(err(e.max.si, Math.max(...vals))).toBeLessThanOrEqual(1e-9);
-        const x = vdiv(vin * (1 + vtol * (u[0] as number)), r1 * (1 + tol * (u[1] as number)), r2 * (1 + tol * (u[2] as number)), rl === undefined ? undefined : rl * (1 + tol * (u[3] as number)));
+        const x = vdiv(vin * (1 + vtol * (u[0] as number)), r1 * (1 + tol * (u[1] as number)), r2 * (1 + tol * (u[2] as number)), rl === undefined ? undefined : rl * (1 + lt * (u[3] as number)));
         expect(x).toBeGreaterThanOrEqual(e.min.si * (1 - 1e-9));
         expect(x).toBeLessThanOrEqual(e.max.si * (1 + 1e-9));
       }),

@@ -3,10 +3,12 @@ import { DIM, FOIL_CONVENTIONS } from '../../core/units';
 import { parseHash, serializeHash, type Route } from '../../state/hash';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
+import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
 import { ResetButton } from '../components/ResetButton';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
 import { useRafValue } from '../hooks';
+import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
 import {
   BASES,
   CALCULATOR_ID,
@@ -118,8 +120,8 @@ export default function CopperConverter() {
   return (
     <div class="calc-layout">
       <p class="muted">
-        Nominal conversion between copper foil weight and thickness. It is not finished copper: ask your fabricator for finished
-        thickness per layer.
+        Conversion between copper foil weight and thickness. Fabs sell finished copper, which is not the base foil: say where your weight
+        comes from, and use your fabricator's finished thickness per layer.
       </p>
       {notices.length > 0 && (
         <div class="banner" role="status">
@@ -152,6 +154,18 @@ export default function CopperConverter() {
             ]}
             onChange={(v) => set({ by: v as EntryMode })}
           />
+          {weightMode && (
+            <>
+              <RadioGroup
+                name="wsrc"
+                legend={WEIGHT_SOURCE_QUESTION}
+                value={state.weightSource}
+                options={WEIGHT_SOURCE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                onChange={(v) => set({ weightSource: isWeightSource(v) ? v : '' })}
+              />
+              {state.weightSource === 'finished' && <FinishedCopperGuidance />}
+            </>
+          )}
           {weightMode ? (
             <QuantityField
               id="weight"

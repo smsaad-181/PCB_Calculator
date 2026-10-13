@@ -3,7 +3,7 @@ import type { AccuracyClass } from '../../confidence';
 /**
  * Legacy IPC-2221 trace width / current / temperature rise (Mode B). Constants come from ledger S-001 (fitted equation),
  * S-010 (chart validity range), S-006 (units) and S-003 (foil convention); S-001 and S-010 are PAYWALLED-USER-MUST-VERIFY.
- * Margin 1.25 and current derating 0.8 are engineering defaults, not values from a standard.
+ * Margin 1.25 (on current; the recommended width is solved for margin x I) and current derating 0.8 (its reciprocal) are engineering defaults, not values from a standard.
  */
 export const meta = {
   id: 'trace-width',
@@ -20,6 +20,8 @@ export const meta = {
   constants: { kOuter: 0.048, kInner: 0.024, exponentDeltaT: 0.44, exponentArea: 0.725 },
   validity: {
     currentA: 35,
+    // S-010 CONFLICT: KiCad legacy help text (tier 4, unverified) gives a separate 17.5 A internal limit. Caution only; 35 A is the hard limit.
+    innerCurrentCautionA: 17.5,
     deltaTMaxC: 100,
     deltaTChartStartC: 10,
     weightOzFt2: [0.5, 3],

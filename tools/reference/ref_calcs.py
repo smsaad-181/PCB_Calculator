@@ -364,12 +364,13 @@ def divider_currents_powers(vin, r1, r2, rl=None):
         out["p_load"] = vout * vout / rl
     return out
 
-def divider_envelope(vin, r1, r2, rl=None, tol=0.0, vin_tol=0.0):
-    """Corner analysis (Vout is monotonic in every input): (min, typ, max) over Vin(1+-vin_tol) and R(1+-tol) of r1, r2, rl."""
+def divider_envelope(vin, r1, r2, rl=None, tol=0.0, vin_tol=0.0, load_tol=0.0):
+    """Corner analysis (Vout is monotonic in every input): (min, typ, max) over Vin(1+-vin_tol), r1 and r2 at (1+-tol), rl at (1+-load_tol).
+    The load tolerance is its own input (default 0: unspecified, NOT the resistor tolerance). Initial-tolerance corners only: TCR and leakage excluded."""
     vs = (vin * (1 - vin_tol), vin * (1 + vin_tol))
     a = (r1 * (1 - tol), r1 * (1 + tol))
     b = (r2 * (1 - tol), r2 * (1 + tol))
-    c = (None,) if rl is None else (rl * (1 - tol), rl * (1 + tol))
+    c = (None,) if rl is None else (rl * (1 - load_tol), rl * (1 + load_tol))
     vals = [divider_vout(x, y, z, w) for x in vs for y in a for z in b for w in c]
     return min(vals), divider_vout(vin, r1, r2, rl), max(vals)
 
@@ -502,9 +503,9 @@ DIV_POWER = [(12.0, 47e3, 10e3, None), (12.0, 47e3, 10e3, 100e3), (5.0, 330.0, 3
 DIV_SNAP_CASES = [("r1", 12.0, 3.3, 10e3), ("r2", 12.0, 3.3, 47e3)]
 DIV_SNAP_SERIES = ("E24", "E96", "E192")
 SNAP_MODES = ("nearest", "up", "down")
-# envelope: (vin, r1, r2, rl, tolerance, vin tolerance)
-DIV_ENV = [(5.0, 10e3, 10e3, None, 0.01, 0.0), (12.0, 47e3, 10e3, None, 0.05, 0.0), (12.0, 47e3, 10e3, 100e3, 0.01, 0.02),
-           (3.3, 2.2e3, 1e3, 4.7e3, 0.001, 0.0), (5.0, 10e3, 10e3, None, 0.1, 0.05)]
+# envelope: (vin, r1, r2, rl, tolerance, vin tolerance, load tolerance); load tolerance 0 = unspecified (own input, not the resistor tolerance)
+DIV_ENV = [(5.0, 10e3, 10e3, None, 0.01, 0.0, 0.0), (12.0, 47e3, 10e3, None, 0.05, 0.0, 0.0), (12.0, 47e3, 10e3, 100e3, 0.01, 0.02, 0.0),
+           (3.3, 2.2e3, 1e3, 4.7e3, 0.001, 0.0, 0.0), (5.0, 10e3, 10e3, None, 0.1, 0.05, 0.0), (12.0, 47e3, 10e3, 100e3, 0.01, 0.02, 0.01)]
 NEAREST_TARGETS = [9.8, 0.97, 4700.0, 26363.636363636364, 1.234e-9, 8.6e5]
 PAIR_CASES = [  # (topology, series, target, n, decades)
     ("series", "E24", 3000.0, 5, 3), ("series", "E96", 12345.0, 5, 3), ("parallel", "E96", 1234.0, 5, 3),
@@ -549,10 +550,15 @@ def _circuit_vectors():
                 out.append(("divider_snap_c%d_%s_%s_ohm" % (ci, s, m), sn, 1e-9, S616, note))
                 out.append(("divider_snap_c%d_%s_%s_vout_V" % (ci, s, m), vo, 1e-9, S616, "Vout with the snapped resistor"))
                 out.append(("divider_snap_c%d_%s_%s_err_frac" % (ci, s, m), ef, 1e-9, S616, "(Vout - target)/target as a fraction"))
-    for ci, (vin, r1, r2, rl, tol, vt) in enumerate(DIV_ENV):
-        lo, _typ, hi = divider_envelope(vin, r1, r2, rl, tol, vt)
-        out.append(("divider_env_c%d_min_V" % ci, lo, 1e-9, S6, "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"))
-        out.append(("divider_env_c%d_max_V" % ci, hi, 1e-9, S6, "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"))
+    for ci, (vin, r1, r2, rl, tol, vt, lt) in enumerate(DIV_ENV):
+        lo, _typ, hi = divider_envelope(vin, r1, r2, rl, tol, vt, lt)
+        out.append(("divider_env_c%d_min_V" % ci, lo, 1e-9, S6, "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"))
+        out.append(("divider_env_c%d_max_V" % ci, hi, 1e-9, S6, "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"))
+        # element voltages (PCB-5): V(R1) = Vin - Vout, V(R2) = Vout
+    for ci, (vin, r1, r2, rl) in enumerate(DIV_POWER):
+        vo = divider_vout(vin, r1, r2, rl)
+        out.append(("divider_power_c%d_v_r1_V" % ci, vin - vo, 1e-9, S6, "voltage across R1 = Vin - Vout"))
+        out.append(("divider_power_c%d_v_r2_V" % ci, vo, 1e-9, S6, "voltage across R2 = Vout"))
     for name in ("E3", "E6", "E12", "E24", "E48", "E96", "E192"):
         lst = eseries_values(name)
         out.append(("eseries_%s_size" % name, float(len(lst)), 1e-9, ("S-016",), "series size"))
@@ -692,12 +698,20 @@ _CIRCUIT_PINNED = {
     'divider_env_c0_max_V': 2.525,
     'divider_env_c1_min_V': 1.9371282922684792,
     'divider_env_c1_max_V': 2.28467815049864,
-    'divider_env_c2_min_V': 1.8742695236408713,
-    'divider_env_c2_max_V': 2.017264167876899,
-    'divider_env_c3_min_V': 0.8983437926140315,
-    'divider_env_c3_max_V': 0.9009613420488201,
+    'divider_env_c2_min_V': 1.875702941523804,
+    'divider_env_c2_max_V': 2.015733693051292,
+    'divider_env_c3_min_V': 0.8984585075769131,
+    'divider_env_c3_max_V': 0.9008464475537348,
     'divider_env_c4_min_V': 2.1375,
     'divider_env_c4_max_V': 2.8875,
+    'divider_env_c5_min_V': 1.8742695236408713,
+    'divider_env_c5_max_V': 2.017264167876899,
+    'divider_power_c0_v_r1_V': 9.894736842105264,
+    'divider_power_c0_v_r2_V': 2.1052631578947367,
+    'divider_power_c1_v_r1_V': 10.055105348460291,
+    'divider_power_c1_v_r2_V': 1.9448946515397083,
+    'divider_power_c2_v_r1_V': 2.5,
+    'divider_power_c2_v_r2_V': 2.5,
     'eseries_E3_size': 3.0,
     'eseries_E3_mantissa_sum': 7.9,
     'eseries_E3_formula_deviation_count': 1.0,

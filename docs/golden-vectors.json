@@ -3247,7 +3247,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c0_max_V",
@@ -3261,7 +3261,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c1_min_V",
@@ -3275,7 +3275,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c1_max_V",
@@ -3289,12 +3289,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c2_min_V",
-      "oracle_value": 1.8742695236408713,
-      "pinned_expected": 1.8742695236408713,
+      "oracle_value": 1.8757029415238038,
+      "pinned_expected": 1.875702941523804,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3303,12 +3303,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c2_max_V",
-      "oracle_value": 2.017264167876899,
-      "pinned_expected": 2.017264167876899,
+      "oracle_value": 2.015733693051292,
+      "pinned_expected": 2.015733693051292,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3317,12 +3317,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c3_min_V",
-      "oracle_value": 0.8983437926140315,
-      "pinned_expected": 0.8983437926140315,
+      "oracle_value": 0.8984585075769133,
+      "pinned_expected": 0.8984585075769131,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3331,12 +3331,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c3_max_V",
-      "oracle_value": 0.9009613420488201,
-      "pinned_expected": 0.9009613420488201,
+      "oracle_value": 0.9008464475537347,
+      "pinned_expected": 0.9008464475537348,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3345,7 +3345,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c4_min_V",
@@ -3359,7 +3359,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c4_max_V",
@@ -3373,7 +3373,119 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
+    },
+    {
+      "name": "divider_env_c5_min_V",
+      "oracle_value": 1.8742695236408713,
+      "pinned_expected": 1.8742695236408713,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
+    },
+    {
+      "name": "divider_env_c5_max_V",
+      "oracle_value": 2.017264167876899,
+      "pinned_expected": 2.017264167876899,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
+    },
+    {
+      "name": "divider_power_c0_v_r1_V",
+      "oracle_value": 9.894736842105264,
+      "pinned_expected": 9.894736842105264,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R1 = Vin - Vout"
+    },
+    {
+      "name": "divider_power_c0_v_r2_V",
+      "oracle_value": 2.1052631578947367,
+      "pinned_expected": 2.1052631578947367,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R2 = Vout"
+    },
+    {
+      "name": "divider_power_c1_v_r1_V",
+      "oracle_value": 10.055105348460291,
+      "pinned_expected": 10.055105348460291,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R1 = Vin - Vout"
+    },
+    {
+      "name": "divider_power_c1_v_r2_V",
+      "oracle_value": 1.9448946515397083,
+      "pinned_expected": 1.9448946515397083,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R2 = Vout"
+    },
+    {
+      "name": "divider_power_c2_v_r1_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R1 = Vin - Vout"
+    },
+    {
+      "name": "divider_power_c2_v_r2_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R2 = Vout"
     },
     {
       "name": "eseries_E3_size",
