@@ -1315,6 +1315,79 @@ _VIA_PINNED = {
 }
 GOLDEN.extend((n, got, _VIA_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _via_vectors())
 
+
+# ---------------------------------------------------------------------------------------------------------------
+# Task 7b: annular ring stack-up arithmetic (pure geometry; every number below is a TEST value, not fab data).
+# AR = (pad - hole)/2. Linear worst case: AR_wc = AR - (pad_tol/2 + hole_tol_plus/2 + position_tol). Tolerances that are
+# absent contribute nothing (no tolerance is assumed). Drill reference: finished hole = drill - 2*plating, so
+# AR_finished = AR_drill + plating.
+# ---------------------------------------------------------------------------------------------------------------
+# (pad mm, finished hole mm, pad tol +/- mm | None, hole tol plus mm | None, position tol mm | None, test minimum mm)
+RING_CASES = [
+    (1.0, 0.6, 0.05, 0.13, 0.075, 0.15),
+    (0.9, 0.5, None, None, 0.075, 0.18),
+    (1.4, 0.8, 0.1, 0.13, 0.075, 0.254),
+    (0.5, 0.3, 0.05, None, None, 0.05),
+]
+# (pad mm, drill mm, plating um)
+RING_DRILL_CASES = [
+    (1.0, 0.65, 25.0),
+    (0.7, 0.45, 18.0),
+]
+
+def ring_nominal_mm(pad, hole):
+    return (pad - hole) / 2.0
+
+def ring_worst_mm(pad, hole, pad_tol, hole_plus, pos_tol):
+    return ring_nominal_mm(pad, hole) - ((pad_tol or 0.0) / 2.0 + (hole_plus or 0.0) / 2.0 + (pos_tol or 0.0))
+
+def ring_drill_to_finished_mm(pad, drill, t_um):
+    return (pad - (drill - 2.0 * t_um * 1e-3)) / 2.0
+
+def _ring_tag(pad, hole, pt, hp, pos):
+    return "p%smm_h%smm_pt%s_hp%s_pos%s" % (_g(pad), _g(hole), _g(pt) if pt is not None else "na", _g(hp) if hp is not None else "na", _g(pos) if pos is not None else "na")
+
+def _ring_vectors():
+    out = []
+    for pad, hole, pt, hp, pos, mn in RING_CASES:
+        tag = _ring_tag(pad, hole, pt, hp, pos)
+        nom = ring_nominal_mm(pad, hole)
+        out.append(("ring_task7b_nominal_mm_" + tag, nom, 1e-9, (), "(pad - finished hole)/2, pure geometry"))
+        out.append(("ring_task7b_nominal_margin_mm_%s_min%s" % (tag, _g(mn)), nom - mn, 1e-9, (), "nominal ring minus a TEST minimum"))
+        if pt is not None or hp is not None or pos is not None:
+            wc = ring_worst_mm(pad, hole, pt, hp, pos)
+            out.append(("ring_task7b_worst_mm_" + tag, wc, 1e-9, (), "linear worst case: AR - (pad_tol/2 + hole_tol_plus/2 + position_tol); absent terms omitted"))
+            out.append(("ring_task7b_worst_margin_mm_%s_min%s" % (tag, _g(mn)), wc - mn, 1e-9, (), "worst-case ring minus a TEST minimum"))
+    for pad, drill, t in RING_DRILL_CASES:
+        tag = "p%smm_drill%smm_t%sum" % (_g(pad), _g(drill), _g(t))
+        out.append(("ring_task7b_drillref_mm_" + tag, ring_nominal_mm(pad, drill), 1e-9, (), "ring referenced to the drill diameter"))
+        out.append(("ring_task7b_finishedref_mm_" + tag, ring_drill_to_finished_mm(pad, drill, t), 1e-9, (), "ring referenced to the finished hole = drill - 2*plating"))
+    return out
+
+_RING_PINNED = {
+    'ring_task7b_nominal_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075': 0.2,
+    'ring_task7b_nominal_margin_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075_min0.15': 0.05000000000000002,
+    'ring_task7b_worst_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075': 0.03500000000000003,
+    'ring_task7b_worst_margin_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075_min0.15': -0.11499999999999996,
+    'ring_task7b_nominal_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075': 0.2,
+    'ring_task7b_nominal_margin_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075_min0.18': 0.020000000000000018,
+    'ring_task7b_worst_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075': 0.125,
+    'ring_task7b_worst_margin_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075_min0.18': -0.05499999999999999,
+    'ring_task7b_nominal_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075': 0.29999999999999993,
+    'ring_task7b_nominal_margin_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075_min0.254': 0.04599999999999993,
+    'ring_task7b_worst_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075': 0.10999999999999993,
+    'ring_task7b_worst_margin_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075_min0.254': -0.14400000000000007,
+    'ring_task7b_nominal_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna': 0.1,
+    'ring_task7b_nominal_margin_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna_min0.05': 0.05,
+    'ring_task7b_worst_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna': 0.07500000000000001,
+    'ring_task7b_worst_margin_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna_min0.05': 0.02500000000000001,
+    'ring_task7b_drillref_mm_p1mm_drill0.65mm_t25um': 0.175,
+    'ring_task7b_finishedref_mm_p1mm_drill0.65mm_t25um': 0.2,
+    'ring_task7b_drillref_mm_p0.7mm_drill0.45mm_t18um': 0.12499999999999997,
+    'ring_task7b_finishedref_mm_p0.7mm_drill0.45mm_t18um': 0.14299999999999996,
+}
+GOLDEN.extend((n, got, _RING_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _ring_vectors())
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:

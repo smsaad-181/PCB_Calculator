@@ -197,3 +197,13 @@ Reports: `phase-1-calc.md`, `phase-1-phase.md`, `phase-1-pcb.md` (all PASS-WITH-
 | T5-3 | Constant-power load stability (negative incremental resistance with input filtering) is warned, not checked (S-019h papers). | calc-implementer | Warning shipped (CONSTANT_POWER_STABILITY); no model | ACCEPTED |
 | T5-4 | JS bundle 119.5 KB of 150 KB after task 5; path calculator and vias still to come. | devops / ui-engineer | Check budget after task 6; split or trim if above ~140 KB | WATCH |
 | T5-5 | Hash scheme double-encodes spaces inside element-list values (page writes %2520 in the URL); hand-written links must use the page's own form or single encoding (both parse). | ui-engineer | Normalise or document | MINOR |
+
+## Task 7b (logged 2026-10-13, branch phase-1-task-7)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| G-6 update | Fab profile restructured into scoped limits (hole type, size basis, layer count, copper weight, layer side), exact-scope lookup with no fallback, JLCPCB example migrated to `jlcpcb-2026-10-13` (67 UNVERIFIED entries from S-019i..m). Still open: profile picker/age banner/"(unverified)" badges (G-5), human browser re-read of the JLCPCB page (R-21). | calc-implementer done; human + ui-engineer | Domain re-review of the new profile; UI banner | PARTLY DONE |
+| T7-1 | Modelling choices made by the implementer: JLCPCB 2 oz PTH absolute ring stored as not published (page says only "0.254 mm or above"); position tolerance applied radially (page does not say radial or diametral). | human | Confirm with JLCPCB | OPEN |
+| T7-2 | Profile JSON values trace only to the researcher's quotes, so tests check them against that same reading (not independent). | human | Browser re-read of every value | OPEN (R-21) |
+| T7-3 | Removed flat profile keys now fail to parse (user profiles using them break by design). | ui-engineer | Say so in the profile editor/import UI | NOTED |
+| T7-4 | Earlier `phase-1-*` reports still cite `jlcpcb-2026-10-06.json` (deleted). | orchestrator | Leave as historical record | NOTED |

@@ -3,7 +3,7 @@ import converterPage from './CopperConverter.tsx?raw';
 import widthPage from './TraceWidth.tsx?raw';
 import resPage from './TraceResistance.tsx?raw';
 import guidanceSrc from '../components/FinishedCopperGuidance.tsx?raw';
-import profileJson from '../../core/data/fab-profiles/jlcpcb-2026-10-06.json';
+import profileJson from '../../core/data/fab-profiles/jlcpcb-2026-10-13.json';
 import * as conv from './copper-converter.vm';
 import * as tw from './trace-width.vm';
 import * as tr from './trace-resistance.vm';

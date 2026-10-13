@@ -1,7 +1,7 @@
 // Where a copper WEIGHT comes from. Fabs sell FINISHED copper (order-form weight), foil datasheets give BASE foil.
 // The two are not the same thickness, so the page asks and never assumes. Pure: no DOM, no engineering math.
 // Finished thicknesses shown here come only from the bundled fab profile data (UNVERIFIED, ledger S-019c).
-import profileJson from '../../core/data/fab-profiles/jlcpcb-2026-10-06.json';
+import profileJson from '../../core/data/fab-profiles/jlcpcb-2026-10-13.json';
 import { parseFabProfile, type ParsedFabProfile } from '../../core/fab/profile';
 import { toUnit, type Quantity } from '../../core/units';
 

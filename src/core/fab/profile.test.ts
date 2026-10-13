@@ -9,20 +9,7 @@ import type { ParsedFabProfile } from './profile';
 // shipped-example test, which compares the shipped JSON to the figures in ledger row S-008 /
 // docs/research/jlcpcb.md section 4 (UNVERIFIED, R-21).
 
-const LENGTH_KEYS = [
-  'minTraceWidth',
-  'minTraceSpace',
-  'minDrill',
-  'maxDrill',
-  'minAnnularRingRecommended',
-  'minAnnularRingAbsolute',
-  'holePlatingAverage',
-  'drillTolerancePlus',
-  'drillToleranceMinus',
-  'holePositionTolerance',
-  'copperToEdge',
-  'holeToTrack',
-] as const;
+const LENGTH_KEYS = ['finishedCopperOuter1oz', 'finishedCopperInner0p5oz', 'finishedCopperInner1oz'] as const;
 const PCT_KEYS = ['traceWidthTolerancePct', 'impedanceTolerancePct', 'boardThicknessTolerancePct'] as const;
 
 type Raw = Record<string, unknown>;
@@ -72,7 +59,7 @@ describe('parseFabProfile: valid input', () => {
     expect(p.edition).toBe('ed 1');
   });
   it('does not mutate its input', () => {
-    const raw = withLimits({ minDrill: { value: 0.2, unit: 'mm' } });
+    const raw = withLimits({ finishedCopperInner1oz: { value: 0.2, unit: 'mm' } });
     const copy = JSON.parse(JSON.stringify(raw)) as unknown;
     parseOk(raw);
     expect(raw).toEqual(copy);
@@ -87,8 +74,8 @@ describe('parseFabProfile: valid input', () => {
     }
   });
   it('absent limits stay absent (no hidden defaults)', () => {
-    const p = parseOk(withLimits({ minDrill: { value: 0.2, unit: 'mm' } }));
-    expect(Object.keys(p.limits)).toEqual(['minDrill']);
+    const p = parseOk(withLimits({ finishedCopperInner1oz: { value: 0.2, unit: 'mm' } }));
+    expect(Object.keys(p.limits)).toEqual(['finishedCopperInner1oz']);
   });
   it('plain-number tolerances and copper weights pass through unchanged', () => {
     const p = parseOk(
@@ -112,8 +99,8 @@ describe('parseFabProfile: valid input', () => {
 
 describe('parseFabProfile: unit handling', () => {
   it('3.5 mil -> 88.9 um (exact: 1 mil = 25.4 um, S-006)', () => {
-    const p = parseOk(withLimits({ minTraceWidth: { value: 3.5, unit: 'mil' } }));
-    const w = p.limits.minTraceWidth;
+    const p = parseOk(withLimits({ finishedCopperOuter1oz: { value: 3.5, unit: 'mil' } }));
+    const w = p.limits.finishedCopperOuter1oz;
     expect(w).toBeDefined();
     if (w) {
       expect(relErr(w.si, 88.9e-6)).toBeLessThanOrEqual(1e-12);
@@ -122,25 +109,25 @@ describe('parseFabProfile: unit handling', () => {
   });
   it('mm, mil, um (ascii u) and micro sign all land on the same SI value', () => {
     const MU = 'µm'; // micro sign U+00B5 + m
-    const a = parseOk(withLimits({ minDrill: { value: 100, unit: 'um' } })).limits.minDrill;
-    const b = parseOk(withLimits({ minDrill: { value: 100, unit: MU } })).limits.minDrill;
-    const c = parseOk(withLimits({ minDrill: { value: 0.1, unit: 'mm' } })).limits.minDrill;
-    const d = parseOk(withLimits({ minDrill: { value: 100 / 25.4, unit: 'mil' } })).limits.minDrill;
+    const a = parseOk(withLimits({ finishedCopperInner1oz: { value: 100, unit: 'um' } })).limits.finishedCopperInner1oz;
+    const b = parseOk(withLimits({ finishedCopperInner1oz: { value: 100, unit: MU } })).limits.finishedCopperInner1oz;
+    const c = parseOk(withLimits({ finishedCopperInner1oz: { value: 0.1, unit: 'mm' } })).limits.finishedCopperInner1oz;
+    const d = parseOk(withLimits({ finishedCopperInner1oz: { value: 100 / 25.4, unit: 'mil' } })).limits.finishedCopperInner1oz;
     for (const x of [a, b, c, d]) expect(x && relErr(x.si, 1e-4)).toBeLessThanOrEqual(1e-12);
   });
   it('18 um plating and 0.075 mm position tolerance convert exactly', () => {
     const p = parseOk(
-      withLimits({ holePlatingAverage: { value: 18, unit: 'um' }, holePositionTolerance: { value: 0.075, unit: 'mm' } }),
+      withLimits({ finishedCopperOuter1oz: { value: 18, unit: 'um' }, finishedCopperInner1oz: { value: 0.075, unit: 'mm' } }),
     );
-    expect(relErr(p.limits.holePlatingAverage?.si ?? 0, 18e-6)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(p.limits.holePositionTolerance?.si ?? 0, 7.5e-5)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(p.limits.finishedCopperOuter1oz?.si ?? 0, 18e-6)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(p.limits.finishedCopperInner1oz?.si ?? 0, 7.5e-5)).toBeLessThanOrEqual(1e-12);
   });
   it('round trip value -> parsed SI == fromUnit(value, unit) (property)', () => {
     fc.assert(
       fc.property(fc.double({ min: 1e-3, max: 1e3, noNaN: true }), fc.constantFrom('mm', 'mil', 'um', 'in'), (value, unit) => {
-        const p = parseOk(withLimits({ minTraceSpace: { value, unit } }));
-        expect(p.limits.minTraceSpace?.si).toBe(fromUnit(value, unit).si);
-        expect(relErr(toUnit(p.limits.minTraceSpace ?? fromUnit(1, 'm'), unit), value)).toBeLessThanOrEqual(1e-12);
+        const p = parseOk(withLimits({ finishedCopperInner1oz: { value, unit } }));
+        expect(p.limits.finishedCopperInner1oz?.si).toBe(fromUnit(value, unit).si);
+        expect(relErr(toUnit(p.limits.finishedCopperInner1oz ?? fromUnit(1, 'm'), unit), value)).toBeLessThanOrEqual(1e-12);
       }),
     );
   });
@@ -201,21 +188,21 @@ describe('parseFabProfile: rejection paths (all problems reported, messages name
     expect(errorsOf(withLimits({ minDrll: { value: 0.2, unit: 'mm' } }))).toContain('minDrll'.toLowerCase());
   });
   it.each([0, -0, -1, NaN, Infinity, -Infinity, '3', null, undefined])('rejects length limit value %j', (value) => {
-    expect(errorsOf(withLimits({ minTraceWidth: { value, unit: 'mil' } }))).toContain('mintracewidth');
+    expect(errorsOf(withLimits({ finishedCopperOuter1oz: { value, unit: 'mil' } }))).toContain('finishedcopperouter1oz');
   });
   it('rejects a limit that is not a {value, unit} object', () => {
     for (const bad of [5, '3 mil', null, [], { value: 3 }, { unit: 'mm' }]) {
-      expect(errorsOf(withLimits({ minDrill: bad }))).toContain('mindrill');
+      expect(errorsOf(withLimits({ finishedCopperInner1oz: bad }))).toContain('finishedcopperinner1oz');
     }
   });
   it('rejects unknown, empty or non-string units', () => {
     for (const unit of ['furlong', '', 'MM', undefined, 5]) {
-      expect(errorsOf(withLimits({ minDrill: { value: 1, unit } }))).toContain('mindrill');
+      expect(errorsOf(withLimits({ finishedCopperInner1oz: { value: 1, unit } }))).toContain('finishedcopperinner1oz');
     }
   });
   it('rejects units of the wrong dimension for a length limit', () => {
     for (const unit of ['A', 'V', 'W', 'oz/ft2', 'K', 'ohm', 'mm2']) {
-      expect(errorsOf(withLimits({ holePlatingAverage: { value: 1, unit } }))).toContain('holeplatingaverage');
+      expect(errorsOf(withLimits({ finishedCopperOuter1oz: { value: 1, unit } }))).toContain('finishedcopperouter1oz');
     }
   });
   it.each(PCT_KEYS)('%s must be in (0, 100]', (key) => {
@@ -241,7 +228,7 @@ describe('parseFabProfile: rejection paths (all problems reported, messages name
       ledgerIds: [],
       verifiedBy: 1,
       bannerRequired: 'x',
-      limits: { minDrill: { value: -1, unit: 'furlong' }, impedanceTolerancePct: 0 },
+      limits: { finishedCopperInner1oz: { value: -1, unit: 'furlong' }, impedanceTolerancePct: 0 },
     });
     for (const needle of [
       'schemaversion',
@@ -253,7 +240,7 @@ describe('parseFabProfile: rejection paths (all problems reported, messages name
       'ledgerids',
       'verifiedby',
       'bannerrequired',
-      'mindrill',
+      'finishedcopperinner1oz',
       'impedancetolerancepct',
     ]) {
       expect(msg).toContain(needle);
@@ -262,7 +249,7 @@ describe('parseFabProfile: rejection paths (all problems reported, messages name
     if (!r.ok) expect(r.error.length).toBeGreaterThanOrEqual(3);
   });
   it('two bad limits yield at least two messages', () => {
-    const r = parseFabProfile(withLimits({ minDrill: { value: -1, unit: 'mm' }, maxDrill: { value: 0, unit: 'mm' } }));
+    const r = parseFabProfile(withLimits({ finishedCopperInner1oz: { value: -1, unit: 'mm' }, finishedCopperInner0p5oz: { value: 0, unit: 'mm' } }));
     expect(r.ok).toBe(false);
     if (!r.ok) expect(r.error.length).toBeGreaterThanOrEqual(2);
   });
@@ -340,46 +327,33 @@ const fileOf = (name: string): string => {
   return files[key] as string;
 };
 
-describe('shipped example: src/core/data/fab-profiles/jlcpcb-2026-10-06.json', () => {
-  const raw = (): unknown => JSON.parse(fileOf('jlcpcb-2026-10-06.json')) as unknown;
-  const mm = (x: ReturnType<typeof fromUnit> | undefined): number => (x ? toUnit(x, 'mm') : NaN);
-  it('parses and is labelled UNVERIFIED with a banner, ledger S-008, dated 2026-10-06', () => {
+describe('shipped example: src/core/data/fab-profiles/jlcpcb-2026-10-13.json', () => {
+  const raw = (): unknown => JSON.parse(fileOf('jlcpcb-2026-10-13.json')) as unknown;
+  it('parses and is labelled UNVERIFIED with a banner, dated 2026-10-13, citing the scoped ledger rows', () => {
     const p = parseOk(raw());
     expect(p.status).toBe('UNVERIFIED');
     expect(p.bannerRequired).toBe(true);
-    expect(p.ledgerIds).toEqual(['S-008', 'S-019c']);
-    expect(p.profileDate).toBe('2026-10-06');
-    expect(p.id).toBe('jlcpcb-2026-10-06');
+    expect(p.ledgerIds).toEqual(['S-008', 'S-019c', 'S-019i', 'S-019j', 'S-019k', 'S-019l', 'S-019m']);
+    expect(p.profileDate).toBe('2026-10-13');
+    expect(p.id).toBe('jlcpcb-2026-10-13');
     expect(p.fabricator).toBe('JLCPCB');
     expect(p.source).toBe('https://jlcpcb.com/capabilities/pcb-capabilities');
     expect(p.verifiedBy).toBe('');
   });
-  it('notes carry the re-read warning and the 1-2 layer figures', () => {
+  it('notes carry the re-read warning and the removed-keys explanation', () => {
     const notes = parseOk(raw()).notes ?? '';
     expect(notes).toContain('R-21');
-    expect(notes).toContain('example only');
+    expect(notes).toContain('Example data only');
     expect(notes).toContain('without notice');
-    expect(notes).toContain('0.25');
-    expect(notes).toContain('0.18');
-    expect(notes).toMatch(/4 mil/);
+    expect(notes).toContain('scopedLimits');
   });
-  it('numbers equal the JLCPCB figures in ledger S-008 / jlcpcb.md section 4 (multilayer values)', () => {
+  it('flat limits: percent tolerances and finished copper only (S-019l, S-019c)', () => {
     const l = parseOk(raw()).limits;
-    expect(relErr(mm(l.minAnnularRingRecommended), 0.2)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.minAnnularRingAbsolute), 0.15)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(toUnit(l.holePlatingAverage ?? fromUnit(1, 'm'), 'um'), 18)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.drillTolerancePlus), 0.13)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.drillToleranceMinus), 0.08)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.holePositionTolerance), 0.075)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(toUnit(l.minTraceWidth ?? fromUnit(1, 'm'), 'mil'), 3.5)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(toUnit(l.minTraceSpace ?? fromUnit(1, 'm'), 'mil'), 3.5)).toBeLessThanOrEqual(1e-12);
     expect(l.traceWidthTolerancePct).toBe(20);
     expect(l.impedanceTolerancePct).toBe(10);
-    expect(relErr(mm(l.minDrill), 0.15)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.maxDrill), 6.3)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.holeToTrack), 0.2)).toBeLessThanOrEqual(1e-12);
-    expect(relErr(mm(l.copperToEdge), 0.2)).toBeLessThanOrEqual(1e-12);
-    expect(l.copperWeightsOzFt2).toEqual([1]);
+    expect(Object.keys(l).sort()).toEqual(
+      ['finishedCopperInner0p5oz', 'finishedCopperInner1oz', 'finishedCopperOuter1oz', 'impedanceTolerancePct', 'traceWidthTolerancePct'].sort(),
+    );
   });
   it('finished copper (PCB-1, ledger S-019c): outer 1 oz 1.6 mil, inner 0.5 oz 0.6 mil, inner 1 oz 1.2 mil; notes say finished, dated, UNVERIFIED, pairing unconfirmed', () => {
     const p = parseOk(raw());
@@ -400,31 +374,6 @@ describe('shipped example: src/core/data/fab-profiles/jlcpcb-2026-10-06.json', (
   it('finished copper keys are lengths: a non-length unit or zero is rejected; a template stays empty', () => {
     expect(errorsOf(withLimits({ finishedCopperOuter1oz: { value: 1.6, unit: 'A' } }))).toContain('finishedcopperouter1oz');
     expect(errorsOf(withLimits({ finishedCopperInner1oz: { value: 0, unit: 'mil' } }))).toContain('finishedcopperinner1oz');
-  });
-  it('lists no limit that the research note does not publish (board thickness tolerance is absent)', () => {
-    const keys = Object.keys(parseOk(raw()).limits).sort();
-    expect(keys).toEqual(
-      [
-        'minTraceWidth',
-        'minTraceSpace',
-        'minDrill',
-        'maxDrill',
-        'minAnnularRingRecommended',
-        'minAnnularRingAbsolute',
-        'holePlatingAverage',
-        'drillTolerancePlus',
-        'drillToleranceMinus',
-        'holePositionTolerance',
-        'copperToEdge',
-        'holeToTrack',
-        'traceWidthTolerancePct',
-        'impedanceTolerancePct',
-        'copperWeightsOzFt2',
-        'finishedCopperOuter1oz',
-        'finishedCopperInner0p5oz',
-        'finishedCopperInner1oz',
-      ].sort(),
-    );
   });
 });
 

@@ -10172,6 +10172,206 @@
       },
       "status": "VERIFIED",
       "note": "P = I^2 R(T) for the whole array"
+    },
+    {
+      "name": "ring_task7b_nominal_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "(pad - finished hole)/2, pure geometry"
+    },
+    {
+      "name": "ring_task7b_nominal_margin_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075_min0.15",
+      "oracle_value": 0.05000000000000002,
+      "pinned_expected": 0.05000000000000002,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "nominal ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_worst_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075",
+      "oracle_value": 0.03500000000000003,
+      "pinned_expected": 0.03500000000000003,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "linear worst case: AR - (pad_tol/2 + hole_tol_plus/2 + position_tol); absent terms omitted"
+    },
+    {
+      "name": "ring_task7b_worst_margin_mm_p1mm_h0.6mm_pt0.05_hp0.13_pos0.075_min0.15",
+      "oracle_value": -0.11499999999999996,
+      "pinned_expected": -0.11499999999999996,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "worst-case ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_nominal_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "(pad - finished hole)/2, pure geometry"
+    },
+    {
+      "name": "ring_task7b_nominal_margin_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075_min0.18",
+      "oracle_value": 0.020000000000000018,
+      "pinned_expected": 0.020000000000000018,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "nominal ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_worst_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075",
+      "oracle_value": 0.125,
+      "pinned_expected": 0.125,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "linear worst case: AR - (pad_tol/2 + hole_tol_plus/2 + position_tol); absent terms omitted"
+    },
+    {
+      "name": "ring_task7b_worst_margin_mm_p0.9mm_h0.5mm_ptna_hpna_pos0.075_min0.18",
+      "oracle_value": -0.05499999999999999,
+      "pinned_expected": -0.05499999999999999,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "worst-case ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_nominal_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075",
+      "oracle_value": 0.29999999999999993,
+      "pinned_expected": 0.29999999999999993,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "(pad - finished hole)/2, pure geometry"
+    },
+    {
+      "name": "ring_task7b_nominal_margin_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075_min0.254",
+      "oracle_value": 0.04599999999999993,
+      "pinned_expected": 0.04599999999999993,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "nominal ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_worst_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075",
+      "oracle_value": 0.10999999999999993,
+      "pinned_expected": 0.10999999999999993,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "linear worst case: AR - (pad_tol/2 + hole_tol_plus/2 + position_tol); absent terms omitted"
+    },
+    {
+      "name": "ring_task7b_worst_margin_mm_p1.4mm_h0.8mm_pt0.1_hp0.13_pos0.075_min0.254",
+      "oracle_value": -0.14400000000000007,
+      "pinned_expected": -0.14400000000000007,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "worst-case ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_nominal_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna",
+      "oracle_value": 0.1,
+      "pinned_expected": 0.1,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "(pad - finished hole)/2, pure geometry"
+    },
+    {
+      "name": "ring_task7b_nominal_margin_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna_min0.05",
+      "oracle_value": 0.05,
+      "pinned_expected": 0.05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "nominal ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_worst_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna",
+      "oracle_value": 0.07500000000000001,
+      "pinned_expected": 0.07500000000000001,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "linear worst case: AR - (pad_tol/2 + hole_tol_plus/2 + position_tol); absent terms omitted"
+    },
+    {
+      "name": "ring_task7b_worst_margin_mm_p0.5mm_h0.3mm_pt0.05_hpna_posna_min0.05",
+      "oracle_value": 0.02500000000000001,
+      "pinned_expected": 0.02500000000000001,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "worst-case ring minus a TEST minimum"
+    },
+    {
+      "name": "ring_task7b_drillref_mm_p1mm_drill0.65mm_t25um",
+      "oracle_value": 0.175,
+      "pinned_expected": 0.175,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "ring referenced to the drill diameter"
+    },
+    {
+      "name": "ring_task7b_finishedref_mm_p1mm_drill0.65mm_t25um",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "ring referenced to the finished hole = drill - 2*plating"
+    },
+    {
+      "name": "ring_task7b_drillref_mm_p0.7mm_drill0.45mm_t18um",
+      "oracle_value": 0.12499999999999997,
+      "pinned_expected": 0.12499999999999997,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "ring referenced to the drill diameter"
+    },
+    {
+      "name": "ring_task7b_finishedref_mm_p0.7mm_drill0.45mm_t18um",
+      "oracle_value": 0.14299999999999996,
+      "pinned_expected": 0.14299999999999996,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "ring referenced to the finished hole = drill - 2*plating"
     }
   ]
 }

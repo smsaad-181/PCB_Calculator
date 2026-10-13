@@ -9,6 +9,7 @@
   "ledgerIds": ["S-008"],
   "verifiedBy": "",
   "bannerRequired": true,
-  "notes": "Generic template. Every limit is absent on purpose: enter your fabricator's current published values, set profileDate to the day you read them and keep status UNVERIFIED until you have checked them yourself.",
-  "limits": {}
+  "notes": "Generic template. Every limit is absent on purpose: enter your fabricator's current published values, set profileDate to the day you read them and keep status UNVERIFIED until you have checked them yourself. Hole, annular-ring, clearance and trace limits go in scopedLimits, one entry per published limit with its own hole type, layer count, copper weight, layer side, ledger row, quote and retrievedOn; a limit your fabricator does not publish for a scope is entered with published false and no value, or left out.",
+  "limits": {},
+  "scopedLimits": []
 }
