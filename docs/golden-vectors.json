@@ -7024,12 +7024,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7044,12 +7046,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7064,12 +7068,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7084,12 +7090,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7104,12 +7112,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7124,12 +7134,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7144,12 +7156,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7164,12 +7178,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7184,12 +7200,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7204,12 +7222,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7224,12 +7244,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7244,12 +7266,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7264,12 +7288,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7284,12 +7310,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7304,12 +7332,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7324,12 +7354,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7344,12 +7376,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7364,12 +7398,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7385,6 +7421,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7392,7 +7429,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7409,6 +7447,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7416,7 +7455,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7433,6 +7473,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7440,7 +7481,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7457,6 +7499,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7464,7 +7507,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7481,6 +7525,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7488,7 +7533,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7505,6 +7551,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7512,7 +7559,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7529,6 +7577,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7536,7 +7585,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7553,6 +7603,7 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006",
         "S-003"
       ],
@@ -7560,7 +7611,8 @@
         "S-001": "PAYWALLED-USER-MUST-VERIFY",
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED",
         "S-003": "CONFLICT"
       },
@@ -7576,12 +7628,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7596,12 +7650,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",
@@ -7616,12 +7672,14 @@
         "S-004",
         "S-019",
         "S-019d",
+        "S-019g",
         "S-006"
       ],
       "ledger_status": {
         "S-004": "VERIFIED",
         "S-019": "VERIFIED",
-        "S-019d": "UNVERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
         "S-006": "VERIFIED"
       },
       "status": "UNVERIFIED",

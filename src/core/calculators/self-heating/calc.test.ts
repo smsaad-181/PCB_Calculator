@@ -12,8 +12,8 @@ import { meta } from './meta';
 // Phase 1 task 4: self-heating with coupled R(T). TESTS FIRST.
 // Expected values come from the independent oracle (tools/reference/ref_calcs.py sh_* functions, which use the CLOSED
 // FORM dT = theta I^2 R(Tamb) / (1 - theta I^2 R20 alpha), no iteration; mirrored in docs/golden-vectors.json) or from the
-// relations written out again below. The implementation is never consulted. Nothing here verifies S-019d (UNVERIFIED),
-// S-001 (PAYWALLED) or S-004: tests compare the implementation with the formula, not the formula with a source.
+// relations written out again below. The implementation is never consulted. S-019d (thermal resistance) is VERIFIED as a definition only; the coupled
+// fixed point (S-019g) is UNVERIFIED/DERIVED. Nothing here verifies S-019g, S-001 (PAYWALLED) or S-004: tests compare the implementation with the formula, not the formula with a source.
 
 interface GoldenVector {
   name: string;
@@ -125,7 +125,7 @@ describe('golden vectors (oracle, closed form): user-supplied theta', () => {
       const vdT = vec(`self_heating_user_dT_K_${suffix}`);
       const v0 = vec(`self_heating_user_dT0_K_${suffix}`);
       const vP = vec(`self_heating_user_P_W_${suffix}`);
-      expect(vdT.ledger_ids).toEqual(expect.arrayContaining(['S-004', 'S-019', 'S-019d']));
+      expect(vdT.ledger_ids).toEqual(expect.arrayContaining(['S-004', 'S-019', 'S-019d', 'S-019g']));
       expect(vdT.status).toBe('UNVERIFIED');
       // The cases with a large rise exceed the default search limit (150 C - ambient); give a wider limit for the oracle comparison.
       const r = ok(user(I, L, w, t, th, Ta, { deltaTMax: dK(1000) }));
@@ -153,7 +153,7 @@ describe('golden vectors (oracle, closed form): legacy IPC-2221 calibrated theta
     it(suffix, () => {
       const vTheta = vec(`self_heating_legacy_theta_K_per_W_${suffix}`);
       const vDt = vec(`self_heating_legacy_dT_K_${suffix}`);
-      expect(vTheta.ledger_ids).toEqual(expect.arrayContaining(['S-001', 'S-019d']));
+      expect(vTheta.ledger_ids).toEqual(expect.arrayContaining(['S-001', 'S-019d', 'S-019g']));
       expect(vTheta.status).toBe('PAYWALLED-USER-MUST-VERIFY');
       const r = ok(legacy(I, L, w, t, layer, Ta));
       expect(relErr(res(r, N.theta).value.si, vTheta.pinned_expected)).toBeLessThanOrEqual(1e-9);
@@ -364,8 +364,22 @@ describe('pulse and duty', () => {
     const r = ok(pulse('much-shorter', 0.25)); // 4 x 0.5 = 2 A
     const steady = ok(user(2, 100, 0.254, 35, 50, 25));
     expect(res(r, N.effectiveCurrent).value.si).toBeCloseTo(2, 12);
-    expect(relErr(res(r, N.deltaT).value.si, res(steady, N.deltaT).value.si)).toBeLessThan(1e-12);
+    // The result is a MEAN (duty-averaged) rise, named as such; the plain 'temperature rise' name is not used for a pulse.
+    expect(has(r, N.deltaT)).toBe(false);
+    expect(N.deltaTMean).toBe('mean temperature rise (duty-averaged)');
+    expect(relErr(res(r, N.deltaTMean).value.si, res(steady, N.deltaT).value.si)).toBeLessThan(1e-12);
+    expect(res(r, N.deltaTMean).role).toBe('primary');
+    expect(r.steps.some((s) => s.label === 'Mean temperature rise (duty-averaged)')).toBe(true);
     expect(r.warnings.some((x) => x.code === 'PULSE_RMS_ASSUMPTION')).toBe(true);
+    const pk = r.warnings.find((x) => x.code === 'PULSE_PEAK_HIGHER');
+    expect(pk?.severity).toBe('warning');
+    expect(pk?.message).toContain('(1 - D)');
+    expect(pk?.message).toContain('not computed');
+    // The period condition is the user's declaration: no computed threshold appears.
+    expect(r.assumptions.some((a) => a.includes('states the period is much shorter'))).toBe(true);
+    expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-019e', 'S-019f', 'S-019g']));
+    expect(r.dataStatus).toBe('UNVERIFIED');
+    expect(r.confidence.level).not.toBe('high');
   });
   it('D = 1 equals the steady peak current', () => {
     const { current: _c, ...rest } = user(4, 100, 0.254, 35, 5, 25);
@@ -373,7 +387,7 @@ describe('pulse and duty', () => {
     const a = ok({ ...rest, peakCurrent: amp(4), duty: duty(1), periodVsTau: 'much-shorter' } as Inputs);
     const b = ok(user(4, 100, 0.254, 35, 5, 25));
     expect(res(a, N.effectiveCurrent).value.si).toBeCloseTo(4, 12);
-    expect(relErr(res(a, N.deltaT).value.si, res(b, N.deltaT).value.si)).toBeLessThan(1e-12);
+    expect(relErr(res(a, N.deltaTMean).value.si, res(b, N.deltaT).value.si)).toBeLessThan(1e-12);
   });
   it('comparable-or-longer: no rms result; the peak-based value is separately named and warned', () => {
     const r = ok(pulse('comparable-or-longer', 0.25));
@@ -381,7 +395,9 @@ describe('pulse and duty', () => {
     expect(res(r, N.effectiveCurrent).value.si).toBeCloseTo(4, 12);
     expect(r.warnings.some((x) => x.code === 'PULSE_PERIOD_NOT_SHORT' && x.severity === 'warning')).toBe(true);
     expect(r.warnings.some((x) => x.code === 'PULSE_RMS_ASSUMPTION')).toBe(false);
-    expect(r.results.some((x) => x.name === N.deltaT)).toBe(false);
+    expect(r.warnings.some((x) => x.code === 'PULSE_PEAK_HIGHER')).toBe(false);
+    expect(r.results.some((x) => x.name === N.deltaT || x.name === N.deltaTMean)).toBe(false);
+    expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-019e', 'S-019f', 'S-019g']));
   });
 });
 
@@ -389,7 +405,9 @@ describe('structure and labelling', () => {
   it('records provenance, a labelled thermal law, ledger ids and confidence rules', () => {
     const r = ok(user(2, 100, 0.254, 35, 50, 25));
     expect(r.assumptions.some((a) => a.includes('user-supplied thermal resistance'))).toBe(true);
-    expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-004', 'S-019', 'S-019d']));
+    expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-004', 'S-019', 'S-019d', 'S-019g', 'S-006']));
+    expect(r.reference.ledgerIds).not.toContain('S-019e');
+    expect(r.reference.ledgerIds).not.toContain('S-019f');
     expect(r.dataStatus).toBe('UNVERIFIED');
     expect(r.formula).toBe(meta.formula);
     expect(r.warnings.some((w) => w.code === 'VOLTAGE_DROP_SCOPE')).toBe(true);
@@ -412,7 +430,7 @@ describe('structure and labelling', () => {
     expect(r.copperBasis?.basis).toBe('nominal');
     expect(r.copperBasis?.layer).toBe('outer');
   });
-  it('user theta gives accuracy estimate: never high confidence (UNVERIFIED S-019d)', () => {
+  it('user theta gives accuracy estimate: never high confidence (S-019g coupled fixed point is UNVERIFIED)', () => {
     expect(meta.accuracyClass).toBe('estimate');
     expect(ok(user(2, 100, 0.254, 35, 50, 25)).confidence.level).not.toBe('high');
   });

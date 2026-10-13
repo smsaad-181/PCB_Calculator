@@ -5,7 +5,8 @@ import type { AccuracyClass } from '../../confidence';
  * the heating. Core only (Phase 1 task 4); the UI comes later.
  *
  * Model: R(T) = R20 x (1 + alpha x (T - 20 C)) with the S-004 constants; P = I^2 x R(T) (S-019); dT = theta x P (thermal
- * resistance, S-019d UNVERIFIED: no source read). The coupled fixed point dT = theta x P(dT) is solved by the existing
+ * resistance, S-019d VERIFIED as a definition only). The coupled fixed point dT = theta x P(dT) (S-019g, UNVERIFIED, DERIVED
+ * algebra, so every result cites it and stays UNVERIFIED) is solved by the existing
  * bracketed Brent root finder (src/core/solvers/rootfind.ts) on [0, dT_max].
  *
  * Thermal law (an explicit choice, never defaulted):
@@ -24,13 +25,15 @@ export const meta = {
   method: 'Steady-state self-heating fixed point dT = theta x P(dT), R(T) linear in temperature (user theta, or legacy IPC-2221 calibrated)',
   reference: {
     standard: 'Copper resistivity (NBS Circular 31 / Handbook 100), circuit relations, thermal resistance definition',
-    edition: 'n/a; thermal-resistance row S-019d is UNVERIFIED (no source read)',
-    ledgerIds: ['S-004', 'S-019', 'S-019d', 'S-006', 'S-003'],
+    edition: 'n/a; thermal-resistance definition S-019d is VERIFIED, but the coupled fixed point and runaway criterion (S-019g) are UNVERIFIED (derived); pulse rows S-019e VERIFIED, S-019f UNVERIFIED',
+    ledgerIds: ['S-004', 'S-019', 'S-019d', 'S-019g', 'S-006', 'S-003'],
   },
+  /** Added to the references when a pulse is given. */
+  pulseLedgerIds: ['S-019e', 'S-019f'],
   legacyLedgerIds: ['S-001', 'S-010'],
   formula:
-    'R(T) = R20 x (1 + alpha x (T - 20 C)); P = I^2 x R(T); dT = theta x P(dT), solved for dT in [0, dT_max] (Brent, max 50 iterations, relative tolerance 1e-6); T = T_ambient + dT; V = I x R(T); uncoupled (alpha = 0) dT0 = theta x I^2 x R20; legacy theta_eff = dT_ipc(I) / (I^2 x R20); pulse I_rms = I_pk x sqrt(D) only when the period is much shorter than the thermal time constant; R20, alpha from ledger S-004',
-  ledgerIds: ['S-004', 'S-019', 'S-019d', 'S-006', 'S-003', 'S-001', 'S-010'],
+    'R(T) = R20 x (1 + alpha x (T - 20 C)); P = I^2 x R(T); dT = theta x P(dT), solved for dT in [0, dT_max] (Brent, max 50 iterations, relative tolerance 1e-6); T = T_ambient + dT; V = I x R(T); uncoupled (alpha = 0) dT0 = theta x I^2 x R20; legacy theta_eff = dT_ipc(I) / (I^2 x R20); pulse I_rms = I_pk x sqrt(D) gives the MEAN (duty-averaged) rise, only when the user declares the period much shorter than the thermal time constant (the peak rise is higher and is not computed); R20, alpha from ledger S-004',
+  ledgerIds: ['S-004', 'S-019', 'S-019d', 'S-019g', 'S-006', 'S-003', 'S-019e', 'S-019f', 'S-001', 'S-010'],
   validity: {
     // The same plausibility ranges as trace-resistance (engineering ranges, not from a standard).
     conductorTempC: [-55, 150],
@@ -41,6 +44,7 @@ export const meta = {
   defaults: { ambientC: 25 },
   resultNames: {
     deltaT: 'temperature rise',
+    deltaTMean: 'mean temperature rise (duty-averaged)',
     deltaTPeak: 'temperature rise at peak current held continuously (not an rms result)',
     conductorTemperature: 'conductor temperature',
     resistance: 'resistance at conductor temperature',

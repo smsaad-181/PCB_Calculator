@@ -96,6 +96,9 @@ def(['Δ°F', 'ΔdegF', 'ddegF'], DIM.TEMPERATURE_DIFFERENCE, 5 / 9, { ledgerIds
 def(['oz/ft2', 'oz/ft²'], DIM.AREAL_MASS, OZ_PER_FT2_KG_M2, { ledgerIds: S006_S003 });
 // Compound units (no prefixes; the unit text is matched exactly)
 def(['K/W', '°C/W', 'degC/W'], DIM.THERMAL_RESISTANCE, 1);
+// Thermal resistance per length (K*m/W): a per-watt delta, never an absolute temperature
+def(['K·m/W', 'K*m/W', 'K.m/W', 'K m/W', '°C·m/W', '°C*m/W', '°C.m/W', '°C m/W', 'degC·m/W', 'degC*m/W', 'degC.m/W', 'degC m/W'], DIM.THERMAL_RESISTANCE_PER_LENGTH, 1);
+def(['K·mm/W', 'K*mm/W', 'K.mm/W', 'K mm/W', '°C·mm/W', '°C*mm/W', '°C.mm/W', '°C mm/W', 'degC·mm/W', 'degC*mm/W', 'degC.mm/W', 'degC mm/W'], DIM.THERMAL_RESISTANCE_PER_LENGTH, 1e-3, { den: 1e3 });
 def(['W/mK', 'W/(mK)', 'W/m·K', 'W/(m·K)', 'W/m.K'], DIM.THERMAL_CONDUCTIVITY, 1);
 def(['/K', '1/K', '/°C', '1/°C', '/degC', '1/degC'], DIM.PER_KELVIN, 1);
 def(['ppm/K', 'ppm/°C', 'ppm/degC'], DIM.PER_KELVIN, 1e-6, { den: 1e6 });

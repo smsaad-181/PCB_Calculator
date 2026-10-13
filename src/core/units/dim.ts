@@ -38,6 +38,7 @@ export const DIM = Object.freeze({
   TEMPERATURE_DIFFERENCE: d([0, 0, 0, 0, 1, 0, 0], 'deltaT'),
   AREAL_MASS: d([-2, 1, 0, 0, 0, 0, 0], 'arealMass'),
   THERMAL_RESISTANCE: d([-2, -1, 3, 0, 1, 0, 0]),
+  THERMAL_RESISTANCE_PER_LENGTH: d([-1, -1, 3, 0, 1, 0, 0]), // K*m/W = thermal resistance x length
   PER_KELVIN: d([0, 0, 0, 0, -1, 0, 0]),
   CURRENT_DENSITY: d([-2, 0, 0, 1, 0, 0, 0]),
   THERMAL_CONDUCTIVITY: d([1, 1, -3, 0, -1, 0, 0]),

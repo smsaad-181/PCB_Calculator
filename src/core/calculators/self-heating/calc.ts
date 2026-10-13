@@ -67,7 +67,7 @@ export interface CoupledArgs {
 const RECOMMENDATION =
   'The temperature rise is an estimate that depends on the thermal resistance used. Confirm it by measurement or thermal simulation of your board, use the worst-case ambient temperature, and keep the conductor temperature well below the limit of the laminate and the attached parts.';
 const THETA_USER_CAUTION =
-  'The thermal resistance is user-supplied and treated as a constant (independent of the temperature rise, air movement, neighbouring copper, planes and vias). It is not checked against any source (ledger S-019d, UNVERIFIED).';
+  'The thermal resistance is user-supplied and treated as a constant (independent of the temperature rise, air movement, neighbouring copper, planes and vias). The relation dT = theta x P is a definition (ledger S-019d, VERIFIED), but no value of theta for this trace is checked against any source.';
 const LEGACY_CAUTION =
   'Legacy IPC-2221 method: the thermal resistance is derived from the legacy curve fit (ledger S-001, PAYWALLED-USER-MUST-VERIFY), which is a fit to a chart and not a heat-flow model. Coupling it with a temperature-dependent resistance is an extrapolation of the fit, not something the fit was made for. Not a substitute for IPC-2152-based analysis.';
 const LINEAR_INFO =
@@ -75,7 +75,9 @@ const LINEAR_INFO =
 const STEADY_INFO =
   'Steady state only: the thermal time constant and transient heating are not computed. DC resistance only: skin effect and AC resistance are not included. Fusing (Onderdonk / Preece) is a different calculation and is out of scope.';
 const RMS_INFO =
-  'Pulse: I_rms = I_pk x sqrt(D) is used because you stated that the period is much shorter than the thermal time constant. That statement is not checked; if it is wrong the conductor ripples around the mean and its peak temperature is higher than this result.';
+  'Pulse: I_rms = I_pk x sqrt(D) (ledger S-019e) is used because you stated that the period is much shorter than the thermal time constant. That statement is your declaration, not a computed or checked threshold, and the condition itself is UNVERIFIED (ledger S-019f).';
+const PEAK_HIGHER_WARNING =
+  'Pulse: the result is the mean (duty-averaged) temperature rise, not the peak. The peak rise is higher by up to (1 - D) x P_pk x Z(t_on), where Z(t_on) is the transient thermal impedance over one on-time. That is not computed: there is no transient thermal impedance for a trace in this calculator. Peak temperature needs the peak power, not the average power.';
 const PEAK_WARNING =
   'Pulse: the period is comparable to or longer than the thermal time constant, so an rms-based result would be wrong and none is given. The value shown is the steady rise at the peak current held continuously, a conservative bound for that case, and not an rms result.';
 
@@ -85,9 +87,9 @@ const ZERO_C_IN_K = 273.15;
 const V = meta.validity;
 const N = meta.resultNames;
 const REF_IDS: readonly string[] = meta.reference.ledgerIds;
+const PULSE_IDS: readonly string[] = meta.pulseLedgerIds;
 const EXCLUDE = { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE };
-const STATUS_USER = dataStatusForLedgerIds([...REF_IDS], undefined, EXCLUDE);
-const STATUS_LEGACY = dataStatusForLedgerIds([...REF_IDS, ...meta.legacyLedgerIds], undefined, EXCLUDE);
+const statusFor = (ids: readonly string[]): ReturnType<typeof dataStatusForLedgerIds> => dataStatusForLedgerIds([...ids], undefined, EXCLUDE);
 
 /** Thrown for a value outside the representable or modelled range; mapped to OUT_OF_DOMAIN by compute. */
 class RangeFailure extends Error {}
@@ -254,7 +256,8 @@ function build(raw: unknown): CalcOutcome {
   const power = solved ? positive(iEffSi * iEffSi * rT, 'Power dissipated') : 0;
   const vDrop = solved ? positive(iEffSi * rT, 'Voltage drop') : 0;
   const coupling = solved ? ((dTSi - dT0) / dT0) * 100 : 0;
-  const deltaTName = peakBased ? N.deltaTPeak : N.deltaT;
+  const deltaTName = peakBased ? N.deltaTPeak : rmsUsed ? N.deltaTMean : N.deltaT;
+  const riseLabel = rmsUsed ? 'Mean temperature rise (duty-averaged)' : 'Temperature rise';
 
   // Inputs.
   const inputs: CalcInput[] = [];
@@ -295,7 +298,7 @@ function build(raw: unknown): CalcOutcome {
     { label: 'Solver residual', expr: 'f(dT) = dT - theta x P(dT)', value: q(sol.residual, DIM.TEMPERATURE_DIFFERENCE) },
   ];
   if (solved) {
-    steps.push({ label: 'Temperature rise', expr: 'dT solves dT = theta x I^2 x R20 x (1 + alpha x (T_amb + dT - 20 °C))', value: q(dTSi, DIM.TEMPERATURE_DIFFERENCE), bound: 'prediction' });
+    steps.push({ label: riseLabel, expr: 'dT solves dT = theta x I^2 x R20 x (1 + alpha x (T_amb + dT - 20 °C))', value: q(dTSi, DIM.TEMPERATURE_DIFFERENCE), bound: 'prediction' });
     steps.push({ label: 'Conductor temperature', expr: 'T = ambient + dT', value: conductor, bound: 'prediction' });
     steps.push({ label: 'Resistance at the conductor temperature', expr: 'R(T) = R20 x (1 + alpha x (T - 20 °C))', value: q(rT, DIM.RESISTANCE), bound: 'prediction' });
     steps.push({ label: 'Power dissipated', expr: 'P = I^2 x R(T)', value: q(power, DIM.POWER), bound: 'prediction' });
@@ -371,7 +374,10 @@ function build(raw: unknown): CalcOutcome {
   }
   warnings.push({ severity: 'info', message: LINEAR_INFO, code: 'LINEAR_ALPHA' }, { severity: 'info', message: STEADY_INFO, code: 'STEADY_STATE_DC_ONLY' });
   if (solved) warnings.push({ severity: 'caution', message: VOLTAGE_DROP_SCOPE, code: 'VOLTAGE_DROP_SCOPE' });
-  if (rmsUsed) warnings.push({ severity: 'caution', message: RMS_INFO, code: 'PULSE_RMS_ASSUMPTION' });
+  if (rmsUsed) {
+    warnings.push({ severity: 'caution', message: RMS_INFO, code: 'PULSE_RMS_ASSUMPTION' });
+    warnings.push({ severity: 'warning', message: PEAK_HIGHER_WARNING, code: 'PULSE_PEAK_HIGHER' });
+  }
   if (peakBased) warnings.push({ severity: 'warning', message: PEAK_WARNING, code: 'PULSE_PERIOD_NOT_SHORT' });
 
   // Assumptions.
@@ -395,7 +401,7 @@ function build(raw: unknown): CalcOutcome {
   if (pulse) {
     assumptions.push(
       rmsUsed
-        ? 'Pulse: rectangular pulses; the user states the period is much shorter than the thermal time constant, so I_rms = I_pk x sqrt(D).'
+        ? 'Pulse: rectangular pulses; the user states the period is much shorter than the thermal time constant, so I_rms = I_pk x sqrt(D); the user declares this condition and no threshold is computed. The result is the mean (duty-averaged) rise, not the peak.'
         : 'Pulse: the user states the period is comparable to or longer than the thermal time constant; no rms result is given and the peak current is held continuously.',
     );
   }
@@ -404,7 +410,8 @@ function build(raw: unknown): CalcOutcome {
   const safetyRelevantDefaults: string[] = [];
   if (ambientDefaulted) safetyRelevantDefaults.push('ambient defaulted to 25 °C (engineering default, not from a standard; it sets the conductor temperature)');
   safetyRelevantDefaults.push(...copperBasisFactors(basis).safetyRelevantDefaults);
-  const dataStatus = legacy ? STATUS_LEGACY : STATUS_USER;
+  const refIds = [...REF_IDS, ...(pulse ? PULSE_IDS : [])];
+  const dataStatus = statusFor(legacy ? [...refIds, ...meta.legacyLedgerIds] : refIds);
   const confidence = rateConfidence({
     outOfRangeInputs: outOfRange,
     defaultedAssumptions: [],
@@ -420,7 +427,7 @@ function build(raw: unknown): CalcOutcome {
 
   const result: CalcResult = {
     method: meta.method,
-    reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds: [...REF_IDS, ...extraLedger] },
+    reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds: [...REF_IDS, ...(pulse ? PULSE_IDS : []), ...extraLedger] },
     formula: meta.formula,
     inputs,
     assumptions,

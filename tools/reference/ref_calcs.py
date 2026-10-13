@@ -964,7 +964,7 @@ GOLDEN.extend((n, got, _CIRCUIT_PINNED[n], tol, ids, note) for n, got, tol, ids,
 # ---- self-heating (Phase 1 task 4). Independent of src/: CLOSED FORM, no iteration (the TS side uses Brent). ----
 # With a constant theta [K/W] and linear R(T) the fixed point dT = theta * I^2 * R20 * (1 + alpha (T_amb + dT - 20)) is
 # linear in dT: dT = theta I^2 R(T_amb) / (1 - theta I^2 R20 alpha), a steady state only while k = theta I^2 R20 alpha < 1
-# (S-019d, UNVERIFIED: thermal-resistance definition, no source read). Reference temperature of the legacy calibration is 20 C.
+# (S-019g, UNVERIFIED/DERIVED: algebra from S-019d dT = theta P (VERIFIED), S-019 and S-004; no source states it for a conductor). Reference temperature of the legacy calibration is 20 C.
 def sh_r20_ohm(L_mm, w_mm, t_um, rho20=RHO_CU_20C):
     return rho20 * (L_mm * 1e-3) / ((w_mm * 1e-3) * (t_um * 1e-6))
 
@@ -1010,14 +1010,14 @@ def _sh_tag(I, L, w, t):
 
 def _selfheat_vectors():
     out = []
-    ids_u = ("S-004", "S-019", "S-019d", "S-006")
+    ids_u = ("S-004", "S-019", "S-019d", "S-019g", "S-006")
     for I, L, w, t, th, Ta in SH_USER_CASES:
         tag = _sh_tag(I, L, w, t) + "_theta%s_Ta%sC" % (_g(th), _g(Ta))
         out.append(("self_heating_user_dT_K_" + tag, sh_dT_K(I, L, w, t, th, Ta), 1e-9, ids_u,
                     "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"))
         out.append(("self_heating_user_dT0_K_" + tag, sh_dT0_K(I, L, w, t, th), 1e-9, ids_u, "alpha = 0: dT0 = theta I^2 R20"))
         out.append(("self_heating_user_P_W_" + tag, sh_power_W(I, L, w, t, th, Ta), 1e-9, ids_u, "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"))
-    ids_l = ("S-001", "S-004", "S-019", "S-019d", "S-006", "S-003")
+    ids_l = ("S-001", "S-004", "S-019", "S-019d", "S-019g", "S-006", "S-003")
     for I, L, w, t, layer, Ta in SH_LEGACY_CASES:
         tag = _sh_tag(I, L, w, t) + "_%s_Ta%sC" % (layer, _g(Ta))
         th = sh_legacy_theta(I, L, w, t, layer)
@@ -1025,7 +1025,7 @@ def _selfheat_vectors():
         out.append(("self_heating_legacy_dT_K_" + tag, sh_dT_K(I, L, w, t, th, Ta), 1e-9, ids_l, "coupled closed form with theta_eff; LEGACY extrapolation"))
     for I, L, w, t in SH_CRIT_CASES:
         out.append(("self_heating_theta_crit_K_per_W_" + _sh_tag(I, L, w, t), sh_theta_crit_K_per_W(I, L, w, t), 1e-9,
-                    ("S-004", "S-019", "S-019d", "S-006"), "theta at loop gain 1: runaway above this"))
+                    ("S-004", "S-019", "S-019d", "S-019g", "S-006"), "theta at loop gain 1: runaway above this"))
     return out
 
 _SELFHEAT_PINNED = {
