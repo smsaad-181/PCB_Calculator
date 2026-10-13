@@ -106,12 +106,6 @@ def copper_oz_from_thickness_um(t_um, convention="nominal-35um"):
 def annular_ring(pad, hole):  # same units in/out
     return (pad - hole) / 2.0
 
-def self_heating_converge(I, w_m, t_m, L_m, theta_per_len=None, dT_target=None):
-    """Optional: coupled R(T) <-> dT loop for a trace using IPC-2221 dT(I) as the thermal law.
-    Returns steady dT such that dT = f(I) with R rising with T. (Illustrative oracle; see skill.)"""
-    raise NotImplementedError("Add once the self-heating model is specified in docs/phases/phase-1.md")
-
-
 # ---- trace resistance with R(T) (Phase 1 task 3). Independent of src/. ----
 def rho_at_C(temp_C, rho20=RHO_CU_20C, alpha=ALPHA_CU):
     """rho(T) = rho20 * (1 + alpha * (T - 20 C)), ohm*m; linear coefficient referenced to 20 C (S-004)."""
@@ -966,6 +960,106 @@ _CIRCUIT_PINNED = {
     'pairs_c5_rank5_err_pct': 0.0,
 }
 GOLDEN.extend((n, got, _CIRCUIT_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _circuit_vectors())
+
+# ---- self-heating (Phase 1 task 4). Independent of src/: CLOSED FORM, no iteration (the TS side uses Brent). ----
+# With a constant theta [K/W] and linear R(T) the fixed point dT = theta * I^2 * R20 * (1 + alpha (T_amb + dT - 20)) is
+# linear in dT: dT = theta I^2 R(T_amb) / (1 - theta I^2 R20 alpha), a steady state only while k = theta I^2 R20 alpha < 1
+# (S-019d, UNVERIFIED: thermal-resistance definition, no source read). Reference temperature of the legacy calibration is 20 C.
+def sh_r20_ohm(L_mm, w_mm, t_um, rho20=RHO_CU_20C):
+    return rho20 * (L_mm * 1e-3) / ((w_mm * 1e-3) * (t_um * 1e-6))
+
+def sh_k(I, L_mm, w_mm, t_um, theta, alpha=ALPHA_CU):
+    """Loop gain k = theta * I^2 * R20 * alpha; runaway (no steady state) for k >= 1."""
+    return theta * I * I * sh_r20_ohm(L_mm, w_mm, t_um) * alpha
+
+def sh_dT_K(I, L_mm, w_mm, t_um, theta, Tamb_C, alpha=ALPHA_CU):
+    r20 = sh_r20_ohm(L_mm, w_mm, t_um)
+    k = theta * I * I * r20 * alpha
+    if k >= 1.0:
+        return None
+    return theta * I * I * r20 * (1.0 + alpha * (Tamb_C - 20.0)) / (1.0 - k)
+
+def sh_dT0_K(I, L_mm, w_mm, t_um, theta):
+    """alpha = 0 closed form: theta * I^2 * R20."""
+    return theta * I * I * sh_r20_ohm(L_mm, w_mm, t_um)
+
+def sh_power_W(I, L_mm, w_mm, t_um, theta, Tamb_C):
+    dT = sh_dT_K(I, L_mm, w_mm, t_um, theta, Tamb_C)
+    return I * I * sh_r20_ohm(L_mm, w_mm, t_um) * (1.0 + ALPHA_CU * (Tamb_C + dT - 20.0))
+
+def sh_theta_crit_K_per_W(I, L_mm, w_mm, t_um, alpha=ALPHA_CU):
+    """theta at which k = 1 (runaway for any larger theta)."""
+    return 1.0 / (I * I * sh_r20_ohm(L_mm, w_mm, t_um) * alpha)
+
+def sh_legacy_theta(I, L_mm, w_mm, t_um, layer):
+    """theta_eff = dT_ipc(I) / P0, P0 = I^2 R(20 C): legacy IPC-2221 rise divided by the 20 C power (S-001 PAYWALLED)."""
+    dT_ipc = ipc2221_dT_C(I, w_mm / 0.0254, layer, t_um)
+    return dT_ipc / (I * I * sh_r20_ohm(L_mm, w_mm, t_um))
+
+# (I A, L mm, w mm, t um, theta K/W, Tamb C)
+SH_USER_CASES = [
+    (2, 100, 0.254, 35, 50, 25), (3, 100, 0.5, 35, 20, 25), (5, 200, 1, 70, 10, 55), (1, 50, 0.2, 17.5, 80, 85),
+    (10, 300, 3, 105, 4, 40), (2, 100, 0.254, 35, 120, 25),
+]
+# (I A, L mm, w mm, t um, layer, Tamb C)
+SH_LEGACY_CASES = [(2, 100, 0.5, 35, "outer", 25), (5, 150, 2, 70, "outer", 25), (2, 100, 1, 35, "inner", 40), (10, 100, 5, 70, "outer", 25)]
+SH_CRIT_CASES = [(2, 100, 0.254, 35), (5, 200, 1, 70), (1, 50, 0.2, 17.5)]
+
+def _sh_tag(I, L, w, t):
+    return "I%sA_L%smm_w%smm_t%sum" % (_g(I), _g(L), _g(w), _g(t))
+
+def _selfheat_vectors():
+    out = []
+    ids_u = ("S-004", "S-019", "S-019d", "S-006")
+    for I, L, w, t, th, Ta in SH_USER_CASES:
+        tag = _sh_tag(I, L, w, t) + "_theta%s_Ta%sC" % (_g(th), _g(Ta))
+        out.append(("self_heating_user_dT_K_" + tag, sh_dT_K(I, L, w, t, th, Ta), 1e-9, ids_u,
+                    "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"))
+        out.append(("self_heating_user_dT0_K_" + tag, sh_dT0_K(I, L, w, t, th), 1e-9, ids_u, "alpha = 0: dT0 = theta I^2 R20"))
+        out.append(("self_heating_user_P_W_" + tag, sh_power_W(I, L, w, t, th, Ta), 1e-9, ids_u, "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"))
+    ids_l = ("S-001", "S-004", "S-019", "S-019d", "S-006", "S-003")
+    for I, L, w, t, layer, Ta in SH_LEGACY_CASES:
+        tag = _sh_tag(I, L, w, t) + "_%s_Ta%sC" % (layer, _g(Ta))
+        th = sh_legacy_theta(I, L, w, t, layer)
+        out.append(("self_heating_legacy_theta_K_per_W_" + tag, th, 1e-9, ids_l, "theta_eff = dT_ipc / (I^2 R20), legacy IPC-2221 fit (not a heat-flow model)"))
+        out.append(("self_heating_legacy_dT_K_" + tag, sh_dT_K(I, L, w, t, th, Ta), 1e-9, ids_l, "coupled closed form with theta_eff; LEGACY extrapolation"))
+    for I, L, w, t in SH_CRIT_CASES:
+        out.append(("self_heating_theta_crit_K_per_W_" + _sh_tag(I, L, w, t), sh_theta_crit_K_per_W(I, L, w, t), 1e-9,
+                    ("S-004", "S-019", "S-019d", "S-006"), "theta at loop gain 1: runaway above this"))
+    return out
+
+_SELFHEAT_PINNED = {
+    'self_heating_user_dT_K_I2A_L100mm_w0.254mm_t35um_theta50_Ta25C': 46.66376824859275,
+    'self_heating_user_dT0_K_I2A_L100mm_w0.254mm_t35um_theta50_Ta25C': 38.78825491641132,
+    'self_heating_user_P_W_I2A_L100mm_w0.254mm_t35um_theta50_Ta25C': 0.9332753649718551,
+    'self_heating_user_dT_K_I3A_L100mm_w0.5mm_t35um_theta20_Ta25C': 19.437125368013053,
+    'self_heating_user_dT0_K_I3A_L100mm_w0.5mm_t35um_theta20_Ta25C': 17.733990147783256,
+    'self_heating_user_P_W_I3A_L100mm_w0.5mm_t35um_theta20_Ta25C': 0.9718562684006526,
+    'self_heating_user_dT_K_I5A_L200mm_w1mm_t70um_theta10_Ta55C': 14.72175488546655,
+    'self_heating_user_dT0_K_I5A_L200mm_w1mm_t70um_theta10_Ta55C': 12.315270935960594,
+    'self_heating_user_P_W_I5A_L200mm_w1mm_t70um_theta10_Ta55C': 1.4721754885466551,
+    'self_heating_user_dT_K_I1A_L50mm_w0.2mm_t17.5um_theta80_Ta85C': 26.81439555745408,
+    'self_heating_user_dT0_K_I1A_L50mm_w0.2mm_t17.5um_theta80_Ta85C': 19.704433497536947,
+    'self_heating_user_P_W_I1A_L50mm_w0.2mm_t17.5um_theta80_Ta85C': 0.335179944468176,
+    'self_heating_user_dT_K_I10A_L300mm_w3mm_t105um_theta4_Ta40C': 7.272114347357066,
+    'self_heating_user_dT0_K_I10A_L300mm_w3mm_t105um_theta4_Ta40C': 6.568144499178982,
+    'self_heating_user_P_W_I10A_L300mm_w3mm_t105um_theta4_Ta40C': 1.8180285868392665,
+    'self_heating_user_dT_K_I2A_L100mm_w0.254mm_t35um_theta120_Ta25C': 149.68254939140013,
+    'self_heating_user_dT0_K_I2A_L100mm_w0.254mm_t35um_theta120_Ta25C': 93.09181179938716,
+    'self_heating_user_P_W_I2A_L100mm_w0.254mm_t35um_theta120_Ta25C': 1.2473545782616677,
+    'self_heating_legacy_theta_K_per_W_I2A_L100mm_w0.5mm_t35um_outer_Ta25C': 52.959061826606025,
+    'self_heating_legacy_dT_K_I2A_L100mm_w0.5mm_t35um_outer_Ta25C': 23.18209937814933,
+    'self_heating_legacy_theta_K_per_W_I5A_L150mm_w2mm_t70um_outer_Ta25C': 11.78751077838797,
+    'self_heating_legacy_dT_K_I5A_L150mm_w2mm_t70um_outer_Ta25C': 5.672056455546067,
+    'self_heating_legacy_theta_K_per_W_I2A_L100mm_w1mm_t35um_inner_Ta40C': 163.34807690488054,
+    'self_heating_legacy_dT_K_I2A_L100mm_w1mm_t35um_inner_Ta40C': 39.74409298486989,
+    'self_heating_legacy_theta_K_per_W_I10A_L100mm_w5mm_t70um_outer_Ta25C': 11.799289453214055,
+    'self_heating_legacy_dT_K_I10A_L100mm_w5mm_t70um_outer_Ta25C': 6.065220235141266,
+    'self_heating_theta_crit_K_per_W_I2A_L100mm_w0.254mm_t35um': 328.002544529262,
+    'self_heating_theta_crit_K_per_W_I5A_L200mm_w1mm_t70um': 206.61577608142488,
+    'self_heating_theta_crit_K_per_W_I1A_L50mm_w0.2mm_t17.5um': 1033.0788804071244,
+}
+GOLDEN.extend((n, got, _SELFHEAT_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _selfheat_vectors())
 
 def main():
     rows, bad = [], 0

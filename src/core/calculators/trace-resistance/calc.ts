@@ -43,7 +43,7 @@ const RHO_CAUTION =
   'The resistivity you entered will replace the ledger value for annealed copper (S-004). The default does not cover plated copper, whose resistivity is a separate row (S-012, UNVERIFIED); replace it only with a value you can source.';
 const ALPHA_CAUTION =
   'The temperature coefficient you entered will replace the S-004 value; the result at any temperature other than 20 °C depends directly on it, so replace it only with a value you can source.';
-const VOLTAGE_DROP_SCOPE =
+export const VOLTAGE_DROP_SCOPE =
   'Voltage drop and power loss cover this trace only: one conductor, one direction. They exclude the return path (about twice the drop for a trace return of equal size), vias, pads, connectors, solder joints and copper necking. Do not compare this figure with a rail budget; the future path calculator covers the whole path.';
 const SKIN_MESSAGE = 'DC formula is optimistic: skin depth is below half the copper thickness';
 
