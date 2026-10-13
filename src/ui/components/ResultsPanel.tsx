@@ -6,7 +6,7 @@ import { DesignValuesPanel } from './DesignValuesPanel';
 import { FormulaPanel } from './FormulaPanel';
 import { InputsProvenance } from './InputsProvenance';
 import { StepsList } from './StepsList';
-import { UnverifiedBadge } from './UnverifiedBadge';
+import { UnverifiedBadges } from './UnverifiedBadge';
 import { ValidityChecksList } from './ValidityChecksList';
 import { WarningList } from './WarningList';
 import type { ResultView } from './view';
@@ -37,7 +37,7 @@ export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, af
       {afterHeadline}
       {v.ledger.unverifiedIds.length > 0 && (
         <p class="unverified-line">
-          <span class="pill-unverified">UNVERIFIED</span> <UnverifiedBadge status={v.ledger.worst} ledgerIds={v.ledger.unverifiedIds} />
+          <span class="pill-unverified">UNVERIFIED</span> <UnverifiedBadges groups={v.ledger.groups} />
         </p>
       )}
       <DesignValuesPanel values={v.designValues} />
@@ -50,6 +50,11 @@ export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, af
             <div key={r.label} class="row">
               <dt>{r.label}</dt>
               <dd>{r.text}</dd>
+              {r.note !== undefined && (
+                <dd class="row-note">
+                  <strong>{r.note.label}.</strong> {r.note.message}
+                </dd>
+              )}
             </div>
           ))}
         </dl>

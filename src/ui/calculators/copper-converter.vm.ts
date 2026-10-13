@@ -7,6 +7,7 @@ import { DEFAULT_FOIL_CONVENTION, foilSpreadPercent } from '../../core/data/cons
 import type { CalcResult } from '../../core/result';
 import { DEFAULT_DISPLAY_PREFS, DIM, FOIL_CONVENTIONS, type DisplayPrefs, type FoilConvention, type Quantity } from '../../core/units';
 import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, weightSourceFromHash, type WeightSource } from './copper-source';
 import { buildResultView, MAX_FIELD_CHARS, parseField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
 
 export const CALCULATOR_ID = 'copper-converter';
@@ -24,6 +25,8 @@ export interface ConverterState {
   /** '' means the default convention (an assumption). */
   readonly convention: FoilConvention | '';
   readonly basis: ThicknessBasis;
+  /** '' means not answered. Only meaningful when a weight is entered. */
+  readonly weightSource: WeightSource;
   readonly plating: string;
   readonly units: Units;
 }
@@ -35,6 +38,7 @@ export const DEFAULT_STATE: ConverterState = Object.freeze({
   layer: '',
   convention: '',
   basis: 'nominal',
+  weightSource: '',
   plating: '',
   units: 'metric',
 });
@@ -88,6 +92,7 @@ export function toHashState(s: ConverterState): Record<string, string> {
   if (s.layer !== '') out['ly'] = s.layer;
   if (s.convention !== '') out['conv'] = s.convention;
   if (s.basis !== DEFAULT_STATE.basis) out['tb'] = s.basis;
+  if (s.weightSource !== '') out['wsrc'] = s.weightSource;
   if (s.plating.trim() !== '') out['pl'] = s.plating.slice(0, MAX_FIELD_CHARS);
   if (s.units !== DEFAULT_STATE.units) out['u'] = s.units;
   return out;
@@ -136,6 +141,7 @@ export function fromHashState(h: HashState): LoadedState {
     if (tb === 'nominal' || tb === 'finished' || tb === 'measured') s = { ...s, basis: tb };
     else notices.push('Thickness basis was not recognised: nominal is used instead.');
   }
+  s = { ...s, weightSource: weightSourceFromHash(get('wsrc'), notices) };
   const u = get('u');
   if (u === 'metric' || u === 'imperial') {
     if (RESERVED_STATE_KEYS.u.isValid(u)) s = { ...s, units: u };
@@ -195,6 +201,13 @@ function provenance(s: ConverterState): ProvenanceRow[] {
       ? { label: 'Foil convention', value: DEFAULT_FOIL_CONVENTION, source: 'default', detail: `conventions differ by up to ${conventionSpreadText()}` }
       : { label: 'Foil convention', value: s.convention, source: 'user' },
   );
+  if (s.by === 'weight') {
+    rows.push(
+      s.weightSource === 'foil'
+        ? { label: 'Weight source', value: 'foil spec (base foil)', source: 'user' }
+        : { label: 'Weight source', value: 'not answered, treated as base foil', source: 'default' },
+    );
+  }
   if (s.by === 'thickness') rows.push({ label: 'Thickness basis', value: s.basis, source: s.basis === 'nominal' ? 'default' : 'user' });
   return rows;
 }
@@ -216,6 +229,9 @@ export function computeView(s: ConverterState): ConverterView {
   if (entered.status === 'error') problems.push(`${fieldName}: ${entered.message}`);
   if (plating.status === 'error') problems.push(`Plating thickness: ${plating.message}`);
   if (problems.length > 0) return { status: 'error', problems, fieldErrors, notes };
+
+  if (s.by === 'weight' && s.weightSource === 'finished') return { status: 'needs-input', needs: [FINISHED_NEEDS], notes };
+  if (s.by === 'weight' && s.weightSource === '' && entered.status === 'ok') notes.push(NOT_ANSWERED_NOTE);
 
   const needs: string[] = [];
   if (entered.status === 'empty') needs.push(`Enter the ${s.by === 'weight' ? 'copper weight (for example 1 oz)' : 'copper thickness (for example 35 um)'}.`);

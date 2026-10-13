@@ -6,10 +6,10 @@
   "source": "https://jlcpcb.com/capabilities/pcb-capabilities",
   "edition": "JLCPCB PCB capabilities page as retrieved 2026-10-06 (no document revision stated)",
   "status": "UNVERIFIED",
-  "ledgerIds": ["S-008"],
+  "ledgerIds": ["S-008", "S-019c"],
   "verifiedBy": "",
   "bannerRequired": true,
-  "notes": "Fabricator figures read through a summarizing fetcher, re-read in a browser before use (R-21); fabs change limits without notice; example only, enter your fabricator's current values. Multilayer values are used where 1-2 layer values differ. 1-2 layer values: annular ring recommended 0.25 mm, absolute minimum 0.18 mm; minimum trace/space 4 mil / 4 mil (1 oz). Copper weights: 1 oz is the base outer copper only; other weights and inner-layer copper are not listed here.",
+  "notes": "Fabricator figures read through a summarizing fetcher, re-read in a browser before use (R-21); fabs change limits without notice; example only, enter your fabricator's current values. Multilayer values are used where 1-2 layer values differ. 1-2 layer values: annular ring recommended 0.25 mm, absolute minimum 0.18 mm; minimum trace/space 4 mil / 4 mil (1 oz). Copper: JLCPCB labels its copper options finished copper (outer 1 oz and 2 oz multilayer; inner 0.5 oz, 1 oz, 2 oz); ledger S-019c. Only the outer 1 oz weight is listed in copperWeightsOzFt2; other weights are a scope choice, not an omission by the fab. Finished thicknesses read 2026-10-13 from the JLCPCB multilayer stackup article (S-019c, UNVERIFIED): outer 1 oz 1.6 mil, inner 0.5 oz 0.6 mil, inner 1 oz 1.2 mil. The label-to-value pairing is by order from a flattened table and is unconfirmed: confirm in a browser. Not published on those pages: 2 oz thickness, 2-layer values, tolerance, and whether 1.6 mil includes plating. Do not compare these with IPC-6012 minimums without checking the basis.",
   "limits": {
     "minTraceWidth": { "value": 3.5, "unit": "mil" },
     "minTraceSpace": { "value": 3.5, "unit": "mil" },
@@ -25,6 +25,9 @@
     "holeToTrack": { "value": 0.2, "unit": "mm" },
     "traceWidthTolerancePct": 20,
     "impedanceTolerancePct": 10,
-    "copperWeightsOzFt2": [1]
+    "copperWeightsOzFt2": [1],
+    "finishedCopperOuter1oz": { "value": 1.6, "unit": "mil" },
+    "finishedCopperInner0p5oz": { "value": 0.6, "unit": "mil" },
+    "finishedCopperInner1oz": { "value": 1.2, "unit": "mil" }
   }
 }

@@ -162,22 +162,23 @@ describe('inputs and assumptions', () => {
 });
 
 describe('design values', () => {
-  it('width solved: one min-requirement design value, recommended = calculated x 1.25 (default)', () => {
+  it('width solved: one min-requirement design value; margin 1.25 is on CURRENT, so width = calculated x 1.25^(1/0.725) (default)', () => {
     const r = ok(solveWidth('outer', 3, 10, 1));
     expect(r.designValues).toHaveLength(1);
     const dv = r.designValues[0];
     expect(dv?.name).toBe('width');
     expect(dv?.direction).toBe('min-requirement');
     expect(dv?.calculated.si).toBe(res(r, 'width').value.si);
-    expect(dv?.derating.factor).toBe(1.25);
-    expect(relErr(dv?.recommended.si ?? 0, (dv?.calculated.si ?? 0) * 1.25)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(dv?.derating.factor ?? 0, 1.25 ** (1 / 0.725))).toBeLessThanOrEqual(1e-12);
+    expect(relErr(dv?.recommended.si ?? 0, (dv?.calculated.si ?? 0) * 1.25 ** (1 / 0.725))).toBeLessThanOrEqual(1e-12);
     expect(dv?.derating.rationale).toMatch(/engineering default, not from a standard/);
+    expect(dv?.derating.rationale).toMatch(/current/i);
     expect(dv?.recommended.si).toBeGreaterThan(dv?.calculated.si ?? Infinity);
   });
   it('width solved with a user margin: factor is the user value; margin 1 gives recommended = calculated', () => {
     const r = ok({ ...solveWidth('inner', 3, 10, 1), designMargin: one(1.5) });
-    expect(r.designValues[0]?.derating.factor).toBe(1.5);
-    expect(relErr(r.designValues[0]?.recommended.si ?? 0, (r.designValues[0]?.calculated.si ?? 0) * 1.5)).toBeLessThanOrEqual(1e-12);
+    expect(relErr(r.designValues[0]?.derating.factor ?? 0, 1.5 ** (1 / 0.725))).toBeLessThanOrEqual(1e-12);
+    expect(relErr(r.designValues[0]?.recommended.si ?? 0, (r.designValues[0]?.calculated.si ?? 0) * 1.5 ** (1 / 0.725))).toBeLessThanOrEqual(1e-12);
     const r1 = ok({ ...solveWidth('inner', 3, 10, 1), designMargin: one(1) });
     expect(r1.designValues[0]?.recommended.si).toBeCloseTo(r1.designValues[0]?.calculated.si ?? NaN, 15);
   });

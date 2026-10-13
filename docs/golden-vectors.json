@@ -3247,7 +3247,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c0_max_V",
@@ -3261,7 +3261,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c1_min_V",
@@ -3275,7 +3275,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c1_max_V",
@@ -3289,12 +3289,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c2_min_V",
-      "oracle_value": 1.8742695236408713,
-      "pinned_expected": 1.8742695236408713,
+      "oracle_value": 1.8757029415238038,
+      "pinned_expected": 1.875702941523804,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3303,12 +3303,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c2_max_V",
-      "oracle_value": 2.017264167876899,
-      "pinned_expected": 2.017264167876899,
+      "oracle_value": 2.015733693051292,
+      "pinned_expected": 2.015733693051292,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3317,12 +3317,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c3_min_V",
-      "oracle_value": 0.8983437926140315,
-      "pinned_expected": 0.8983437926140315,
+      "oracle_value": 0.8984585075769133,
+      "pinned_expected": 0.8984585075769131,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3331,12 +3331,12 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c3_max_V",
-      "oracle_value": 0.9009613420488201,
-      "pinned_expected": 0.9009613420488201,
+      "oracle_value": 0.9008464475537347,
+      "pinned_expected": 0.9008464475537348,
       "rel_tol": 1e-09,
       "ledger_ids": [
         "S-019"
@@ -3345,7 +3345,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c4_min_V",
@@ -3359,7 +3359,7 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
     },
     {
       "name": "divider_env_c4_max_V",
@@ -3373,7 +3373,119 @@
         "S-019": "VERIFIED"
       },
       "status": "VERIFIED",
-      "note": "corner analysis over Vin, R1, R2 (and RL) at +-tolerance"
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
+    },
+    {
+      "name": "divider_env_c5_min_V",
+      "oracle_value": 1.8742695236408713,
+      "pinned_expected": 1.8742695236408713,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
+    },
+    {
+      "name": "divider_env_c5_max_V",
+      "oracle_value": 2.017264167876899,
+      "pinned_expected": 2.017264167876899,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "initial-tolerance corners over Vin (+-vin tol), R1 and R2 (+-tol) and RL (+-load tol, default 0)"
+    },
+    {
+      "name": "divider_power_c0_v_r1_V",
+      "oracle_value": 9.894736842105264,
+      "pinned_expected": 9.894736842105264,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R1 = Vin - Vout"
+    },
+    {
+      "name": "divider_power_c0_v_r2_V",
+      "oracle_value": 2.1052631578947367,
+      "pinned_expected": 2.1052631578947367,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R2 = Vout"
+    },
+    {
+      "name": "divider_power_c1_v_r1_V",
+      "oracle_value": 10.055105348460291,
+      "pinned_expected": 10.055105348460291,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R1 = Vin - Vout"
+    },
+    {
+      "name": "divider_power_c1_v_r2_V",
+      "oracle_value": 1.9448946515397083,
+      "pinned_expected": 1.9448946515397083,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R2 = Vout"
+    },
+    {
+      "name": "divider_power_c2_v_r1_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R1 = Vin - Vout"
+    },
+    {
+      "name": "divider_power_c2_v_r2_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "voltage across R2 = Vout"
     },
     {
       "name": "eseries_E3_size",
@@ -6902,6 +7014,2674 @@
       },
       "status": "PAYWALLED-USER-MUST-VERIFY",
       "note": "exhaustive two-resistor search (divider-ratio, E24); order: |error|, then digits, then r1, then r2"
+    },
+    {
+      "name": "self_heating_user_dT_K_I2A_L100mm_w0.254mm_t35um_theta50_Ta25C",
+      "oracle_value": 46.66376824859275,
+      "pinned_expected": 46.66376824859275,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"
+    },
+    {
+      "name": "self_heating_user_dT0_K_I2A_L100mm_w0.254mm_t35um_theta50_Ta25C",
+      "oracle_value": 38.78825491641132,
+      "pinned_expected": 38.78825491641132,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "alpha = 0: dT0 = theta I^2 R20"
+    },
+    {
+      "name": "self_heating_user_P_W_I2A_L100mm_w0.254mm_t35um_theta50_Ta25C",
+      "oracle_value": 0.9332753649718551,
+      "pinned_expected": 0.9332753649718551,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"
+    },
+    {
+      "name": "self_heating_user_dT_K_I3A_L100mm_w0.5mm_t35um_theta20_Ta25C",
+      "oracle_value": 19.437125368013053,
+      "pinned_expected": 19.437125368013053,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"
+    },
+    {
+      "name": "self_heating_user_dT0_K_I3A_L100mm_w0.5mm_t35um_theta20_Ta25C",
+      "oracle_value": 17.733990147783256,
+      "pinned_expected": 17.733990147783256,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "alpha = 0: dT0 = theta I^2 R20"
+    },
+    {
+      "name": "self_heating_user_P_W_I3A_L100mm_w0.5mm_t35um_theta20_Ta25C",
+      "oracle_value": 0.9718562684006526,
+      "pinned_expected": 0.9718562684006526,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"
+    },
+    {
+      "name": "self_heating_user_dT_K_I5A_L200mm_w1mm_t70um_theta10_Ta55C",
+      "oracle_value": 14.72175488546655,
+      "pinned_expected": 14.72175488546655,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"
+    },
+    {
+      "name": "self_heating_user_dT0_K_I5A_L200mm_w1mm_t70um_theta10_Ta55C",
+      "oracle_value": 12.315270935960594,
+      "pinned_expected": 12.315270935960594,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "alpha = 0: dT0 = theta I^2 R20"
+    },
+    {
+      "name": "self_heating_user_P_W_I5A_L200mm_w1mm_t70um_theta10_Ta55C",
+      "oracle_value": 1.4721754885466551,
+      "pinned_expected": 1.4721754885466551,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"
+    },
+    {
+      "name": "self_heating_user_dT_K_I1A_L50mm_w0.2mm_t17.5um_theta80_Ta85C",
+      "oracle_value": 26.81439555745408,
+      "pinned_expected": 26.81439555745408,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"
+    },
+    {
+      "name": "self_heating_user_dT0_K_I1A_L50mm_w0.2mm_t17.5um_theta80_Ta85C",
+      "oracle_value": 19.704433497536947,
+      "pinned_expected": 19.704433497536947,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "alpha = 0: dT0 = theta I^2 R20"
+    },
+    {
+      "name": "self_heating_user_P_W_I1A_L50mm_w0.2mm_t17.5um_theta80_Ta85C",
+      "oracle_value": 0.335179944468176,
+      "pinned_expected": 0.335179944468176,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"
+    },
+    {
+      "name": "self_heating_user_dT_K_I10A_L300mm_w3mm_t105um_theta4_Ta40C",
+      "oracle_value": 7.272114347357066,
+      "pinned_expected": 7.272114347357066,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"
+    },
+    {
+      "name": "self_heating_user_dT0_K_I10A_L300mm_w3mm_t105um_theta4_Ta40C",
+      "oracle_value": 6.568144499178982,
+      "pinned_expected": 6.568144499178982,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "alpha = 0: dT0 = theta I^2 R20"
+    },
+    {
+      "name": "self_heating_user_P_W_I10A_L300mm_w3mm_t105um_theta4_Ta40C",
+      "oracle_value": 1.8180285868392665,
+      "pinned_expected": 1.8180285868392665,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"
+    },
+    {
+      "name": "self_heating_user_dT_K_I2A_L100mm_w0.254mm_t35um_theta120_Ta25C",
+      "oracle_value": 149.68254939140013,
+      "pinned_expected": 149.68254939140013,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "closed form dT = theta I^2 R(Tamb)/(1 - theta I^2 R20 alpha); theta user-supplied"
+    },
+    {
+      "name": "self_heating_user_dT0_K_I2A_L100mm_w0.254mm_t35um_theta120_Ta25C",
+      "oracle_value": 93.09181179938716,
+      "pinned_expected": 93.09181179938716,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "alpha = 0: dT0 = theta I^2 R20"
+    },
+    {
+      "name": "self_heating_user_P_W_I2A_L100mm_w0.254mm_t35um_theta120_Ta25C",
+      "oracle_value": 1.2473545782616677,
+      "pinned_expected": 1.2473545782616677,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "P = I^2 R20 (1 + alpha (Tamb + dT - 20))"
+    },
+    {
+      "name": "self_heating_legacy_theta_K_per_W_I2A_L100mm_w0.5mm_t35um_outer_Ta25C",
+      "oracle_value": 52.959061826606025,
+      "pinned_expected": 52.959061826606025,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "theta_eff = dT_ipc / (I^2 R20), legacy IPC-2221 fit (not a heat-flow model)"
+    },
+    {
+      "name": "self_heating_legacy_dT_K_I2A_L100mm_w0.5mm_t35um_outer_Ta25C",
+      "oracle_value": 23.18209937814933,
+      "pinned_expected": 23.18209937814933,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "coupled closed form with theta_eff; LEGACY extrapolation"
+    },
+    {
+      "name": "self_heating_legacy_theta_K_per_W_I5A_L150mm_w2mm_t70um_outer_Ta25C",
+      "oracle_value": 11.78751077838797,
+      "pinned_expected": 11.78751077838797,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "theta_eff = dT_ipc / (I^2 R20), legacy IPC-2221 fit (not a heat-flow model)"
+    },
+    {
+      "name": "self_heating_legacy_dT_K_I5A_L150mm_w2mm_t70um_outer_Ta25C",
+      "oracle_value": 5.672056455546067,
+      "pinned_expected": 5.672056455546067,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "coupled closed form with theta_eff; LEGACY extrapolation"
+    },
+    {
+      "name": "self_heating_legacy_theta_K_per_W_I2A_L100mm_w1mm_t35um_inner_Ta40C",
+      "oracle_value": 163.34807690488054,
+      "pinned_expected": 163.34807690488054,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "theta_eff = dT_ipc / (I^2 R20), legacy IPC-2221 fit (not a heat-flow model)"
+    },
+    {
+      "name": "self_heating_legacy_dT_K_I2A_L100mm_w1mm_t35um_inner_Ta40C",
+      "oracle_value": 39.74409298486989,
+      "pinned_expected": 39.74409298486989,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "coupled closed form with theta_eff; LEGACY extrapolation"
+    },
+    {
+      "name": "self_heating_legacy_theta_K_per_W_I10A_L100mm_w5mm_t70um_outer_Ta25C",
+      "oracle_value": 11.799289453214055,
+      "pinned_expected": 11.799289453214055,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "theta_eff = dT_ipc / (I^2 R20), legacy IPC-2221 fit (not a heat-flow model)"
+    },
+    {
+      "name": "self_heating_legacy_dT_K_I10A_L100mm_w5mm_t70um_outer_Ta25C",
+      "oracle_value": 6.065220235141266,
+      "pinned_expected": 6.065220235141266,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "coupled closed form with theta_eff; LEGACY extrapolation"
+    },
+    {
+      "name": "self_heating_theta_crit_K_per_W_I2A_L100mm_w0.254mm_t35um",
+      "oracle_value": 328.002544529262,
+      "pinned_expected": 328.002544529262,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "theta at loop gain 1: runaway above this"
+    },
+    {
+      "name": "self_heating_theta_crit_K_per_W_I5A_L200mm_w1mm_t70um",
+      "oracle_value": 206.61577608142488,
+      "pinned_expected": 206.61577608142488,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "theta at loop gain 1: runaway above this"
+    },
+    {
+      "name": "self_heating_theta_crit_K_per_W_I1A_L50mm_w0.2mm_t17.5um",
+      "oracle_value": 1033.0788804071244,
+      "pinned_expected": 1033.0788804071244,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-019d",
+        "S-019g",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019d": "VERIFIED",
+        "S-019g": "UNVERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "theta at loop gain 1: runaway above this"
+    },
+    {
+      "name": "vdrop_A_constR_same_r_total_ohm",
+      "oracle_value": 0.20045812807881774,
+      "pinned_expected": 0.20045812807881774,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_i_A",
+      "oracle_value": 1.1764177499996378,
+      "pinned_expected": 1.1764177499996378,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_drop_V",
+      "oracle_value": 0.23582250000362198,
+      "pinned_expected": 0.23582250000362198,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_pct_frac",
+      "oracle_value": 0.01965187500030183,
+      "pinned_expected": 0.01965187500030183,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_v_load_V",
+      "oracle_value": 11.764177499996379,
+      "pinned_expected": 11.764177499996379,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_p_loss_W",
+      "oracle_value": 0.2774257748535505,
+      "pinned_expected": 0.2774257748535505,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_p_load_W",
+      "oracle_value": 13.839587225142104,
+      "pinned_expected": 13.839587225142104,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_p_src_W",
+      "oracle_value": 14.117012999995653,
+      "pinned_expected": 14.117012999995653,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_eff_frac",
+      "oracle_value": 0.9803481249996983,
+      "pinned_expected": 0.9803481249996983,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_p_max_W",
+      "oracle_value": 179.58862703659105,
+      "pinned_expected": 179.58862703659105,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_A_constR_same_e0_R_ohm",
+      "oracle_value": 0.05022906403940887,
+      "pinned_expected": 0.05022906403940887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_A_constR_same_e0_drop_V",
+      "oracle_value": 0.0590903625018291,
+      "pinned_expected": 0.0590903625018291,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e0_loss_W",
+      "oracle_value": 0.06951495130106476,
+      "pinned_expected": 0.06951495130106476,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e1_R_ohm",
+      "oracle_value": 0.05,
+      "pinned_expected": 0.05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_A_constR_same_e1_drop_V",
+      "oracle_value": 0.05882088749998189,
+      "pinned_expected": 0.05882088749998189,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e1_loss_W",
+      "oracle_value": 0.06919793612571051,
+      "pinned_expected": 0.06919793612571051,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e2_R_ohm",
+      "oracle_value": 0.05022906403940887,
+      "pinned_expected": 0.05022906403940887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_A_constR_same_e2_drop_V",
+      "oracle_value": 0.0590903625018291,
+      "pinned_expected": 0.0590903625018291,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e2_loss_W",
+      "oracle_value": 0.06951495130106476,
+      "pinned_expected": 0.06951495130106476,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e3_R_ohm",
+      "oracle_value": 0.05,
+      "pinned_expected": 0.05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_A_constR_same_e3_drop_V",
+      "oracle_value": 0.05882088749998189,
+      "pinned_expected": 0.05882088749998189,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_A_constR_same_e3_loss_W",
+      "oracle_value": 0.06919793612571051,
+      "pinned_expected": 0.06919793612571051,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_B_constI_none_r_total_ohm",
+      "oracle_value": 0.05092241379310346,
+      "pinned_expected": 0.05092241379310346,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_i_A",
+      "oracle_value": 2.0,
+      "pinned_expected": 2.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_drop_V",
+      "oracle_value": 0.10184482758620692,
+      "pinned_expected": 0.10184482758620692,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_pct_frac",
+      "oracle_value": 0.020368965517241384,
+      "pinned_expected": 0.020368965517241384,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_v_load_V",
+      "oracle_value": 4.8981551724137935,
+      "pinned_expected": 4.8981551724137935,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_p_loss_W",
+      "oracle_value": 0.20368965517241383,
+      "pinned_expected": 0.20368965517241383,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_p_load_W",
+      "oracle_value": 9.796310344827587,
+      "pinned_expected": 9.796310344827587,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_p_src_W",
+      "oracle_value": 10.0,
+      "pinned_expected": 10.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_eff_frac",
+      "oracle_value": 0.9796310344827587,
+      "pinned_expected": 0.9796310344827587,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_p_max_W",
+      "oracle_value": 122.7357372608769,
+      "pinned_expected": 122.7357372608769,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_B_constI_none_e0_R_ohm",
+      "oracle_value": 0.030922413793103457,
+      "pinned_expected": 0.030922413793103457,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_B_constI_none_e0_drop_V",
+      "oracle_value": 0.061844827586206914,
+      "pinned_expected": 0.061844827586206914,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_B_constI_none_e0_loss_W",
+      "oracle_value": 0.12368965517241383,
+      "pinned_expected": 0.12368965517241383,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_B_constI_none_e1_R_ohm",
+      "oracle_value": 0.02,
+      "pinned_expected": 0.02,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_B_constI_none_e1_drop_V",
+      "oracle_value": 0.04,
+      "pinned_expected": 0.04,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_B_constI_none_e1_loss_W",
+      "oracle_value": 0.08,
+      "pinned_expected": 0.08,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_r_total_ohm",
+      "oracle_value": 0.21965911330049262,
+      "pinned_expected": 0.21965911330049262,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_i_A",
+      "oracle_value": 1.7208750767428527,
+      "pinned_expected": 1.7208750767428527,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_drop_V",
+      "oracle_value": 0.3780058934582522,
+      "pinned_expected": 0.3780058934582522,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_pct_frac",
+      "oracle_value": 0.031500491121521014,
+      "pinned_expected": 0.031500491121521014,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_v_load_V",
+      "oracle_value": 11.621994106541749,
+      "pinned_expected": 11.621994106541749,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_p_loss_W",
+      "oracle_value": 0.6505009209142204,
+      "pinned_expected": 0.6505009209142204,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_p_load_W",
+      "oracle_value": 20.000000000000014,
+      "pinned_expected": 20.000000000000014,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_p_src_W",
+      "oracle_value": 20.650500920914233,
+      "pinned_expected": 20.650500920914233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_eff_frac",
+      "oracle_value": 0.968499508878479,
+      "pinned_expected": 0.968499508878479,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_p_max_W",
+      "oracle_value": 163.89030921176564,
+      "pinned_expected": 163.89030921176564,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_C_constP_list_e0_R_ohm",
+      "oracle_value": 0.05603694581280789,
+      "pinned_expected": 0.05603694581280789,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_C_constP_list_e0_drop_V",
+      "oracle_value": 0.09643258342605085,
+      "pinned_expected": 0.09643258342605085,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e0_loss_W",
+      "oracle_value": 0.1659484294038168,
+      "pinned_expected": 0.1659484294038168,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e1_R_ohm",
+      "oracle_value": 0.1,
+      "pinned_expected": 0.1,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_C_constP_list_e1_drop_V",
+      "oracle_value": 0.17208750767428527,
+      "pinned_expected": 0.17208750767428527,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e1_loss_W",
+      "oracle_value": 0.2961411029754719,
+      "pinned_expected": 0.2961411029754719,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e2_R_ohm",
+      "oracle_value": 0.03,
+      "pinned_expected": 0.03,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_C_constP_list_e2_drop_V",
+      "oracle_value": 0.051626252302285576,
+      "pinned_expected": 0.051626252302285576,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e2_loss_W",
+      "oracle_value": 0.08884233089264157,
+      "pinned_expected": 0.08884233089264157,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e3_R_ohm",
+      "oracle_value": 0.033622167487684734,
+      "pinned_expected": 0.033622167487684734,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_C_constP_list_e3_drop_V",
+      "oracle_value": 0.05785955005563051,
+      "pinned_expected": 0.05785955005563051,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_C_constP_list_e3_loss_W",
+      "oracle_value": 0.09956905764229008,
+      "pinned_expected": 0.09956905764229008,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_D_constV_none_r_total_ohm",
+      "oracle_value": 0.16068719211822663,
+      "pinned_expected": 0.16068719211822663,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_i_A",
+      "oracle_value": 0.6223271356090658,
+      "pinned_expected": 0.6223271356090658,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_drop_V",
+      "oracle_value": 0.09999999999999963,
+      "pinned_expected": 0.09999999999999963,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_pct_frac",
+      "oracle_value": 0.030303030303030193,
+      "pinned_expected": 0.030303030303030193,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_v_load_V",
+      "oracle_value": 3.2,
+      "pinned_expected": 3.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_p_loss_W",
+      "oracle_value": 0.06223271356090636,
+      "pinned_expected": 0.06223271356090636,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_p_load_W",
+      "oracle_value": 1.9914468339490108,
+      "pinned_expected": 1.9914468339490108,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_p_src_W",
+      "oracle_value": 2.053679547509917,
+      "pinned_expected": 2.053679547509917,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_eff_frac",
+      "oracle_value": 0.9696969696969698,
+      "pinned_expected": 0.9696969696969698,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_p_max_W",
+      "oracle_value": 16.942856266956877,
+      "pinned_expected": 16.942856266956877,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_D_constV_none_e0_R_ohm",
+      "oracle_value": 0.15068719211822662,
+      "pinned_expected": 0.15068719211822662,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_D_constV_none_e0_drop_V",
+      "oracle_value": 0.09377672864390897,
+      "pinned_expected": 0.09377672864390897,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_D_constV_none_e0_loss_W",
+      "oracle_value": 0.058359802923752514,
+      "pinned_expected": 0.058359802923752514,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_D_constV_none_e1_R_ohm",
+      "oracle_value": 0.01,
+      "pinned_expected": 0.01,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_D_constV_none_e1_drop_V",
+      "oracle_value": 0.0062232713560906585,
+      "pinned_expected": 0.0062232713560906585,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_D_constV_none_e1_loss_W",
+      "oracle_value": 0.0038729106371538464,
+      "pinned_expected": 0.0038729106371538464,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_r_total_ohm",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_i_A",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_drop_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_pct_frac",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_v_load_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_p_loss_W",
+      "oracle_value": 6.25,
+      "pinned_expected": 6.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_p_load_W",
+      "oracle_value": 6.25,
+      "pinned_expected": 6.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_p_src_W",
+      "oracle_value": 12.5,
+      "pinned_expected": 12.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_eff_frac",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_p_max_W",
+      "oracle_value": 6.25,
+      "pinned_expected": 6.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_e0_R_ohm",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_e0_drop_V",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_E_pmax_edge_e0_loss_W",
+      "oracle_value": 6.25,
+      "pinned_expected": 6.25,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_r_total_ohm",
+      "oracle_value": 0.4821459359605912,
+      "pinned_expected": 0.4821459359605912,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_i_A",
+      "oracle_value": 4.58989265292049,
+      "pinned_expected": 4.58989265292049,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_drop_V",
+      "oracle_value": 2.2129980891009904,
+      "pinned_expected": 2.2129980891009904,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_pct_frac",
+      "oracle_value": 0.09220825371254127,
+      "pinned_expected": 0.09220825371254127,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_v_load_V",
+      "oracle_value": 21.787001910899008,
+      "pinned_expected": 21.787001910899008,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_p_loss_W",
+      "oracle_value": 10.15742367009172,
+      "pinned_expected": 10.15742367009172,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_p_load_W",
+      "oracle_value": 100.00000000000003,
+      "pinned_expected": 100.00000000000003,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_p_src_W",
+      "oracle_value": 110.15742367009176,
+      "pinned_expected": 110.15742367009176,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_eff_frac",
+      "oracle_value": 0.9077917462874586,
+      "pinned_expected": 0.9077917462874586,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_p_max_W",
+      "oracle_value": 298.66475948429445,
+      "pinned_expected": 298.66475948429445,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e0_R_ohm",
+      "oracle_value": 0.041072967980295576,
+      "pinned_expected": 0.041072967980295576,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e0_drop_V",
+      "oracle_value": 0.1885205139663972,
+      "pinned_expected": 0.1885205139663972,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e0_loss_W",
+      "oracle_value": 0.8652889219791612,
+      "pinned_expected": 0.8652889219791612,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e1_R_ohm",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e1_drop_V",
+      "oracle_value": 0.9179785305840981,
+      "pinned_expected": 0.9179785305840981,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e1_loss_W",
+      "oracle_value": 4.213422913066699,
+      "pinned_expected": 4.213422913066699,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e2_R_ohm",
+      "oracle_value": 0.041072967980295576,
+      "pinned_expected": 0.041072967980295576,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e2_drop_V",
+      "oracle_value": 0.1885205139663972,
+      "pinned_expected": 0.1885205139663972,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e2_loss_W",
+      "oracle_value": 0.8652889219791612,
+      "pinned_expected": 0.8652889219791612,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e3_R_ohm",
+      "oracle_value": 0.2,
+      "pinned_expected": 0.2,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance (trace R(T) or user ohmic value)"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e3_drop_V",
+      "oracle_value": 0.9179785305840981,
+      "pinned_expected": 0.9179785305840981,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "vdrop_F_constP_heavy_e3_loss_W",
+      "oracle_value": 4.213422913066699,
+      "pinned_expected": 4.213422913066699,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
     }
   ]
 }

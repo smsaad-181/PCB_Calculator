@@ -74,6 +74,7 @@ function build(raw: unknown): CalcOutcome {
   let baseThickness: Quantity;
   let weightMode = false;
   let basis: CopperBasis;
+  let platingEstimate = false;
 
   if (inp.weight !== undefined) {
     weightMode = true;
@@ -133,8 +134,9 @@ function build(raw: unknown): CalcOutcome {
     const p = inp.platingThickness;
     inputs.push({ name: 'plating thickness', value: q(p.si, p.dim), source: 'user' });
     const fin = q(baseThickness.si + p.si, DIM.LENGTH);
-    steps.push({ label: 'Estimated finished thickness', expr: 'finished = base thickness + plating thickness', value: fin });
+    steps.push({ label: 'Estimated finished thickness (upper estimate)', expr: 'finished = base thickness + plating thickness', value: fin });
     results.push({ name: 'estimated finished thickness', value: fin, role: 'secondary', bound: nominalBound });
+    platingEstimate = true;
   }
 
   const info = FOIL_CONVENTIONS[convention];
@@ -150,7 +152,7 @@ function build(raw: unknown): CalcOutcome {
     warnings.push({
       severity: 'caution',
       message:
-        'Outer-layer copper usually finishes thicker than the nominal foil after plating; a secondhand figure is about +37 % (S-009, not read from the standard). Ask your fabricator for finished copper.',
+        'Outer-layer copper can finish thicker than the nominal foil after plating. The +37 % figure (1 oz, Class 2) is an IPC-6012 minimum indexed by starting foil weight, reported secondhand (S-009, not read from the standard); it is a minimum, not typical, and your fabricator may start from thinner foil. Ask your fabricator for finished copper.',
       code: 'OUTER_FINISHES_THICKER',
     });
   } else {
@@ -159,6 +161,14 @@ function build(raw: unknown): CalcOutcome {
       message:
         'Inner-layer finished copper can be thinner than nominal after etch and processing; a secondhand figure is about -29 % (S-009, not read from the standard). Ask your fabricator for finished copper.',
       code: 'INNER_FINISHES_THINNER',
+    });
+  }
+  if (platingEstimate) {
+    warnings.push({
+      severity: 'caution',
+      message:
+        'Estimated finished thickness (base + plating) is an upper estimate: it ignores processing loss and that a fabricator often starts from thinner foil. Do not use it as a design input; use the finished copper value published or confirmed by your fabricator.',
+      code: 'PLATING_UPPER_ESTIMATE',
     });
   }
   warnings.push({

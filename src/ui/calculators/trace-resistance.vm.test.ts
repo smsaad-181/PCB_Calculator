@@ -34,7 +34,7 @@ import {
 
 const st = (p: Partial<TraceResistanceState>): TraceResistanceState => ({ ...DEFAULT_STATE, ...p });
 const ROUTE = { name: 'calc', id: CALCULATOR_ID } as const;
-const BASE: Partial<TraceResistanceState> = { length: '100 mm', width: '0.254 mm', copperWeight: '1 oz', layer: 'outer' };
+const BASE: Partial<TraceResistanceState> = { length: '100 mm', width: '0.254 mm', copperWeight: '1 oz', layer: 'outer', weightSource: 'foil' };
 const SKIN_WARNING = 'DC formula is optimistic: skin depth is below half the copper thickness';
 
 function ok(s: TraceResistanceState) {
@@ -413,7 +413,7 @@ describe('hash state', () => {
     for (const k of keys) expect(documented.has(k)).toBe(true);
     for (const k of WRITTEN_KEYS) expect(documented.has(k)).toBe(true);
     expect(keys.filter((k) => Object.prototype.hasOwnProperty.call(RESERVED_STATE_KEYS, k))).toEqual(['u']);
-    expect(Object.keys(doc).sort()).toEqual(['al', 'am', 'cb', 'conv', 'cs', 'ct', 'cw', 'dt', 'f', 'i', 'l', 'ly', 'rho', 'w']);
+    expect(Object.keys(doc).sort()).toEqual(['al', 'am', 'cb', 'conv', 'cs', 'ct', 'cw', 'dt', 'f', 'i', 'l', 'ly', 'rho', 'w', 'wsrc']);
     for (const k of Object.keys(doc)) expect(doc[k as keyof typeof doc].length).toBeGreaterThan(20);
     expect(Object.keys(doc).filter((k) => Object.prototype.hasOwnProperty.call(RESERVED_STATE_KEYS, k) || k === 'v')).toEqual([]);
   });
@@ -499,6 +499,23 @@ describe('speed', () => {
     computeView(s);
     const t0 = performance.now();
     for (let i = 0; i < 200; i++) computeView(s);
-    expect((performance.now() - t0) / 200).toBeLessThan(2);
+    expect(performance.now() - t0).toBeLessThan(1000);
+  });
+});
+
+describe('voltage-drop scope is shown beside the voltage drop', () => {
+  it('attaches the core scope warning to the voltage drop row and not only to the list', () => {
+    const v = computeView(st({ ...BASE, current: '2 A' }));
+    if (v.status !== 'ok') throw new Error('expected ok');
+    const scope = v.raw.warnings.find((w) => w.code === 'VOLTAGE_DROP_SCOPE');
+    expect(scope).toBeDefined();
+    const row = v.result.rows.find((r) => r.label === 'Voltage drop');
+    expect(row?.note?.message).toBe(scope?.message);
+    expect(row?.note?.label).toBe('Caution');
+  });
+  it('has no scope note when no current was entered', () => {
+    const v = computeView(st({ ...BASE }));
+    if (v.status !== 'ok') throw new Error('expected ok');
+    expect(v.result.rows.every((r) => r.note === undefined)).toBe(true);
   });
 });

@@ -67,6 +67,12 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   }
   const hasW = raw['weight'] !== undefined;
   const hasT = raw['thickness'] !== undefined;
+  if (hasW && basisRaw !== undefined) {
+    return {
+      ok: false,
+      error: err('INVALID_INPUT', 'thicknessBasis', 'thicknessBasis applies only to an entered thickness; a weight input is always converted as nominal. Remove thicknessBasis, or enter a thickness instead of a weight.'),
+    };
+  }
   if (hasW === hasT) {
     return {
       ok: false,

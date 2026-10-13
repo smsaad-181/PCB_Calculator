@@ -180,22 +180,22 @@ function build(raw: unknown): CalcOutcome {
 
   // Steps.
   const steps: CalcResult['steps'] = [
-    { label: 'Copper thickness', expr: 'weight x thickness per oz/ft2 of the chosen convention, or the entered thickness', value: thickness },
+    { label: 'Copper thickness', expr: 'weight x thickness per oz/ft2 of the chosen convention, or the entered thickness', value: thickness, bound: 'nominal' },
     { label: 'Fitted constant k', expr: `k = ${String(k)} (${layer === 'outer' ? 'external' : 'internal'})`, value: dimless(k) },
   ];
   if (solved === 'width') {
-    steps.push({ label: 'Required cross-section area', expr: 'A = (I / (k x dT^0.44))^(1/0.725), computed in mil2', value: area });
-    steps.push({ label: 'Required width', expr: 'width = A / copper thickness', value: width });
+    steps.push({ label: 'Required cross-section area', expr: 'A = (I / (k x dT^0.44))^(1/0.725), computed in mil2', value: area, bound: 'min-requirement' });
+    steps.push({ label: 'Required width', expr: 'width = A / copper thickness', value: width, bound: 'min-requirement' });
   } else {
-    steps.push({ label: 'Cross-section area', expr: 'A = width x copper thickness', value: area });
+    steps.push({ label: 'Cross-section area', expr: 'A = width x copper thickness', value: area, bound: 'nominal' });
     steps.push(
       solved === 'current'
-        ? { label: 'Current capacity', expr: 'I = k x dT^0.44 x A^0.725', value: current }
-        : { label: 'Temperature rise', expr: 'dT = (I / (k x A^0.725))^(1/0.44)', value: deltaT },
+        ? { label: 'Current capacity', expr: 'I = k x dT^0.44 x A^0.725', value: current, bound: 'max-capacity' }
+        : { label: 'Temperature rise', expr: 'dT = (I / (k x A^0.725))^(1/0.44)', value: deltaT, bound: 'prediction' },
     );
   }
-  steps.push({ label: 'Maximum conductor temperature', expr: 'T = ambient + dT', value: maxTemp });
-  steps.push({ label: 'Current density', expr: 'J = I / A', value: density });
+  steps.push({ label: 'Maximum conductor temperature', expr: 'T = ambient + dT', value: maxTemp, bound: 'prediction' });
+  steps.push({ label: 'Current density', expr: 'J = I / A', value: density, bound: 'prediction' });
 
   // Results.
   const roleOf = (n: 'width' | 'current' | 'deltaT'): 'primary' | 'secondary' => (n === solved ? 'primary' : 'secondary');
@@ -212,17 +212,22 @@ function build(raw: unknown): CalcOutcome {
   // Design values.
   const designValues: DesignValue[] = [];
   if (solved === 'width') {
+    // One margin basis for the whole tool: the margin is on CURRENT (the reciprocal of the current derating). The
+    // recommended width is the width that carries margin x I at the same temperature rise: A is proportional to I^(1/0.725).
     const f = margin.si;
+    const widthFactor = f ** (1 / C.exponentArea);
+    const effect = `the recommended width carries ${String(f)} x the requested current at the same temperature rise (minimum width x${num(widthFactor)})`;
     designValues.push({
       name: 'width',
       direction: 'min-requirement',
       calculated: width,
-      recommended: q(width.si * f, DIM.LENGTH),
+      recommended: q(width.si * widthFactor, DIM.LENGTH),
       derating: {
-        factor: f,
+        // The schema requires recommended = calculated x factor, so the factor is the WIDTH factor; the margin on current is f.
+        factor: widthFactor,
         rationale: marginDefaulted
-          ? `Design margin x${String(f)} on the minimum width: engineering default, not from a standard. Set your own margin.`
-          : `Design margin x${String(f)} on the minimum width, set by the user.`,
+          ? `Design margin x${String(f)} on the current: ${effect}. This margin is an engineering default, not from a standard. Set your own margin.`
+          : `Design margin x${String(f)} on the current, set by the user: ${effect}.`,
       },
     });
   } else if (solved === 'current') {
@@ -289,6 +294,13 @@ function build(raw: unknown): CalcOutcome {
   const solvedReasons: string[] = [];
   const warnings: CalcWarning[] = [{ severity: 'caution', message: MANDATORY_CAUTION, code: 'LEGACY_METHOD' }];
   if (layer === 'inner') warnings.push({ severity: 'caution', message: INNER_CAUTION, code: 'INNER_K_CONSERVATIVE' });
+  if (layer === 'inner' && above(curA, V.innerCurrentCautionA)) {
+    warnings.push({
+      severity: 'caution',
+      message: `Inner-layer current ${num(curA)} A is above ${String(V.innerCurrentCautionA)} A. Ledger S-010 records a CONFLICT: one source gives a separate ${String(V.innerCurrentCautionA)} A internal limit (KiCad legacy help text, tier 4, unverified) while the main chart range is ${String(V.currentA)} A. The ${String(V.currentA)} A hard limit still applies; between the two the result is extrapolation, so treat it with extra caution.`,
+      code: 'INNER_CURRENT_ABOVE_17_5A',
+    });
+  }
   if (dTc < V.deltaTChartStartC * (1 - REL_TOL)) {
     warnings.push({
       severity: 'info',
@@ -334,8 +346,8 @@ function build(raw: unknown): CalcOutcome {
       ? `Ambient temperature ${String(DEF.ambientC)} °C is an engineering default, not from a standard; it sets the maximum conductor temperature.`
       : `Ambient temperature ${num(toUnit(ambient, 'degC'))} °C set by the user.`,
     marginDefaulted
-      ? `Design margin ${String(DEF.designMargin)} is an engineering default, not from a standard (applied when the width is solved).`
-      : `Design margin ${String(margin.si)} set by the user (applied when the width is solved).`,
+      ? `Design margin ${String(DEF.designMargin)} is a margin on current and an engineering default, not from a standard (applied when the width is solved: the recommended width is solved for margin x current).`
+      : `Design margin ${String(margin.si)} on current set by the user (applied when the width is solved: the recommended width is solved for margin x current).`,
     derateDefaulted
       ? `Current derating ${String(DEF.currentDerating)} is an engineering default, not from a standard (applied when the current capacity is solved).`
       : `Current derating ${String(derating.si)} set by the user (applied when the current capacity is solved).`,

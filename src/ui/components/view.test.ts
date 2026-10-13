@@ -91,3 +91,15 @@ describe('local state keys', () => {
     }
   });
 });
+
+describe('ledgerView groups', () => {
+  it('separates paywalled from conflicting sources', () => {
+    const v = ledgerView(['S-001', 'S-010', 'S-003']);
+    for (const g of v.groups) for (const id of g.ids) expect(v.entries.find((e) => e.id === id)?.status).toBe(g.status);
+    expect(v.groups.flatMap((g) => g.ids).sort()).toEqual([...v.unverifiedIds].sort());
+    expect(new Set(v.groups.map((g) => g.status)).size).toBe(v.groups.length);
+  });
+  it('has no groups when everything is verified', () => {
+    expect(ledgerView([]).groups).toEqual([]);
+  });
+});

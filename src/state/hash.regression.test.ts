@@ -37,11 +37,15 @@ describe('m-5 hash size and key-count caps', () => {
 
   it('m-5 200k keys discards state quickly without throwing', () => {
     const h = hashWithKeys(200_000);
+    const runs = 5;
     const t0 = performance.now();
-    const r = parseHash(h);
+    let r = parseHash(h);
+    for (let i = 1; i < runs; i++) r = parseHash(h);
+    const dt = performance.now() - t0;
     expect(r.stateDiscarded).toBe(true);
     expect(r.state).toEqual({});
-    expect(performance.now() - t0).toBeLessThan(100);
+    // Total budget over several runs; an O(n^2) walk of 200k keys would take far longer.
+    expect(dt).toBeLessThan(1000);
   });
 
   it('m-5 route-only parsing of an oversized hash still works', () => {

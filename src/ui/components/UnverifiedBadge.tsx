@@ -28,3 +28,16 @@ export function UnverifiedBadge({ status, ledgerIds }: Props) {
     </span>
   );
 }
+
+/** One badge per status group, so paywalled sources and conflicting sources are described separately. */
+export function UnverifiedBadges({ groups }: { readonly groups: readonly { readonly status: LedgerStatus; readonly ids: readonly string[] }[] }) {
+  return (
+    <>
+      {groups.map((g) => (
+        <span key={g.status}>
+          <UnverifiedBadge status={g.status} ledgerIds={g.ids} />{' '}
+        </span>
+      ))}
+    </>
+  );
+}

@@ -123,6 +123,7 @@ function plainFor(dim: Dim, prefs: DisplayPrefs): Plain | undefined {
   }
   if (dimEqual(dim, DIM.AREAL_MASS)) return { unit: 'oz/ft2', label: `oz/ft${SQ}` };
   if (dimEqual(dim, DIM.THERMAL_RESISTANCE)) return { unit: 'K/W', label: 'K/W' };
+  if (dimEqual(dim, DIM.THERMAL_RESISTANCE_PER_LENGTH)) return { unit: 'K·m/W', label: 'K·m/W' };
   if (dimEqual(dim, DIM.THERMAL_CONDUCTIVITY)) return { unit: 'W/mK', label: 'W/(m·K)' };
   if (dimEqual(dim, DIM.PER_KELVIN)) return { unit: '/K', label: '/K' };
   if (dimEqual(dim, DIM.CURRENT_DENSITY)) return { unit: 'A/mm2', label: `A/mm${SQ}` };

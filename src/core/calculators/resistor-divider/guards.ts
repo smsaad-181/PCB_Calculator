@@ -18,6 +18,8 @@ export interface ValidInputs {
   readonly snap: SnapMode;
   readonly tolerance?: Quantity;
   readonly vinTolerance?: Quantity;
+  readonly loadTolerance?: Quantity;
+  readonly ratedVoltage?: Quantity;
 }
 
 const err = (code: CalcError['code'], field: string, message: string): CalcError => ({ code, field, message });
@@ -26,13 +28,14 @@ const SOLVE: readonly string[] = ['vout', 'r1', 'r2'];
 const SERIES: readonly string[] = ['E24', 'E96', 'E192', 'none'];
 const SNAPS: readonly string[] = ['nearest', 'up', 'down'];
 
-type QField = 'vin' | 'r1' | 'r2' | 'target' | 'load';
+type QField = 'vin' | 'r1' | 'r2' | 'target' | 'load' | 'ratedVoltage';
 const SPEC: Record<QField, { dim: Quantity['dim']; name: string }> = {
   vin: { dim: DIM.VOLTAGE, name: 'voltage (V)' },
   r1: { dim: DIM.RESISTANCE, name: 'resistance (ohm)' },
   r2: { dim: DIM.RESISTANCE, name: 'resistance (ohm)' },
   target: { dim: DIM.VOLTAGE, name: 'voltage (V)' },
   load: { dim: DIM.RESISTANCE, name: 'resistance (ohm)' },
+  ratedVoltage: { dim: DIM.VOLTAGE, name: 'voltage (V)' },
 };
 
 function guardFraction(field: string, v: unknown): Result<Quantity, CalcError> {
@@ -70,14 +73,14 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
     return { ok: false, error: err('INVALID_INPUT', 'snap', 'snap must be "nearest", "up" or "down".') };
   }
   const out: Partial<Record<QField, Quantity>> = {};
-  for (const f of ['vin', 'r1', 'r2', 'target', 'load'] as const) {
+  for (const f of ['vin', 'r1', 'r2', 'target', 'load', 'ratedVoltage'] as const) {
     if (raw[f] === undefined) continue;
     const g = guardQuantity(f, raw[f], SPEC[f].dim, SPEC[f].name);
     if (!g.ok) return g;
     out[f] = g.value;
   }
-  const frs: Partial<Record<'tolerance' | 'vinTolerance', Quantity>> = {};
-  for (const f of ['tolerance', 'vinTolerance'] as const) {
+  const frs: Partial<Record<'tolerance' | 'vinTolerance' | 'loadTolerance', Quantity>> = {};
+  for (const f of ['tolerance', 'vinTolerance', 'loadTolerance'] as const) {
     if (raw[f] === undefined) continue;
     const g = guardFraction(f, raw[f]);
     if (!g.ok) return g;
@@ -93,6 +96,9 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       const why = f === mode ? `${f} is the unknown when solving for ${mode}; do not give it.` : `${f} is not used when solving for ${mode}.`;
       return { ok: false, error: err('INVALID_INPUT', f, why) };
     }
+  }
+  if (frs.loadTolerance !== undefined && out.load === undefined) {
+    return { ok: false, error: err('INVALID_INPUT', 'loadTolerance', 'loadTolerance needs a load; give the load resistance or remove loadTolerance.') };
   }
   const series = (seriesRaw as SeriesChoice | undefined) ?? 'none';
   if (mode === 'vout' && series !== 'none') {
@@ -111,6 +117,8 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       snap: (snapRaw as SnapMode | undefined) ?? 'nearest',
       ...(frs.tolerance !== undefined ? { tolerance: frs.tolerance } : {}),
       ...(frs.vinTolerance !== undefined ? { vinTolerance: frs.vinTolerance } : {}),
+      ...(frs.loadTolerance !== undefined ? { loadTolerance: frs.loadTolerance } : {}),
+      ...(out.ratedVoltage !== undefined ? { ratedVoltage: out.ratedVoltage } : {}),
     },
   };
 }

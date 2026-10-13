@@ -2,7 +2,7 @@
 // No engineering math lives here. Every headline number is printed through src/core/format-result.ts.
 import { CONFIDENCE_RULE_TEXT, type ConfidenceLevel, type AccuracyClass } from '../../core/confidence';
 import { LEDGER, type LedgerStatus } from '../../core/data/ledger';
-import { formatDesignValue, formatResult, type HeadlineOpts } from '../../core/format-result';
+import { formatDesignValue, formatResult, formatStep, type HeadlineOpts } from '../../core/format-result';
 import type { Bound, CalcInput, CalcResult, InputSource, WarningSeverity } from '../../core/result';
 import {
   DEFAULT_DISPLAY_PREFS,
@@ -62,6 +62,8 @@ export interface LedgerView {
   /** Ids whose status is not VERIFIED. Non-empty means the UNVERIFIED badge is shown. */
   readonly unverifiedIds: readonly string[];
   readonly worst: LedgerStatus;
+  /** Non-VERIFIED ids grouped by their own status, most serious first, so a paywalled source is not described as a conflict. */
+  readonly groups: readonly { readonly status: LedgerStatus; readonly ids: readonly string[] }[];
 }
 
 const STATUS_RANK: Readonly<Record<LedgerStatus, number>> = {
@@ -82,7 +84,10 @@ export function ledgerView(ids: readonly string[]): LedgerView {
   });
   let worst: LedgerStatus = 'VERIFIED';
   for (const e of entries) if (STATUS_RANK[e.status] > STATUS_RANK[worst]) worst = e.status;
-  return { entries, unverifiedIds: entries.filter((e) => e.status !== 'VERIFIED').map((e) => e.id), worst };
+  const groups = (['CONFLICT', 'PAYWALLED-USER-MUST-VERIFY', 'UNVERIFIED'] as const)
+    .map((status) => ({ status, ids: entries.filter((e) => e.status === status).map((e) => e.id) }))
+    .filter((g) => g.ids.length > 0);
+  return { entries, unverifiedIds: entries.filter((e) => e.status !== 'VERIFIED').map((e) => e.id), worst, groups };
 }
 
 // ---------------------------------------------------------------------------
@@ -132,6 +137,8 @@ export interface ProvenanceRow {
 export interface ResultRowView {
   readonly label: string;
   readonly text: string;
+  /** A core warning shown directly under this row (for example the scope of a voltage drop). */
+  readonly note?: { readonly label: string; readonly message: string };
 }
 
 /** A calculated limit next to the recommended design value, both printed through formatDesignValue. */
@@ -181,7 +188,9 @@ export interface BuildOptions {
   /** Per-name override of `lengthRole`, matched against result names, input names and step labels. */
   readonly lengthRoleByName?: Readonly<Record<string, 'geometry' | 'thickness'>>;
   /** Per design value name: what the factor is called ("margin", "derating") and whether it is an engineering default. */
-  readonly designNotes?: Readonly<Record<string, { readonly noun: string; readonly defaulted: boolean }>>;
+  readonly designNotes?: Readonly<Record<string, { readonly noun: string; readonly defaulted: boolean; /** Replaces "calculated × factor" when the factor is not the user-facing margin. */ readonly basis?: string }>>;
+  /** Result name to warning code: that warning is shown under the row instead of in the warning list. */
+  readonly rowWarnings?: Readonly<Record<string, string>>;
   /** Extra result rows with text already built through format-result by the caller. */
   readonly extraRows?: readonly ResultRowView[];
   /** Input names left out of the provenance table (inputs the chosen solve does not use). */
@@ -196,6 +205,11 @@ const MEANING: Readonly<Record<Bound, string>> = {
   'max-capacity': 'Maximum capacity (rounded down)',
   prediction: 'Predicted value (rounded up)',
 };
+
+/** A dimensionless factor printed through format-result. */
+export function factorText(f: number, opts: HeadlineOpts): string {
+  return formatResult({ value: q(f, DIM.DIMENSIONLESS), bound: 'nominal' }, opts);
+}
 
 const capitalise = (s: string): string => (s === '' ? s : s.charAt(0).toUpperCase() + s.slice(1));
 
@@ -217,13 +231,21 @@ export function buildResultView(r: CalcResult, o: BuildOptions): ResultView {
   const skip = new Set(o.skip ?? []);
   const rows: ResultRowView[] = r.results
     .filter((x) => x !== head && !skip.has(x.name))
-    .map((x) => ({ label: label(x.name), text: formatResult(x, optsFor(x.name)) }));
+    .map((x): ResultRowView => {
+      const base = { label: label(x.name), text: formatResult(x, optsFor(x.name)) };
+      const code = o.rowWarnings?.[x.name];
+      const w = code === undefined ? undefined : r.warnings.find((k) => k.code === code);
+      return w === undefined ? base : { ...base, note: { label: SEVERITY_LABEL[w.severity], message: w.message } };
+    });
+  const inlineCodes = new Set(Object.values(o.rowWarnings ?? {}));
+  const listed = r.warnings.filter((w) => w.code === undefined || !inlineCodes.has(w.code) || !rows.some((row) => row.note?.message === w.message));
   rows.push(...(o.extraRows ?? []));
   const designValues: DesignValueView[] = r.designValues.map((dv) => {
     const dvOpts = optsFor(dv.name);
     const note = o.designNotes?.[dv.name];
-    const factor = String(dv.derating.factor);
-    const how = note === undefined ? `calculated × ${factor}` : `calculated × ${factor} ${note.noun}, ${note.defaulted ? 'engineering default' : 'set by you'}`;
+    const factor = factorText(dv.derating.factor, dvOpts);
+    const who = note?.defaulted === true ? 'engineering default' : 'set by you';
+    const how = note === undefined ? `calculated × ${factor}` : note.basis !== undefined ? `${note.basis}, ${who}` : `calculated × ${factor} ${note.noun}, ${who}`;
     return {
       name: label(dv.name),
       direction: dv.direction,
@@ -240,13 +262,13 @@ export function buildResultView(r: CalcResult, o: BuildOptions): ResultView {
     designValues,
     ledger: ledgerView(r.reference.ledgerIds),
     confidence: { level: r.confidence.level, score: r.confidence.score, reasons: [...r.confidence.reasons], ruleText: CONFIDENCE_RULE_TEXT },
-    warnings: orderWarnings(r.warnings, o.pinWarningCodes ?? []),
+    warnings: orderWarnings(listed, o.pinWarningCodes ?? []),
     recommendation: r.recommendation,
     details: {
       method: r.method,
       reference: `${r.reference.standard}, edition: ${r.reference.edition}`,
       formula: r.formula,
-      steps: r.steps.map((s) => ({ label: s.label, expr: s.expr, text: formatResult({ value: s.value, bound: 'nominal' }, optsFor(s.label)) })),
+      steps: r.steps.map((s) => ({ label: s.label, expr: s.expr, text: formatStep(s, optsFor(s.label)) })),
       assumptions: [...r.assumptions],
       validity: r.validityChecks.map((v) => ({ ...v })),
       inputs: [...r.inputs.filter((i) => !(o.skipInputs ?? []).includes(i.name)).map((i) => inputRow(i, label(i.name), optsFor(i.name))), ...(o.extraProvenance ?? [])],

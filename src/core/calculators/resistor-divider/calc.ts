@@ -21,11 +21,17 @@ export interface Inputs {
   snap?: SnapMode;
   tolerance?: Quantity;
   vinTolerance?: Quantity;
+  /** Load tolerance, its own input. Unspecified means 0 % extra (an assumption), never the resistor tolerance. */
+  loadTolerance?: Quantity;
+  /** User-entered rated working voltage of the resistors. No default: the app carries no resistor voltage rating. */
+  ratedVoltage?: Quantity;
 }
 
 const RECOMMENDATION =
   'Values are exact for the stated inputs and ideal resistors. Check the power rating of each resistor against the dissipation shown, and use the tolerance envelope for real parts.';
 const POWER_INFO = 'Choose resistors rated for at least twice the dissipation shown for each resistor unless your design rules say otherwise; check the power rating against the figures above.';
+const VOLTAGE_NOT_CHECKED = 'resistor voltage rating not checked: enter the rated working voltage';
+const CREEPAGE_NOT_CHECKED = 'Creepage and clearance are not checked. At high voltage the spacing across and around the resistor bodies and pads needs its own check against the applicable safety standard.';
 const REL_TOL = 1e-9;
 const STATUS_PLAIN = dataStatusForLedgerIds(['S-019']);
 const STATUS_SNAP = dataStatusForLedgerIds(['S-019', 'S-016']);
@@ -94,6 +100,8 @@ function build(raw: unknown): CalcOutcome {
   const i1 = fin((vin - vout) / r1, 'Divider current');
   const p1 = fin(i1 * i1 * r1, 'Power in r1');
   const p2 = fin((vout * vout) / r2, 'Power in r2');
+  const vR1 = fin(vin - vout, 'Voltage across r1');
+  const vR2 = vout;
   const pTotal = fin(vin * i1, 'Total power');
   const pLoad = rl === undefined ? undefined : fin((vout * vout) / rl, 'Power in load');
   const rout = fin(par(r1, r2), 'Output impedance');
@@ -105,6 +113,8 @@ function build(raw: unknown): CalcOutcome {
   if (inp.load !== undefined) inputs.push({ name: 'load', value: q(inp.load.si, DIM.RESISTANCE), source: 'user' });
   if (inp.tolerance !== undefined) inputs.push({ name: 'tolerance', value: q(inp.tolerance.si, DIM.DIMENSIONLESS), source: 'user' });
   if (inp.vinTolerance !== undefined) inputs.push({ name: 'vinTolerance', value: q(inp.vinTolerance.si, DIM.DIMENSIONLESS), source: 'user' });
+  if (inp.loadTolerance !== undefined) inputs.push({ name: 'loadTolerance', value: q(inp.loadTolerance.si, DIM.DIMENSIONLESS), source: 'user' });
+  if (inp.ratedVoltage !== undefined) inputs.push({ name: 'ratedVoltage', value: q(inp.ratedVoltage.si, DIM.VOLTAGE), source: 'user' });
 
   const steps: CalcResult['steps'] = [];
   if (ideal !== undefined) steps.push({ label: `Solve ${inp.solveFor}`, expr: inp.solveFor === 'r1' ? 'R1 = Re × (Vin − Vt) / Vt' : 'Re = R1 × Vt / (Vin − Vt); R2 = Re × RL / (RL − Re)', value: q(ideal, DIM.RESISTANCE) });
@@ -117,6 +127,8 @@ function build(raw: unknown): CalcOutcome {
     { name: 'vout', value: q(vout, DIM.VOLTAGE), role: inp.solveFor === 'vout' ? 'primary' : 'secondary', bound: 'nominal' },
     { name: 'r1', value: q(r1, DIM.RESISTANCE), role: role('r1'), bound: 'nominal' },
     { name: 'r2', value: q(r2, DIM.RESISTANCE), role: role('r2'), bound: 'nominal' },
+    { name: 'voltage across r1', value: q(vR1, DIM.VOLTAGE), role: 'secondary', bound: 'prediction' },
+    { name: 'voltage across r2', value: q(vR2, DIM.VOLTAGE), role: 'secondary', bound: 'prediction' },
     { name: 'divider current', value: q(i1, DIM.CURRENT), role: 'secondary', bound: 'prediction' },
     { name: 'power in r1', value: q(p1, DIM.POWER), role: 'secondary', bound: 'prediction' },
     { name: 'power in r2', value: q(p2, DIM.POWER), role: 'secondary', bound: 'prediction' },
@@ -134,18 +146,19 @@ function build(raw: unknown): CalcOutcome {
 
   // Envelope.
   let envelope: Envelope[] | undefined;
-  if (inp.tolerance !== undefined || inp.vinTolerance !== undefined) {
+  if (inp.tolerance !== undefined || inp.vinTolerance !== undefined || inp.loadTolerance !== undefined) {
     const t = inp.tolerance?.si ?? 0;
+    const lt = inp.loadTolerance?.si ?? 0;
     const vt = inp.vinTolerance?.si ?? 0;
     const vals: number[] = [];
-    for (const a of [1 - vt, 1 + vt]) for (const b of [1 - t, 1 + t]) for (const c of [1 - t, 1 + t]) for (const d of rl === undefined ? [1] : [1 - t, 1 + t]) {
+    for (const a of [1 - vt, 1 + vt]) for (const b of [1 - t, 1 + t]) for (const c of [1 - t, 1 + t]) for (const d of rl === undefined ? [1] : [1 - lt, 1 + lt]) {
       vals.push(vdiv(vin * a, r1 * b, r2 * c, rl === undefined ? undefined : rl * d));
     }
     const typ = vout;
     for (const x of vals) fin(x, 'Envelope corner');
     const min = Math.min(typ, ...vals);
     const max = Math.max(typ, ...vals);
-    const names = [...(inp.tolerance !== undefined ? ['r1', 'r2', ...(rl !== undefined ? ['load'] : [])] : []), ...(inp.vinTolerance !== undefined ? ['vin'] : [])];
+    const names = [...(inp.tolerance !== undefined ? ['r1', 'r2'] : []), ...(inp.loadTolerance !== undefined ? ['load'] : []), ...(inp.vinTolerance !== undefined ? ['vin'] : [])];
     envelope = [{ name: 'vout', min: q(min, DIM.VOLTAGE), typ: q(typ, DIM.VOLTAGE), max: q(max, DIM.VOLTAGE), toleranceInputs: names }];
   }
 
@@ -169,6 +182,14 @@ function build(raw: unknown): CalcOutcome {
   }
 
   const assumptions = ['Ideal resistors at their stated values; DC. Divider relations from ledger S-019 (textbook, VERIFIED).'];
+  if (envelope !== undefined) {
+    assumptions.push('The envelope covers initial tolerance corners only. TCR (temperature coefficient), leakage, ageing, self-heating and voltage coefficient are excluded.');
+  } else {
+    assumptions.push('No tolerance given, so no envelope is shown. TCR (temperature coefficient) and leakage are never included.');
+  }
+  if (rl !== undefined && inp.loadTolerance === undefined) {
+    assumptions.push('Load tolerance unspecified: assumed 0 % extra (the load is held at its stated value). It is not taken from the resistor tolerance; enter the load tolerance to include it.');
+  }
   if (inp.solveFor !== 'vout') {
     assumptions.push(
       snapped
@@ -176,6 +197,20 @@ function build(raw: unknown): CalcOutcome {
         : 'Solved resistor is the exact value, not a stock value.',
     );
   }
+  if (inp.ratedVoltage === undefined) {
+    warnings.push({ severity: 'info', message: VOLTAGE_NOT_CHECKED, code: 'RESISTOR_VOLTAGE_NOT_CHECKED' });
+  } else {
+    const rated = inp.ratedVoltage.si;
+    const over = [['r1', vR1], ['r2', vR2]].filter(([, x]) => (x as number) > rated * (1 + REL_TOL)) as [string, number][];
+    if (over.length > 0) {
+      warnings.push({
+        severity: 'caution',
+        message: `The nominal voltage across ${over.map(([n, x]) => `${n} (${num(x)} V)`).join(' and ')} exceeds the rated working voltage you entered (${num(rated)} V). Use a higher-rated part or split the resistor into several in series.`,
+        code: 'RESISTOR_VOLTAGE',
+      });
+    }
+  }
+  warnings.push({ severity: 'info', message: CREEPAGE_NOT_CHECKED, code: 'CREEPAGE_NOT_CHECKED' });
   const dataStatus = snapped ? STATUS_SNAP : STATUS_PLAIN;
   const confidence = rateConfidence({ outOfRangeInputs: outOfRange, defaultedAssumptions: [], accuracyClass: meta.accuracyClass, dataStatus });
   const result: CalcResult = {

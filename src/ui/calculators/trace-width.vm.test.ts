@@ -15,6 +15,7 @@ import warnSrc from '../components/WarningList.tsx?raw';
 import { meta } from '../../core/calculators/trace-width/meta';
 import { formatDesignValue, formatResult } from '../../core/format-result';
 import { DIM } from '../../core/units';
+import { factorText } from '../components/view';
 import { parseHash, serializeHash, CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS } from '../../state/hash';
 import {
   CALCULATOR_ID,
@@ -238,7 +239,7 @@ describe('headline formatting goes through format-result', () => {
     expect(view.calculated).toBe(formatDesignValue(dv, 'calculated', optsG));
     expect(view.recommended).toBe(formatDesignValue(dv, 'recommended', optsG));
     expect(view.calculatedLabel).toBe('Calculated');
-    expect(view.recommendedLabel).toBe('Recommended (calculated × 1.25 margin, engineering default)');
+    expect(view.recommendedLabel).toBe('Recommended (width ×1.36 (margin ×1.25 on current), engineering default)');
     expect(view.calculated).not.toBe(view.recommended);
     const cd = cur.result.designValues[0];
     expect(cd?.recommendedLabel).toBe('Recommended (calculated × 0.8 derating, engineering default)');
@@ -247,7 +248,7 @@ describe('headline formatting goes through format-result', () => {
   });
   it('a margin you set is labelled as set by you, not as an engineering default', () => {
     const w = ok(st({ ...OUTER_W, designMargin: '1.5' }));
-    expect(w.result.designValues[0]?.recommendedLabel).toBe('Recommended (calculated × 1.5 margin, set by you)');
+    expect(w.result.designValues[0]?.recommendedLabel).toBe('Recommended (width ×1.75 (margin ×1.5 on current), set by you)');
   });
   it('a rise prediction has no design value and says so', () => {
     const r = computeView(st({ solveFor: 'deltaT', width: '0.3 mm', current: '1 A', copperWeight: '1 oz', layer: 'outer' }));
@@ -375,7 +376,7 @@ describe('warnings, badges, provenance', () => {
 
 describe('Mode A is shown disabled and is never selectable', () => {
   it('the page offers a visible disabled option with the stated reason', () => {
-    expect(MODE_A_HINT).toBe('not available — waiting for a decision (OPEN_RISKS R-8)');
+    expect(MODE_A_HINT).toBe('not available yet: waiting on a source decision');
     expect(pageSrc).toMatch(/MODE_A_LABEL, disabled: true, hint: MODE_A_HINT/);
     expect(pageSrc).toMatch(/Method: IPC-2221 legacy \(Mode B\)|METHOD_TEXT/);
     expect(pageSrc).not.toMatch(/value="A"/);
@@ -495,5 +496,40 @@ describe('speed', () => {
     const t0 = performance.now();
     for (let i = 0; i < 200; i++) computeView(s);
     expect((performance.now() - t0) / 200).toBeLessThan(2);
+  });
+});
+
+describe('PCB-9 / PCB-3 / PCB-13 view-model behaviour', () => {
+  it('steps print through formatStep: a step that repeats the headline matches it', () => {
+    const w = ok(st({ solveFor: 'width', current: '2 A', deltaT: '10 °C', copperWeight: '1 oz', layer: 'outer' }));
+    const head = w.raw.results.find((r) => r.role === 'primary');
+    const optsG = { accuracyClass: meta.accuracyClass, lengthRole: 'geometry' as const, prefs: headlinePrefs('metric') };
+    for (const [i, step] of w.raw.steps.entries()) {
+      if (head !== undefined && step.bound !== undefined && step.value.si === head.value.si) {
+        expect(w.result.details.steps[i]?.text).toBe(formatResult(head, optsG));
+      }
+    }
+    expect(w.result.details.steps.length).toBe(w.raw.steps.length);
+    expect(viewSrc).toMatch(/formatStep\(/);
+    expect(viewSrc).not.toMatch(/bound: 'nominal' \}, optsFor\(s\.label\)/);
+  });
+  it('the recommended width label states the width factor and the current margin, both from core data', () => {
+    const w = ok(st({ ...OUTER_W }));
+    const dv = w.raw.designValues[0];
+    const label = w.result.designValues[0]?.recommendedLabel ?? '';
+    expect(label).toContain(`width ×${factorText(dv?.derating.factor ?? 0, { accuracyClass: meta.accuracyClass })}`);
+    expect(label).toContain('on current');
+    expect(label).not.toMatch(/calculated × 1\.25/);
+  });
+  it('the Mode A hint carries no internal risk id', () => {
+    expect(MODE_A_HINT).not.toMatch(/R-\d/);
+    expect(vmSrc).not.toMatch(/OPEN_RISKS/);
+  });
+  it('the new core cautions reach the warning list', () => {
+    const inner = ok(st({ solveFor: 'width', current: '20 A', deltaT: '10 °C', copperWeight: '1 oz', layer: 'inner' }));
+    expect(inner.result.warnings.some((x) => /17\.5/.test(x.message))).toBe(true);
+    const codes = new Set(inner.raw.warnings.map((x) => x.code));
+    for (const wv of inner.raw.warnings) expect(inner.result.warnings.some((x) => x.message === wv.message)).toBe(true);
+    expect(codes.has('INNER_CURRENT_ABOVE_17_5A')).toBe(true);
   });
 });

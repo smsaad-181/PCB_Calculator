@@ -51,7 +51,8 @@ function acceptedUnits(dim: Dim): string | undefined {
   if (dimEqual(dim, DIM.POWER)) return 'W, mW, kW';
   if (dimEqual(dim, DIM.FREQUENCY)) return 'Hz, kHz, MHz, GHz';
   if (dimEqual(dim, DIM.AREAL_MASS)) return 'oz (copper weight, oz/ft²), oz/ft2, g/m2, kg/m2';
-  if (dimEqual(dim, DIM.THERMAL_RESISTANCE)) return 'K/W';
+  if (dimEqual(dim, DIM.THERMAL_RESISTANCE)) return 'K/W, °C/W';
+  if (dimEqual(dim, DIM.THERMAL_RESISTANCE_PER_LENGTH)) return 'K·m/W, K*m/W, °C·m/W, K·mm/W';
   if (dimEqual(dim, DIM.RESISTIVITY)) return 'Ω·m, µΩ·cm';
   if (dimEqual(dim, DIM.PER_KELVIN)) return '/K, ppm/K';
   if (dimEqual(dim, DIM.CURRENT_DENSITY)) return 'A/mm2, A/m2';
@@ -171,6 +172,7 @@ const BARE_PREFIX_EXAMPLES: ReadonlyArray<readonly [Dim, readonly string[]]> = [
   [DIM.CURRENT_DENSITY, ['A/mm2', 'A/m2']],
   [DIM.PER_KELVIN, ['ppm/K', '/K']],
   [DIM.THERMAL_RESISTANCE, ['K/W']],
+  [DIM.THERMAL_RESISTANCE_PER_LENGTH, ['K·m/W']],
   [DIM.AREAL_MASS, ['oz', 'g/m2']],
   [DIM.DIMENSIONLESS, ['%', 'ppm']],
   [DIM.TEMPERATURE_DIFFERENCE, ['K', '°C']],
@@ -428,6 +430,7 @@ const FIELD_NAMES: ReadonlyArray<readonly [Dim, string]> = [
   [DIM.FREQUENCY, 'frequency'],
   [DIM.RESISTIVITY, 'resistivity'],
   [DIM.THERMAL_RESISTANCE, 'thermal resistance'],
+  [DIM.THERMAL_RESISTANCE_PER_LENGTH, 'thermal resistance per length'],
   [DIM.THERMAL_CONDUCTIVITY, 'thermal conductivity'],
   [DIM.PER_KELVIN, 'temperature coefficient'],
   [DIM.CURRENT_DENSITY, 'current density'],

@@ -41,6 +41,13 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/TraceResistance'),
   },
   {
+    id: 'self-heating',
+    title: 'Trace self-heating (coupled R(T))',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/SelfHeating'),
+  },
+  {
     id: 'ohm-power',
     title: "Ohm's law and power",
     category: 'circuit',
