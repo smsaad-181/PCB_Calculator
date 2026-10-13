@@ -157,3 +157,14 @@ td.num { font-variant-numeric: tabular-nums; }
 ul.decade { list-style: none; padding: 0; margin: 0.25rem 0; display: grid; gap: 0.25rem; grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr)); }
 ul.decade li { border: 1px solid var(--border); border-radius: 4px; padding: 0.15rem 0.4rem; background: var(--bg); color: var(--fg); font-variant-numeric: tabular-nums; }
 ul.decade li.chosen { border: 3px solid var(--link); font-weight: 700; }
+
+/* ---- Voltage drop (feed path) ---- */
+.element-card { margin: 0.75rem 0; border: 2px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--fg); padding: 0.25rem 0.75rem 0.75rem; min-width: 0; }
+.element-card legend { font-weight: 700; padding: 0 0.25rem; }
+.element-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.5rem 0; }
+.element-table h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.limiting-row th, .limiting-row td { border-left: 0; background: var(--bg); color: var(--fg); font-weight: 700; }
+.limiting-row th { border-left: 6px solid var(--link); }
+.limiting-tag { display: inline-block; border: 2px solid var(--link); border-radius: 4px; padding: 0 0.35rem; font-size: 0.875rem; }
+.element-src { display: block; font-weight: 400; font-size: 0.875rem; }
+.limiting-line { margin: 0.5rem 0; }

@@ -1,7 +1,7 @@
 // Choices and display helpers shared by the three circuit-value pages. Pure: no DOM, no engineering math.
 // This is the ONE UI file that spells the E-series snap direction of the core library; the source-scan tests rely on that.
 import type { SeriesChoice, SnapMode } from '../../core/calculators/resistor-divider/guards';
-import { formatResult, formatUtilisation, type HeadlineOpts } from '../../core/format-result';
+import { formatResult, formatSignedPercent, type HeadlineOpts } from '../../core/format-result';
 import type { Mode, SeriesName, Topology } from '../../core/eseries';
 import { DIM, q } from '../../core/units';
 import { MAX_FIELD_CHARS, parseFractionField, type FieldView } from '../components/view';
@@ -22,16 +22,14 @@ export function catalogRatio(ratio: number): string {
 /** Relative errors below this are floating-point noise, not an error. */
 export const NEGLIGIBLE_ERROR = 1e-9;
 
-/**
- * Signed error as a percent, for example "+0.8 %" or "−1.1 %". The magnitude comes from formatUtilisation, so it has one
- * decimal and is rounded UP: an error is never understated. Zero prints without a sign.
- */
+/** Accuracy class for printing a catalog-lookup error (a computed ratio of catalog values, not an exact number). */
+export const ERROR_ACCURACY = 'analytical' as const;
+
+/** Signed error as a percent through core formatSignedPercent (sign always printed, size rounded away from zero). */
 export function signedPercent(fraction: number): string {
   if (!Number.isFinite(fraction)) return 'not available';
-  // Float noise (a pair that is exact on paper) must not print as a 0.1 % error.
-  if (Math.abs(fraction) < NEGLIGIBLE_ERROR) return formatUtilisation(0);
-  const text = formatUtilisation(Math.abs(fraction));
-  return `${fraction < 0 ? '−' : '+'}${text}`;
+  // Float noise (a pair that is exact on paper) must not print as a tiny error.
+  return formatSignedPercent(Math.abs(fraction) < NEGLIGIBLE_ERROR ? 0 : fraction, { accuracyClass: ERROR_ACCURACY });
 }
 
 // ---------------------------------------------------------------------------

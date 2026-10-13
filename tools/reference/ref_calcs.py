@@ -1065,7 +1065,8 @@ GOLDEN.extend((n, got, _SELFHEAT_PINNED[n], tol, ids, note) for n, got, tol, ids
 # One source Vs, series path elements (copper traces with R(T) per S-004, or user-given ohmic elements), one load
 # described by exactly ONE of: current I, power P (constant power), resistance RL, or the voltage Vl at the load.
 # Constant power uses the textbook quadratic Rp I^2 - Vs I + P = 0 in the (Vs - sqrt(Vs^2 - 4 Rp P)) / (2 Rp) form (the
-# physical, low-current root); no real root = the load cannot be supplied (P > Vs^2/(4 Rp)). Algebra of S-019 (a),(b).
+# physical, low-current root); no real root = the load cannot be supplied (P > Vs^2/(4 Rp)). Quadratic, P_max = Vs^2/(4 Rp)
+# and efficiency = P_load/P_src are ledger S-019h (VERIFIED); series R and Ohm's law are S-019 (a),(b).
 # Element: ("t", L_mm, w_mm, t_um, T_degC) or ("r", ohm). Return: "none" | "same" | "list" (ret list separate).
 def vd_element_R(e):
     if e[0] == "t":
@@ -1113,14 +1114,20 @@ VD_CASES = [
 def _vd_vectors():
     out = []
     ids = ("S-004", "S-019", "S-006")
+    # S-019h (constant-power quadratic, P_max, efficiency) is cited where the value depends on it: every vector of a
+    # constant-power case whose value depends on the current from the quadratic (not r_total or the element
+    # resistances, which are plain series R) and the p_max / eff vectors of every case.
+    ids_h = ("S-004", "S-019", "S-019h", "S-006")
     for name, vs, kind, val, fwd, rm, ret in VD_CASES:
         s = vd_solve(vs, kind, val, fwd, rm, ret)
+        case_ids = ids_h if kind == "P" else ids
         for key, unit in (("r_total", "ohm"), ("i", "A"), ("drop", "V"), ("pct", "frac"), ("v_load", "V"), ("p_loss", "W"), ("p_load", "W"), ("p_src", "W"), ("eff", "frac"), ("p_max", "W")):
-            out.append(("vdrop_%s_%s_%s" % (name, key, unit), s[key], 1e-9, ids, "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"))
+            key_ids = ids_h if key in ("eff", "p_max") else (ids if key == "r_total" else case_ids)
+            out.append(("vdrop_%s_%s_%s" % (name, key, unit), s[key], 1e-9, key_ids, "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"))
         for k, rk in enumerate(s["elems_R"]):
             out.append(("vdrop_%s_e%d_R_ohm" % (name, k), rk, 1e-9, ids, "element resistance (trace R(T) or user ohmic value)"))
-            out.append(("vdrop_%s_e%d_drop_V" % (name, k), s["i"] * rk, 1e-9, ids, "I x R_k"))
-            out.append(("vdrop_%s_e%d_loss_W" % (name, k), s["i"] * s["i"] * rk, 1e-9, ids, "I^2 x R_k"))
+            out.append(("vdrop_%s_e%d_drop_V" % (name, k), s["i"] * rk, 1e-9, case_ids, "I x R_k"))
+            out.append(("vdrop_%s_e%d_loss_W" % (name, k), s["i"] * s["i"] * rk, 1e-9, case_ids, "I^2 x R_k"))
     return out
 
 _VDROP_PINNED = {

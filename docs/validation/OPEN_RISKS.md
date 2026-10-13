@@ -187,3 +187,13 @@ Reports: `phase-1-calc.md`, `phase-1-phase.md`, `phase-1-pcb.md` (all PASS-WITH-
 | PV-8 | Mutable cache in `trace-width/calc.ts:50`; µ0 literal in trace-resistance not in constants | calc | Move/immutable | OPEN |
 | PV-9 | Three pages copy `useCalcState` logic | ui | Use the hook | OPEN |
 | PV-10 | Coverage excludes `src/state` and view-models (V-8) | test-engineer | Include them | OPEN |
+
+## Task 5 (logged 2026-10-13, branch phase-1-task-5)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| T5-1 | Voltage-drop confidence is "high" for a path made only of user-supplied resistances (no defaults, S-019/S-019h VERIFIED). The method is exact but the answer is only as good as unchecked user values; a PCB designer could read "high" as "the drop is right". | pcb-domain-reviewer / calc-implementer | Decide whether user-supplied elements should add a visible confidence reason or a cap at medium | OPEN |
+| T5-2 | Task 5 deviates from the brief: exactly one load quantity (a second over-determines the operating point) instead of two given. | orchestrator | User may ask for literal "two given" semantics | NOTED |
+| T5-3 | Constant-power load stability (negative incremental resistance with input filtering) is warned, not checked (S-019h papers). | calc-implementer | Warning shipped (CONSTANT_POWER_STABILITY); no model | ACCEPTED |
+| T5-4 | JS bundle 119.5 KB of 150 KB after task 5; path calculator and vias still to come. | devops / ui-engineer | Check budget after task 6; split or trim if above ~140 KB | WATCH |
+| T5-5 | Hash scheme double-encodes spaces inside element-list values (page writes %2520 in the URL); hand-written links must use the page's own form or single encoding (both parse). | ui-engineer | Normalise or document | MINOR |

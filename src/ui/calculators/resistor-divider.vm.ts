@@ -3,12 +3,12 @@
 import { compute, type Inputs } from '../../core/calculators/resistor-divider/calc';
 import type { SeriesChoice, SolveFor } from '../../core/calculators/resistor-divider/guards';
 import { meta } from '../../core/calculators/resistor-divider/meta';
-import { formatResult } from '../../core/format-result';
+import { formatResult, formatSignedPercent } from '../../core/format-result';
 import type { CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
 import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
-import { DEFAULT_SNAP, SNAP_CHOICES, isDividerSeries, isSnapChoice, parseToleranceField, signedPercent, type SnapChoice } from './circuit-choices';
+import { DEFAULT_SNAP, SNAP_CHOICES, isDividerSeries, isSnapChoice, ERROR_ACCURACY, parseToleranceField, type SnapChoice } from './circuit-choices';
 
 export const CALCULATOR_ID = 'resistor-divider';
 
@@ -307,7 +307,7 @@ export function computeView(s: DividerState): DividerView {
   }
   const extraRows: { label: string; text: string }[] = [];
   const err = raw.results.find((r) => r.name === ERROR_NAME);
-  if (err !== undefined) extraRows.push({ label: 'Vout error vs target (magnitude rounded up)', text: signedPercent(err.value.si) });
+  if (err !== undefined) extraRows.push({ label: 'Vout error vs target (size rounded away from zero)', text: formatSignedPercent(err.value, { accuracyClass: ERROR_ACCURACY }) });
   const result = buildResultView(raw, {
     headline: headName,
     accuracyClass: meta.accuracyClass,

@@ -13,6 +13,7 @@ import {
   formatDualThickness,
   formatFor,
   roundDirectionFor,
+  sigFigsFor,
   type AccuracyClass,
   type DisplayPrefs,
   type Quantity,
@@ -96,4 +97,54 @@ export function formatUtilisation(u: number): string {
   return `${text} %`;
 }
 
-export const HEADLINE_FORMATTERS = [formatResult, formatDesignValue, formatMargin, formatUtilisation] as const;
+const MAX_PERCENT_MAGNITUDE = 1e20;
+
+function floorGuarded(t: number): number {
+  const r = Math.round(t);
+  return Math.abs(t - r) <= GUARD * Math.abs(t) ? r : Math.floor(t);
+}
+
+/** Percent text of p (already times 100) with `sig` significant figures, rounded in `dir`; 'up'/'down' go toward +/- infinity. */
+function percentText(p: number, dir: 'up' | 'down' | 'nearest', sig: number): string {
+  if (p === 0) return '0 %';
+  const decimalsFor = (x: number): number => sig - 1 - Math.floor(Math.log10(Math.abs(x)));
+  const scale = 10 ** decimalsFor(p);
+  const t = p * scale;
+  const n = dir === 'up' ? ceilGuarded(t) : dir === 'down' ? floorGuarded(t) : Math.round(t);
+  const r = n / scale;
+  if (r === 0) return '0 %';
+  return `${r.toFixed(Math.max(decimalsFor(r), 0))} %`;
+}
+
+function fractionOf(x: Quantity | number): number {
+  let f: number;
+  if (typeof x === 'number') f = x;
+  else if (sameDim(x, q(1, DIM.DIMENSIONLESS))) f = x.si;
+  else throw new InvalidValueError('A percent needs a dimensionless fraction');
+  if (!Number.isFinite(f)) throw new InvalidValueError('Cannot format a non-finite percent');
+  if (Math.abs(f) * 100 >= MAX_PERCENT_MAGNITUDE) throw new InvalidValueError('Percent is too large to print');
+  return f;
+}
+
+/**
+ * A dimensionless fraction printed as a percent, in the direction implied by its bound (prediction and min-requirement up,
+ * max-capacity down, nominal nearest; up/down are toward +/- infinity). Significant figures follow the accuracy class.
+ * No `round` override. Example: drop 0.06977 prediction -> '6.98 %'; efficiency 0.93028 max-capacity -> '93.0 %'.
+ */
+export function formatPercent(x: Quantity | number, bound: Bound, opts: { readonly accuracyClass: AccuracyClass }): string {
+  const f = fractionOf(x);
+  return percentText(f * 100, roundDirectionFor(bound), sigFigsFor(opts.accuracyClass));
+}
+
+/**
+ * A signed error or deviation as a percent. Rule: the MAGNITUDE rounds away from zero (a deviation is never understated,
+ * whichever way it points), and the sign is always printed ('+' or '-'). Exact zero prints '0 %'.
+ */
+export function formatSignedPercent(x: Quantity | number, opts: { readonly accuracyClass: AccuracyClass }): string {
+  const f = fractionOf(x);
+  if (f === 0) return '0 %';
+  const text = percentText(Math.abs(f) * 100, 'up', sigFigsFor(opts.accuracyClass));
+  return `${f < 0 ? '-' : '+'}${text}`;
+}
+
+export const HEADLINE_FORMATTERS =[formatResult, formatDesignValue, formatMargin, formatUtilisation] as const;
