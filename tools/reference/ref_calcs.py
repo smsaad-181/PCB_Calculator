@@ -1061,6 +1061,183 @@ _SELFHEAT_PINNED = {
 }
 GOLDEN.extend((n, got, _SELFHEAT_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _selfheat_vectors())
 
+# ---- voltage drop / power loss along a feed path (Phase 1 task 5). Independent of src/. ----
+# One source Vs, series path elements (copper traces with R(T) per S-004, or user-given ohmic elements), one load
+# described by exactly ONE of: current I, power P (constant power), resistance RL, or the voltage Vl at the load.
+# Constant power uses the textbook quadratic Rp I^2 - Vs I + P = 0 in the (Vs - sqrt(Vs^2 - 4 Rp P)) / (2 Rp) form (the
+# physical, low-current root); no real root = the load cannot be supplied (P > Vs^2/(4 Rp)). Algebra of S-019 (a),(b).
+# Element: ("t", L_mm, w_mm, t_um, T_degC) or ("r", ohm). Return: "none" | "same" | "list" (ret list separate).
+def vd_element_R(e):
+    if e[0] == "t":
+        return trace_resistance_ohm(e[1], e[2], e[3], e[4])
+    return e[1]
+
+def vd_solve(vs, load_kind, load_value, fwd, ret_mode="none", ret=()):
+    """Returns dict with the self-consistent DC state, or None when the load cannot be supplied."""
+    elems = [vd_element_R(e) for e in fwd]
+    if ret_mode == "same":
+        elems += [vd_element_R(e) for e in fwd]
+    elif ret_mode == "list":
+        elems += [vd_element_R(e) for e in ret]
+    rp = sum(elems)
+    if load_kind == "I":
+        i = load_value
+    elif load_kind == "R":
+        i = vs / (rp + load_value)
+    elif load_kind == "V":
+        i = (vs - load_value) / rp
+    else:  # constant power
+        disc = vs * vs - 4.0 * rp * load_value
+        if disc < 0:
+            return None
+        i = (vs - math.sqrt(disc)) / (2.0 * rp)
+    v_load = vs - i * rp
+    if v_load <= 0 or i <= 0:
+        return None
+    return {
+        "elems_R": elems, "r_total": rp, "i": i, "drop": i * rp, "pct": i * rp / vs, "v_load": v_load,
+        "p_loss": i * i * rp, "p_load": v_load * i, "p_src": vs * i, "eff": v_load / vs, "p_max": vs * vs / (4.0 * rp),
+        "r_load": v_load / i,
+    }
+
+# (case name, Vs, load kind, load value, forward elements, return mode, return list)
+VD_CASES = [
+    ("A_constR_same",  12.0, "R", 10.0,  [("t", 100, 1.0, 35, 25), ("r", 0.05)], "same", ()),
+    ("B_constI_none",   5.0, "I", 2.0,   [("t", 200, 2.0, 70, 85), ("r", 0.02)], "none", ()),
+    ("C_constP_list",  12.0, "P", 20.0,  [("t", 300, 3.0, 35, 55), ("r", 0.1), ("r", 0.03)], "list", [("t", 300, 5.0, 35, 55)]),
+    ("D_constV_none",   3.3, "V", 3.2,   [("t", 150, 0.5, 35, 25), ("r", 0.01)], "none", ()),
+    ("E_pmax_edge",     5.0, "P", 6.25,  [("r", 1.0)], "none", ()),
+    ("F_constP_heavy", 24.0, "P", 100.0, [("t", 500, 4.0, 70, 105), ("r", 0.2)], "same", ()),
+]
+
+def _vd_vectors():
+    out = []
+    ids = ("S-004", "S-019", "S-006")
+    for name, vs, kind, val, fwd, rm, ret in VD_CASES:
+        s = vd_solve(vs, kind, val, fwd, rm, ret)
+        for key, unit in (("r_total", "ohm"), ("i", "A"), ("drop", "V"), ("pct", "frac"), ("v_load", "V"), ("p_loss", "W"), ("p_load", "W"), ("p_src", "W"), ("eff", "frac"), ("p_max", "W")):
+            out.append(("vdrop_%s_%s_%s" % (name, key, unit), s[key], 1e-9, ids, "V = I R; P = I^2 R; series R; constant-power quadratic root (low-current)"))
+        for k, rk in enumerate(s["elems_R"]):
+            out.append(("vdrop_%s_e%d_R_ohm" % (name, k), rk, 1e-9, ids, "element resistance (trace R(T) or user ohmic value)"))
+            out.append(("vdrop_%s_e%d_drop_V" % (name, k), s["i"] * rk, 1e-9, ids, "I x R_k"))
+            out.append(("vdrop_%s_e%d_loss_W" % (name, k), s["i"] * s["i"] * rk, 1e-9, ids, "I^2 x R_k"))
+    return out
+
+_VDROP_PINNED = {
+    'vdrop_A_constR_same_r_total_ohm': 0.20045812807881774,
+    'vdrop_A_constR_same_i_A': 1.1764177499996378,
+    'vdrop_A_constR_same_drop_V': 0.23582250000362198,
+    'vdrop_A_constR_same_pct_frac': 0.01965187500030183,
+    'vdrop_A_constR_same_v_load_V': 11.764177499996379,
+    'vdrop_A_constR_same_p_loss_W': 0.2774257748535505,
+    'vdrop_A_constR_same_p_load_W': 13.839587225142104,
+    'vdrop_A_constR_same_p_src_W': 14.117012999995653,
+    'vdrop_A_constR_same_eff_frac': 0.9803481249996983,
+    'vdrop_A_constR_same_p_max_W': 179.58862703659105,
+    'vdrop_A_constR_same_e0_R_ohm': 0.05022906403940887,
+    'vdrop_A_constR_same_e0_drop_V': 0.0590903625018291,
+    'vdrop_A_constR_same_e0_loss_W': 0.06951495130106476,
+    'vdrop_A_constR_same_e1_R_ohm': 0.05,
+    'vdrop_A_constR_same_e1_drop_V': 0.05882088749998189,
+    'vdrop_A_constR_same_e1_loss_W': 0.06919793612571051,
+    'vdrop_A_constR_same_e2_R_ohm': 0.05022906403940887,
+    'vdrop_A_constR_same_e2_drop_V': 0.0590903625018291,
+    'vdrop_A_constR_same_e2_loss_W': 0.06951495130106476,
+    'vdrop_A_constR_same_e3_R_ohm': 0.05,
+    'vdrop_A_constR_same_e3_drop_V': 0.05882088749998189,
+    'vdrop_A_constR_same_e3_loss_W': 0.06919793612571051,
+    'vdrop_B_constI_none_r_total_ohm': 0.05092241379310346,
+    'vdrop_B_constI_none_i_A': 2.0,
+    'vdrop_B_constI_none_drop_V': 0.10184482758620692,
+    'vdrop_B_constI_none_pct_frac': 0.020368965517241384,
+    'vdrop_B_constI_none_v_load_V': 4.8981551724137935,
+    'vdrop_B_constI_none_p_loss_W': 0.20368965517241383,
+    'vdrop_B_constI_none_p_load_W': 9.796310344827587,
+    'vdrop_B_constI_none_p_src_W': 10.0,
+    'vdrop_B_constI_none_eff_frac': 0.9796310344827587,
+    'vdrop_B_constI_none_p_max_W': 122.7357372608769,
+    'vdrop_B_constI_none_e0_R_ohm': 0.030922413793103457,
+    'vdrop_B_constI_none_e0_drop_V': 0.061844827586206914,
+    'vdrop_B_constI_none_e0_loss_W': 0.12368965517241383,
+    'vdrop_B_constI_none_e1_R_ohm': 0.02,
+    'vdrop_B_constI_none_e1_drop_V': 0.04,
+    'vdrop_B_constI_none_e1_loss_W': 0.08,
+    'vdrop_C_constP_list_r_total_ohm': 0.21965911330049262,
+    'vdrop_C_constP_list_i_A': 1.7208750767428527,
+    'vdrop_C_constP_list_drop_V': 0.3780058934582522,
+    'vdrop_C_constP_list_pct_frac': 0.031500491121521014,
+    'vdrop_C_constP_list_v_load_V': 11.621994106541749,
+    'vdrop_C_constP_list_p_loss_W': 0.6505009209142204,
+    'vdrop_C_constP_list_p_load_W': 20.000000000000014,
+    'vdrop_C_constP_list_p_src_W': 20.650500920914233,
+    'vdrop_C_constP_list_eff_frac': 0.968499508878479,
+    'vdrop_C_constP_list_p_max_W': 163.89030921176564,
+    'vdrop_C_constP_list_e0_R_ohm': 0.05603694581280789,
+    'vdrop_C_constP_list_e0_drop_V': 0.09643258342605085,
+    'vdrop_C_constP_list_e0_loss_W': 0.1659484294038168,
+    'vdrop_C_constP_list_e1_R_ohm': 0.1,
+    'vdrop_C_constP_list_e1_drop_V': 0.17208750767428527,
+    'vdrop_C_constP_list_e1_loss_W': 0.2961411029754719,
+    'vdrop_C_constP_list_e2_R_ohm': 0.03,
+    'vdrop_C_constP_list_e2_drop_V': 0.051626252302285576,
+    'vdrop_C_constP_list_e2_loss_W': 0.08884233089264157,
+    'vdrop_C_constP_list_e3_R_ohm': 0.033622167487684734,
+    'vdrop_C_constP_list_e3_drop_V': 0.05785955005563051,
+    'vdrop_C_constP_list_e3_loss_W': 0.09956905764229008,
+    'vdrop_D_constV_none_r_total_ohm': 0.16068719211822663,
+    'vdrop_D_constV_none_i_A': 0.6223271356090658,
+    'vdrop_D_constV_none_drop_V': 0.09999999999999963,
+    'vdrop_D_constV_none_pct_frac': 0.030303030303030193,
+    'vdrop_D_constV_none_v_load_V': 3.2,
+    'vdrop_D_constV_none_p_loss_W': 0.06223271356090636,
+    'vdrop_D_constV_none_p_load_W': 1.9914468339490108,
+    'vdrop_D_constV_none_p_src_W': 2.053679547509917,
+    'vdrop_D_constV_none_eff_frac': 0.9696969696969698,
+    'vdrop_D_constV_none_p_max_W': 16.942856266956877,
+    'vdrop_D_constV_none_e0_R_ohm': 0.15068719211822662,
+    'vdrop_D_constV_none_e0_drop_V': 0.09377672864390897,
+    'vdrop_D_constV_none_e0_loss_W': 0.058359802923752514,
+    'vdrop_D_constV_none_e1_R_ohm': 0.01,
+    'vdrop_D_constV_none_e1_drop_V': 0.0062232713560906585,
+    'vdrop_D_constV_none_e1_loss_W': 0.0038729106371538464,
+    'vdrop_E_pmax_edge_r_total_ohm': 1.0,
+    'vdrop_E_pmax_edge_i_A': 2.5,
+    'vdrop_E_pmax_edge_drop_V': 2.5,
+    'vdrop_E_pmax_edge_pct_frac': 0.5,
+    'vdrop_E_pmax_edge_v_load_V': 2.5,
+    'vdrop_E_pmax_edge_p_loss_W': 6.25,
+    'vdrop_E_pmax_edge_p_load_W': 6.25,
+    'vdrop_E_pmax_edge_p_src_W': 12.5,
+    'vdrop_E_pmax_edge_eff_frac': 0.5,
+    'vdrop_E_pmax_edge_p_max_W': 6.25,
+    'vdrop_E_pmax_edge_e0_R_ohm': 1.0,
+    'vdrop_E_pmax_edge_e0_drop_V': 2.5,
+    'vdrop_E_pmax_edge_e0_loss_W': 6.25,
+    'vdrop_F_constP_heavy_r_total_ohm': 0.4821459359605912,
+    'vdrop_F_constP_heavy_i_A': 4.58989265292049,
+    'vdrop_F_constP_heavy_drop_V': 2.2129980891009904,
+    'vdrop_F_constP_heavy_pct_frac': 0.09220825371254127,
+    'vdrop_F_constP_heavy_v_load_V': 21.787001910899008,
+    'vdrop_F_constP_heavy_p_loss_W': 10.15742367009172,
+    'vdrop_F_constP_heavy_p_load_W': 100.00000000000003,
+    'vdrop_F_constP_heavy_p_src_W': 110.15742367009176,
+    'vdrop_F_constP_heavy_eff_frac': 0.9077917462874586,
+    'vdrop_F_constP_heavy_p_max_W': 298.66475948429445,
+    'vdrop_F_constP_heavy_e0_R_ohm': 0.041072967980295576,
+    'vdrop_F_constP_heavy_e0_drop_V': 0.1885205139663972,
+    'vdrop_F_constP_heavy_e0_loss_W': 0.8652889219791612,
+    'vdrop_F_constP_heavy_e1_R_ohm': 0.2,
+    'vdrop_F_constP_heavy_e1_drop_V': 0.9179785305840981,
+    'vdrop_F_constP_heavy_e1_loss_W': 4.213422913066699,
+    'vdrop_F_constP_heavy_e2_R_ohm': 0.041072967980295576,
+    'vdrop_F_constP_heavy_e2_drop_V': 0.1885205139663972,
+    'vdrop_F_constP_heavy_e2_loss_W': 0.8652889219791612,
+    'vdrop_F_constP_heavy_e3_R_ohm': 0.2,
+    'vdrop_F_constP_heavy_e3_drop_V': 0.9179785305840981,
+    'vdrop_F_constP_heavy_e3_loss_W': 4.213422913066699,
+}
+GOLDEN.extend((n, got, _VDROP_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _vd_vectors())
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:
