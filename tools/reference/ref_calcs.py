@@ -1245,6 +1245,76 @@ _VDROP_PINNED = {
 }
 GOLDEN.extend((n, got, _VDROP_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _vd_vectors())
 
+# ---- via barrel electrical / axial thermal (Phase 1 task 7a). Independent of src/. ----
+# A = pi t (d + t), d = FINISHED hole (inside) diameter; R(T) = rho20 (1 + alpha (T - 20)) L / (N A) (ideal parallel, equal
+# sharing); theta_axial = L / (k N A) (axial conduction through the barrel copper only; NOT a trace-to-ambient resistance).
+# Plating thicknesses below are TEST values, not defaults (S-015 is PAYWALLED). k from S-007 (CONFLICT): 401 pure, 391 C11000.
+# Case: (d_mm, t_um, L_mm, N, T_degC, I_A or None, k_W_per_mK)
+VIA_CASES = [
+    (0.3, 25, 1.6, 1, 20, None, 401.0),
+    (0.3, 25, 1.6, 4, 85, 2.0, 391.0),
+    (0.2, 18, 0.8, 1, 105, 0.5, 401.0),
+    (0.5, 35, 2.4, 6, 55, 3.0, 401.0),
+    (0.25, 20, 1.0, 2, 25, 1.0, 391.0),
+]
+
+def via_R_T(d_mm, t_um, L_mm, N, T_c, rho20=RHO_CU_20C, alpha=ALPHA_CU):
+    A = via_area_m2(d_mm * 1e-3, t_um * 1e-6)
+    return rho20 * (1 + alpha * (T_c - 20.0)) * (L_mm * 1e-3) / (N * A)
+
+def via_theta_array(d_mm, t_um, L_mm, N, k):
+    return via_theta(d_mm * 1e-3, t_um * 1e-6, L_mm * 1e-3, k) / N
+
+def _via_tag(d, t, L, N, T, k):
+    return "d%smm_t%sum_L%smm_N%s_T%sC_k%s" % (_g(d), _g(t), _g(L), N, _g(T), _g(k))
+
+def _via_vectors():
+    out = []
+    for d, t, L, N, T, I, k in VIA_CASES:
+        tag = _via_tag(d, t, L, N, T, k)
+        out.append(("via_task7a_area_mm2_" + tag, via_area_m2(d * 1e-3, t * 1e-6) * 1e6, 1e-9, (), "one barrel, pure geometry (finished hole d, test plating t)"))
+        out.append(("via_task7a_R_T_mohm_" + tag, via_R_T(d, t, L, N, T) * 1e3, 1e-9, ("S-004",), "ideal parallel R(T)/N, pure-copper rho (S-012 plated copper unverified)"))
+        out.append(("via_task7a_R20_mohm_" + tag, via_R_T(d, t, L, N, 20.0) * 1e3, 1e-9, ("S-004",), "ideal parallel R20/N"))
+        out.append(("via_task7a_theta_KperW_" + tag, via_theta_array(d, t, L, N, k), 1e-9, ("S-007",), "axial conduction only, ideal parallel theta/N"))
+        if I is not None:
+            R = via_R_T(d, t, L, N, T)
+            out.append(("via_task7a_vdrop_mV_" + tag, I * R * 1e3, 1e-9, ("S-004", "S-019"), "I = %s A through the whole array" % _g(I)))
+            out.append(("via_task7a_power_mW_" + tag, I * I * R * 1e3, 1e-9, ("S-004", "S-019"), "P = I^2 R(T) for the whole array"))
+    return out
+
+# Pinned literals recorded from this oracle (regression pins, same policy as _TRACE_PINNED).
+_VIA_PINNED = {
+    'via_task7a_area_mm2_d0.3mm_t25um_L1.6mm_N1_T20C_k401': 0.025525440310417067,
+    'via_task7a_R_T_mohm_d0.3mm_t25um_L1.6mm_N1_T20C_k401': 1.0807338310749393,
+    'via_task7a_R20_mohm_d0.3mm_t25um_L1.6mm_N1_T20C_k401': 1.0807338310749393,
+    'via_task7a_theta_KperW_d0.3mm_t25um_L1.6mm_N1_T20C_k401': 156.31561646470445,
+    'via_task7a_area_mm2_d0.3mm_t25um_L1.6mm_N4_T85C_k391': 0.025525440310417067,
+    'via_task7a_R_T_mohm_d0.3mm_t25um_L1.6mm_N4_T85C_k391': 0.33920182205575816,
+    'via_task7a_R20_mohm_d0.3mm_t25um_L1.6mm_N4_T85C_k391': 0.2701834577687348,
+    'via_task7a_theta_KperW_d0.3mm_t25um_L1.6mm_N4_T85C_k391': 40.07836457950542,
+    'via_task7a_vdrop_mV_d0.3mm_t25um_L1.6mm_N4_T85C_k391': 0.6784036441115163,
+    'via_task7a_power_mW_d0.3mm_t25um_L1.6mm_N4_T85C_k391': 1.3568072882230326,
+    'via_task7a_area_mm2_d0.2mm_t18um_L0.8mm_N1_T105C_k401': 0.012327609572686348,
+    'via_task7a_R_T_mohm_d0.2mm_t18um_L0.8mm_N1_T105C_k401': 1.4926405274824635,
+    'via_task7a_R20_mohm_d0.2mm_t18um_L0.8mm_N1_T105C_k401': 1.1188789981503418,
+    'via_task7a_theta_KperW_d0.2mm_t18um_L0.8mm_N1_T105C_k401': 161.8328725504235,
+    'via_task7a_vdrop_mV_d0.2mm_t18um_L0.8mm_N1_T105C_k401': 0.7463202637412317,
+    'via_task7a_power_mW_d0.2mm_t18um_L0.8mm_N1_T105C_k401': 0.37316013187061586,
+    'via_task7a_area_mm2_d0.5mm_t35um_L2.4mm_N6_T55C_k401': 0.05882632243846887,
+    'via_task7a_R_T_mohm_d0.5mm_t35um_L2.4mm_N6_T55C_k401': 0.13336159883186635,
+    'via_task7a_R20_mohm_d0.5mm_t35um_L2.4mm_N6_T55C_k401': 0.11723581278349642,
+    'via_task7a_theta_KperW_d0.5mm_t35um_L2.4mm_N6_T55C_k401': 16.95680085147828,
+    'via_task7a_vdrop_mV_d0.5mm_t35um_L2.4mm_N6_T55C_k401': 0.4000847964955991,
+    'via_task7a_power_mW_d0.5mm_t35um_L2.4mm_N6_T55C_k401': 1.2002543894867972,
+    'via_task7a_area_mm2_d0.25mm_t20um_L1mm_N2_T25C_k391': 0.01696460032938488,
+    'via_task7a_R_T_mohm_d0.25mm_t20um_L1mm_N2_T25C_k391': 0.5181428407523981,
+    'via_task7a_R20_mohm_d0.25mm_t20um_L1mm_N2_T25C_k391': 0.5081575449932803,
+    'via_task7a_theta_KperW_d0.25mm_t20um_L1mm_N2_T25C_k391': 75.37886856677815,
+    'via_task7a_vdrop_mV_d0.25mm_t20um_L1mm_N2_T25C_k391': 0.5181428407523981,
+    'via_task7a_power_mW_d0.25mm_t20um_L1mm_N2_T25C_k391': 0.5181428407523981,
+}
+GOLDEN.extend((n, got, _VIA_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _via_vectors())
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:
