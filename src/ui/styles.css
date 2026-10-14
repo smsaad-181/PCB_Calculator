@@ -185,3 +185,14 @@ ul.decade li.chosen { border: 3px solid var(--link); font-weight: 700; }
 .cmp-tag { border: 2px solid var(--muted); border-radius: 4px; padding: 0 0.3rem; font-size: 0.85rem; white-space: nowrap; }
 .tol .radio { min-height: 2.25rem; }
 td.num { font-variant-numeric: tabular-nums; }
+
+/* ---- Path and load (weakest link) ---- */
+.totals, .netclass { border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--fg); padding: 0.25rem 0.75rem 0.5rem; margin: 0.75rem 0; }
+.totals h3, .netclass h3, .unrated h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.unrated { border: 2px dashed var(--border); border-radius: 6px; padding: 0.25rem 0.75rem 0.5rem; margin: 0.75rem 0; }
+.rating-pair { margin: 0.5rem 0; border: 1px dashed var(--border); border-radius: 6px; padding: 0.25rem 0.75rem 0.5rem; min-width: 0; }
+.rating-pair legend { font-weight: 700; padding: 0 0.25rem; }
+.add-row { align-items: flex-end; }
+.over-tag { border-style: double; border-width: 4px; }
+.netclass .cmp-tag { display: inline-block; margin: 0 0.25rem 0.25rem 0; }
+.netclass-text { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 0.875rem; background: var(--bg); color: var(--fg); border: 2px solid var(--border); border-radius: 4px; padding: 0.5rem; }

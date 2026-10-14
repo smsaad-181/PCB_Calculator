@@ -69,6 +69,13 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/AnnularRing'),
   },
   {
+    id: 'path-load',
+    title: 'Path and load (weakest link)',
+    category: 'load',
+    phase: 1,
+    load: () => import('./calculators/PathLoad'),
+  },
+  {
     id: 'ohm-power',
     title: "Ohm's law and power",
     category: 'circuit',
