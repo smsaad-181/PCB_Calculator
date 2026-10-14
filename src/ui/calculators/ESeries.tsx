@@ -9,6 +9,7 @@ import { SelectField } from '../components/SelectField';
 import { UnverifiedBadge } from '../components/UnverifiedBadge';
 import { parseFractionField } from '../components/view';
 import { useCalcState } from '../useCalcState';
+import { useSearch } from '../useSearch';
 import { isSeriesName, isTopology } from './circuit-choices';
 import {
   CALCULATOR_ID,
@@ -22,11 +23,12 @@ import {
   TOPOLOGY_OPTIONS,
   TOPOLOGY_FORMULA,
   computeNearest,
-  computePairs,
+  finishPairs,
   fromHashState,
   nearestSummary,
   pairTargetLabel,
   pairsSummary,
+  planPairs,
   toHashState,
   type ESeriesState,
   type NearestView,
@@ -78,7 +80,16 @@ function Nearest({ view }: { view: NearestView }) {
   );
 }
 
-function Pairs({ view, topology }: { view: PairsView; topology: ESeriesState['topology'] }) {
+function Pairs({ view, topology }: { view: PairsView | 'searching'; topology: ESeriesState['topology'] }) {
+  if (view === 'searching') {
+    return (
+      <div class="needs" role="status">
+        <p>
+          <strong>Searching...</strong> Looking for the best pairs in the series. The page stays responsive; no result is shown until the search finishes.
+        </p>
+      </div>
+    );
+  }
   if (view.status === 'needs-input') return <ResultStatus status="needs-input" items={view.needs} />;
   if (view.status === 'error') return <ResultStatus status="error" items={view.problems} />;
   const divider = topology === 'divider-ratio';
@@ -124,7 +135,13 @@ export default function ESeries() {
     toHash: toHashState,
   });
   const nearest = useMemo(() => computeNearest(applied), [applied]);
-  const pairs = useMemo(() => computePairs(applied), [applied]);
+  const pairPlan = useMemo(() => planPairs(applied), [applied]);
+  const search = useSearch(pairPlan.kind === 'search' ? pairPlan.task : null);
+  const pairs = useMemo((): PairsView | 'searching' => {
+    if (pairPlan.kind === 'view') return pairPlan.view;
+    if (search.status === 'done' && search.reply.kind === 'e-pairs') return finishPairs(pairPlan.state, search.reply.result);
+    return 'searching';
+  }, [pairPlan, search]);
   const ratio = state.topology === 'divider-ratio';
 
   return (
@@ -139,7 +156,7 @@ export default function ESeries() {
       <NoticeBanner notices={notices} onDismiss={() => setNotices([])} />
       <p class="method-line">{METHOD_TEXT}</p>
       <div class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
-        {nearestSummary(nearest)} {pairsSummary(pairs)}
+        {nearestSummary(nearest)} {pairs === 'searching' ? 'Two-resistor search: searching, no result yet.' : pairsSummary(pairs)}
       </div>
       <div class="calc-stack" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>
         <section class="panel" aria-labelledby="near-h">

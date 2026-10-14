@@ -3,7 +3,9 @@
 // no confidence rating. Every value is printed as a catalog number through format-result.
 import { ESERIES, ESERIES_SOURCE } from '../../core/data/eseries';
 import { bestPairs, nearest, valuesInDecade, type Pair, type SeriesName, type Topology } from '../../core/eseries';
+import type { CalcError, Result } from '../../core/result';
 import { DIM, type Dim } from '../../core/units';
+import type { SearchTask } from '../../workers/pair-search.protocol';
 import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
 import { MAX_FIELD_CHARS, parseField, parseFractionField, type FieldView } from '../components/view';
 import { ALL_SERIES, LOOKUP_MODES, TOPOLOGIES, catalogRatio, catalogResistance, isSeriesName, isTopology, signedPercent } from './circuit-choices';
@@ -193,13 +195,25 @@ function pairRow(p: Pair, t: Topology): PairRow {
   };
 }
 
-export function computePairs(s: ESeriesState): PairsView {
+/** What to do for the two-resistor search: show a view now, or run a search (in a worker) and then call finishPairs. */
+export type PairsPlan =
+  | { readonly kind: 'view'; readonly view: PairsView }
+  | { readonly kind: 'search'; readonly task: Extract<SearchTask, { kind: 'e-pairs' }>; readonly state: ESeriesState };
+
+export function planPairs(s: ESeriesState): PairsPlan {
   const f = parsePairTarget(s);
   if (f.status === 'empty') {
-    return { status: 'needs-input', needs: [s.topology === 'divider-ratio' ? 'Enter a target ratio between 0 and 1 (for example 0.25 or 25%).' : 'Enter a target resistance (for example 4k7 or 4.7 kΩ).'] };
+    return {
+      kind: 'view',
+      view: { status: 'needs-input', needs: [s.topology === 'divider-ratio' ? 'Enter a target ratio between 0 and 1 (for example 0.25 or 25%).' : 'Enter a target resistance (for example 4k7 or 4.7 kΩ).'] },
+    };
   }
-  if (f.status === 'error') return { status: 'error', problems: [`${pairTargetLabel(s.topology)}: ${f.message}`] };
-  const r = bestPairs(f.value.si, s.pairSeries, s.topology, PAIR_COUNT);
+  if (f.status === 'error') return { kind: 'view', view: { status: 'error', problems: [`${pairTargetLabel(s.topology)}: ${f.message}`] } };
+  return { kind: 'search', task: { kind: 'e-pairs', target: f.value.si, series: s.pairSeries, topology: s.topology, count: PAIR_COUNT }, state: s };
+}
+
+/** The view for a finished search (from a worker or from bestPairs on this thread). */
+export function finishPairs(s: ESeriesState, r: Result<Pair[], CalcError>): PairsView {
   if (!r.ok) return { status: 'error', problems: [`${pairTargetLabel(s.topology)}: ${r.error.message}`] };
   return {
     status: 'ok',
@@ -207,6 +221,12 @@ export function computePairs(s: ESeriesState): PairsView {
     resultHeading: TOPOLOGY_FORMULA[s.topology],
     window: SEARCH_WINDOW_TEXT[s.topology],
   };
+}
+
+/** Plan and search on this thread (tests, and the page's fallback when it has no worker). */
+export function computePairs(s: ESeriesState): PairsView {
+  const p = planPairs(s);
+  return p.kind === 'view' ? p.view : finishPairs(p.state, bestPairs(p.task.target, p.task.series, p.task.topology, p.task.count));
 }
 
 export function nearestSummary(v: NearestView): string {

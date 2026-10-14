@@ -6,6 +6,18 @@ import eVm from './e-series.vm.ts?raw';
 import ohmPage from './OhmPower.tsx?raw';
 import divPage from './ResistorDivider.tsx?raw';
 import ePage from './ESeries.tsx?raw';
+import fbVm from './feedback-divider.vm.ts?raw';
+import ledVm from './led-resistor.vm.ts?raw';
+import rcVm from './rc-lc.vm.ts?raw';
+import reVm from './reactance.vm.ts?raw';
+import viewSrc from './circuit-view.ts?raw';
+import fbPage from './FeedbackDivider.tsx?raw';
+import ledPage from './LedResistor.tsx?raw';
+import rcPage from './RcLc.tsx?raw';
+import rePage from './Reactance.tsx?raw';
+import clientSrc from '../search-client.ts?raw';
+import searchHook from '../useSearch.ts?raw';
+import fbSchem from '../components/FeedbackSchematic.tsx?raw';
 import schemSrc from '../components/DividerSchematic.tsx?raw';
 import noticeSrc from '../components/NoticeBanner.tsx?raw';
 import statusSrc from '../components/ResultStatus.tsx?raw';
@@ -36,6 +48,18 @@ const UI_FILES: Record<string, string> = {
   OhmPower: ohmPage,
   ResistorDivider: divPage,
   ESeries: ePage,
+  'feedback-divider.vm': fbVm,
+  'led-resistor.vm': ledVm,
+  'rc-lc.vm': rcVm,
+  'reactance.vm': reVm,
+  'circuit-view': viewSrc,
+  FeedbackDivider: fbPage,
+  LedResistor: ledPage,
+  RcLc: rcPage,
+  Reactance: rePage,
+  'search-client': clientSrc,
+  useSearch: searchHook,
+  FeedbackSchematic: fbSchem,
   DividerSchematic: schemSrc,
   NoticeBanner: noticeSrc,
   ResultStatus: statusSrc,
@@ -136,7 +160,7 @@ describe('source scans (all circuit-value UI files)', () => {
     }
   });
   it('every page has a visually hidden live region, a reset button and the notice banner', () => {
-    for (const [f, page] of [['OhmPower', ohmPage], ['ResistorDivider', divPage], ['ESeries', ePage]] as const) {
+    for (const [f, page] of [['OhmPower', ohmPage], ['ResistorDivider', divPage], ['ESeries', ePage], ['FeedbackDivider', fbPage], ['LedResistor', ledPage], ['RcLc', rcPage], ['Reactance', rePage]] as const) {
       expect(page, f).toMatch(/class="visually-hidden" role="status" aria-live="polite"/);
       expect(page, f).toMatch(/<ResetButton/);
       expect(page, f).toMatch(/NoticeBanner/);
@@ -147,7 +171,7 @@ describe('source scans (all circuit-value UI files)', () => {
 describe('hash keys', () => {
   it('are documented, never reserved, never v', () => {
     const reserved = Object.keys(RESERVED_STATE_KEYS);
-    for (const id of ['ohm-power', 'resistor-divider', 'e-series'] as const) {
+    for (const id of ['ohm-power', 'resistor-divider', 'e-series', 'feedback-divider', 'led-resistor', 'rc-lc', 'reactance'] as const) {
       const table: Record<string, string> = CALCULATOR_STATE_KEYS[id];
       const keys = Object.keys(table);
       expect(keys.length).toBeGreaterThan(0);

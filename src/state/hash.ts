@@ -321,6 +321,41 @@ export const CALCULATOR_STATE_KEYS = {
     pk: 'Two-resistor topology: "series", "parallel" or "divider-ratio". Absent means series.',
     ps: 'E-series for the two-resistor search: E3, E6, E12, E24, E48, E96 or E192. Absent means E24.',
   },
+  'feedback-divider': {
+    vr: 'Entered reference voltage text from the regulator datasheet, for example "0.8 V" (at most 40 characters). Absent means not entered: required, never pre-filled.',
+    vs: 'Entered note on where the Vref value came from, for example a datasheet name and table (free text, at most 200 characters). Absent means no source note.',
+    r1: 'Entered R1 text, the TOP resistor from Vout to the FB pin, for example "100k" (at most 40 characters). Leave R1, R2 or Vout out: that one is solved.',
+    r2: 'Entered R2 text, the BOTTOM resistor from the FB pin to ground, for example "10k" (at most 40 characters).',
+    vo: 'Entered output voltage text, for example "3.3 V" (at most 40 characters): the target when solving a resistor, the only voltage given in a pair search.',
+    se: 'E-series for snapping a solved resistor or for the best-pair search: "none", "E12", "E24", "E48", "E96" or "E192". Absent means none (exact value). A pair search needs a series.',
+    sn: 'Snap direction of a solved resistor: "nearest", "up" or "down". Absent means not chosen: there is no default and no snapped result without it.',
+    pc: 'Number of best pairs listed in a pair search, a whole number from 1 to 10 (at most 40 characters). Absent means the calculator default of 5.',
+    tol: 'Entered optional resistor tolerance, a percent or fraction such as "1%" or "0.01" (at most 40 characters). Absent means no tolerance envelope.',
+    vtol: 'Entered optional Vref tolerance, a percent or fraction such as "1%" (at most 40 characters). Absent means none.',
+    ib: 'Entered optional FB pin bias current magnitude, for example "50 nA" (at most 40 characters). Needs a direction.',
+    bd: 'Direction of the FB bias current: "into-pin" or "out-of-pin". Absent means not chosen: there is no default, and a bias current gives no result without it.',
+  },
+  'led-resistor': {
+    vs: 'Entered supply voltage text, for example "5 V" (at most 40 characters).',
+    vf: 'Entered forward voltage of ONE LED from its datasheet, for example "2.1 V" (at most 40 characters). Absent means not entered: required, never pre-filled.',
+    i: 'Entered target LED current text, for example "10 mA" (at most 40 characters).',
+    n: 'Entered number of LEDs in series, a whole number from 1 (at most 40 characters). Absent means 1.',
+    se: 'E-series the resistor is rounded UP to: "none", "E6", "E12", "E24", "E48", "E96" or "E192". Absent means none (exact value).',
+    pr: 'Entered optional rated power of the resistor you will use, for example "250 mW" (at most 40 characters). Absent means the rating is not checked.',
+  },
+  'rc-lc': {
+    fm: 'Circuit family: "rc" or "lc". Absent means not chosen: there is no default and no result without it.',
+    r: 'Entered resistance text, for example "1 kΩ" (at most 40 characters; RC family only). Give exactly two of r, c, f; the third is solved.',
+    c: 'Entered capacitance text, for example "1 µF" (at most 40 characters; both families).',
+    l: 'Entered inductance text, for example "10 µH" (at most 40 characters; LC family only).',
+    f: 'Entered frequency text, for example "1 kHz" (at most 40 characters): the cut-off frequency fc (RC) or the resonant frequency f0 (LC).',
+  },
+  reactance: {
+    kd: 'Kind of reactance: "inductive" or "capacitive". Absent means not chosen: there is no default and no result without it.',
+    x: 'Entered reactance MAGNITUDE text, for example "6.28 Ω" (at most 40 characters). Give exactly two of x, f, cv; the third is solved.',
+    f: 'Entered frequency text, for example "1 kHz" (at most 40 characters).',
+    cv: 'Entered component value text: the inductance for inductive, the capacitance for capacitive, for example "1 mH" or "100 nF" (at most 40 characters).',
+  },
 } as const satisfies Record<string, Record<string, string>>;
 
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {

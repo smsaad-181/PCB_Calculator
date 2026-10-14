@@ -108,3 +108,50 @@ export function parseToleranceField(text: string): FieldView {
 }
 
 export { MAX_FIELD_CHARS };
+
+// ---------------------------------------------------------------------------
+// Series lists of the second slice (feedback divider, LED resistor)
+// ---------------------------------------------------------------------------
+export type StockSeries = 'none' | 'E6' | 'E12' | 'E24' | 'E48' | 'E96' | 'E192';
+
+const seriesRow = (value: StockSeries): { readonly value: StockSeries; readonly label: string } => ({ value, label: value === 'none' ? 'None (exact value, not a stock value)' : value });
+
+/** Feedback divider series (the core accepts E12 to E192). */
+export const FEEDBACK_SERIES = (['none', 'E12', 'E24', 'E48', 'E96', 'E192'] as const).map(seriesRow);
+/** LED resistor series (the core accepts E6 to E192). */
+export const LED_SERIES = (['none', 'E6', 'E12', 'E24', 'E48', 'E96', 'E192'] as const).map(seriesRow);
+
+export type FeedbackSeries = Exclude<StockSeries, 'E6'>;
+
+export function isFeedbackSeries(v: string): v is FeedbackSeries {
+  return FEEDBACK_SERIES.some((c) => c.value === v);
+}
+export function isLedSeries(v: string): v is StockSeries {
+  return LED_SERIES.some((c) => c.value === v);
+}
+
+// ---------------------------------------------------------------------------
+// Whole-number field (LED count, number of pairs)
+// ---------------------------------------------------------------------------
+export type CountView =
+  | { readonly status: 'empty' }
+  | { readonly status: 'ok'; readonly count: number }
+  | { readonly status: 'error'; readonly message: string };
+
+/** A whole number written with digits only. Range limits belong to the calculator, whose message is shown for a count outside them. */
+export function parseCountField(text: string): CountView {
+  const t = text.trim();
+  if (t === '') return { status: 'empty' };
+  if (t.length > MAX_FIELD_CHARS) return { status: 'error', message: `Too long (at most ${String(MAX_FIELD_CHARS)} characters).` };
+  if (!/^\d+$/.test(t)) return { status: 'error', message: `"${t}" is not a whole number. Write digits only, for example 3.` };
+  const n = Number(t);
+  if (!Number.isSafeInteger(n)) return { status: 'error', message: 'The number is too large.' };
+  return { status: 'ok', count: n };
+}
+
+/** The same whole-number parse in the field shape QuantityField expects (a dimensionless count). */
+export function parseCountFieldView(text: string): FieldView {
+  const r = parseCountField(text);
+  if (r.status !== 'ok') return r;
+  return { status: 'ok', value: q(r.count, DIM.DIMENSIONLESS), echo: `${String(r.count)} (whole number)`, warnings: [] };
+}
