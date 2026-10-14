@@ -4,7 +4,7 @@
  *   type RoundDirection = 'up' | 'down' | 'nearest'
  *   formatFor(q, { prefs?, accuracyClass?, unit?, round?: RoundDirection })   // default 'nearest'
  *   roundDirectionFor(bound: 'min-requirement' | 'max-capacity' | 'nominal' | 'prediction'): RoundDirection
- * 'up': parseQuantity(printed) >= SI value; 'down': <= SI value, exactly (no tolerance). For negative values
+ * 'up': parseQuantity(printed) >= SI value; 'down': <= SI value, within 4 ulp (the float-noise guard, round-guard.ts). For negative values
  * 'up' means toward +Infinity. Applies to every dimension and every prefix path, including prefix roll-over.
  * Fixed decimals (trailing zeros trimmed): LENGTH mm 3, mil 2, um 1; AREA mm2 4, mil2 2;
  * absolute temperature and delta-T 1 (any scale). All other dimensions keep sigFigsFor(accuracyClass), default 6.
@@ -23,6 +23,11 @@ import {
   type DisplayPrefs,
   type RoundDirection,
 } from './index';
+
+/** Display rounding absorbs float noise up to 4 ulp (relative) of a rounding boundary (src/core/units/round-guard.ts). */
+const NOISE = 4 * Number.EPSILON;
+const noLess = (x: number): number => x - NOISE * Math.abs(x);
+const noMore = (x: number): number => x + NOISE * Math.abs(x);
 
 const OHM = 'Ω';
 const MICRO = 'µ';
@@ -253,8 +258,8 @@ for (const [name, dim, kind] of PROP_DIMS) {
           expect(r.ok, `${text}${r.ok ? '' : ': ' + r.error.message}`).toBe(true);
           if (!r.ok) return;
           const back = r.value.si;
-          if (round === 'up') expect(back >= si, `up: "${text}" parsed ${String(back)} < ${String(si)}`).toBe(true);
-          else if (round === 'down') expect(back <= si, `down: "${text}" parsed ${String(back)} > ${String(si)}`).toBe(true);
+          if (round === 'up') expect(back >= noLess(si), `up: "${text}" parsed ${String(back)} < ${String(si)}`).toBe(true);
+          else if (round === 'down') expect(back <= noMore(si), `down: "${text}" parsed ${String(back)} > ${String(si)}`).toBe(true);
           else if (kind === 'sig') {
             const sig = acc === undefined ? 6 : sigFigsFor(acc);
             const tol = 0.5 * Math.pow(10, 1 - sig) * (1 + 1e-9);

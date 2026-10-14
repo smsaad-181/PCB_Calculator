@@ -18,6 +18,7 @@ import {
   type DisplayPrefs,
   type Quantity,
 } from './units';
+import { ceilGuarded, floorGuarded } from './units/round-guard';
 
 export interface HeadlineOpts {
   readonly accuracyClass: AccuracyClass;
@@ -72,14 +73,7 @@ export function formatMargin(el: ElementResult, opts: HeadlineOpts): string {
   return `+${text}`;
 }
 
-const GUARD = 4 * Number.EPSILON;
 const MAX_PERCENT_DECIMALS = 20;
-
-/** ceil(t), except that t within a 4-ulp relative guard of an integer is taken as that integer (float noise only). */
-function ceilGuarded(t: number): number {
-  const r = Math.round(t);
-  return Math.abs(t - r) <= GUARD * Math.abs(t) ? r : Math.ceil(t);
-}
 
 /** Utilisation as percent with one decimal, rounded up; a value below 1 never prints as 100 or more (decimals are added). */
 export function formatUtilisation(u: number): string {
@@ -98,11 +92,6 @@ export function formatUtilisation(u: number): string {
 }
 
 const MAX_PERCENT_MAGNITUDE = 1e20;
-
-function floorGuarded(t: number): number {
-  const r = Math.round(t);
-  return Math.abs(t - r) <= GUARD * Math.abs(t) ? r : Math.floor(t);
-}
 
 /** Percent text of p (already times 100) with `sig` significant figures, rounded in `dir`; 'up'/'down' go toward +/- infinity. */
 function percentText(p: number, dir: 'up' | 'down' | 'nearest', sig: number): string {
