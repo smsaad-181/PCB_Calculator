@@ -149,6 +149,21 @@ export const RESERVED_STATE_KEYS = {
   },
 } as const satisfies Record<string, ReservedKeySpec>;
 
+const PATH_ELEMENT_ENCODING =
+  'list-encoded (values percent-encoded and ended by "~"; the page writes the value percent-encoded a second time in the link, and a single encoding is accepted on read). ' +
+  'First value is the kind code. Trace "t": label, layer (outer|inner|empty), length, width, copper by (w weight|t thickness), copper weight, copper thickness, thickness basis, weight source (foil|finished|empty), allowed temperature rise (a difference). ' +
+  'Via "v": label, finished hole, plating thickness, barrel length, count, drill (optional), pad (optional), rated current (optional), rating source. ' +
+  'User elements "c" connector, "p" pad, "s" spoke, "n" pour-neck, "k" cable, "r" resistance: label, resistance, source note, rated current (optional), rating source.';
+
+/** Documents the numbered element slots of the path and load page (numbered from 1 without gaps). */
+function pathElementKeys(what: string, prefix: string, max: number): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (let n = 1; n <= max; n++) {
+    out[`${prefix}${String(n)}`] = `${what} ${String(n)}, ${PATH_ELEMENT_ENCODING} Elements are numbered from 1 without gaps; at most ${String(max)}.`;
+  }
+  return out;
+}
+
 /**
  * Calculator-local state keys, documented here so two calculators cannot silently collide with a reserved key.
  * Values are validated by the owning calculator's view-model (unknown values fall back to defaults with a notice),
@@ -260,6 +275,18 @@ export const CALCULATOR_STATE_KEYS = {
     re4: 'Return path element 4 (only with return path included-in-list); same encoding as fe1; at most 6.',
     re5: 'Return path element 5 (only with return path included-in-list); same encoding as fe1; at most 6.',
     re6: 'Return path element 6 (only with return path included-in-list); same encoding as fe1; at most 6.',
+  },
+  'path-load': {
+    vs: 'Entered source voltage text, for example "12 V" (at most 40 characters).',
+    lk: 'Kind of load: "current", "power", "resistance" or "voltage". Absent means not chosen: there is no default and no result without it.',
+    lv: 'Entered load value text for the chosen kind, for example "2 A", "10 W", "10 ohm" or "11.5 V" (at most 40 characters).',
+    rp: 'Return path: "included-in-list", "same-as-forward" or "not-counted". Absent means not chosen: there is no default and no result without it.',
+    db: 'Entered optional drop budget, a percent or fraction such as "5%" (at most 40 characters). Absent means no budget; there is no default.',
+    tc: 'Entered conductor temperature text of every trace and via, for example "60 °C" (at most 40 characters). Absent means the 25 °C engineering default.',
+    conv: 'Foil convention id for every trace: nominal-35um, nominal-1.35mil or mass-density. Absent means the default assumption.',
+    lc: 'Layer count scope for the clearance export: "1", "2" or "multilayer". Absent means not given. Only used with a fab profile (reserved key fp).',
+    ...pathElementKeys('Forward path element', 'fe', 12),
+    ...pathElementKeys('Return path element', 're', 12),
   },
   via: {
     d: 'Finished hole diameter text (not the drill), for example "0.3 mm" (max 40 characters).',

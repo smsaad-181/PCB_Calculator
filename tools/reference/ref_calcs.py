@@ -1623,6 +1623,626 @@ _PL_PINNED = {
 GOLDEN.extend((n, got, _PL_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _pl_vectors())
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Circuit values, second slice (Phase 1 task 8): feedback divider, LED resistor, RC / LC, reactance. Independent of src/.
+# Relations are ledger S-019 (VERIFIED textbook relations); sqrt(L/C) is S-019b (UNVERIFIED naming); snapping to preferred
+# values reuses the S-016 lists above (PAYWALLED-USER-MUST-VERIFY). Nothing here verifies any ledger row.
+# Every number in the case tables is a TEST value: Vref values are not taken from any datasheet.
+# ---------------------------------------------------------------------------------------------------------------
+TWO_PI = 2.0 * math.pi
+
+def fb_vout(vref, r1, r2):
+    """Vout = Vref (1 + R1/R2); R1 top (Vout to FB), R2 bottom (FB to ground)."""
+    return vref * (1.0 + r1 / r2)
+
+def fb_solve_r1(vref, vout, r2):
+    return r2 * (vout / vref - 1.0)
+
+def fb_solve_r2(vref, vout, r1):
+    return r1 / (vout / vref - 1.0)
+
+def fb_bias_vout(vref, r1, r2, ib, sign):
+    """FB bias current ib (magnitude) INTO the pin (sign +1) or OUT of the pin (sign -1): Vout = Vref (1 + R1/R2) + sign ib R1."""
+    return fb_vout(vref, r1, r2) + sign * ib * r1
+
+def fb_powers(vref, r1, r2):
+    vout = fb_vout(vref, r1, r2)
+    i = vref / r2
+    return {"vout": vout, "i": i, "v_r1": vout - vref, "v_r2": vref, "p_r1": (vout - vref) ** 2 / r1, "p_r2": vref * vref / r2, "p_total": vout * i}
+
+def fb_snap(kind, vref, vout_t, other, series, mode):
+    ideal = fb_solve_r1(vref, vout_t, other) if kind == "r1" else fb_solve_r2(vref, vout_t, other)
+    snapped = eseries_nearest(ideal, series, mode)[0]
+    vo = fb_vout(vref, snapped, other) if kind == "r1" else fb_vout(vref, other, snapped)
+    return ideal, snapped, vo, (vo - vout_t) / vout_t
+
+def fb_pairs(vref, vout_t, series, n=5):
+    """Best (R1, R2) pairs: ranked by the divider-ratio error R2/(R1+R2) against Vref/Vout (best_pairs); Vout re-derived per pair."""
+    out = []
+    for r1, r2, _ratio, _e in best_pairs(vref / vout_t, series, "divider-ratio", n):
+        vo = fb_vout(vref, r1, r2)
+        out.append((r1, r2, vo, (vo - vout_t) / vout_t))
+    return out
+
+def fb_envelope(vref, r1, r2, tol, vtol, ib=0.0, sign=0):
+    """Corner analysis over Vref (1 +- vtol), R1 and R2 (1 +- tol); ib (no tolerance) adds sign ib R1 at the corner R1. Returns (min, typ, max)."""
+    vals = []
+    for a in (1 - vtol, 1 + vtol):
+        for b in (1 - tol, 1 + tol):
+            for c in (1 - tol, 1 + tol):
+                vals.append(fb_bias_vout(vref * a, r1 * b, r2 * c, ib, sign))
+    typ = fb_bias_vout(vref, r1, r2, ib, sign)
+    return min(vals), typ, max(vals)
+
+def led_ideal_r(vs, vf, n, i):
+    return (vs - n * vf) / i
+
+def led_design(vs, vf, n, i, series):
+    """Snap UP to the series (series None: exact). Returns the used R, the actual current, the signed current error fraction and powers."""
+    ideal = led_ideal_r(vs, vf, n, i)
+    r = ideal if series is None else eseries_nearest(ideal, series, "up")[0]
+    ia = (vs - n * vf) / r
+    return {"ideal": ideal, "r": r, "i": ia, "err": (ia - i) / i, "p_r": ia * ia * r, "p_led": vf * ia, "p_leds": n * vf * ia, "p_src": vs * ia,
+            "di_per_100mV": n * 0.1 / r}
+
+def rc_tau(r, c):
+    return r * c
+
+def rc_fc(r, c):
+    return 1.0 / (TWO_PI * r * c)
+
+def rc_solve_r(fc, c):
+    return 1.0 / (TWO_PI * fc * c)
+
+def rc_solve_c(fc, r):
+    return 1.0 / (TWO_PI * fc * r)
+
+def lc_f0(l, c):
+    return 1.0 / (TWO_PI * math.sqrt(l * c))
+
+def lc_z0(l, c):
+    return math.sqrt(l / c)
+
+def lc_solve_l(f0, c):
+    return 1.0 / ((TWO_PI * f0) ** 2 * c)
+
+def lc_solve_c(f0, l):
+    return 1.0 / ((TWO_PI * f0) ** 2 * l)
+
+def x_l(f, l):
+    return TWO_PI * f * l
+
+def x_c(f, c):
+    return 1.0 / (TWO_PI * f * c)
+
+FB_VOUT = [(0.8, 100e3, 10e3), (1.25, 22e3, 10e3), (0.6, 47e3, 10e3), (2.5, 10e3, 10e3), (0.5, 180e3, 20e3)]
+FB_SOLVE_R1 = [(0.8, 3.3, 10e3), (0.6, 5.0, 10e3), (1.25, 12.0, 4.7e3)]
+FB_SOLVE_R2 = [(0.8, 3.3, 100e3), (0.6, 1.8, 47e3), (1.25, 5.0, 33e3)]
+FB_POWER = [(0.8, 100e3, 10e3), (1.25, 22e3, 10e3), (0.6, 1e3, 330.0)]
+FB_BIAS = [(0.8, 100e3, 10e3, 50e-9, 1), (0.8, 100e3, 10e3, 50e-9, -1), (0.6, 1e6, 100e3, 1e-6, 1)]
+FB_SNAP_CASES = [("r1", 0.8, 3.3, 10e3), ("r2", 0.8, 3.3, 91e3)]
+FB_SNAP_SERIES = ("E24", "E96", "E192")
+FB_PAIR_CASES = [(0.8, 3.3, "E24"), (0.8, 3.3, "E96"), (0.6, 5.0, "E96")]
+FB_ENV = [(0.8, 100e3, 10e3, 0.01, 0.0, 0.0, 0), (0.8, 100e3, 10e3, 0.01, 0.01, 0.0, 0), (0.6, 47e3, 10e3, 0.05, 0.02, 0.0, 0),
+          (0.8, 100e3, 10e3, 0.01, 0.01, 50e-9, 1), (0.8, 100e3, 10e3, 0.01, 0.01, 50e-9, -1)]
+LED_CASES = [(5.0, 2.1, 1, 0.010), (3.3, 1.8, 1, 0.020), (12.0, 3.2, 3, 0.020), (24.0, 2.0, 4, 0.015), (5.0, 2.0, 1, 0.010)]
+LED_SERIES = (None, "E12", "E24", "E96", "E192")
+RC_CASES = [(1e3, 1e-6), (10e3, 100e-9), (4.7e3, 47e-12), (500.0, 7e-6), (100.0, 10e-12)]
+RC_SOLVE_R = [(1e3, 100e-9), (159.1549430918954, 1e-6), (10e6, 10e-12)]
+RC_SOLVE_C = [(1e3, 1e3), (50.0, 10e3), (2.4e6, 50.0)]
+LC_CASES = [(10e-6, 100e-9), (1e-3, 1e-6), (100e-9, 10e-12), (4.7e-6, 22e-6)]
+LC_SOLVE_L = [(1e6, 100e-9), (50e3, 1e-6), (13.56e6, 100e-12)]
+LC_SOLVE_C = [(1e6, 10e-6), (455e3, 1e-3), (100e6, 47e-9)]
+XL_CASES = [(1e3, 1e-3), (100e3, 10e-6), (50.0, 1.0), (2.4e9, 1e-9)]
+XC_CASES = [(1e3, 1e-6), (100e6, 100e-12), (50.0, 100e-6), (1e6, 100e-9)]
+XL_SOLVE_F = [(6.283185307179586, 1e-3), (100.0, 10e-6)]
+XL_SOLVE_L = [(62.83185307179586, 1e3), (1.0, 1e6)]
+XC_SOLVE_F = [(159.1549430918954, 1e-6), (1.0, 100e-12)]
+XC_SOLVE_C = [(159.1549430918954, 1e3), (10.0, 1e6)]
+
+def _circuit2_vectors():
+    out = []
+    S = ("S-019",)
+    SS = ("S-019", "S-016")
+    SB = ("S-019", "S-019b")
+    for ci, (vref, r1, r2) in enumerate(FB_VOUT):
+        out.append(("fb_vout_c%d_V" % ci, fb_vout(vref, r1, r2), 1e-9, S, "Vout = Vref (1 + R1/R2)"))
+    for ci, (vref, t, r2) in enumerate(FB_SOLVE_R1):
+        out.append(("fb_solve_r1_c%d_ohm" % ci, fb_solve_r1(vref, t, r2), 1e-9, S, "R1 = R2 (Vout/Vref - 1); exact, unsnapped"))
+    for ci, (vref, t, r1) in enumerate(FB_SOLVE_R2):
+        out.append(("fb_solve_r2_c%d_ohm" % ci, fb_solve_r2(vref, t, r1), 1e-9, S, "R2 = R1 / (Vout/Vref - 1); exact, unsnapped"))
+    for ci, (vref, r1, r2) in enumerate(FB_POWER):
+        o = fb_powers(vref, r1, r2)
+        for key, unit in (("i", "A"), ("v_r1", "V"), ("v_r2", "V"), ("p_r1", "W"), ("p_r2", "W"), ("p_total", "W")):
+            out.append(("fb_power_c%d_%s_%s" % (ci, key, unit), o[key], 1e-9, S, "I = Vref/R2; V(R1) = Vout - Vref; P(R1) = V(R1)^2/R1; P(R2) = Vref^2/R2; total = Vout I"))
+    for ci, (vref, r1, r2, ib, sg) in enumerate(FB_BIAS):
+        vb = fb_bias_vout(vref, r1, r2, ib, sg)
+        out.append(("fb_bias_c%d_shift_V" % ci, sg * ib * r1, 1e-9, S, "shift = +ib R1 for current INTO the FB pin, -ib R1 out of it (KCL at the FB node)"))
+        out.append(("fb_bias_c%d_vout_V" % ci, vb, 1e-9, S, "Vout = Vref (1 + R1/R2) + shift"))
+        out.append(("fb_bias_c%d_ratio" % ci, (vref / r2) / ib, 1e-9, S, "divider current Vref/R2 over the bias current"))
+    for ci, (kind, vref, t, other) in enumerate(FB_SNAP_CASES):
+        for s in FB_SNAP_SERIES:
+            for m in SNAP_MODES:
+                ideal, sn, vo, ef = fb_snap(kind, vref, t, other, s, m)
+                out.append(("fb_snap_c%d_%s_%s_ohm" % (ci, s, m), sn, 1e-9, SS, "solved %s snapped to %s (%s)" % (kind, s, m)))
+                out.append(("fb_snap_c%d_%s_%s_vout_V" % (ci, s, m), vo, 1e-9, SS, "Vout with the snapped resistor"))
+                out.append(("fb_snap_c%d_%s_%s_err_frac" % (ci, s, m), ef, 1e-9, SS, "(Vout - target)/target as a fraction"))
+    for ci, (vref, t, s) in enumerate(FB_PAIR_CASES):
+        for k, (r1, r2, vo, ef) in enumerate(fb_pairs(vref, t, s)):
+            out.append(("fb_pair_c%d_rank%d_r1_ohm" % (ci, k), r1, 1e-9, SS, "best_pairs divider-ratio R2/(R1+R2) = Vref/Vout over %s, window 1 kohm .. 976 kohm" % s))
+            out.append(("fb_pair_c%d_rank%d_r2_ohm" % (ci, k), r2, 1e-9, SS, "pair R2"))
+            out.append(("fb_pair_c%d_rank%d_vout_V" % (ci, k), vo, 1e-9, SS, "Vout of the pair"))
+            out.append(("fb_pair_c%d_rank%d_err_frac" % (ci, k), ef, 1e-9, SS, "(Vout - target)/target as a fraction"))
+    for ci, (vref, r1, r2, tol, vt, ib, sg) in enumerate(FB_ENV):
+        lo, _typ, hi = fb_envelope(vref, r1, r2, tol, vt, ib, sg)
+        out.append(("fb_env_c%d_min_V" % ci, lo, 1e-9, S, "initial-tolerance corners over Vref and R1, R2 (+bias shift when ib > 0); TCR excluded"))
+        out.append(("fb_env_c%d_max_V" % ci, hi, 1e-9, S, "initial-tolerance corners over Vref and R1, R2 (+bias shift when ib > 0); TCR excluded"))
+    for ci, (vs, vf, n, i) in enumerate(LED_CASES):
+        for s in LED_SERIES:
+            tag = "none" if s is None else s
+            d = led_design(vs, vf, n, i, s)
+            ids = S if s is None else SS
+            for key, unit in (("ideal", "ohm"), ("r", "ohm"), ("i", "A"), ("err", "frac"), ("p_r", "W"), ("p_led", "W"), ("p_leds", "W"), ("p_src", "W"), ("di_per_100mV", "A")):
+                if key == "ideal" and s is not None:
+                    continue
+                out.append(("led_c%d_%s_%s_%s" % (ci, tag, key, unit), d[key], 1e-9, ids, "R = (Vs - N Vf)/If, snapped UP to the series; I = (Vs - N Vf)/R; P(R) = I^2 R; P(LED) = Vf I; source = Vs I"))
+    for ci, (r, c) in enumerate(RC_CASES):
+        out.append(("rc_c%d_tau_s" % ci, rc_tau(r, c), 1e-9, S, "tau = R C"))
+        out.append(("rc_c%d_fc_Hz" % ci, rc_fc(r, c), 1e-9, S, "fc = 1/(2 pi R C)"))
+    for ci, (fc, c) in enumerate(RC_SOLVE_R):
+        out.append(("rc_solve_r_c%d_ohm" % ci, rc_solve_r(fc, c), 1e-9, S, "R = 1/(2 pi fc C)"))
+    for ci, (fc, r) in enumerate(RC_SOLVE_C):
+        out.append(("rc_solve_c_c%d_F" % ci, rc_solve_c(fc, r), 1e-9, S, "C = 1/(2 pi fc R)"))
+    for ci, (l, c) in enumerate(LC_CASES):
+        out.append(("lc_c%d_f0_Hz" % ci, lc_f0(l, c), 1e-9, S, "f0 = 1/(2 pi sqrt(L C))"))
+        out.append(("lc_c%d_z0_ohm" % ci, lc_z0(l, c), 1e-9, SB, "sqrt(L/C) (= XL = XC at f0); S-019b UNVERIFIED naming"))
+    for ci, (f0, c) in enumerate(LC_SOLVE_L):
+        out.append(("lc_solve_l_c%d_H" % ci, lc_solve_l(f0, c), 1e-9, S, "L = 1/((2 pi f0)^2 C)"))
+        out.append(("lc_solve_l_c%d_z0_ohm" % ci, lc_z0(lc_solve_l(f0, c), c), 1e-9, SB, "sqrt(L/C) of the solved L"))
+    for ci, (f0, l) in enumerate(LC_SOLVE_C):
+        out.append(("lc_solve_c_c%d_F" % ci, lc_solve_c(f0, l), 1e-9, S, "C = 1/((2 pi f0)^2 L)"))
+        out.append(("lc_solve_c_c%d_z0_ohm" % ci, lc_z0(l, lc_solve_c(f0, l)), 1e-9, SB, "sqrt(L/C) of the solved C"))
+    for ci, (f, l) in enumerate(XL_CASES):
+        out.append(("xl_c%d_ohm" % ci, x_l(f, l), 1e-9, S, "XL = 2 pi f L (magnitude)"))
+    for ci, (f, c) in enumerate(XC_CASES):
+        out.append(("xc_c%d_ohm" % ci, x_c(f, c), 1e-9, S, "XC = 1/(2 pi f C) (magnitude)"))
+    for ci, (x, l) in enumerate(XL_SOLVE_F):
+        out.append(("xl_solve_f_c%d_Hz" % ci, x / (TWO_PI * l), 1e-9, S, "f = XL/(2 pi L)"))
+    for ci, (x, f) in enumerate(XL_SOLVE_L):
+        out.append(("xl_solve_l_c%d_H" % ci, x / (TWO_PI * f), 1e-9, S, "L = XL/(2 pi f)"))
+    for ci, (x, c) in enumerate(XC_SOLVE_F):
+        out.append(("xc_solve_f_c%d_Hz" % ci, 1.0 / (TWO_PI * x * c), 1e-9, S, "f = 1/(2 pi XC C)"))
+    for ci, (x, f) in enumerate(XC_SOLVE_C):
+        out.append(("xc_solve_c_c%d_F" % ci, 1.0 / (TWO_PI * x * f), 1e-9, S, "C = 1/(2 pi f XC)"))
+    return out
+
+
+
+# Pinned literals recorded from this oracle (regression pins, same policy as _CIRCUIT_PINNED).
+_CIRCUIT2_PINNED = {
+    'fb_vout_c0_V': 8.8,
+    'fb_vout_c1_V': 4.0,
+    'fb_vout_c2_V': 3.42,
+    'fb_vout_c3_V': 5.0,
+    'fb_vout_c4_V': 5.0,
+    'fb_solve_r1_c0_ohm': 31249.999999999993,
+    'fb_solve_r1_c1_ohm': 73333.33333333334,
+    'fb_solve_r1_c2_ohm': 40420.0,
+    'fb_solve_r2_c0_ohm': 32000.00000000001,
+    'fb_solve_r2_c1_ohm': 23500.0,
+    'fb_solve_r2_c2_ohm': 11000.0,
+    'fb_power_c0_i_A': 8e-05,
+    'fb_power_c0_v_r1_V': 8.0,
+    'fb_power_c0_v_r2_V': 0.8,
+    'fb_power_c0_p_r1_W': 0.00064,
+    'fb_power_c0_p_r2_W': 6.400000000000001e-05,
+    'fb_power_c0_p_total_W': 0.0007040000000000001,
+    'fb_power_c1_i_A': 0.000125,
+    'fb_power_c1_v_r1_V': 2.75,
+    'fb_power_c1_v_r2_V': 1.25,
+    'fb_power_c1_p_r1_W': 0.00034375,
+    'fb_power_c1_p_r2_W': 0.00015625,
+    'fb_power_c1_p_total_W': 0.0005,
+    'fb_power_c2_i_A': 0.0018181818181818182,
+    'fb_power_c2_v_r1_V': 1.818181818181818,
+    'fb_power_c2_v_r2_V': 0.6,
+    'fb_power_c2_p_r1_W': 0.0033057851239669408,
+    'fb_power_c2_p_r2_W': 0.001090909090909091,
+    'fb_power_c2_p_total_W': 0.004396694214876032,
+    'fb_bias_c0_shift_V': 0.005,
+    'fb_bias_c0_vout_V': 8.805000000000001,
+    'fb_bias_c0_ratio': 1600.0000000000002,
+    'fb_bias_c1_shift_V': -0.005,
+    'fb_bias_c1_vout_V': 8.795,
+    'fb_bias_c1_ratio': 1600.0000000000002,
+    'fb_bias_c2_shift_V': 1.0,
+    'fb_bias_c2_vout_V': 7.6,
+    'fb_bias_c2_ratio': 6.0,
+    'fb_snap_c0_E24_nearest_ohm': 30000.0,
+    'fb_snap_c0_E24_nearest_vout_V': 3.2,
+    'fb_snap_c0_E24_nearest_err_frac': -0.030303030303030196,
+    'fb_snap_c0_E24_up_ohm': 33000.0,
+    'fb_snap_c0_E24_up_vout_V': 3.44,
+    'fb_snap_c0_E24_up_err_frac': 0.04242424242424246,
+    'fb_snap_c0_E24_down_ohm': 30000.0,
+    'fb_snap_c0_E24_down_vout_V': 3.2,
+    'fb_snap_c0_E24_down_err_frac': -0.030303030303030196,
+    'fb_snap_c0_E96_nearest_ohm': 30900.0,
+    'fb_snap_c0_E96_nearest_vout_V': 3.2720000000000002,
+    'fb_snap_c0_E96_nearest_err_frac': -0.008484848484848359,
+    'fb_snap_c0_E96_up_ohm': 31600.0,
+    'fb_snap_c0_E96_up_vout_V': 3.3280000000000003,
+    'fb_snap_c0_E96_up_err_frac': 0.008484848484848628,
+    'fb_snap_c0_E96_down_ohm': 30900.0,
+    'fb_snap_c0_E96_down_vout_V': 3.2720000000000002,
+    'fb_snap_c0_E96_down_err_frac': -0.008484848484848359,
+    'fb_snap_c0_E192_nearest_ohm': 31200.0,
+    'fb_snap_c0_E192_nearest_vout_V': 3.2960000000000003,
+    'fb_snap_c0_E192_nearest_err_frac': -0.0012121212121210788,
+    'fb_snap_c0_E192_up_ohm': 31600.0,
+    'fb_snap_c0_E192_up_vout_V': 3.3280000000000003,
+    'fb_snap_c0_E192_up_err_frac': 0.008484848484848628,
+    'fb_snap_c0_E192_down_ohm': 31200.0,
+    'fb_snap_c0_E192_down_vout_V': 3.2960000000000003,
+    'fb_snap_c0_E192_down_err_frac': -0.0012121212121210788,
+    'fb_snap_c1_E24_nearest_ohm': 30000.0,
+    'fb_snap_c1_E24_nearest_vout_V': 3.2266666666666666,
+    'fb_snap_c1_E24_nearest_err_frac': -0.0222222222222222,
+    'fb_snap_c1_E24_up_ohm': 30000.0,
+    'fb_snap_c1_E24_up_vout_V': 3.2266666666666666,
+    'fb_snap_c1_E24_up_err_frac': -0.0222222222222222,
+    'fb_snap_c1_E24_down_ohm': 27000.0,
+    'fb_snap_c1_E24_down_vout_V': 3.4962962962962965,
+    'fb_snap_c1_E24_down_err_frac': 0.05948372615039292,
+    'fb_snap_c1_E96_nearest_ohm': 29400.0,
+    'fb_snap_c1_E96_nearest_vout_V': 3.276190476190476,
+    'fb_snap_c1_E96_nearest_err_frac': -0.00721500721500719,
+    'fb_snap_c1_E96_up_ohm': 29400.0,
+    'fb_snap_c1_E96_up_vout_V': 3.276190476190476,
+    'fb_snap_c1_E96_up_err_frac': -0.00721500721500719,
+    'fb_snap_c1_E96_down_ohm': 28700.0,
+    'fb_snap_c1_E96_down_vout_V': 3.336585365853659,
+    'fb_snap_c1_E96_down_err_frac': 0.011086474501108792,
+    'fb_snap_c1_E192_nearest_ohm': 29100.0,
+    'fb_snap_c1_E192_nearest_vout_V': 3.301718213058419,
+    'fb_snap_c1_E192_nearest_err_frac': 0.0005206706237634055,
+    'fb_snap_c1_E192_up_ohm': 29400.0,
+    'fb_snap_c1_E192_up_vout_V': 3.276190476190476,
+    'fb_snap_c1_E192_up_err_frac': -0.00721500721500719,
+    'fb_snap_c1_E192_down_ohm': 29100.0,
+    'fb_snap_c1_E192_down_vout_V': 3.301718213058419,
+    'fb_snap_c1_E192_down_err_frac': 0.0005206706237634055,
+    'fb_pair_c0_rank0_r1_ohm': 7500.0,
+    'fb_pair_c0_rank0_r2_ohm': 2400.0,
+    'fb_pair_c0_rank0_vout_V': 3.3000000000000003,
+    'fb_pair_c0_rank0_err_frac': 1.345724878333523e-16,
+    'fb_pair_c0_rank1_r1_ohm': 75000.0,
+    'fb_pair_c0_rank1_r2_ohm': 24000.0,
+    'fb_pair_c0_rank1_vout_V': 3.3000000000000003,
+    'fb_pair_c0_rank1_err_frac': 1.345724878333523e-16,
+    'fb_pair_c0_rank2_r1_ohm': 750000.0,
+    'fb_pair_c0_rank2_r2_ohm': 240000.0,
+    'fb_pair_c0_rank2_vout_V': 3.3000000000000003,
+    'fb_pair_c0_rank2_err_frac': 1.345724878333523e-16,
+    'fb_pair_c0_rank3_r1_ohm': 4700.0,
+    'fb_pair_c0_rank3_r2_ohm': 1500.0,
+    'fb_pair_c0_rank3_vout_V': 3.3066666666666666,
+    'fb_pair_c0_rank3_err_frac': 0.002020202020202067,
+    'fb_pair_c0_rank4_r1_ohm': 47000.0,
+    'fb_pair_c0_rank4_r2_ohm': 15000.0,
+    'fb_pair_c0_rank4_vout_V': 3.3066666666666666,
+    'fb_pair_c0_rank4_err_frac': 0.002020202020202067,
+    'fb_pair_c1_rank0_r1_ohm': 3570.0,
+    'fb_pair_c1_rank0_r2_ohm': 1150.0,
+    'fb_pair_c1_rank0_vout_V': 3.2834782608695647,
+    'fb_pair_c1_rank0_err_frac': -0.00500658761528336,
+    'fb_pair_c1_rank1_r1_ohm': 35700.0,
+    'fb_pair_c1_rank1_r2_ohm': 11500.0,
+    'fb_pair_c1_rank1_vout_V': 3.2834782608695647,
+    'fb_pair_c1_rank1_err_frac': -0.00500658761528336,
+    'fb_pair_c1_rank2_r1_ohm': 357000.0,
+    'fb_pair_c1_rank2_r2_ohm': 115000.0,
+    'fb_pair_c1_rank2_vout_V': 3.2834782608695647,
+    'fb_pair_c1_rank2_err_frac': -0.00500658761528336,
+    'fb_pair_c1_rank3_r1_ohm': 10700.0,
+    'fb_pair_c1_rank3_r2_ohm': 3400.0,
+    'fb_pair_c1_rank3_vout_V': 3.317647058823529,
+    'fb_pair_c1_rank3_err_frac': 0.005347593582887682,
+    'fb_pair_c1_rank4_r1_ohm': 107000.0,
+    'fb_pair_c1_rank4_r2_ohm': 34000.0,
+    'fb_pair_c1_rank4_vout_V': 3.317647058823529,
+    'fb_pair_c1_rank4_err_frac': 0.005347593582887682,
+    'fb_pair_c2_rank0_r1_ohm': 11000.0,
+    'fb_pair_c2_rank0_r2_ohm': 1500.0,
+    'fb_pair_c2_rank0_vout_V': 4.999999999999999,
+    'fb_pair_c2_rank0_err_frac': -1.7763568394002506e-16,
+    'fb_pair_c2_rank1_r1_ohm': 110000.0,
+    'fb_pair_c2_rank1_r2_ohm': 15000.0,
+    'fb_pair_c2_rank1_vout_V': 4.999999999999999,
+    'fb_pair_c2_rank1_err_frac': -1.7763568394002506e-16,
+    'fb_pair_c2_rank2_r1_ohm': 15400.0,
+    'fb_pair_c2_rank2_r2_ohm': 2100.0,
+    'fb_pair_c2_rank2_vout_V': 4.999999999999999,
+    'fb_pair_c2_rank2_err_frac': -1.7763568394002506e-16,
+    'fb_pair_c2_rank3_r1_ohm': 154000.0,
+    'fb_pair_c2_rank3_r2_ohm': 21000.0,
+    'fb_pair_c2_rank3_vout_V': 4.999999999999999,
+    'fb_pair_c2_rank3_err_frac': -1.7763568394002506e-16,
+    'fb_pair_c2_rank4_r1_ohm': 12100.0,
+    'fb_pair_c2_rank4_r2_ohm': 1650.0,
+    'fb_pair_c2_rank4_vout_V': 4.999999999999999,
+    'fb_pair_c2_rank4_err_frac': -1.7763568394002506e-16,
+    'fb_env_c0_min_V': 8.641584158415842,
+    'fb_env_c0_max_V': 8.961616161616162,
+    'fb_env_c1_min_V': 8.555168316831683,
+    'fb_env_c1_max_V': 9.051232323232323,
+    'fb_env_c2_min_V': 3.0884,
+    'fb_env_c2_max_V': 3.7911789473684214,
+    'fb_env_c3_min_V': 8.560118316831682,
+    'fb_env_c3_max_V': 9.056282323232324,
+    'fb_env_c4_min_V': 8.550218316831684,
+    'fb_env_c4_max_V': 9.046182323232323,
+    'led_c0_none_ideal_ohm': 290.0,
+    'led_c0_none_r_ohm': 290.0,
+    'led_c0_none_i_A': 0.01,
+    'led_c0_none_err_frac': 0.0,
+    'led_c0_none_p_r_W': 0.029,
+    'led_c0_none_p_led_W': 0.021,
+    'led_c0_none_p_leds_W': 0.021,
+    'led_c0_none_p_src_W': 0.05,
+    'led_c0_none_di_per_100mV_A': 0.0003448275862068966,
+    'led_c0_E12_r_ohm': 330.0,
+    'led_c0_E12_i_A': 0.008787878787878787,
+    'led_c0_E12_err_frac': -0.1212121212121213,
+    'led_c0_E12_p_r_W': 0.02548484848484848,
+    'led_c0_E12_p_led_W': 0.018454545454545453,
+    'led_c0_E12_p_leds_W': 0.018454545454545453,
+    'led_c0_E12_p_src_W': 0.04393939393939394,
+    'led_c0_E12_di_per_100mV_A': 0.00030303030303030303,
+    'led_c0_E24_r_ohm': 300.0,
+    'led_c0_E24_i_A': 0.009666666666666667,
+    'led_c0_E24_err_frac': -0.033333333333333305,
+    'led_c0_E24_p_r_W': 0.028033333333333337,
+    'led_c0_E24_p_led_W': 0.020300000000000002,
+    'led_c0_E24_p_leds_W': 0.020300000000000002,
+    'led_c0_E24_p_src_W': 0.04833333333333334,
+    'led_c0_E24_di_per_100mV_A': 0.0003333333333333334,
+    'led_c0_E96_r_ohm': 294.0,
+    'led_c0_E96_i_A': 0.009863945578231292,
+    'led_c0_E96_err_frac': -0.013605442176870854,
+    'led_c0_E96_p_r_W': 0.028605442176870742,
+    'led_c0_E96_p_led_W': 0.020714285714285713,
+    'led_c0_E96_p_leds_W': 0.020714285714285713,
+    'led_c0_E96_p_src_W': 0.04931972789115646,
+    'led_c0_E96_di_per_100mV_A': 0.00034013605442176874,
+    'led_c0_E192_r_ohm': 291.0,
+    'led_c0_E192_i_A': 0.009965635738831614,
+    'led_c0_E192_err_frac': -0.00343642611683858,
+    'led_c0_E192_p_r_W': 0.028900343642611678,
+    'led_c0_E192_p_led_W': 0.02092783505154639,
+    'led_c0_E192_p_leds_W': 0.02092783505154639,
+    'led_c0_E192_p_src_W': 0.04982817869415807,
+    'led_c0_E192_di_per_100mV_A': 0.0003436426116838488,
+    'led_c1_none_ideal_ohm': 74.99999999999999,
+    'led_c1_none_r_ohm': 74.99999999999999,
+    'led_c1_none_i_A': 0.02,
+    'led_c1_none_err_frac': 0.0,
+    'led_c1_none_p_r_W': 0.029999999999999995,
+    'led_c1_none_p_led_W': 0.036000000000000004,
+    'led_c1_none_p_leds_W': 0.036000000000000004,
+    'led_c1_none_p_src_W': 0.066,
+    'led_c1_none_di_per_100mV_A': 0.0013333333333333337,
+    'led_c1_E12_r_ohm': 82.0,
+    'led_c1_E12_i_A': 0.018292682926829267,
+    'led_c1_E12_err_frac': -0.08536585365853666,
+    'led_c1_E12_p_r_W': 0.0274390243902439,
+    'led_c1_E12_p_led_W': 0.032926829268292684,
+    'led_c1_E12_p_leds_W': 0.032926829268292684,
+    'led_c1_E12_p_src_W': 0.06036585365853658,
+    'led_c1_E12_di_per_100mV_A': 0.0012195121951219512,
+    'led_c1_E24_r_ohm': 75.0,
+    'led_c1_E24_i_A': 0.019999999999999997,
+    'led_c1_E24_err_frac': -1.734723475976807e-16,
+    'led_c1_E24_p_r_W': 0.02999999999999999,
+    'led_c1_E24_p_led_W': 0.036,
+    'led_c1_E24_p_leds_W': 0.036,
+    'led_c1_E24_p_src_W': 0.06599999999999999,
+    'led_c1_E24_di_per_100mV_A': 0.0013333333333333335,
+    'led_c1_E96_r_ohm': 75.0,
+    'led_c1_E96_i_A': 0.019999999999999997,
+    'led_c1_E96_err_frac': -1.734723475976807e-16,
+    'led_c1_E96_p_r_W': 0.02999999999999999,
+    'led_c1_E96_p_led_W': 0.036,
+    'led_c1_E96_p_leds_W': 0.036,
+    'led_c1_E96_p_src_W': 0.06599999999999999,
+    'led_c1_E96_di_per_100mV_A': 0.0013333333333333335,
+    'led_c1_E192_r_ohm': 75.0,
+    'led_c1_E192_i_A': 0.019999999999999997,
+    'led_c1_E192_err_frac': -1.734723475976807e-16,
+    'led_c1_E192_p_r_W': 0.02999999999999999,
+    'led_c1_E192_p_led_W': 0.036,
+    'led_c1_E192_p_leds_W': 0.036,
+    'led_c1_E192_p_src_W': 0.06599999999999999,
+    'led_c1_E192_di_per_100mV_A': 0.0013333333333333335,
+    'led_c2_none_ideal_ohm': 119.99999999999993,
+    'led_c2_none_r_ohm': 119.99999999999993,
+    'led_c2_none_i_A': 0.02,
+    'led_c2_none_err_frac': 0.0,
+    'led_c2_none_p_r_W': 0.04799999999999997,
+    'led_c2_none_p_led_W': 0.064,
+    'led_c2_none_p_leds_W': 0.19200000000000003,
+    'led_c2_none_p_src_W': 0.24,
+    'led_c2_none_di_per_100mV_A': 0.002500000000000002,
+    'led_c2_E12_r_ohm': 120.0,
+    'led_c2_E12_i_A': 0.019999999999999987,
+    'led_c2_E12_err_frac': -6.938893903907228e-16,
+    'led_c2_E12_p_r_W': 0.04799999999999994,
+    'led_c2_E12_p_led_W': 0.06399999999999996,
+    'led_c2_E12_p_leds_W': 0.1919999999999999,
+    'led_c2_E12_p_src_W': 0.23999999999999982,
+    'led_c2_E12_di_per_100mV_A': 0.0025000000000000005,
+    'led_c2_E24_r_ohm': 120.0,
+    'led_c2_E24_i_A': 0.019999999999999987,
+    'led_c2_E24_err_frac': -6.938893903907228e-16,
+    'led_c2_E24_p_r_W': 0.04799999999999994,
+    'led_c2_E24_p_led_W': 0.06399999999999996,
+    'led_c2_E24_p_leds_W': 0.1919999999999999,
+    'led_c2_E24_p_src_W': 0.23999999999999982,
+    'led_c2_E24_di_per_100mV_A': 0.0025000000000000005,
+    'led_c2_E96_r_ohm': 121.0,
+    'led_c2_E96_i_A': 0.01983471074380164,
+    'led_c2_E96_err_frac': -0.008264462809918008,
+    'led_c2_E96_p_r_W': 0.0476033057851239,
+    'led_c2_E96_p_led_W': 0.06347107438016525,
+    'led_c2_E96_p_leds_W': 0.19041322314049577,
+    'led_c2_E96_p_src_W': 0.2380165289256197,
+    'led_c2_E96_di_per_100mV_A': 0.0024793388429752068,
+    'led_c2_E192_r_ohm': 120.0,
+    'led_c2_E192_i_A': 0.019999999999999987,
+    'led_c2_E192_err_frac': -6.938893903907228e-16,
+    'led_c2_E192_p_r_W': 0.04799999999999994,
+    'led_c2_E192_p_led_W': 0.06399999999999996,
+    'led_c2_E192_p_leds_W': 0.1919999999999999,
+    'led_c2_E192_p_src_W': 0.23999999999999982,
+    'led_c2_E192_di_per_100mV_A': 0.0025000000000000005,
+    'led_c3_none_ideal_ohm': 1066.6666666666667,
+    'led_c3_none_r_ohm': 1066.6666666666667,
+    'led_c3_none_i_A': 0.015,
+    'led_c3_none_err_frac': 0.0,
+    'led_c3_none_p_r_W': 0.24000000000000002,
+    'led_c3_none_p_led_W': 0.03,
+    'led_c3_none_p_leds_W': 0.12,
+    'led_c3_none_p_src_W': 0.36,
+    'led_c3_none_di_per_100mV_A': 0.000375,
+    'led_c3_E12_r_ohm': 1200.0,
+    'led_c3_E12_i_A': 0.013333333333333334,
+    'led_c3_E12_err_frac': -0.11111111111111102,
+    'led_c3_E12_p_r_W': 0.21333333333333337,
+    'led_c3_E12_p_led_W': 0.02666666666666667,
+    'led_c3_E12_p_leds_W': 0.10666666666666667,
+    'led_c3_E12_p_src_W': 0.32,
+    'led_c3_E12_di_per_100mV_A': 0.0003333333333333334,
+    'led_c3_E24_r_ohm': 1100.0,
+    'led_c3_E24_i_A': 0.014545454545454545,
+    'led_c3_E24_err_frac': -0.03030303030303027,
+    'led_c3_E24_p_r_W': 0.23272727272727273,
+    'led_c3_E24_p_led_W': 0.02909090909090909,
+    'led_c3_E24_p_leds_W': 0.11636363636363636,
+    'led_c3_E24_p_src_W': 0.3490909090909091,
+    'led_c3_E24_di_per_100mV_A': 0.00036363636363636367,
+    'led_c3_E96_r_ohm': 1070.0,
+    'led_c3_E96_i_A': 0.014953271028037384,
+    'led_c3_E96_err_frac': -0.00311526479750771,
+    'led_c3_E96_p_r_W': 0.23925233644859814,
+    'led_c3_E96_p_led_W': 0.029906542056074768,
+    'led_c3_E96_p_leds_W': 0.11962616822429907,
+    'led_c3_E96_p_src_W': 0.3588785046728972,
+    'led_c3_E96_di_per_100mV_A': 0.0003738317757009346,
+    'led_c3_E192_r_ohm': 1070.0,
+    'led_c3_E192_i_A': 0.014953271028037384,
+    'led_c3_E192_err_frac': -0.00311526479750771,
+    'led_c3_E192_p_r_W': 0.23925233644859814,
+    'led_c3_E192_p_led_W': 0.029906542056074768,
+    'led_c3_E192_p_leds_W': 0.11962616822429907,
+    'led_c3_E192_p_src_W': 0.3588785046728972,
+    'led_c3_E192_di_per_100mV_A': 0.0003738317757009346,
+    'led_c4_none_ideal_ohm': 300.0,
+    'led_c4_none_r_ohm': 300.0,
+    'led_c4_none_i_A': 0.01,
+    'led_c4_none_err_frac': 0.0,
+    'led_c4_none_p_r_W': 0.030000000000000002,
+    'led_c4_none_p_led_W': 0.02,
+    'led_c4_none_p_leds_W': 0.02,
+    'led_c4_none_p_src_W': 0.05,
+    'led_c4_none_di_per_100mV_A': 0.0003333333333333334,
+    'led_c4_E12_r_ohm': 330.0,
+    'led_c4_E12_i_A': 0.00909090909090909,
+    'led_c4_E12_err_frac': -0.09090909090909097,
+    'led_c4_E12_p_r_W': 0.02727272727272727,
+    'led_c4_E12_p_led_W': 0.01818181818181818,
+    'led_c4_E12_p_leds_W': 0.01818181818181818,
+    'led_c4_E12_p_src_W': 0.045454545454545456,
+    'led_c4_E12_di_per_100mV_A': 0.00030303030303030303,
+    'led_c4_E24_r_ohm': 300.0,
+    'led_c4_E24_i_A': 0.01,
+    'led_c4_E24_err_frac': 0.0,
+    'led_c4_E24_p_r_W': 0.030000000000000002,
+    'led_c4_E24_p_led_W': 0.02,
+    'led_c4_E24_p_leds_W': 0.02,
+    'led_c4_E24_p_src_W': 0.05,
+    'led_c4_E24_di_per_100mV_A': 0.0003333333333333334,
+    'led_c4_E96_r_ohm': 301.0,
+    'led_c4_E96_i_A': 0.009966777408637873,
+    'led_c4_E96_err_frac': -0.003322259136212709,
+    'led_c4_E96_p_r_W': 0.02990033222591362,
+    'led_c4_E96_p_led_W': 0.019933554817275746,
+    'led_c4_E96_p_leds_W': 0.019933554817275746,
+    'led_c4_E96_p_src_W': 0.04983388704318936,
+    'led_c4_E96_di_per_100mV_A': 0.0003322259136212625,
+    'led_c4_E192_r_ohm': 301.0,
+    'led_c4_E192_i_A': 0.009966777408637873,
+    'led_c4_E192_err_frac': -0.003322259136212709,
+    'led_c4_E192_p_r_W': 0.02990033222591362,
+    'led_c4_E192_p_led_W': 0.019933554817275746,
+    'led_c4_E192_p_leds_W': 0.019933554817275746,
+    'led_c4_E192_p_src_W': 0.04983388704318936,
+    'led_c4_E192_di_per_100mV_A': 0.0003322259136212625,
+    'rc_c0_tau_s': 0.001,
+    'rc_c0_fc_Hz': 159.15494309189535,
+    'rc_c1_tau_s': 0.001,
+    'rc_c1_fc_Hz': 159.15494309189535,
+    'rc_c2_tau_s': 2.209e-07,
+    'rc_c2_fc_Hz': 720484.1244540305,
+    'rc_c3_tau_s': 0.0035,
+    'rc_c3_fc_Hz': 45.47284088339867,
+    'rc_c4_tau_s': 9.999999999999999e-10,
+    'rc_c4_fc_Hz': 159154943.09189534,
+    'rc_solve_r_c0_ohm': 1591.5494309189537,
+    'rc_solve_r_c1_ohm': 999.9999999999998,
+    'rc_solve_r_c2_ohm': 1591.5494309189535,
+    'rc_solve_c_c0_F': 1.5915494309189535e-07,
+    'rc_solve_c_c1_F': 3.1830988618379064e-07,
+    'rc_solve_c_c2_F': 1.3262911924324612e-09,
+    'lc_c0_f0_Hz': 159154.94309189534,
+    'lc_c0_z0_ohm': 10.0,
+    'lc_c1_f0_Hz': 5032.921210448703,
+    'lc_c1_z0_ohm': 31.622776601683796,
+    'lc_c2_f0_Hz': 159154943.09189537,
+    'lc_c2_z0_ohm': 100.0,
+    'lc_c3_f0_Hz': 15651.640433668284,
+    'lc_c3_z0_ohm': 0.4622081388685877,
+    'lc_solve_l_c0_H': 2.5330295910584445e-07,
+    'lc_solve_l_c0_z0_ohm': 1.5915494309189535,
+    'lc_solve_l_c1_H': 1.0132118364233778e-05,
+    'lc_solve_l_c1_z0_ohm': 3.1830988618379066,
+    'lc_solve_l_c2_H': 1.3775928632813219e-06,
+    'lc_solve_l_c2_z0_ohm': 117.37090198517356,
+    'lc_solve_c_c0_F': 2.5330295910584445e-09,
+    'lc_solve_c_c0_z0_ohm': 62.83185307179586,
+    'lc_solve_c_c1_F': 1.223538022489286e-10,
+    'lc_solve_c_c1_z0_ohm': 2858.849314766712,
+    'lc_solve_c_c2_F': 5.389424661826479e-11,
+    'lc_solve_c_c2_z0_ohm': 29.53097094374405,
+    'xl_c0_ohm': 6.283185307179586,
+    'xl_c1_ohm': 6.283185307179586,
+    'xl_c2_ohm': 314.1592653589793,
+    'xl_c3_ohm': 15.079644737231007,
+    'xc_c0_ohm': 159.15494309189535,
+    'xc_c1_ohm': 15.915494309189537,
+    'xc_c2_ohm': 31.830988618379067,
+    'xc_c3_ohm': 1.5915494309189535,
+    'xl_solve_f_c0_Hz': 999.9999999999999,
+    'xl_solve_f_c1_Hz': 1591549.4309189531,
+    'xl_solve_l_c0_H': 0.01,
+    'xl_solve_l_c1_H': 1.5915494309189535e-07,
+    'xc_solve_f_c0_Hz': 999.9999999999998,
+    'xc_solve_f_c1_Hz': 1591549430.9189532,
+    'xc_solve_c_c0_F': 9.999999999999997e-07,
+    'xc_solve_c_c1_F': 1.5915494309189534e-08,
+}
+GOLDEN.extend((n, got, _CIRCUIT2_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _circuit2_vectors())
+
+
 
 def main():
     rows, bad = [], 0
