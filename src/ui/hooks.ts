@@ -1,4 +1,11 @@
 import { useEffect, useState } from 'preact/hooks';
+import { isoDayUtc } from './today';
+
+/** Today as YYYY-MM-DD (UTC), read once when the page mounts. The only place the UI reads the clock; the core receives it as a value. */
+export function useToday(): string {
+  const [t] = useState(() => isoDayUtc(new Date()));
+  return t;
+}
 
 /**
  * Returns `value` one animation frame after it last changed (requestAnimationFrame debounce). Rapid changes inside

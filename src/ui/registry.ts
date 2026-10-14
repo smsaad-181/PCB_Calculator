@@ -55,6 +55,20 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/VoltageDrop'),
   },
   {
+    id: 'via',
+    title: 'Via resistance and thermal (barrel)',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/Via'),
+  },
+  {
+    id: 'annular-ring',
+    title: 'Annular ring, drill reference and tolerance stack-up',
+    category: 'trace',
+    phase: 1,
+    load: () => import('./calculators/AnnularRing'),
+  },
+  {
     id: 'ohm-power',
     title: "Ohm's law and power",
     category: 'circuit',
