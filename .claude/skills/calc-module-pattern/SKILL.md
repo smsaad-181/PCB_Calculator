@@ -101,7 +101,8 @@ interface CalcResult {
   - `rankElements(es)` sorts by utilisation descending, ties by id ascending, and returns a new array.
   - When elements are present, `limitingElement.id` must be the top-ranked id.
 - **`copperBasis` (`checkCopperBasis`):** the layer must be outer or inner, the basis must be one of the three kinds, the thickness must be a finite length > 0, and the source must not be empty.
-- `exports` values are checked only for finiteness today (no dimension, sign or bound check: G3-c open).
+- `ElementResult` may also carry `limitBasis` (only `'current'`), `limitSource` (required with the basis), `resistance`, `drop`, `loss` (G3-g). `checkElements` rejects absolute-temperature loads/limits/margins and requires ONE dimension across all elements (G3-d): convert a temperature-rise limit to a current limit before ranking.
+- `exports` are checked by `checkExports` inside `assertCalcResult` (G3-c): keys must be in `NET_CLASS_KEYS` (`width`, `clearance`, `viaDrill`, `viaPad`; all lengths, positive, inside a plausibility window; width and clearance are `min-requirement`, via echoes `nominal`); `sources` gives per-value provenance (a `clearance` must be `fab-profile` or `user-entered`); a fab-profile value needs `profile {id, status, ageDays, stale}` that matches `result.fabProfile`; a non-VERIFIED profile needs its status tag in the note, a stale one the word STALE.
 
 ## `assertCalcResult(result)`: the full schema check
 It never throws: it returns `Result<CalcResult, string[]>` with every problem listed. It enforces:

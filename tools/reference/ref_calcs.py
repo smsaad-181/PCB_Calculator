@@ -1388,6 +1388,242 @@ _RING_PINNED = {
 }
 GOLDEN.extend((n, got, _RING_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _ring_vectors())
 
+
+# ---------------------------------------------------------------------------------------------------------------
+# Task 6: series current path with per-element current limits (path/load calculator). Independent of src/.
+# The DC state comes from vd_solve (S-019, S-019h). Element kinds:
+#   ("t", L_mm, w_mm, t_um, T_C, layer, dT_K)       copper trace; limit = IPC-2221 legacy current at the allowed rise dT_K (S-001)
+#   ("v", d_mm, t_um, L_mm, N, T_C, rating_A|None)  via array (finished hole d, test plating t); limit = USER rating or None
+#   ("r", ohm, rating_A|None)                        any user ohmic element; limit = USER rating or None
+# Utilisation = I / I_limit (current basis only); margin = I_limit - I. A rating of None means the element is UNRATED and is
+# left out of the ranking. Net-class width: the trace-width solve at the same dT for the applied current I, and with the
+# 1.25 design margin on current (an engineering default of the trace-width calculator, not from a standard).
+# Every number below is a TEST value, not fab data and not a rating from any datasheet.
+# ---------------------------------------------------------------------------------------------------------------
+PL_MARGIN = 1.25
+
+def pl_R(e):
+    if e[0] == "t":
+        return trace_resistance_ohm(e[1], e[2], e[3], e[4])
+    if e[0] == "v":
+        return via_R_T(e[1], e[2], e[3], e[4], e[5])
+    return e[1]
+
+def pl_limit_A(e):
+    if e[0] == "t":
+        return ipc2221_current_A(e[2] * 1000.0 / MIL_UM, e[6], e[5], e[3])
+    return e[6] if e[0] == "v" else e[2]
+
+def pl_conv(e):
+    return ("t", e[1], e[2], e[3], e[4]) if e[0] == "t" else ("r", pl_R(e))
+
+def pl_solve(vs, kind, val, fwd, ret_mode, ret):
+    s = vd_solve(vs, kind, val, [pl_conv(e) for e in fwd], ret_mode, [pl_conv(e) for e in ret])
+    els = list(fwd) + (list(fwd) if ret_mode == "same" else list(ret) if ret_mode == "list" else [])
+    rated = [(k, s["i"] / pl_limit_A(e)) for k, e in enumerate(els) if pl_limit_A(e) is not None]
+    weakest = max(rated, key=lambda kv: (kv[1], -kv[0]))[0] if rated else None
+    return s, els, weakest
+
+# (case name, Vs, load kind, load value, forward elements, return mode, return list)
+PL_CASES = [
+    ("A_skill3A",   12.0, "I", 3.0,  [("t", 100, 1.0, 35.0, 25, "outer", 20.0), ("v", 0.3, 25.0, 1.6, 4, 25, None)], "none", ()),
+    ("B_unratedconn", 5.0, "I", 2.0, [("t", 50, 2.0, 35.0, 25, "outer", 10.0), ("r", 0.01, None)], "none", ()),
+    ("C_viaweakest", 12.0, "I", 2.0, [("t", 80, 3.0, 70.0, 25, "outer", 20.0), ("v", 0.3, 25.0, 1.6, 2, 25, 2.5), ("r", 0.02, 6.0)], "same", ()),
+    ("D_constP",    24.0, "P", 60.0, [("t", 200, 4.0, 70.0, 60, "outer", 30.0), ("r", 0.015, 5.0)], "same", ()),
+    ("E_over",       5.0, "R", 2.0,  [("t", 100, 0.3, 35.0, 25, "outer", 10.0)], "none", ()),
+    ("F_under",     12.0, "I", 0.5,  [("t", 100, 2.0, 35.0, 25, "outer", 20.0), ("r", 0.05, 3.0)], "none", ()),
+    ("G_innerlist",  5.0, "V", 4.8,  [("t", 150, 1.0, 35.0, 25, "inner", 20.0), ("r", 0.02, 4.0)], "list", [("t", 150, 2.0, 35.0, 25, "outer", 20.0)]),
+]
+
+def _pl_vectors():
+    out = []
+    for name, vs, kind, val, fwd, rm, ret in PL_CASES:
+        s, els, weakest = pl_solve(vs, kind, val, fwd, rm, ret)
+        h = ("S-019h",) if kind == "P" else ()
+        out.append(("pl_%s_i_A" % name, s["i"], 1e-9, ("S-004", "S-019", "S-006") + h, "applied (series) current of the path"))
+        out.append(("pl_%s_drop_V" % name, s["drop"], 1e-9, ("S-004", "S-019", "S-006") + h, "total drop = sum I R_k"))
+        out.append(("pl_%s_weakest_idx" % name, float(weakest) if weakest is not None else -1.0, 1e-9, ("S-019",), "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"))
+        for k, e in enumerate(els):
+            R = pl_R(e)
+            rids = ("S-004", "S-006") if e[0] in ("t", "v") else ()
+            out.append(("pl_%s_e%d_R_ohm" % (name, k), R, 1e-9, rids, "element resistance"))
+            out.append(("pl_%s_e%d_drop_V" % (name, k), s["i"] * R, 1e-9, ("S-019",) + rids + h, "I x R_k"))
+            out.append(("pl_%s_e%d_loss_W" % (name, k), s["i"] ** 2 * R, 1e-9, ("S-019",) + rids + h, "I^2 x R_k"))
+            lim = pl_limit_A(e)
+            if lim is not None:
+                lids = ("S-001", "S-010", "S-003", "S-006") if e[0] == "t" else ()
+                lnote = "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)" if e[0] == "t" else "USER-SUPPLIED rating, not a ledger value"
+                out.append(("pl_%s_e%d_limit_A" % (name, k), lim, 1e-9, lids, lnote))
+                out.append(("pl_%s_e%d_util_frac" % (name, k), s["i"] / lim, 1e-9, lids + ("S-019",) + h, "I / I_limit"))
+                out.append(("pl_%s_e%d_margin_A" % (name, k), lim - s["i"], 1e-9, lids + ("S-019",) + h, "I_limit - I (negative when over)"))
+            if e[0] == "t":
+                wmin = ipc2221_width_mil(s["i"], e[6], e[5], e[3]) * MIL_UM / 1000.0
+                wrec = ipc2221_width_mil(PL_MARGIN * s["i"], e[6], e[5], e[3]) * MIL_UM / 1000.0
+                out.append(("pl_%s_e%d_wmin_mm" % (name, k), wmin, 1e-9, ("S-001", "S-003", "S-006") + h, "net-class: minimum width for the applied current at the allowed rise (legacy)"))
+                out.append(("pl_%s_e%d_wrec_mm" % (name, k), wrec, 1e-9, ("S-001", "S-003", "S-006") + h, "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"))
+    return out
+
+_PL_PINNED = {
+    'pl_A_skill3A_i_A': 3.0,
+    'pl_A_skill3A_drop_V': 0.15151366980636827,
+    'pl_A_skill3A_weakest_idx': 0.0,
+    'pl_A_skill3A_e0_R_ohm': 0.05022906403940887,
+    'pl_A_skill3A_e0_drop_V': 0.15068719211822662,
+    'pl_A_skill3A_e0_loss_W': 0.4520615763546798,
+    'pl_A_skill3A_e0_limit_A': 3.2444036291288856,
+    'pl_A_skill3A_e0_util_frac': 0.9246691666429595,
+    'pl_A_skill3A_e0_margin_A': 0.24440362912888558,
+    'pl_A_skill3A_e0_wmin_mm': 0.8976037469333806,
+    'pl_A_skill3A_e0_wrec_mm': 1.2211067734861527,
+    'pl_A_skill3A_e1_R_ohm': 0.00027549256271389047,
+    'pl_A_skill3A_e1_drop_V': 0.0008264776881416714,
+    'pl_A_skill3A_e1_loss_W': 0.0024794330644250144,
+    'pl_B_unratedconn_i_A': 2.0,
+    'pl_B_unratedconn_drop_V': 0.04511453201970443,
+    'pl_B_unratedconn_weakest_idx': 0.0,
+    'pl_B_unratedconn_e0_R_ohm': 0.012557266009852217,
+    'pl_B_unratedconn_e0_drop_V': 0.025114532019704434,
+    'pl_B_unratedconn_e0_loss_W': 0.05022906403940887,
+    'pl_B_unratedconn_e0_limit_A': 3.9530146812356732,
+    'pl_B_unratedconn_e0_util_frac': 0.5059429729653369,
+    'pl_B_unratedconn_e0_margin_A': 1.9530146812356732,
+    'pl_B_unratedconn_e0_wmin_mm': 0.781437462908628,
+    'pl_B_unratedconn_e0_wrec_mm': 1.0630733018590897,
+    'pl_B_unratedconn_e1_R_ohm': 0.01,
+    'pl_B_unratedconn_e1_drop_V': 0.02,
+    'pl_B_unratedconn_e1_loss_W': 0.04,
+    'pl_C_viaweakest_i_A': 2.0,
+    'pl_C_viaweakest_drop_V': 0.10899277465606252,
+    'pl_C_viaweakest_weakest_idx': 1.0,
+    'pl_C_viaweakest_e0_R_ohm': 0.00669720853858785,
+    'pl_C_viaweakest_e0_drop_V': 0.0133944170771757,
+    'pl_C_viaweakest_e0_loss_W': 0.0267888341543514,
+    'pl_C_viaweakest_e0_limit_A': 11.893085335448598,
+    'pl_C_viaweakest_e0_util_frac': 0.16816494152604697,
+    'pl_C_viaweakest_e0_margin_A': 9.893085335448598,
+    'pl_C_viaweakest_e0_wmin_mm': 0.2565489053349371,
+    'pl_C_viaweakest_e0_wrec_mm': 0.34901102753328894,
+    'pl_C_viaweakest_e1_R_ohm': 0.0005509851254277809,
+    'pl_C_viaweakest_e1_drop_V': 0.0011019702508555619,
+    'pl_C_viaweakest_e1_loss_W': 0.0022039405017111238,
+    'pl_C_viaweakest_e1_limit_A': 2.5,
+    'pl_C_viaweakest_e1_util_frac': 0.8,
+    'pl_C_viaweakest_e1_margin_A': 0.5,
+    'pl_C_viaweakest_e2_R_ohm': 0.02,
+    'pl_C_viaweakest_e2_drop_V': 0.04,
+    'pl_C_viaweakest_e2_loss_W': 0.08,
+    'pl_C_viaweakest_e2_limit_A': 6.0,
+    'pl_C_viaweakest_e2_util_frac': 0.3333333333333333,
+    'pl_C_viaweakest_e2_margin_A': 4.0,
+    'pl_C_viaweakest_e3_R_ohm': 0.00669720853858785,
+    'pl_C_viaweakest_e3_drop_V': 0.0133944170771757,
+    'pl_C_viaweakest_e3_loss_W': 0.0267888341543514,
+    'pl_C_viaweakest_e3_limit_A': 11.893085335448598,
+    'pl_C_viaweakest_e3_util_frac': 0.16816494152604697,
+    'pl_C_viaweakest_e3_margin_A': 9.893085335448598,
+    'pl_C_viaweakest_e3_wmin_mm': 0.2565489053349371,
+    'pl_C_viaweakest_e3_wrec_mm': 0.34901102753328894,
+    'pl_C_viaweakest_e4_R_ohm': 0.0005509851254277809,
+    'pl_C_viaweakest_e4_drop_V': 0.0011019702508555619,
+    'pl_C_viaweakest_e4_loss_W': 0.0022039405017111238,
+    'pl_C_viaweakest_e4_limit_A': 2.5,
+    'pl_C_viaweakest_e4_util_frac': 0.8,
+    'pl_C_viaweakest_e4_margin_A': 0.5,
+    'pl_C_viaweakest_e5_R_ohm': 0.02,
+    'pl_C_viaweakest_e5_drop_V': 0.04,
+    'pl_C_viaweakest_e5_loss_W': 0.08,
+    'pl_C_viaweakest_e5_limit_A': 6.0,
+    'pl_C_viaweakest_e5_util_frac': 0.3333333333333333,
+    'pl_C_viaweakest_e5_margin_A': 4.0,
+    'pl_D_constP_i_A': 2.515423579078251,
+    'pl_D_constP_drop_V': 0.1471584750006567,
+    'pl_D_constP_weakest_idx': 1.0,
+    'pl_D_constP_e0_R_ohm': 0.0142512315270936,
+    'pl_D_constP_e0_drop_V': 0.03584788381415459,
+    'pl_D_constP_e0_loss_W': 0.09017261220618203,
+    'pl_D_constP_e0_limit_A': 17.512787302243233,
+    'pl_D_constP_e0_util_frac': 0.14363353677892537,
+    'pl_D_constP_e0_margin_A': 14.997363723164982,
+    'pl_D_constP_e0_wmin_mm': 0.27520370310656606,
+    'pl_D_constP_e0_wrec_mm': 0.37438915234033837,
+    'pl_D_constP_e1_R_ohm': 0.015,
+    'pl_D_constP_e1_drop_V': 0.03773135368617376,
+    'pl_D_constP_e1_loss_W': 0.09491033673274256,
+    'pl_D_constP_e1_limit_A': 5.0,
+    'pl_D_constP_e1_util_frac': 0.5030847158156502,
+    'pl_D_constP_e1_margin_A': 2.484576420921749,
+    'pl_D_constP_e2_R_ohm': 0.0142512315270936,
+    'pl_D_constP_e2_drop_V': 0.03584788381415459,
+    'pl_D_constP_e2_loss_W': 0.09017261220618203,
+    'pl_D_constP_e2_limit_A': 17.512787302243233,
+    'pl_D_constP_e2_util_frac': 0.14363353677892537,
+    'pl_D_constP_e2_margin_A': 14.997363723164982,
+    'pl_D_constP_e2_wmin_mm': 0.27520370310656606,
+    'pl_D_constP_e2_wrec_mm': 0.37438915234033837,
+    'pl_D_constP_e3_R_ohm': 0.015,
+    'pl_D_constP_e3_drop_V': 0.03773135368617376,
+    'pl_D_constP_e3_loss_W': 0.09491033673274256,
+    'pl_D_constP_e3_limit_A': 5.0,
+    'pl_D_constP_e3_util_frac': 0.5030847158156502,
+    'pl_D_constP_e3_margin_A': 2.484576420921749,
+    'pl_E_over_i_A': 2.30687934907365,
+    'pl_E_over_drop_V': 0.3862413018527007,
+    'pl_E_over_weakest_idx': 0.0,
+    'pl_E_over_e0_R_ohm': 0.16743021346469625,
+    'pl_E_over_e0_drop_V': 0.3862413018527007,
+    'pl_E_over_e0_loss_W': 0.8910120830033175,
+    'pl_E_over_e0_limit_A': 0.9990669447801742,
+    'pl_E_over_e0_util_frac': 2.3090338051182697,
+    'pl_E_over_e0_margin_A': -1.3078124042934758,
+    'pl_E_over_e0_wmin_mm': 0.9514904090535866,
+    'pl_E_over_e0_wrec_mm': 1.2944145870289887,
+    'pl_F_under_i_A': 0.5,
+    'pl_F_under_drop_V': 0.03755726600985222,
+    'pl_F_under_weakest_idx': 1.0,
+    'pl_F_under_e0_R_ohm': 0.025114532019704434,
+    'pl_F_under_e0_drop_V': 0.012557266009852217,
+    'pl_F_under_e0_loss_W': 0.006278633004926109,
+    'pl_F_under_e0_limit_A': 5.362676823028493,
+    'pl_F_under_e0_util_frac': 0.09323701884344252,
+    'pl_F_under_e0_margin_A': 4.862676823028493,
+    'pl_F_under_e0_wmin_mm': 0.07581804597041836,
+    'pl_F_under_e0_wrec_mm': 0.10314343027562439,
+    'pl_F_under_e1_R_ohm': 0.05,
+    'pl_F_under_e1_drop_V': 0.025,
+    'pl_F_under_e1_loss_W': 0.0125,
+    'pl_F_under_e1_limit_A': 3.0,
+    'pl_F_under_e1_util_frac': 0.16666666666666666,
+    'pl_F_under_e1_margin_A': 2.5,
+    'pl_G_innerlist_i_A': 1.5035853659665686,
+    'pl_G_innerlist_drop_V': 0.20000000000000018,
+    'pl_G_innerlist_weakest_idx': 0.0,
+    'pl_G_innerlist_e0_R_ohm': 0.07534359605911331,
+    'pl_G_innerlist_e0_drop_V': 0.1132855284537792,
+    'pl_G_innerlist_e0_loss_W': 0.17033446275889172,
+    'pl_G_innerlist_e0_limit_A': 1.6222018145644428,
+    'pl_G_innerlist_e0_util_frac': 0.9268793515499041,
+    'pl_G_innerlist_e0_margin_A': 0.11861644859787424,
+    'pl_G_innerlist_e0_wmin_mm': 0.9005643870284858,
+    'pl_G_innerlist_e0_wrec_mm': 1.2251344501601182,
+    'pl_G_innerlist_e1_R_ohm': 0.02,
+    'pl_G_innerlist_e1_drop_V': 0.030071707319331373,
+    'pl_G_innerlist_e1_loss_W': 0.0452153790549764,
+    'pl_G_innerlist_e1_limit_A': 4.0,
+    'pl_G_innerlist_e1_util_frac': 0.37589634149164214,
+    'pl_G_innerlist_e1_margin_A': 2.4964146340334317,
+    'pl_G_innerlist_e2_R_ohm': 0.037671798029556655,
+    'pl_G_innerlist_e2_drop_V': 0.0566427642268896,
+    'pl_G_innerlist_e2_loss_W': 0.08516723137944586,
+    'pl_G_innerlist_e2_limit_A': 5.362676823028493,
+    'pl_G_innerlist_e2_util_frac': 0.2803796341986987,
+    'pl_G_innerlist_e2_margin_A': 3.8590914570619246,
+    'pl_G_innerlist_e2_wmin_mm': 0.3461792092728165,
+    'pl_G_innerlist_e2_wrec_mm': 0.47094475566454,
+}
+GOLDEN.extend((n, got, _PL_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _pl_vectors())
+
+
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:

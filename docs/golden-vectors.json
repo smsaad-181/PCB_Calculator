@@ -10372,6 +10372,2646 @@
       "ledger_status": {},
       "status": "NOT-APPLICABLE",
       "note": "ring referenced to the finished hole = drill - 2*plating"
+    },
+    {
+      "name": "pl_A_skill3A_i_A",
+      "oracle_value": 3.0,
+      "pinned_expected": 3.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_A_skill3A_drop_V",
+      "oracle_value": 0.15151366980636827,
+      "pinned_expected": 0.15151366980636827,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_A_skill3A_weakest_idx",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_A_skill3A_e0_R_ohm",
+      "oracle_value": 0.05022906403940887,
+      "pinned_expected": 0.05022906403940887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_A_skill3A_e0_drop_V",
+      "oracle_value": 0.15068719211822662,
+      "pinned_expected": 0.15068719211822662,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_A_skill3A_e0_loss_W",
+      "oracle_value": 0.4520615763546798,
+      "pinned_expected": 0.4520615763546798,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_A_skill3A_e0_limit_A",
+      "oracle_value": 3.2444036291288856,
+      "pinned_expected": 3.2444036291288856,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_A_skill3A_e0_util_frac",
+      "oracle_value": 0.9246691666429595,
+      "pinned_expected": 0.9246691666429595,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_A_skill3A_e0_margin_A",
+      "oracle_value": 0.24440362912888558,
+      "pinned_expected": 0.24440362912888558,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_A_skill3A_e0_wmin_mm",
+      "oracle_value": 0.8976037469333806,
+      "pinned_expected": 0.8976037469333806,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_A_skill3A_e0_wrec_mm",
+      "oracle_value": 1.2211067734861527,
+      "pinned_expected": 1.2211067734861527,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_A_skill3A_e1_R_ohm",
+      "oracle_value": 0.00027549256271389047,
+      "pinned_expected": 0.00027549256271389047,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_A_skill3A_e1_drop_V",
+      "oracle_value": 0.0008264776881416714,
+      "pinned_expected": 0.0008264776881416714,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_A_skill3A_e1_loss_W",
+      "oracle_value": 0.0024794330644250144,
+      "pinned_expected": 0.0024794330644250144,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_B_unratedconn_i_A",
+      "oracle_value": 2.0,
+      "pinned_expected": 2.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_B_unratedconn_drop_V",
+      "oracle_value": 0.04511453201970443,
+      "pinned_expected": 0.04511453201970443,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_B_unratedconn_weakest_idx",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_R_ohm",
+      "oracle_value": 0.012557266009852217,
+      "pinned_expected": 0.012557266009852217,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_drop_V",
+      "oracle_value": 0.025114532019704434,
+      "pinned_expected": 0.025114532019704434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_loss_W",
+      "oracle_value": 0.05022906403940887,
+      "pinned_expected": 0.05022906403940887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_limit_A",
+      "oracle_value": 3.9530146812356732,
+      "pinned_expected": 3.9530146812356732,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_util_frac",
+      "oracle_value": 0.5059429729653369,
+      "pinned_expected": 0.5059429729653369,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_margin_A",
+      "oracle_value": 1.9530146812356732,
+      "pinned_expected": 1.9530146812356732,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_wmin_mm",
+      "oracle_value": 0.781437462908628,
+      "pinned_expected": 0.781437462908628,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_B_unratedconn_e0_wrec_mm",
+      "oracle_value": 1.0630733018590897,
+      "pinned_expected": 1.0630733018590897,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_B_unratedconn_e1_R_ohm",
+      "oracle_value": 0.01,
+      "pinned_expected": 0.01,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_B_unratedconn_e1_drop_V",
+      "oracle_value": 0.02,
+      "pinned_expected": 0.02,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_B_unratedconn_e1_loss_W",
+      "oracle_value": 0.04,
+      "pinned_expected": 0.04,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_i_A",
+      "oracle_value": 2.0,
+      "pinned_expected": 2.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_C_viaweakest_drop_V",
+      "oracle_value": 0.10899277465606252,
+      "pinned_expected": 0.10899277465606252,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_weakest_idx",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_R_ohm",
+      "oracle_value": 0.00669720853858785,
+      "pinned_expected": 0.00669720853858785,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_drop_V",
+      "oracle_value": 0.0133944170771757,
+      "pinned_expected": 0.0133944170771757,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_loss_W",
+      "oracle_value": 0.0267888341543514,
+      "pinned_expected": 0.0267888341543514,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_limit_A",
+      "oracle_value": 11.893085335448598,
+      "pinned_expected": 11.893085335448598,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_util_frac",
+      "oracle_value": 0.16816494152604697,
+      "pinned_expected": 0.16816494152604697,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_margin_A",
+      "oracle_value": 9.893085335448598,
+      "pinned_expected": 9.893085335448598,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_wmin_mm",
+      "oracle_value": 0.2565489053349371,
+      "pinned_expected": 0.2565489053349371,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_C_viaweakest_e0_wrec_mm",
+      "oracle_value": 0.34901102753328894,
+      "pinned_expected": 0.34901102753328894,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_C_viaweakest_e1_R_ohm",
+      "oracle_value": 0.0005509851254277809,
+      "pinned_expected": 0.0005509851254277809,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_C_viaweakest_e1_drop_V",
+      "oracle_value": 0.0011019702508555619,
+      "pinned_expected": 0.0011019702508555619,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e1_loss_W",
+      "oracle_value": 0.0022039405017111238,
+      "pinned_expected": 0.0022039405017111238,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e1_limit_A",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_C_viaweakest_e1_util_frac",
+      "oracle_value": 0.8,
+      "pinned_expected": 0.8,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_C_viaweakest_e1_margin_A",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_C_viaweakest_e2_R_ohm",
+      "oracle_value": 0.02,
+      "pinned_expected": 0.02,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_C_viaweakest_e2_drop_V",
+      "oracle_value": 0.04,
+      "pinned_expected": 0.04,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e2_loss_W",
+      "oracle_value": 0.08,
+      "pinned_expected": 0.08,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e2_limit_A",
+      "oracle_value": 6.0,
+      "pinned_expected": 6.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_C_viaweakest_e2_util_frac",
+      "oracle_value": 0.3333333333333333,
+      "pinned_expected": 0.3333333333333333,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_C_viaweakest_e2_margin_A",
+      "oracle_value": 4.0,
+      "pinned_expected": 4.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_R_ohm",
+      "oracle_value": 0.00669720853858785,
+      "pinned_expected": 0.00669720853858785,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_drop_V",
+      "oracle_value": 0.0133944170771757,
+      "pinned_expected": 0.0133944170771757,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_loss_W",
+      "oracle_value": 0.0267888341543514,
+      "pinned_expected": 0.0267888341543514,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_limit_A",
+      "oracle_value": 11.893085335448598,
+      "pinned_expected": 11.893085335448598,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_util_frac",
+      "oracle_value": 0.16816494152604697,
+      "pinned_expected": 0.16816494152604697,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_margin_A",
+      "oracle_value": 9.893085335448598,
+      "pinned_expected": 9.893085335448598,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_wmin_mm",
+      "oracle_value": 0.2565489053349371,
+      "pinned_expected": 0.2565489053349371,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_C_viaweakest_e3_wrec_mm",
+      "oracle_value": 0.34901102753328894,
+      "pinned_expected": 0.34901102753328894,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_C_viaweakest_e4_R_ohm",
+      "oracle_value": 0.0005509851254277809,
+      "pinned_expected": 0.0005509851254277809,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_C_viaweakest_e4_drop_V",
+      "oracle_value": 0.0011019702508555619,
+      "pinned_expected": 0.0011019702508555619,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e4_loss_W",
+      "oracle_value": 0.0022039405017111238,
+      "pinned_expected": 0.0022039405017111238,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e4_limit_A",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_C_viaweakest_e4_util_frac",
+      "oracle_value": 0.8,
+      "pinned_expected": 0.8,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_C_viaweakest_e4_margin_A",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_C_viaweakest_e5_R_ohm",
+      "oracle_value": 0.02,
+      "pinned_expected": 0.02,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_C_viaweakest_e5_drop_V",
+      "oracle_value": 0.04,
+      "pinned_expected": 0.04,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e5_loss_W",
+      "oracle_value": 0.08,
+      "pinned_expected": 0.08,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_C_viaweakest_e5_limit_A",
+      "oracle_value": 6.0,
+      "pinned_expected": 6.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_C_viaweakest_e5_util_frac",
+      "oracle_value": 0.3333333333333333,
+      "pinned_expected": 0.3333333333333333,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_C_viaweakest_e5_margin_A",
+      "oracle_value": 4.0,
+      "pinned_expected": 4.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_D_constP_i_A",
+      "oracle_value": 2.515423579078251,
+      "pinned_expected": 2.515423579078251,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_D_constP_drop_V",
+      "oracle_value": 0.1471584750006567,
+      "pinned_expected": 0.1471584750006567,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_D_constP_weakest_idx",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_D_constP_e0_R_ohm",
+      "oracle_value": 0.0142512315270936,
+      "pinned_expected": 0.0142512315270936,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_D_constP_e0_drop_V",
+      "oracle_value": 0.03584788381415459,
+      "pinned_expected": 0.03584788381415459,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_D_constP_e0_loss_W",
+      "oracle_value": 0.09017261220618203,
+      "pinned_expected": 0.09017261220618203,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_D_constP_e0_limit_A",
+      "oracle_value": 17.512787302243233,
+      "pinned_expected": 17.512787302243233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_D_constP_e0_util_frac",
+      "oracle_value": 0.14363353677892537,
+      "pinned_expected": 0.14363353677892537,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_D_constP_e0_margin_A",
+      "oracle_value": 14.997363723164982,
+      "pinned_expected": 14.997363723164982,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_D_constP_e0_wmin_mm",
+      "oracle_value": 0.27520370310656606,
+      "pinned_expected": 0.27520370310656606,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_D_constP_e0_wrec_mm",
+      "oracle_value": 0.37438915234033837,
+      "pinned_expected": 0.37438915234033837,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_D_constP_e1_R_ohm",
+      "oracle_value": 0.015,
+      "pinned_expected": 0.015,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_D_constP_e1_drop_V",
+      "oracle_value": 0.03773135368617376,
+      "pinned_expected": 0.03773135368617376,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_D_constP_e1_loss_W",
+      "oracle_value": 0.09491033673274256,
+      "pinned_expected": 0.09491033673274256,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_D_constP_e1_limit_A",
+      "oracle_value": 5.0,
+      "pinned_expected": 5.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_D_constP_e1_util_frac",
+      "oracle_value": 0.5030847158156502,
+      "pinned_expected": 0.5030847158156502,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_D_constP_e1_margin_A",
+      "oracle_value": 2.484576420921749,
+      "pinned_expected": 2.484576420921749,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_D_constP_e2_R_ohm",
+      "oracle_value": 0.0142512315270936,
+      "pinned_expected": 0.0142512315270936,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_D_constP_e2_drop_V",
+      "oracle_value": 0.03584788381415459,
+      "pinned_expected": 0.03584788381415459,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_D_constP_e2_loss_W",
+      "oracle_value": 0.09017261220618203,
+      "pinned_expected": 0.09017261220618203,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_D_constP_e2_limit_A",
+      "oracle_value": 17.512787302243233,
+      "pinned_expected": 17.512787302243233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_D_constP_e2_util_frac",
+      "oracle_value": 0.14363353677892537,
+      "pinned_expected": 0.14363353677892537,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_D_constP_e2_margin_A",
+      "oracle_value": 14.997363723164982,
+      "pinned_expected": 14.997363723164982,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_D_constP_e2_wmin_mm",
+      "oracle_value": 0.27520370310656606,
+      "pinned_expected": 0.27520370310656606,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_D_constP_e2_wrec_mm",
+      "oracle_value": 0.37438915234033837,
+      "pinned_expected": 0.37438915234033837,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_D_constP_e3_R_ohm",
+      "oracle_value": 0.015,
+      "pinned_expected": 0.015,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_D_constP_e3_drop_V",
+      "oracle_value": 0.03773135368617376,
+      "pinned_expected": 0.03773135368617376,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_D_constP_e3_loss_W",
+      "oracle_value": 0.09491033673274256,
+      "pinned_expected": 0.09491033673274256,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_D_constP_e3_limit_A",
+      "oracle_value": 5.0,
+      "pinned_expected": 5.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_D_constP_e3_util_frac",
+      "oracle_value": 0.5030847158156502,
+      "pinned_expected": 0.5030847158156502,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_D_constP_e3_margin_A",
+      "oracle_value": 2.484576420921749,
+      "pinned_expected": 2.484576420921749,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-019h"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-019h": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_E_over_i_A",
+      "oracle_value": 2.30687934907365,
+      "pinned_expected": 2.30687934907365,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_E_over_drop_V",
+      "oracle_value": 0.3862413018527007,
+      "pinned_expected": 0.3862413018527007,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_E_over_weakest_idx",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_E_over_e0_R_ohm",
+      "oracle_value": 0.16743021346469625,
+      "pinned_expected": 0.16743021346469625,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_E_over_e0_drop_V",
+      "oracle_value": 0.3862413018527007,
+      "pinned_expected": 0.3862413018527007,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_E_over_e0_loss_W",
+      "oracle_value": 0.8910120830033175,
+      "pinned_expected": 0.8910120830033175,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_E_over_e0_limit_A",
+      "oracle_value": 0.9990669447801742,
+      "pinned_expected": 0.9990669447801742,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_E_over_e0_util_frac",
+      "oracle_value": 2.3090338051182697,
+      "pinned_expected": 2.3090338051182697,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_E_over_e0_margin_A",
+      "oracle_value": -1.3078124042934758,
+      "pinned_expected": -1.3078124042934758,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_E_over_e0_wmin_mm",
+      "oracle_value": 0.9514904090535866,
+      "pinned_expected": 0.9514904090535866,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_E_over_e0_wrec_mm",
+      "oracle_value": 1.2944145870289887,
+      "pinned_expected": 1.2944145870289887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_F_under_i_A",
+      "oracle_value": 0.5,
+      "pinned_expected": 0.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_F_under_drop_V",
+      "oracle_value": 0.03755726600985222,
+      "pinned_expected": 0.03755726600985222,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_F_under_weakest_idx",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_F_under_e0_R_ohm",
+      "oracle_value": 0.025114532019704434,
+      "pinned_expected": 0.025114532019704434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_F_under_e0_drop_V",
+      "oracle_value": 0.012557266009852217,
+      "pinned_expected": 0.012557266009852217,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_F_under_e0_loss_W",
+      "oracle_value": 0.006278633004926109,
+      "pinned_expected": 0.006278633004926109,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_F_under_e0_limit_A",
+      "oracle_value": 5.362676823028493,
+      "pinned_expected": 5.362676823028493,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_F_under_e0_util_frac",
+      "oracle_value": 0.09323701884344252,
+      "pinned_expected": 0.09323701884344252,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_F_under_e0_margin_A",
+      "oracle_value": 4.862676823028493,
+      "pinned_expected": 4.862676823028493,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_F_under_e0_wmin_mm",
+      "oracle_value": 0.07581804597041836,
+      "pinned_expected": 0.07581804597041836,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_F_under_e0_wrec_mm",
+      "oracle_value": 0.10314343027562439,
+      "pinned_expected": 0.10314343027562439,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_F_under_e1_R_ohm",
+      "oracle_value": 0.05,
+      "pinned_expected": 0.05,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_F_under_e1_drop_V",
+      "oracle_value": 0.025,
+      "pinned_expected": 0.025,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_F_under_e1_loss_W",
+      "oracle_value": 0.0125,
+      "pinned_expected": 0.0125,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_F_under_e1_limit_A",
+      "oracle_value": 3.0,
+      "pinned_expected": 3.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_F_under_e1_util_frac",
+      "oracle_value": 0.16666666666666666,
+      "pinned_expected": 0.16666666666666666,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_F_under_e1_margin_A",
+      "oracle_value": 2.5,
+      "pinned_expected": 2.5,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_G_innerlist_i_A",
+      "oracle_value": 1.5035853659665686,
+      "pinned_expected": 1.5035853659665686,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "applied (series) current of the path"
+    },
+    {
+      "name": "pl_G_innerlist_drop_V",
+      "oracle_value": 0.20000000000000018,
+      "pinned_expected": 0.20000000000000018,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-019",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-019": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "total drop = sum I R_k"
+    },
+    {
+      "name": "pl_G_innerlist_weakest_idx",
+      "oracle_value": 0.0,
+      "pinned_expected": 0.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "index of the rated element with the highest I/I_limit (-1: none rated); ties go to the first"
+    },
+    {
+      "name": "pl_G_innerlist_e0_R_ohm",
+      "oracle_value": 0.07534359605911331,
+      "pinned_expected": 0.07534359605911331,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_G_innerlist_e0_drop_V",
+      "oracle_value": 0.1132855284537792,
+      "pinned_expected": 0.1132855284537792,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_G_innerlist_e0_loss_W",
+      "oracle_value": 0.17033446275889172,
+      "pinned_expected": 0.17033446275889172,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_G_innerlist_e0_limit_A",
+      "oracle_value": 1.6222018145644428,
+      "pinned_expected": 1.6222018145644428,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_G_innerlist_e0_util_frac",
+      "oracle_value": 0.9268793515499041,
+      "pinned_expected": 0.9268793515499041,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_G_innerlist_e0_margin_A",
+      "oracle_value": 0.11861644859787424,
+      "pinned_expected": 0.11861644859787424,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_G_innerlist_e0_wmin_mm",
+      "oracle_value": 0.9005643870284858,
+      "pinned_expected": 0.9005643870284858,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_G_innerlist_e0_wrec_mm",
+      "oracle_value": 1.2251344501601182,
+      "pinned_expected": 1.2251344501601182,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
+    },
+    {
+      "name": "pl_G_innerlist_e1_R_ohm",
+      "oracle_value": 0.02,
+      "pinned_expected": 0.02,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_G_innerlist_e1_drop_V",
+      "oracle_value": 0.030071707319331373,
+      "pinned_expected": 0.030071707319331373,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_G_innerlist_e1_loss_W",
+      "oracle_value": 0.0452153790549764,
+      "pinned_expected": 0.0452153790549764,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_G_innerlist_e1_limit_A",
+      "oracle_value": 4.0,
+      "pinned_expected": 4.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "USER-SUPPLIED rating, not a ledger value"
+    },
+    {
+      "name": "pl_G_innerlist_e1_util_frac",
+      "oracle_value": 0.37589634149164214,
+      "pinned_expected": 0.37589634149164214,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_G_innerlist_e1_margin_A",
+      "oracle_value": 2.4964146340334317,
+      "pinned_expected": 2.4964146340334317,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_G_innerlist_e2_R_ohm",
+      "oracle_value": 0.037671798029556655,
+      "pinned_expected": 0.037671798029556655,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "element resistance"
+    },
+    {
+      "name": "pl_G_innerlist_e2_drop_V",
+      "oracle_value": 0.0566427642268896,
+      "pinned_expected": 0.0566427642268896,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I x R_k"
+    },
+    {
+      "name": "pl_G_innerlist_e2_loss_W",
+      "oracle_value": 0.08516723137944586,
+      "pinned_expected": 0.08516723137944586,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-019",
+        "S-004",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-019": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-006": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "I^2 x R_k"
+    },
+    {
+      "name": "pl_G_innerlist_e2_limit_A",
+      "oracle_value": 5.362676823028493,
+      "pinned_expected": 5.362676823028493,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "IPC-2221 legacy current capacity at the allowed rise (S-001, PAYWALLED)"
+    },
+    {
+      "name": "pl_G_innerlist_e2_util_frac",
+      "oracle_value": 0.2803796341986987,
+      "pinned_expected": 0.2803796341986987,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I / I_limit"
+    },
+    {
+      "name": "pl_G_innerlist_e2_margin_A",
+      "oracle_value": 3.8590914570619246,
+      "pinned_expected": 3.8590914570619246,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-010",
+        "S-003",
+        "S-006",
+        "S-019"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-010": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED",
+        "S-019": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_limit - I (negative when over)"
+    },
+    {
+      "name": "pl_G_innerlist_e2_wmin_mm",
+      "oracle_value": 0.3461792092728165,
+      "pinned_expected": 0.3461792092728165,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: minimum width for the applied current at the allowed rise (legacy)"
+    },
+    {
+      "name": "pl_G_innerlist_e2_wrec_mm",
+      "oracle_value": 0.47094475566454,
+      "pinned_expected": 0.47094475566454,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-003",
+        "S-006"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-003": "CONFLICT",
+        "S-006": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "net-class: width solved for 1.25 x the applied current (engineering-default margin on current)"
     }
   ]
 }
