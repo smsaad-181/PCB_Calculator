@@ -9,6 +9,6 @@ description: Vite + GitHub Actions deployment to GitHub Pages, base path, hash r
 - Use `npm ci`, `.nvmrc`, lockfile committed.
 - Check current major versions of `actions/*` (checkout, setup-node, configure-pages, upload-pages-artifact, deploy-pages) on their GitHub release pages; pin to SHAs when confirmed.
 - Service worker: versioned precache keyed on build hash; "update available" prompt; must never trap users on a stale build. If in doubt, omit.
-- Budgets: gzip JS < 150 KB total; per-calculator dynamic imports.
+- Budgets: first-load gzip JS per calculator route <= 150 KB (entry + shared + route chunks) and total gzip JS <= 400 KB (user decision 2026-10-14); per-calculator dynamic imports.
 - Rollback: revert the bad commit on `main`; pipeline redeploys. Document in `docs/RUNBOOK.md`.
 - Custom domain: set in repo Settings → Pages (a CNAME file is ignored for Actions-based deployments).

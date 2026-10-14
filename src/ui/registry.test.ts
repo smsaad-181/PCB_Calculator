@@ -47,6 +47,15 @@ describe('registry', () => {
       expect(typeof m?.default, id).toBe('function');
     }
   });
+  it('lists via and annular ring under Trace as lazy phase-1 entries that resolve to a component', async () => {
+    expect(findCalculator('via')?.title).toBe('Via resistance and thermal (barrel)');
+    for (const id of ['via', 'annular-ring']) {
+      const e = findCalculator(id);
+      expect(e?.category, id).toBe('trace');
+      expect(e?.phase, id).toBe(1);
+      expect(typeof (await e?.load())?.default, id).toBe('function');
+    }
+  });
   it('every registry entry has a hash-state key table', () => {
     for (const x of REGISTRY) expect(Object.keys(CALCULATOR_STATE_KEYS)).toContain(x.id);
   });

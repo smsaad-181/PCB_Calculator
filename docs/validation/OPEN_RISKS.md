@@ -207,3 +207,9 @@ Reports: `phase-1-calc.md`, `phase-1-phase.md`, `phase-1-pcb.md` (all PASS-WITH-
 | T7-2 | Profile JSON values trace only to the researcher's quotes, so tests check them against that same reading (not independent). | human | Browser re-read of every value | OPEN (R-21) |
 | T7-3 | Removed flat profile keys now fail to parse (user profiles using them break by design). | ui-engineer | Say so in the profile editor/import UI | NOTED |
 | T7-4 | Earlier `phase-1-*` reports still cite `jlcpcb-2026-10-06.json` (deleted). | orchestrator | Leave as historical record | NOTED |
+
+## Bundle budget (logged 2026-10-14, branch phase-1-task-7-ui)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| B-1 | Bundle budget redefined by user decision 2026-10-14: first-load JS per calculator route <= 150 KB gzip (entry + static shared chunks + the route's lazy chunks), plus a separate total ceiling of 400 KB gzip across all JS. The old rule (total <= 150 KB) stood at 149.98 KB and would have blocked further calculators. `check:size` now reads `dist/.vite/manifest.json` (`build.manifest: true`), falling back to parsing chunk imports if absent. Supersedes T5-4. | devops / user | None (decision recorded); revisit the 400 KB ceiling when Phase 2 adds calculators | ACCEPTED |

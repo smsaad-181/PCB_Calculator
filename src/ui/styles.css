@@ -168,3 +168,20 @@ ul.decade li.chosen { border: 3px solid var(--link); font-weight: 700; }
 .limiting-tag { display: inline-block; border: 2px solid var(--link); border-radius: 4px; padding: 0 0.35rem; font-size: 0.875rem; }
 .element-src { display: block; font-weight: 400; font-size: 0.875rem; }
 .limiting-line { margin: 0.5rem 0; }
+
+/* ---- Via and annular ring ---- */
+.ledger-rows h3, .stackup h3, .comparisons h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.ledger-rows ul { list-style: none; padding: 0; margin: 0.25rem 0; }
+.ledger-rows li { border: 1px solid var(--border); border-left-width: 5px; border-radius: 4px; background: var(--bg); color: var(--fg); padding: 0.3rem 0.6rem; margin-bottom: 0.4rem; overflow-wrap: anywhere; }
+.status-text { font-weight: 700; letter-spacing: 0.02em; }
+.profile-banner { display: block; position: sticky; top: 0; z-index: 2; }
+.profile-banner p { margin: 0.35rem 0; }
+.profile-stale { border-top: 2px solid var(--warn-border); padding-top: 0.35rem; }
+.stackup, .comparisons { border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--fg); padding: 0.25rem 0.75rem 0.5rem; margin: 0.75rem 0; }
+.cmp { border-top: 1px solid var(--border); padding: 0.25rem 0; }
+.cmp h4 { margin: 0.4rem 0 0.2rem; font-size: 0.95rem; }
+.cmp-statements { list-style: none; padding: 0; margin: 0.25rem 0; }
+.cmp-statements li { border-left: 5px solid var(--muted); padding: 0.2rem 0.5rem; margin-bottom: 0.3rem; background: var(--card); color: var(--fg); overflow-wrap: anywhere; }
+.cmp-tag { border: 2px solid var(--muted); border-radius: 4px; padding: 0 0.3rem; font-size: 0.85rem; white-space: nowrap; }
+.tol .radio { min-height: 2.25rem; }
+td.num { font-variant-numeric: tabular-nums; }
