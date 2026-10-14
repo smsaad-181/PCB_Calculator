@@ -20,7 +20,7 @@
 | 5 | Golden check | `python3 tools/reference/gen_golden.py --check` | Committed golden vectors match the generator output |
 | 6 | Test | `npm run test:coverage` | Vitest unit, golden-vector, property and audit tests, with coverage |
 | 7 | Build | `npm run build` | Vite production build (`base: './'`, hash routing) |
-| 8 | Size | `npm run check:size` | Total gzip JS in `dist/` <= 150 KB (docs/SPEC.md); warns if one chunk > 50 KB |
+| 8 | Size | `npm run check:size` | First-load gzip JS per calculator route <= 150 KB and total gzip JS in `dist/` <= 400 KB (docs/SPEC.md); lists routes largest first; warns if one chunk > 50 KB |
 | 9 | Audit | `npm run check:audit` | Forbidden compliance phrases only in `src/core/gate.ts` / `gate.test.ts`; every JSON data table has source, edition, ledgerIds, status, verifiedBy (and bannerRequired when not VERIFIED; fab profiles also profileDate + fabricator); every LEDGER.md row has a valid status; every `S-nnn` referenced in `src/` exists in the ledger |
 
 - Pages artifact upload (`upload-pages-artifact`) happens in `verify` only on `main`, after all gates.

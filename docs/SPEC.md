@@ -38,7 +38,7 @@ The reference calculator is `src/core/calculators/copper-converter/`. The UI sho
 
 ## Non-functional requirements
 - Closed-form calc < 1 ms; self-heating solver ≤ 50 iterations; envelope via corners (≤ 6 inputs) else Monte Carlo (5-10k samples) in a Web Worker.
-- Bundle ≤ 150 KB gzip JS total, code-split per calculator. Load < 1 s broadband.
+- Bundle: first-load JS per calculator route ≤ 150 KB gzip (entry + shared chunks + that route's lazy chunks) and total JS across all chunks ≤ 400 KB gzip (user decision 2026-10-14), code-split per calculator. Load < 1 s broadband.
 - Offline capable. No runtime network calls. Hash-routed. State in URL hash (schema-versioned).
 - Per-calculator error boundary. Input guards. Never display NaN.
 - **Headline formatting:** every headline number is printed through `src/core/format-result.ts`. This covers results, design values, margins and utilisation. The four helpers are `formatResult`, `formatDesignValue`, `formatMargin` and `formatUtilisation`.

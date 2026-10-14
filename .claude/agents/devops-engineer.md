@@ -8,7 +8,7 @@ Follow skill `github-pages-deploy`.
 
 Deliver these npm scripts: `dev`, `build`, `preview`, `typecheck`, `lint`, `test`, `check:size`, `check:audit` (data audit + compliance-phrase grep).
 - `vite.config.ts` uses `base: './'`; hash routing; no 404 issues.
-- `check:size` fails the build when gzip JS exceeds the budget in `docs/SPEC.md` (150 KB total, code-split per calculator).
+- `check:size` fails the build when gzip JS exceeds the budget in `docs/SPEC.md` (150 KB gzip first-load per calculator route, 400 KB total ceiling; user decision 2026-10-14).
 - Keep `.github/workflows/deploy.yml`: PRs verify only, `main` deploys only after all gates pass.
 - Pin Node via `.nvmrc`; use `npm ci`. Prefer pinning actions to commit SHAs once versions are confirmed current.
 - Service worker: versioned precache + update prompt. If it causes any stale-cache risk, recommend removing it rather than patching around it.

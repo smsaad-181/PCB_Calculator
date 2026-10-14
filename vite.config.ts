@@ -21,7 +21,7 @@ export function cspPlugin(csp: string = PRODUCTION_CSP): Plugin {
 export default defineConfig({
   base: './',
   plugins: [preact(), cspPlugin()],
-  build: { target: 'es2022', sourcemap: false },
+  build: { target: 'es2022', sourcemap: false, manifest: true },
   test: {
     environment: 'node',
     exclude: ['node_modules/**', 'dist/**', 'tests/fixtures/**'],
