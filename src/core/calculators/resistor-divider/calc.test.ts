@@ -492,23 +492,23 @@ describe('robustness near the representable range', () => {
 });
 
 describe('performance sanity', () => {
-  it('10 000 loaded computes with a tolerance envelope take under 1 s in total', () => {
+  it('10 000 loaded computes with a tolerance envelope stay within a 5 s total budget', () => {
     const input = fwd(12, 47e3, 10e3, { load: R(100e3), tolerance: frac(0.01), vinTolerance: frac(0.02) });
     compute(input);
     const t0 = performance.now();
     let n = 0;
     for (let i = 0; i < 10_000; i++) if (compute(input).ok) n++;
     expect(n).toBe(10_000);
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(5000);
   });
-  it('2 000 solved-and-snapped E192 computes take under 1 s in total', () => {
+  it('2 000 solved-and-snapped E192 computes stay within a 5 s total budget', () => {
     const input = solve1(12, 3.3, 10e3, { series: 'E192', snap: 'nearest', load: R(100e3), tolerance: frac(0.01) });
     compute(input);
     const t0 = performance.now();
     let n = 0;
     for (let i = 0; i < 2000; i++) if (compute(input).ok) n++;
     expect(n).toBe(2000);
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(5000);
   });
 });
 

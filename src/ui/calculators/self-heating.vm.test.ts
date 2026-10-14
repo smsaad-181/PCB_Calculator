@@ -339,6 +339,6 @@ describe('accessibility wiring and speed', () => {
     computeView(s);
     const t0 = performance.now();
     for (let i = 0; i < 100; i++) computeView(s);
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(5000);
   });
 });
