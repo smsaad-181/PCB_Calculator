@@ -8,6 +8,7 @@ import { RadioGroup } from '../components/RadioGroup';
 import { ResetButton } from '../components/ResetButton';
 import { ResultStatus } from '../components/ResultStatus';
 import { ResultsPanel } from '../components/ResultsPanel';
+import { ViaRatingPointer } from '../components/ViaRatingPointer';
 import { SelectField } from '../components/SelectField';
 import { ToleranceResults } from '../components/ToleranceResults';
 import { ToleranceSection } from '../components/ToleranceInputs';
@@ -46,6 +47,7 @@ function Results({ view }: { view: ViaView }) {
         failedCheckHint={RANGE_HINT}
         afterHeadline={
           <>
+            <ViaRatingPointer />
             <ToleranceResults view={view.tolerance} />
             {view.cautions.map((c) => (
               <Callout key={c.code} heading={c.heading} text={c.text} />

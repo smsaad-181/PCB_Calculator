@@ -1,4 +1,5 @@
 import { rateConfidence } from '../../confidence';
+import { addUserSuppliedReason, userSuppliedDefault } from '../circuit-shared';
 import type { OutOfRangeInput } from '../../confidence';
 import { FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE, copperBasisFactors } from '../../data/constants';
 import { dataStatusForLedgerIds } from '../../data-status';
@@ -62,6 +63,10 @@ export interface PathAnalysis {
   readonly elements: readonly PathElementState[];
   readonly limiting: PathElementState;
 }
+
+/** Result name of the primary drop; qualified when the return path is not counted so a forward-only figure is never read as a loop drop. */
+export const TOTAL_DROP_NAME = 'total voltage drop';
+export const TOTAL_DROP_FORWARD_ONLY_NAME = 'total voltage drop (forward path only)';
 
 export const VOLTAGE_DROP_PATH_SCOPE =
   'Included: the listed path elements only, at DC and at the stated temperatures, feeding one load. Not included: elements you did not list (vias, pads, solder joints, plane or pour spreading and necking, source output resistance, sense wiring), AC, skin and proximity effects, and any change of resistance caused by the current itself.';
@@ -278,6 +283,8 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
   const Fq = (n: number): Quantity => q(n, DIM.DIMENSIONLESS);
 
   // Steps.
+  const forwardOnly = inp.returnPath === 'not-counted';
+  const dropName = forwardOnly ? TOTAL_DROP_FORWARD_ONLY_NAME : TOTAL_DROP_NAME;
   const steps: CalcResult['steps'] = [
     { label: 'Total path resistance', expr: 'R_path = ΣR_k (forward and return elements)', value: Rq(rTotal), bound: 'prediction' },
   ];
@@ -289,7 +296,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
     steps.push({ label: 'Load current', expr: 'I = (V_source − √(V_source² − 4 R_path P)) / (2 R_path), low-current root', value: q(I, DIM.CURRENT), bound: 'prediction' });
   }
   steps.push(
-    { label: 'Total voltage drop', expr: 'V_drop = Σ I·R_k', value: Vq(totalDrop), bound: 'prediction' },
+    { label: forwardOnly ? 'Total voltage drop (forward path only)' : 'Total voltage drop', expr: forwardOnly ? 'V_drop = Σ I·R_k (forward elements only; the return is not counted)' : 'V_drop = Σ I·R_k', value: Vq(totalDrop), bound: 'prediction' },
     { label: 'Load voltage', expr: 'V_load = V_source − V_drop', value: Vq(loadVoltage), bound: 'max-capacity' },
     { label: 'Total power loss', expr: 'P_loss = Σ I²·R_k', value: Pq(totalLoss), bound: 'prediction' },
     { label: 'Power delivered to the load', expr: 'P_load = V_load × I', value: Pq(loadPower), bound: 'max-capacity' },
@@ -298,7 +305,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
 
   // Results.
   const results: CalcResult['results'] = [
-    { name: 'total voltage drop', value: Vq(totalDrop), role: 'primary', bound: 'prediction' },
+    { name: dropName, value: Vq(totalDrop), role: 'primary', bound: 'prediction' },
     { name: 'voltage drop percent of source', value: Fq(dropFraction), role: 'secondary', bound: 'prediction' },
     { name: 'load voltage', value: Vq(loadVoltage), role: 'secondary', bound: given('loadVoltage') ? 'nominal' : 'max-capacity' },
     { name: 'load current', value: q(I, DIM.CURRENT), role: 'secondary', bound: given('loadCurrent') ? 'nominal' : 'prediction' },
@@ -364,7 +371,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
   if (inp.dropBudget !== undefined && dropFraction > inp.dropBudget.si * (1 + REL_TOL)) {
     warnings.push({
       severity: 'warning',
-      message: `The total drop ${pct(dropFraction)} of the source exceeds the budget you set, ${pct(inp.dropBudget.si)}. The biggest contributor is "${limiting.name}" (${pct(limiting.dropShare)} of the drop).`,
+      message: `The total drop ${pct(dropFraction)} of the source exceeds the budget you set, ${pct(inp.dropBudget.si)}. The largest-drop element is "${limiting.name}" (${pct(limiting.dropShare)} of the drop).`,
       code: 'DROP_BUDGET_EXCEEDED',
     });
   }
@@ -393,6 +400,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
   const assumptions: string[] = [
     returnText[inp.returnPath],
     `Load model: ${load.field === 'loadCurrent' ? 'constant current' : load.field === 'loadPower' ? 'constant power (physical low-current root of the quadratic)' : load.field === 'loadResistance' ? 'constant resistance' : 'constant voltage at the load'}, entered by the user.`,
+    ...(forwardOnly ? ['Total voltage drop is for the forward path only (return not counted); it is not the loop drop.'] : []),
     'DC steady state; ideal source with zero output resistance; the path elements are in series.',
     `Voltage drop, power loss, resistance and source power are calculated predictions and print rounded up; the load voltage, the power delivered to the load and the efficiency print rounded down (never overstated). ${FORMULA_NOTE}`,
   ];
@@ -406,6 +414,9 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
 
   // Confidence.
   const defaultedAssumptions = defTemp.length > 0 ? ['conductor temperature (trace default 25 °C)'] : [];
+  const userSupplied = fixedRes.map((e) => `${e.label} resistance`);
+  const userDefault = userSuppliedDefault(userSupplied);
+  if (userDefault !== undefined) defaultedAssumptions.push(userDefault);
   const safetyRelevantDefaults = [...new Set(traces.flatMap((t) => copperBasisFactors(t.basis).safetyRelevantDefaults))];
   const dataStatus = traces.length > 0 ? STATUS_TRACES : load.field === 'loadPower' ? STATUS_NO_TRACES_CPL : STATUS_NO_TRACES;
   const confidence = rateConfidence({
@@ -415,6 +426,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
     accuracyClass: meta.accuracyClass,
     dataStatus,
   });
+  addUserSuppliedReason(confidence, userSupplied);
   if (safetyRelevantDefaults.length > 0) {
     confidence.reasons.push('Trace resistance is inversely proportional to copper thickness, so any difference between nominal and finished copper carries straight into the drop and the loss.');
   }
@@ -438,7 +450,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathAnalysis } | C
     limitingElement: {
       id: limiting.id,
       name: limiting.name,
-      reason: `Largest voltage drop on the path: ${num(limiting.drop)} V, ${pct(limiting.dropShare)} of the total drop (${limiting.provenance}).`,
+      reason: `Largest-drop element (the element with the largest voltage drop, not a current-rating limit): ${num(limiting.drop)} V, ${pct(limiting.dropShare)} of the total drop (${limiting.provenance}).`,
     },
     ...(basisForResult !== undefined ? { copperBasis: basisForResult } : {}),
   };

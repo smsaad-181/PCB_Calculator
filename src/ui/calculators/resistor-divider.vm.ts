@@ -8,6 +8,7 @@ import type { CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
 import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
+import { resistorDividerCallouts, type DividerCallout } from './divider-emphasis';
 import { DEFAULT_SNAP, SNAP_CHOICES, isDividerSeries, isSnapChoice, ERROR_ACCURACY, parseToleranceField, type SnapChoice } from './circuit-choices';
 
 export const CALCULATOR_ID = 'resistor-divider';
@@ -218,6 +219,8 @@ export type DividerView =
       readonly raw: CalcResult;
       readonly fieldErrors: FieldErrors;
       readonly envelope?: EnvelopeView;
+      /** Important blocks shown under the headline: over the entered rating, or high voltage with no rating (presentation only). */
+      readonly importantCallouts: readonly DividerCallout[];
     };
 
 const RESULT_LABELS: Readonly<Record<string, string>> = {
@@ -329,7 +332,9 @@ export function computeView(s: DividerState): DividerView {
           max: formatResult({ value: env.max, bound: 'prediction' }, { accuracyClass: meta.accuracyClass }),
           note: `Initial-tolerance corners: every combination of the tolerances on ${env.toleranceInputs.map((n) => TOLERANCE_NAME[n] ?? n).join(', ')} at their limits. Temperature coefficient (TCR), leakage, ageing, self-heating and voltage coefficient are not included, so these are not limits over the life of the part. The minimum is printed rounded down and the maximum rounded up.`,
         };
-  return envelope === undefined ? { status: 'ok', result, raw, fieldErrors } : { status: 'ok', result, raw, fieldErrors, envelope };
+  const importantCallouts = resistorDividerCallouts(raw, quantity('ratedVoltage') !== undefined, meta.accuracyClass);
+  const base = { status: 'ok', result, raw, fieldErrors, importantCallouts } as const;
+  return envelope === undefined ? base : { ...base, envelope };
 }
 
 export function liveSummary(v: DividerView): string {

@@ -132,14 +132,24 @@ describe('worked example: weakest link B at 80 %, cable unrated, total drop 0.12
   });
   it('totals: drop with percent of source, load voltage, loss, efficiency', () => {
     const t = totalsOf(ok(EXAMPLE));
-    expect(t['Total voltage drop']).toMatch(/^120 mV \(1\.0/);
+    expect(t['Total voltage drop (forward path only)']).toMatch(/^120 mV \(1\.0/);
     expect(t['Load voltage']).toMatch(/^11\.88 V$/);
     expect(t['Total power loss']).toMatch(/^240 mW$/);
     expect(t['Efficiency (share of the source power, 100 % is lossless)']).toMatch(/^99/);
   });
+  it('the totals row is present under the forward-only name when the return is not counted, and under the plain name when it is', () => {
+    const notCounted = totalsOf(ok(EXAMPLE));
+    expect(Object.keys(notCounted)).toContain('Total voltage drop (forward path only)');
+    expect(Object.keys(notCounted)).not.toContain('Total voltage drop');
+    const counted = totalsOf(ok({ ...EXAMPLE, returnPath: 'same-as-forward' }));
+    expect(Object.keys(counted)).toContain('Total voltage drop');
+    expect(Object.keys(counted)).not.toContain('Total voltage drop (forward path only)');
+    expect(counted['Total voltage drop']).toMatch(/mV|V/);
+  });
   it('does not repeat the totals or per-element numbers as generic rows', () => {
     const rows = rowsOf(ok(EXAMPLE));
     expect(Object.keys(rows)).not.toContain('Total voltage drop');
+    expect(Object.keys(rows)).not.toContain('Total voltage drop (forward path only)');
     expect(Object.keys(rows).some((k) => /Connector B|Cable/.test(k))).toBe(false);
   });
   it('the unrated warning and the not-counted return warning are in the list; deferred scope and self-heating are pinned first', () => {
@@ -446,8 +456,10 @@ describe('return path and list handling', () => {
 describe('loads and failures never give a number', () => {
   it('no rated element: the headline is the total drop and there is no weakest link; the callout says so', () => {
     const v = ok({ ...EXAMPLE, elements: [user('cable', 'Cable', '0.03 ohm'), user('connector', 'Plug', '0.01 ohm')] });
-    expect(v.result.headline.label).toMatch(/total voltage drop/i);
+    expect(v.result.headline.label).toBe('Total voltage drop (forward path only)');
     expect(v.result.headline.label).not.toMatch(/weakest link:/i);
+    const both = ok({ ...EXAMPLE, returnPath: 'same-as-forward', elements: [user('cable', 'Cable', '0.03 ohm')] });
+    expect(both.result.headline.label).toBe('Total voltage drop');
     expect(v.weakest).toBeUndefined();
     expect(v.table).toHaveLength(0);
     expect(v.unrated).toHaveLength(2);

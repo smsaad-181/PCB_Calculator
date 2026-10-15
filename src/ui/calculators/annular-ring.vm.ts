@@ -293,6 +293,8 @@ export interface StackUp {
   readonly total: string | undefined;
   readonly worstLabel: string | undefined;
   readonly worst: string | undefined;
+  /** True when the worst case leaves out at least one tolerance term: it is then a partial (optimistic) figure, never a complete worst case. */
+  readonly partial: boolean;
   /** Terms that are not in the worst case (not supplied or not published). */
   readonly omitted: readonly string[];
 }
@@ -358,6 +360,11 @@ const COMPARISON_CODES: readonly string[] = ['MEETS_VALUE', 'BELOW_VALUE'];
 const MOVED_CODES: readonly string[] = [...COMPARISON_CODES, 'BREAKOUT_POSSIBLE', 'WORST_CASE_INCOMPLETE'];
 export const BREAKOUT_HEADING = 'The hole can break out of the pad in the worst case';
 const PIN_CODES = ['FAB_PROFILE_STALE', 'IPC6012_NOT_EVALUATED'] as const;
+
+/** The core marks the ring as max-capacity (rounded down); a ring is not a capacity, so this page says what the rounding means. */
+export const RING_BOUND_MEANING = 'Rounded down (a minimum guarantee)';
+/** Matches both core names: 'worst-case annular ring (...)' and 'partial worst-case annular ring (omits: ...) (...)'. */
+const WORST_NAME = /^(?:partial )?worst-case annular ring \(/;
 
 const RESULT_LABELS: Readonly<Record<string, string>> = {
   'pad minus hole diameter': 'Pad minus hole diameter (a diameter difference, not an annular ring)',
@@ -470,7 +477,7 @@ export function computeView(s: AnnularRingState, today: string): AnnularRingView
 
   // Stack-up: nominal, each term with its source, total, worst case, and what is left out.
   const nominalItem = raw.results.find((r) => r.name.startsWith('nominal annular ring ('));
-  const worstItem = raw.results.find((r) => r.name.startsWith('worst-case annular ring ('));
+  const worstItem = raw.results.find((r) => WORST_NAME.test(r.name));
   const terms: StackTerm[] = [];
   const omitted: string[] = [];
   for (const t of TERMS) {
@@ -497,6 +504,7 @@ export function computeView(s: AnnularRingState, today: string): AnnularRingView
     total: totalStep === undefined ? undefined : formatStep(totalStep, opts),
     worstLabel: worstItem?.name,
     worst: worstItem === undefined ? undefined : print(worstItem.value, worstItem.bound),
+    partial: omitted.length > 0 || (worstItem?.name.startsWith('partial ') ?? false),
     omitted,
   };
 
@@ -507,7 +515,8 @@ export function computeView(s: AnnularRingState, today: string): AnnularRingView
     const src = sourceOf(inp, fallbackStatus);
     const margins = MARGIN_PREFIXES.flatMap((m) => {
       const item = resultByName(`${m.prefix}${r.name}`);
-      return item === undefined ? [] : [{ label: m.label, text: print(item.value, item.bound) }];
+      const label = m.label.startsWith('Worst-case') && stackUp.partial ? `Partial ${m.label.charAt(0).toLowerCase()}${m.label.slice(1)}` : m.label;
+      return item === undefined ? [] : [{ label, text: print(item.value, item.bound) }];
     });
     const statements = raw.warnings.flatMap((w): Statement[] => {
       if ((w.code !== 'MEETS_VALUE' && w.code !== 'BELOW_VALUE') || !w.message.includes(`the ${r.name} (`)) return [];
@@ -555,7 +564,7 @@ export function computeView(s: AnnularRingState, today: string): AnnularRingView
   });
   // Without a profile no profile row is consulted: show only the ledger rows the numbers actually rest on.
   const ledger = useProfile ? rv.ledger : ledgerView(['S-006']);
-  const result: ResultView = { ...rv, ledger };
+  const result: ResultView = { ...rv, ledger, headline: worstItem !== undefined && rv.headline.meaning.startsWith('Maximum capacity') ? { ...rv.headline, meaning: RING_BOUND_MEANING } : rv.headline };
   if (!useProfile) notes.push(NO_PROFILE_NOTE);
   return { status: 'ok', result, raw, fieldErrors, notes, stackUp, comparisons, notPublished, breakout, incomplete };
 }

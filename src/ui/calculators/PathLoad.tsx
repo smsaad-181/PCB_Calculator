@@ -10,6 +10,7 @@ import { ResetButton } from '../components/ResetButton';
 import { ResultStatus } from '../components/ResultStatus';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
+import { ViaRatingPointer } from '../components/ViaRatingPointer';
 import { BASES, BASIS_LABEL, CONVENTION_IDS, conventionOptionLabel, conventionSpreadText, echoPrefs } from '../components/prefs';
 import { useToday } from '../hooks';
 import { useCalcState } from '../useCalcState';
@@ -150,6 +151,7 @@ function RatingPair({ id, e, units, err, edit }: { id: string; e: ElementForm; u
     <fieldset class="rating-pair">
       <legend>Current rating (optional pair)</legend>
       <p class="help">{RATING_HELP}</p>
+      {e.kind === 'via' && <ViaRatingPointer />}
       <QuantityField
         id={`${id}-rated`}
         label="Rated current of the whole element"
@@ -555,6 +557,7 @@ function UnratedBlock({ heading, text, rows }: { heading: string; text: string; 
         <span class="cmp-tag">[Unrated]</span> {heading}
       </h3>
       <p>{text}</p>
+      {rows.some((r) => r.kindLabel.toLowerCase().startsWith('via')) && <ViaRatingPointer />}
       <div class="table-wrap">
         <table>
           <caption class="visually-hidden">Elements with no current rating. They are not in the weakest-link ranking and may be the real limit.</caption>

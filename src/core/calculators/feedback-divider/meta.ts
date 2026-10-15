@@ -16,6 +16,8 @@ export const meta = {
   /** Series values searched for the best pair: this many decades from 1 kohm (1 kohm to 976 kohm of the series). */
   pairWindow: { lowDecade: 3, decades: 3 },
   accuracyClass: 'exact' as AccuracyClass,
+  /** Class for printing the tolerance-corner envelope: corners of 1 % parts do not deserve the 6 significant figures of an exact relation (4 s.f.). */
+  envelopeAccuracyClass: 'analytical' as AccuracyClass,
   toleranceInputs: ['r1', 'r2', 'vref'] as string[],
   /** Rounding of headline values (see results[].bound): resistances, voltages and errors are nominal; currents and powers are predictions (round up). */
   rounding: 'nominal values round to nearest; divider current and powers are predictions and round up',

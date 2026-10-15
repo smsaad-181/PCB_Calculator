@@ -66,7 +66,7 @@ const RHO_CAUTION =
 const ALPHA_CAUTION =
   'The temperature coefficient you entered will replace the S-004 value; the result at any temperature other than 20 °C depends directly on it, so replace it only with a value you can source.';
 export const VOLTAGE_DROP_SCOPE =
-  'Voltage drop and power loss cover this trace only: one conductor, one direction. They exclude the return path (about twice the drop for a trace return of equal size), vias, pads, connectors, solder joints and copper necking. Do not compare this figure with a rail budget; the future path calculator covers the whole path.';
+  'Voltage drop and power loss cover this trace only: one conductor, one direction. They exclude the return path (about twice the drop for a trace return of equal size), vias, pads, connectors, solder joints and copper necking. Do not compare this figure with a rail budget; use the Path and load calculator (path-load) for the whole path.';
 const SKIN_MESSAGE = 'DC formula is optimistic: skin depth is below half the copper thickness';
 
 const REL_TOL = 1e-9;
@@ -266,7 +266,7 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
     ambientDefaulted
       ? `Ambient temperature ${String(meta.defaults.ambientC)} °C is an engineering default, not from a standard; it sets the conductor temperature.`
       : `Ambient temperature ${num(toUnit(ambient, 'degC'))} °C set by the user.`,
-    ...(vDrop !== undefined ? ['Voltage drop and power loss are for one conductor, one direction: they exclude the return path, vias, pads, connectors, solder joints and necking (the future path calculator covers the whole path).'] : []),
+    ...(vDrop !== undefined ? ['Voltage drop and power loss are for one conductor, one direction: they exclude the return path, vias, pads, connectors, solder joints and necking (use the Path and load calculator (path-load) for the whole path).'] : []),
     'DC resistance of a uniform rectangular conductor; the cross-section is treated as an ideal rectangle (etch factor, plating and surface roughness are not modelled).',
   ];
 

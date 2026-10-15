@@ -83,6 +83,7 @@ function Results({ view }: { view: FeedbackView }) {
       <ResultsPanel
         view={view.result}
         failedCheckHint={RANGE_HINT}
+        callouts={view.importantCallouts}
         afterHeadline={
           <>
             <PairsTable view={view} />

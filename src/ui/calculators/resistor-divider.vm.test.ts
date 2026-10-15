@@ -4,6 +4,7 @@ import schemSrc from '../components/DividerSchematic.tsx?raw';
 import { meta } from '../../core/calculators/resistor-divider/meta';
 import { formatResult } from '../../core/format-result';
 import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { HIGH_VOLTAGE_DISPLAY_THRESHOLD_V, OVER_RATING_HEADING } from './divider-emphasis';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
@@ -207,6 +208,24 @@ describe('initial-tolerance corners, rated voltage and load tolerance', () => {
     expect(v.raw.warnings.map((w) => w.code)).toContain('RESISTOR_VOLTAGE');
     expect(v.raw.warnings.map((w) => w.code)).not.toContain('RESISTOR_VOLTAGE_NOT_CHECKED');
     expect(v.result.warnings[0]?.message).toMatch(/rated working voltage/);
+  });
+  it('a rated voltage below the resistor voltage gives an Important block with the core message (and the core caution stays in the core result)', () => {
+    const v = ok(st({ ...FWD, ratedVoltage: '5 V' }));
+    expect(v.importantCallouts).toHaveLength(1);
+    expect(v.importantCallouts[0]?.heading).toBe(OVER_RATING_HEADING);
+    expect(v.importantCallouts[0]?.text).toBe(v.raw.warnings.find((w) => w.code === 'RESISTOR_VOLTAGE')?.message);
+    expect(v.raw.warnings.map((w) => w.code)).toContain('RESISTOR_VOLTAGE');
+  });
+  it('no rating and above the presentation threshold: Important block asking for the rated working voltage', () => {
+    const v = ok(st({ vin: '400 V', r1: '1.58 MΩ', r2: '10 kΩ' }));
+    expect(HIGH_VOLTAGE_DISPLAY_THRESHOLD_V).toBe(100);
+    expect(v.importantCallouts).toHaveLength(1);
+    expect(v.importantCallouts[0]?.heading).toBe('high voltage across one resistor: enter its rated working voltage');
+    expect(v.importantCallouts[0]?.text).toMatch(/R1/);
+  });
+  it('no block at or below the threshold, or when a sufficient rating is entered', () => {
+    expect(ok(st(FWD)).importantCallouts).toEqual([]);
+    expect(ok(st({ vin: '400 V', r1: '1.58 MΩ', r2: '10 kΩ', ratedVoltage: '500 V' })).importantCallouts).toEqual([]);
   });
   it('a high enough rated voltage does not warn', () => {
     const v = ok(st({ ...FWD, ratedVoltage: '100 V' }));

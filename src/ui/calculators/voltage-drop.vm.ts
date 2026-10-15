@@ -1,5 +1,6 @@
 // View-model for the voltage drop and power loss (feed path) page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/voltage-drop analyse().
+import { findTotalDrop } from './total-drop';
 import { analyse, type Inputs, type PathElement } from '../../core/calculators/voltage-drop/calc';
 import { meta } from '../../core/calculators/voltage-drop/meta';
 import type { LoadField, ReturnPath } from '../../core/calculators/voltage-drop/guards';
@@ -398,6 +399,7 @@ export type VoltageDropView =
 
 const RESULT_LABELS: Readonly<Record<string, string>> = {
   'total voltage drop': 'Total voltage drop',
+  'total voltage drop (forward path only)': 'Total voltage drop (forward path only)',
   'load voltage': 'Load voltage',
   'load current': 'Load current',
   'total path resistance': 'Total path resistance',
@@ -663,7 +665,7 @@ export function computeView(s: VoltageDropState): VoltageDropView {
   }
 
   const rv = buildResultView(forView, {
-    headline: 'total voltage drop',
+    headline: findTotalDrop(raw.results)?.name ?? 'total voltage drop',
     accuracyClass: meta.accuracyClass,
     prefs,
     lengthRole: 'geometry',
@@ -708,7 +710,7 @@ export function computeView(s: VoltageDropState): VoltageDropView {
 export function liveSummary(v: VoltageDropView): string {
   switch (v.status) {
     case 'ok':
-      return `Result: ${v.result.headline.label} ${v.result.headline.text}. ${v.result.headline.meaning}. Limiting element ${v.limiting.name}. Confidence ${v.result.confidence.level}.`;
+      return `Result: ${v.result.headline.label} ${v.result.headline.text}. ${v.result.headline.meaning}. Largest-drop element ${v.limiting.name}. Confidence ${v.result.confidence.level}.`;
     case 'cannot-supply':
       return `No result. ${v.message}`;
     case 'error':

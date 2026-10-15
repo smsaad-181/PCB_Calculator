@@ -17,6 +17,7 @@ import { validate } from './guards';
 import type { LayerCountInput, LoadElement, PathLoadElementKind, ReturnPath, TraceLoadElement, UserLoadElement, ViaLoadElement } from './guards';
 import { meta, PATH_LOAD_DEFERRED } from './meta';
 import { buildExports } from './netclass';
+import { addUserSuppliedReason, userSuppliedDefault } from '../circuit-shared';
 import type { ParsedFabProfile } from '../../fab/profile';
 
 export type { LoadElement, PathLoadElementKind, ReturnPath, TraceLoadElement, UserLoadElement, ViaLoadElement } from './guards';
@@ -466,7 +467,8 @@ function build(raw: unknown): { result: CalcResult; analysis: PathLoadAnalysis }
   const defaulted: string[] = [];
   if (allResolved.some((r) => r.tempDefaulted)) defaulted.push('conductor temperature (default 25 °C)');
   if (allResolved.some((r) => r.rhoDefaulted)) defaulted.push('plated copper resistivity (pure copper used; non-conservative)');
-  if (userSupplied.length > 0) defaulted.push(`user-supplied values taken as given and not checked against any source: ${userSupplied.join('; ')}`);
+  const userDefault = userSuppliedDefault(userSupplied);
+  if (userDefault !== undefined) defaulted.push(userDefault);
   const bases = new Map<string, CopperBasis>();
   for (const r of allResolved) if (r.basis !== undefined) bases.set(`${r.basis.layer}|${String(r.basis.weightOzFt2)}|${r.basis.basis}|${String(r.basis.thickness.si)}`, r.basis);
   const safety = [...new Set([...bases.values()].flatMap((b) => copperBasisFactors(b).safetyRelevantDefaults))];
@@ -486,9 +488,7 @@ function build(raw: unknown): { result: CalcResult; analysis: PathLoadAnalysis }
     ...(fabProfile !== undefined ? [fabProfile.status] : []),
   ]);
   const confidence = rateConfidence({ outOfRangeInputs: outOfRange, defaultedAssumptions: defaulted, safetyRelevantDefaults: safety, accuracyClass, dataStatus });
-  if (userSupplied.length > 0) {
-    confidence.reasons.push('Each user-supplied resistance or rating is only as good as its source note; the tool does not verify it, so a path made of such values cannot rate high on the strength of the method alone.');
-  }
+  addUserSuppliedReason(confidence, userSupplied);
   if (unrated.length > 0) {
     confidence.reasons.push('A path with any unrated element cannot rate high: the weakest link named here is only the weakest of the elements that have a limit.');
   }

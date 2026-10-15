@@ -119,7 +119,6 @@ function build(raw: unknown): CalcOutcome {
 
   const NOM = `nominal annular ring (${refName})`;
   const NOM_OTHER = `nominal annular ring (${inp.ringReference === 'drill' ? 'finished hole' : 'drill'})`;
-  const WC = `worst-case annular ring (${refName})`;
 
   const nominalRef = finite((pad - refDia) / 2, 'Nominal annular ring');
   const nominalFinished = finite((pad - hole) / 2, 'Nominal annular ring (finished hole)');
@@ -217,7 +216,11 @@ function build(raw: unknown): CalcOutcome {
     });
   }
 
-  // ---- worst case
+  // ---- worst case (named partial when a term is omitted: PCB-F2)
+  const partial = terms.length > 0 && omitted.length > 0;
+  const WC = partial ? `partial worst-case annular ring (omits: ${omitted.join(', ')}) (${refName})` : `worst-case annular ring (${refName})`;
+  const wcStepLabel = partial ? `Partial worst-case annular ring (omits: ${omitted.join(', ')}) (${refName})` : `Worst-case annular ring (${refName})`;
+  const wcWord = partial ? 'partial worst-case ring' : 'worst-case ring';
   const totalSi = terms.reduce((a, t) => a + t.contributionSi, 0);
   const worstSi = terms.length > 0 ? finite(nominalRef - totalSi, 'Worst-case annular ring') : undefined;
 
@@ -281,7 +284,7 @@ function build(raw: unknown): CalcOutcome {
   for (const t of terms) steps.push({ label: `Tolerance term: ${t.label}`, expr: `${t.expr}; value ${mmText(lengthQ(t.contributionSi))}`, value: lengthQ(t.contributionSi), bound: 'prediction' });
   if (worstSi !== undefined) {
     steps.push({ label: 'Tolerance stack-up total', expr: 'sum of the terms above (linear worst case)', value: lengthQ(totalSi), bound: 'prediction' });
-    steps.push({ label: `Worst-case annular ring (${refName})`, expr: 'AR_wc = AR - total', value: lengthQ(worstSi), bound: 'max-capacity' });
+    steps.push({ label: wcStepLabel, expr: partial ? 'AR_partial = AR - total of the terms supplied (omitted terms are not subtracted: optimistic)' : 'AR_wc = AR - total', value: lengthQ(worstSi), bound: 'max-capacity' });
   }
 
   const hasWorst = worstSi !== undefined;
@@ -320,7 +323,7 @@ function build(raw: unknown): CalcOutcome {
     results.push({ name: r.name, value: copy(r.value), role: 'secondary', bound: 'min-requirement' });
     if (r.kind === 'ring') {
       compare('nominal ring', nominalRef, 'nominal', r, `nominal ring margin to ${r.name}`);
-      if (worstSi !== undefined) compare('worst-case ring', worstSi, 'max-capacity', r, `worst-case ring margin to ${r.name}`);
+      if (worstSi !== undefined) compare(wcWord, worstSi, 'max-capacity', r, `worst-case ring margin to ${r.name}`);
     } else {
       compare('pad-minus-hole diameter', pad - refDia, 'nominal', r, `pad-minus-hole margin to ${r.name}`);
     }
@@ -342,7 +345,7 @@ function build(raw: unknown): CalcOutcome {
       warnings.push({
         severity: 'caution',
         code: 'WORST_CASE_INCOMPLETE',
-        message: `The worst case omits: ${omitted.join(', ')} (not supplied or not published). It is therefore optimistic by at least those terms.`,
+        message: `The worst case is PARTIAL: it omits ${omitted.join(', ')} (not supplied or not published). It is therefore optimistic by at least those terms, and its confidence is lowered for each omitted term.`,
       });
     }
   }
@@ -411,7 +414,10 @@ function build(raw: unknown): CalcOutcome {
   });
   if (profile !== undefined) statuses.push(profile.status);
   const dataStatus: DataStatus = worstDataStatus(statuses);
-  const confidence = rateConfidence(confidenceFactorsFromInputs({ inputs, accuracyClass: meta.accuracyClass, dataStatus }));
+  const factors = confidenceFactorsFromInputs({ inputs, accuracyClass: meta.accuracyClass, dataStatus });
+  // Each omitted worst-case term is a safety-relevant defaulted assumption (a missing term makes the worst case optimistic).
+  const omittedDefaults = partial ? omitted.map((t) => `omitted worst-case term: ${t} (not entered or not published; the partial worst case is optimistic by at least this term)`) : [];
+  const confidence = rateConfidence({ ...factors, safetyRelevantDefaults: [...(factors.safetyRelevantDefaults ?? []), ...omittedDefaults] });
 
   for (const r of results) if (!Number.isFinite(r.value.si)) throw new RangeFailure(`Result "${r.name}" is not finite for these inputs (check the units).`);
   const result: CalcResult = {

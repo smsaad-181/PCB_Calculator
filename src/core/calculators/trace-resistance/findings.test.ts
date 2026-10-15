@@ -12,7 +12,7 @@ describe('PCB-4: voltage drop carries a scope label', () => {
     if (!o.ok) throw new Error(o.error.message);
     const w = o.value.warnings.find((x) => x.code === 'VOLTAGE_DROP_SCOPE');
     expect(w).toBeDefined();
-    for (const re of [/one conductor/i, /one direction/i, /return path/i, /vias/i, /pads/i, /connectors/i, /necking/i, /path calculator/i]) {
+    for (const re of [/one conductor/i, /one direction/i, /return path/i, /vias/i, /pads/i, /connectors/i, /necking/i, /Path and load calculator/i]) {
       expect(w?.message).toMatch(re);
     }
     expect(o.value.assumptions.join(' ')).toMatch(/one conductor, one direction/i);

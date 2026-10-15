@@ -130,7 +130,8 @@ export interface CalcResult {
   assumptions: string[];
   /** `bound`, when set, is the rounding direction for this step's displayed value; a step that repeats a result carries that result's bound so the two print identically. */
   steps: { label: string; expr: string; value: Quantity; bound?: Bound }[];
-  results: { name: string; value: Quantity; role: 'primary' | 'secondary'; bound: Bound }[];
+  /** `note`, when set, is a short caveat that must be shown with the value (for example 'solved without FB bias'). */
+  results: { name: string; value: Quantity; role: 'primary' | 'secondary'; bound: Bound; note?: string }[];
   validityChecks: { name: string; ok: boolean; detail: string }[];
   warnings: CalcWarning[];
   confidence: Confidence;

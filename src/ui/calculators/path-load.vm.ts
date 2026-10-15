@@ -1,5 +1,6 @@
 // View-model for the path and load (weakest link) page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/path-load analysePathLoad(). The date is handed in.
+import { findTotalDrop, isTotalDropName, totalDropLabel } from './total-drop';
 import { LAYER_COUNT_INPUTS } from '../../core/calculators/annular-ring/guards';
 import { UNRATED_CAUTION, analysePathLoad, type Inputs, type LoadElement } from '../../core/calculators/path-load/calc';
 import type { LayerCountInput } from '../../core/calculators/path-load/guards';
@@ -581,6 +582,7 @@ export type PathLoadView =
 
 const RESULT_LABELS: Readonly<Record<string, string>> = {
   'total voltage drop': 'Total voltage drop',
+  'total voltage drop (forward path only)': 'Total voltage drop (forward path only)',
   'load voltage': 'Load voltage',
   'load current': 'Load current',
   'total path resistance': 'Total path resistance',
@@ -598,7 +600,7 @@ const RESULT_LABELS: Readonly<Record<string, string>> = {
   dropBudgetPercent: 'Drop budget',
 };
 const PCT_NAME = 'voltage drop percent of source';
-const TOTAL_NAMES = ['total voltage drop', 'load voltage', 'total power loss', 'efficiency', PCT_NAME] as const;
+const TOTAL_NAMES = ['load voltage', 'total power loss', 'efficiency', PCT_NAME] as const;
 const PIN_WARNINGS = ['OVER_LIMIT', 'RETURN_NOT_COUNTED', 'DROP_BUDGET_EXCEEDED', 'SELF_HEATING_NOT_COUPLED', 'DEFERRED_SCOPE'] as const;
 export const SCOPE_HEADING = 'What this path covers';
 
@@ -967,9 +969,9 @@ export function computeView(s: PathLoadState, today: string): PathLoadView {
   // Totals.
   const item = (n: string) => raw.results.find((r) => r.name === n);
   const totals: TotalRow[] = [];
-  const dropItem = item('total voltage drop');
+  const dropItem = findTotalDrop(raw.results);
   const pctItem = item(PCT_NAME);
-  if (dropItem !== undefined) totals.push({ label: 'Total voltage drop', text: `${formatResult(dropItem, opts)}${pctItem === undefined ? '' : ` (${pct(pctItem.value, 'prediction')} of the source)`}` });
+  if (dropItem !== undefined) totals.push({ label: totalDropLabel(dropItem.name), text: `${formatResult(dropItem, opts)}${pctItem === undefined ? '' : ` (${pct(pctItem.value, 'prediction')} of the source)`}` });
   const lv = item('load voltage');
   if (lv !== undefined) totals.push({ label: 'Load voltage', text: formatResult(lv, opts) });
   const lossItem = item('total power loss');
@@ -1013,12 +1015,12 @@ export function computeView(s: PathLoadState, today: string): PathLoadView {
   extra.push({ label: 'Fab profile', value: useProfile ? BUNDLED_LABEL : 'none / not chosen', source: 'user' });
 
   const rv = buildResultView(forView, {
-    headline: weakest !== undefined ? 'weakest-link utilisation' : 'total voltage drop',
+    headline: weakest !== undefined ? 'weakest-link utilisation' : (dropItem?.name ?? 'total voltage drop'),
     accuracyClass,
     prefs,
     lengthRole: 'geometry',
     labels: RESULT_LABELS,
-    skip: [...TOTAL_NAMES, ...perElement],
+    skip: [...TOTAL_NAMES, ...raw.results.filter((r) => isTotalDropName(r.name)).map((r) => r.name), ...perElement],
     skipInputs: ['returnPath'],
     pinWarningCodes: PIN_WARNINGS,
     extraProvenance: extra,

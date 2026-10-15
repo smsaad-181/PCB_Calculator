@@ -121,3 +121,21 @@ export function run(build: () => CalcOutcome): CalcOutcome {
 
 /** Plausibility check helper: inside [lo, hi] up to a relative tolerance. */
 export const within = (x: number, lo: number, hi: number): boolean => x >= lo * (1 - REL_TOL) && x <= hi * (1 + REL_TOL);
+
+/** Visible reason shared by every path calculator that takes user-supplied resistances or ratings (voltage-drop and path-load). */
+export const USER_SUPPLIED_REASON =
+  'Each user-supplied resistance or rating is only as good as its source note; the tool does not verify it, so a path made of such values cannot rate high on the strength of the method alone.';
+
+/**
+ * The ONE rule for user-supplied path values: all of them together count as a single defaulted-type item (+1, so a path of
+ * only such values is at most medium), listed with its names. Returns undefined when there are none.
+ */
+export function userSuppliedDefault(names: readonly string[]): string | undefined {
+  const unique = [...new Set(names)];
+  return unique.length === 0 ? undefined : `user-supplied values taken as given and not checked against any source: ${unique.join('; ')}`;
+}
+
+/** Append the visible reason once when user-supplied values were counted. */
+export function addUserSuppliedReason(confidence: Confidence, names: readonly string[]): void {
+  if (names.length > 0 && !confidence.reasons.includes(USER_SUPPLIED_REASON)) confidence.reasons.push(USER_SUPPLIED_REASON);
+}

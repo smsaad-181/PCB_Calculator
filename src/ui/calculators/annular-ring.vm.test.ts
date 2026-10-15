@@ -11,6 +11,7 @@ import {
   WRITTEN_KEYS,
   computeView,
   fromHashState,
+  liveSummary,
   profileBanner,
   toHashState,
   type AnnularRingState,
@@ -48,12 +49,18 @@ describe('worked example (pad 1.0 mm, finished hole 0.6 mm, PTH, 2-layer, 1 oz, 
   it('nominal ring 0.2 mm, worst case 0.06 mm, incomplete', () => {
     const v = ok(EXAMPLE);
     expect(rowsOf(v)['Nominal annular ring (finished hole)']).toMatch(/^0\.2 mm/);
-    expect(v.result.headline.label).toBe('Worst-case annular ring (finished hole)');
+    expect(v.result.headline.label).toBe('Partial worst-case annular ring (omits: pad size tolerance) (finished hole)');
     expect(v.result.headline.text).toMatch(/^0\.06 mm/);
-    expect(v.result.headline.meaning).toBe('Maximum capacity (rounded down)');
+    expect(v.result.headline.meaning).toBe('Rounded down (a minimum guarantee)');
+    expect(v.stackUp.partial).toBe(true);
+    expect(v.stackUp.worstLabel).toMatch(/^partial worst-case annular ring \(omits: pad size tolerance\)/);
+    expect(liveSummary(v)).toMatch(/Partial worst-case annular ring \(omits: pad size tolerance\)/);
+    expect(liveSummary(v)).not.toMatch(/Result: Worst-case/);
+    const margin = v.comparisons.flatMap((c) => c.margins).map((m) => m.label);
+    expect(margin).not.toContain('Worst-case ring margin');
     expect(v.stackUp.nominal).toMatch(/^0\.2 mm/);
     expect(v.stackUp.worst).toMatch(/^0\.06 mm/);
-    expect(v.incomplete).toMatch(/omits: pad size tolerance/);
+    expect(v.incomplete).toMatch(/PARTIAL: it omits pad size tolerance/);
     expect(v.stackUp.omitted).toEqual(['pad size tolerance']);
   });
   it('lists the stack-up terms with each source (profile entry with ledger id and status)', () => {
@@ -86,9 +93,20 @@ describe('worked example (pad 1.0 mm, finished hole 0.6 mm, PTH, 2-layer, 1 oz, 
   });
   it('every printed number comes from the core: the core worst-case value is the printed one', () => {
     const v = ok(EXAMPLE);
-    const worst = v.raw.results.find((r) => r.name.startsWith('worst-case annular ring'));
+    const worst = v.raw.results.find((r) => r.name.startsWith('worst-case annular ring') || r.name.startsWith('partial worst-case annular ring'));
     expect(worst).toBeDefined();
     expect(v.result.headline.text).toBe(v.stackUp.worst);
+  });
+});
+
+describe('complete worst case keeps the plain name', () => {
+  it('all three terms supplied: the headline is the worst case, not partial', () => {
+    const v = ok(st({ ...OWN, holeTol: '0.1 mm', posTol: '0.05 mm', padTol: '0.05 mm' }));
+    expect(v.result.headline.label).toBe('Worst-case annular ring (finished hole)');
+    expect(v.result.headline.meaning).toBe('Rounded down (a minimum guarantee)');
+    expect(v.stackUp.partial).toBe(false);
+    expect(v.stackUp.worst).toBeDefined();
+    expect(v.comparisons.length + v.stackUp.terms.length).toBeGreaterThan(0);
   });
 });
 
@@ -205,7 +223,7 @@ describe('ring minimums and margins use only the core wording, in neutral form',
         expect(s.text).toMatch(/ (meets|is below) the /);
       }
     }
-    expect(min?.margins.map((m) => m.label)).toEqual(['Nominal ring margin', 'Worst-case ring margin']);
+    expect(min?.margins.map((m) => m.label)).toEqual(['Nominal ring margin', 'Partial worst-case ring margin']);
     expect(min?.margins[1]?.text).toMatch(/^-0\.12 mm/);
   });
   it('the comparison sentences are not repeated in the generic warning list', () => {

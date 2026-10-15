@@ -60,7 +60,7 @@ function Envelope({ env }: { env: EnvelopeView }) {
 
 function Results({ view }: { view: DividerView }) {
   if (view.status === 'ok') {
-    return <ResultsPanel view={view.result} failedCheckHint={RANGE_HINT} {...(view.envelope !== undefined ? { afterHeadline: <Envelope env={view.envelope} /> } : {})} />;
+    return <ResultsPanel view={view.result} failedCheckHint={RANGE_HINT} callouts={view.importantCallouts} {...(view.envelope !== undefined ? { afterHeadline: <Envelope env={view.envelope} /> } : {})} />;
   }
   if (view.status === 'error') return <ResultStatus status="error" items={view.problems} />;
   return <ResultStatus status="needs-input" items={view.needs} />;

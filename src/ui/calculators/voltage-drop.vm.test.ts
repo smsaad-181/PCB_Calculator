@@ -14,6 +14,7 @@ import {
   WRITTEN_KEYS,
   addElement,
   computeView,
+  liveSummary,
   fromHashState,
   newElement,
   removeElement,
@@ -57,9 +58,19 @@ function ok(s: VoltageDropState) {
 const rowsOf = (v: ReturnType<typeof ok>) => Object.fromEntries(v.result.rows.map((r) => [r.label, r.text]));
 
 describe('worked example (12 V, 10 ohm load, cable 0.5 ohm, connector 0.25 ohm, return not counted)', () => {
+  it('headline is the plain total drop when the return path is counted', () => {
+    const v = ok({ ...EXAMPLE, returnPath: 'same-as-forward' });
+    expect(v.result.headline.label).toBe('Total voltage drop');
+    expect(v.result.headline.text).toMatch(/mV|V/);
+  });
+  it('the live summary says Largest-drop element, never Limiting', () => {
+    const v = ok(EXAMPLE);
+    expect(liveSummary(v)).toMatch(/Largest-drop element cable/);
+    expect(liveSummary(v)).not.toMatch(/Limiting/);
+  });
   it('headline is the total drop with its percent of the source', () => {
     const v = ok(EXAMPLE);
-    expect(v.result.headline.label).toBe('Total voltage drop');
+    expect(v.result.headline.label).toBe('Total voltage drop (forward path only)');
     expect(v.result.headline.text).toMatch(/^837\.3 mV \(6\.977 %\)$/);
     expect(v.result.headline.meaning).toMatch(/rounded up/);
   });
@@ -174,8 +185,8 @@ describe('traces', () => {
   });
   it('a hotter conductor raises the drop of a trace-only path', () => {
     const base = st({ ...EXAMPLE, elements: [trace('feed')] });
-    const cold = ok(base).raw.results.find((r) => r.name === 'total voltage drop')?.value.si ?? 0;
-    const hot = ok({ ...base, temperature: '100 °C' }).raw.results.find((r) => r.name === 'total voltage drop')?.value.si ?? 0;
+    const cold = ok(base).raw.results.find((r) => r.name.startsWith('total voltage drop'))?.value.si ?? 0;
+    const hot = ok({ ...base, temperature: '100 °C' }).raw.results.find((r) => r.name.startsWith('total voltage drop'))?.value.si ?? 0;
     expect(hot).toBeGreaterThan(cold);
   });
   it('a wrong-dimension temperature is an inline error, not a number', () => {

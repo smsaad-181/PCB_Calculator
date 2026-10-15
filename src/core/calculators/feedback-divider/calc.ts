@@ -106,6 +106,10 @@ function build(raw: unknown): CalcOutcome {
   }
 
   const dir = inp.fbBiasDirection;
+  const solved = inp.mode !== 'vout';
+  const solvedNoBias = solved && bias !== undefined;
+  const errFracBias = target === undefined || voutBias === undefined ? undefined : (voutBias - target) / target;
+  const NO_BIAS_NOTE = 'solved without FB bias';
   const inputs: CalcInput[] = [
     {
       name: 'vref',
@@ -123,20 +127,22 @@ function build(raw: unknown): CalcOutcome {
 
   const steps: CalcResult['steps'] = [];
   if (ideal !== undefined) {
-    steps.push({ label: `Solve ${inp.mode}`, expr: inp.mode === 'r1' ? 'R1 = R2 × (Vout / Vref − 1)' : 'R2 = R1 / (Vout / Vref − 1)', value: q(ideal, DIM.RESISTANCE) });
+    steps.push({ label: solvedNoBias ? `Solve ${inp.mode} (solved without FB bias)` : `Solve ${inp.mode}`, expr: inp.mode === 'r1' ? 'R1 = R2 × (Vout / Vref − 1)' : 'R2 = R1 / (Vout / Vref − 1)', value: q(ideal, DIM.RESISTANCE) });
   }
   if (inp.mode === 'pair') steps.push({ label: 'Target divider ratio', expr: 'R2 / (R1 + R2) = Vref / Vout', value: q(vref / (target as number), DIM.DIMENSIONLESS) });
+  if (solvedNoBias && inp.mode === 'pair') steps.push({ label: 'Pair search (solved without FB bias)', expr: 'the ranking uses the ideal ratio R2 / (R1 + R2) = Vref / Vout; the FB bias current is not compensated', value: q(vref / (target as number), DIM.DIMENSIONLESS) });
   steps.push({ label: 'Output voltage', expr: 'Vout = Vref × (1 + R1 / R2)', value: q(vout, DIM.VOLTAGE) });
   steps.push({ label: 'Divider current', expr: 'I = Vref / R2', value: q(iDiv, DIM.CURRENT) });
   steps.push({ label: 'Total power', expr: 'P = Vout × I', value: q(pTotal, DIM.POWER) });
+  if (errFracBias !== undefined) steps.push({ label: 'Vout error vs target including FB bias', expr: '(Vout + ΔVout − Vtarget) / Vtarget', value: q(errFracBias, DIM.DIMENSIONLESS), bound: 'nominal' });
   if (shift !== undefined) steps.push({ label: 'FB bias shift', expr: 'ΔVout = ±Ib × R1 (+ into the pin, − out of the pin)', value: q(shift, DIM.VOLTAGE) });
 
   const primary = inp.mode === 'pair' ? 'r1' : inp.mode;
   const role = (name: string): 'primary' | 'secondary' => (name === primary ? 'primary' : 'secondary');
   const results: CalcResult['results'] = [
     { name: 'vout', value: q(vout, DIM.VOLTAGE), role: role('vout'), bound: 'nominal' },
-    { name: 'r1', value: q(r1, DIM.RESISTANCE), role: role('r1'), bound: 'nominal' },
-    { name: 'r2', value: q(r2, DIM.RESISTANCE), role: role('r2'), bound: 'nominal' },
+    { name: 'r1', value: q(r1, DIM.RESISTANCE), role: role('r1'), bound: 'nominal', ...(solvedNoBias && inp.mode !== 'r2' ? { note: NO_BIAS_NOTE } : {}) },
+    { name: 'r2', value: q(r2, DIM.RESISTANCE), role: role('r2'), bound: 'nominal', ...(solvedNoBias && inp.mode === 'r2' ? { note: NO_BIAS_NOTE } : {}) },
     { name: 'voltage across r1', value: q(vR1, DIM.VOLTAGE), role: 'secondary', bound: 'prediction' },
     { name: 'voltage across r2', value: q(vref, DIM.VOLTAGE), role: 'secondary', bound: 'prediction' },
     { name: 'divider current', value: q(iDiv, DIM.CURRENT), role: 'secondary', bound: 'prediction' },
@@ -144,8 +150,11 @@ function build(raw: unknown): CalcOutcome {
     { name: 'power in r2', value: q(p2, DIM.POWER), role: 'secondary', bound: 'prediction' },
     { name: 'total power', value: q(pTotal, DIM.POWER), role: 'secondary', bound: 'prediction' },
   ];
-  if (errFrac !== undefined && (snapSeries || inp.mode === 'pair')) {
-    results.push({ name: 'vout error vs target', value: q(errFrac, DIM.DIMENSIONLESS), role: 'secondary', bound: 'nominal' });
+  if (errFrac !== undefined && (snapSeries || inp.mode === 'pair' || bias !== undefined)) {
+    results.push({ name: 'vout error vs target', value: q(errFrac, DIM.DIMENSIONLESS), role: 'secondary', bound: 'nominal', ...(bias !== undefined ? { note: 'ideal relation, without FB bias' } : {}) });
+  }
+  if (errFracBias !== undefined) {
+    results.push({ name: 'vout error vs target including FB bias', value: q(errFracBias, DIM.DIMENSIONLESS), role: 'secondary', bound: 'nominal', note: 'nominal: the entered bias current is applied as given and has no tolerance' });
   }
   if (snapSeries && ideal !== undefined) results.push({ name: `ideal ${inp.mode}`, value: q(ideal, DIM.RESISTANCE), role: 'secondary', bound: 'nominal' });
   if (inp.mode === 'pair') {
@@ -232,6 +241,14 @@ function build(raw: unknown): CalcOutcome {
     }
   }
 
+  if (solvedNoBias && errFracBias !== undefined && voutBias !== undefined) {
+    warnings.push({
+      severity: 'caution',
+      code: 'SOLVED_WITHOUT_FB_BIAS',
+      message: `${inp.mode === 'pair' ? 'The pair search' : `R${inp.mode === 'r1' ? '1' : '2'}`} is solved without the FB bias current you entered. With the bias, Vout is ${text(q(voutBias, DIM.VOLTAGE), 'nominal', ACC)} (${pct(errFracBias, ACC)} from the target; the ideal relation gives ${errFrac === undefined || errFrac === 0 ? '0 %' : pct(errFrac, ACC)}).`,
+    });
+  }
+
   const assumptions: string[] = [
     'Ideal resistors at their stated values; DC. The error amplifier is assumed to hold the FB pin exactly at Vref, so the relation holds only in regulation (error-amplifier offset and load regulation are ignored). Relation from ledger S-019 (textbook, VERIFIED).',
     NAMING,
@@ -260,6 +277,9 @@ function build(raw: unknown): CalcOutcome {
     assumptions.push(
       `FB bias current ${text(q(bias.ib, DIM.CURRENT), 'nominal', ACC)} (user value) flows ${dir ?? ''}: ΔVout = ${bias.sign > 0 ? '+' : '−'}Ib × R1 (KCL at the FB node). The headline vout is the ideal relation; the bias is shown as a separate effect. Divider current, voltages and powers are for the ideal relation (the bias adds ${bias.sign > 0 ? '+' : '−'}Ib to the R1 current). Ib has no tolerance.`,
     );
+  }
+  if (solvedNoBias) {
+    assumptions.push(`The ${inp.mode === 'pair' ? 'resistor pair' : `solved resistor R${inp.mode === 'r1' ? '1' : '2'}`} is solved without FB bias: the bias current you entered is not compensated in the solve. "Vout error vs target" is the ideal-relation error; "Vout error vs target including FB bias" adds the bias shift (nominal).`);
   }
   assumptions.push('Resistor dissipation is computed from the ideal relation. Zero-ohm links are not supported (resistances must be above zero).');
 

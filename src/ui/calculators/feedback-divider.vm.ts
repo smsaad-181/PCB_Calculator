@@ -10,9 +10,10 @@ import type { CalcOutcome, CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
 import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
-import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
+import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultRowView, type ResultView } from '../components/view';
 import type { SearchTask } from '../../workers/pair-search.protocol';
 import { FEEDBACK_SERIES, SNAP_CHOICES, catalogResistance, isFeedbackSeries, isSnapChoice, parseCountField, parseToleranceField, signedPercent, type FeedbackSeries, type SnapChoice } from './circuit-choices';
+import { feedbackDividerCallouts, type DividerCallout } from './divider-emphasis';
 import { hasKey, ledgerRowsOf, readText } from './circuit-view';
 
 export const CALCULATOR_ID = 'feedback-divider';
@@ -255,6 +256,8 @@ export type FeedbackView =
       readonly pairs: readonly PairRowView[];
       readonly envelopes: readonly EnvelopeView[];
       readonly ledgerRows: readonly LedgerRowBadge[];
+      /** Important blocks shown under the headline (presentation only; the core is unchanged). */
+      readonly importantCallouts: readonly DividerCallout[];
     };
 
 export type Plan =
@@ -344,6 +347,7 @@ const RESULT_LABELS: Readonly<Record<string, string>> = {
   'divider current / fb bias current': 'Divider current / FB bias current',
 };
 const ERROR_NAME = 'vout error vs target';
+const ERROR_BIAS_NAME = 'vout error vs target including FB bias';
 const BIAS_SHARE_NAME = 'fb bias shift vs vout';
 const PAIR_NAME = /^pair (\d+) (r1|r2|vout|vout error vs target)$/;
 const TOLERANCE_NAME: Readonly<Record<string, string>> = { r1: 'R1', r2: 'R2', vref: 'Vref' };
@@ -372,9 +376,11 @@ export function finishView(s: FeedbackState, out: CalcOutcome): FeedbackView {
     labels[headName] = `${RESULT_LABELS[headName] ?? headName}, solved, ${snapped ? `snapped to ${s.series}: ${snapLabel}` : 'exact value, not a stock value'}`;
   }
 
-  const extraRows: { label: string; text: string }[] = [];
+  const extraRows: ResultRowView[] = [];
   const err = raw.results.find((r) => r.name === ERROR_NAME);
-  if (err !== undefined) extraRows.push({ label: 'Vout error vs target (signed; size rounded away from zero)', text: signedPercent(err.value.si) });
+  if (err !== undefined) extraRows.push({ label: 'Vout error vs target (signed; size rounded away from zero)', text: signedPercent(err.value.si), ...(err.note !== undefined ? { hint: err.note } : {}) });
+  const errBias = raw.results.find((r) => r.name === ERROR_BIAS_NAME);
+  if (errBias !== undefined) extraRows.push({ label: 'Vout error vs target including FB bias (signed)', text: signedPercent(errBias.value.si), ...(errBias.note !== undefined ? { hint: errBias.note } : {}) });
   const share = raw.results.find((r) => r.name === BIAS_SHARE_NAME);
   if (share !== undefined) extraRows.push({ label: 'FB bias shift as a share of Vout (signed)', text: signedPercent(share.value.si) });
 
@@ -383,7 +389,7 @@ export function finishView(s: FeedbackState, out: CalcOutcome): FeedbackView {
     headline: headName,
     accuracyClass: meta.accuracyClass,
     labels,
-    skip: [ERROR_NAME, BIAS_SHARE_NAME, ...pairNames],
+    skip: [ERROR_NAME, ERROR_BIAS_NAME, BIAS_SHARE_NAME, ...pairNames],
     extraRows,
     pinWarningCodes: ['RESISTOR_NAMING', 'FB_BIAS_DOMINATES'],
   });
@@ -407,12 +413,12 @@ export function finishView(s: FeedbackState, out: CalcOutcome): FeedbackView {
   const envelopes: EnvelopeView[] = (raw.envelope ?? []).map((env) => ({
     label: ENVELOPE_LABEL[env.name] ?? env.name,
     // Outward rounding: the minimum rounds down and the maximum up, so the printed range always contains the true one.
-    min: formatResult({ value: env.min, bound: 'max-capacity' }, { accuracyClass: meta.accuracyClass }),
-    typ: formatResult({ value: env.typ, bound: 'nominal' }, { accuracyClass: meta.accuracyClass }),
-    max: formatResult({ value: env.max, bound: 'prediction' }, { accuracyClass: meta.accuracyClass }),
+    min: formatResult({ value: env.min, bound: 'max-capacity' }, { accuracyClass: meta.envelopeAccuracyClass }),
+    typ: formatResult({ value: env.typ, bound: 'nominal' }, { accuracyClass: meta.envelopeAccuracyClass }),
+    max: formatResult({ value: env.max, bound: 'prediction' }, { accuracyClass: meta.envelopeAccuracyClass }),
     note: `Initial-tolerance corners: every combination of the tolerances on ${env.toleranceInputs.map((n) => TOLERANCE_NAME[n] ?? n).join(', ')} at their limits. Temperature coefficient (TCR), leakage, ageing, self-heating, line and load regulation are not included, so these are not limits over the life of the part. The minimum is printed rounded down and the maximum rounded up.`,
   }));
-  return { status: 'ok', result, raw, fieldErrors, pairs, envelopes, ledgerRows: ledgerRowsOf(result.ledger) };
+  return { status: 'ok', result, raw, fieldErrors, pairs, envelopes, ledgerRows: ledgerRowsOf(result.ledger), importantCallouts: feedbackDividerCallouts(raw, meta.accuracyClass) };
 }
 
 /** Everything synchronously: the plan, and the pair search on this thread when there is one. */
