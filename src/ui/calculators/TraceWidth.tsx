@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { FOIL_CONVENTIONS } from '../../core/units';
 import { parseHash, serializeHash, type Route } from '../../state/hash';
+import { ProfileBanner } from '../components/ProfileBanner';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
 import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
 import { ResetButton } from '../components/ResetButton';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
-import { useRafValue } from '../hooks';
+import { ToleranceResults } from '../components/ToleranceResults';
+import { ToleranceSection } from '../components/ToleranceInputs';
+import { useRafValue, useToday } from '../hooks';
+import { BUNDLED_LABEL, NONE_LABEL, isProfileChoice } from './fab-profile-choice';
+import { profileBanner } from './fab-profile-banner';
 import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
 import {
   BASES,
@@ -20,6 +25,10 @@ import {
   METHOD_TEXT,
   MODE_A_HINT,
   MODE_A_LABEL,
+  PROFILE_HELP,
+  PROFILE_QUESTION,
+  PROFILE_WIDTH_LABEL,
+  PROFILE_WIDTH_LOCKED,
   SOLVE_OPTIONS,
   computeView,
   conventionOptionLabel,
@@ -27,7 +36,12 @@ import {
   echoPrefs,
   fieldDim,
   fromHashState,
+  hasToleranceState,
+  profileWidthOffered,
+  thicknessModesOffered,
   toHashState,
+  toleranceFields,
+  withProfile,
   type SolveFor,
   type TraceWidthState,
   type TraceWidthView,
@@ -64,7 +78,9 @@ function liveSummary(v: TraceWidthView): string {
 }
 
 function Results({ view }: { view: TraceWidthView }) {
-  if (view.status === 'ok') return <ResultsPanel view={view.result} failedCheckHint={FAILED_CHECK_HINT} />;
+  if (view.status === 'ok') {
+    return <ResultsPanel view={view.result} failedCheckHint={FAILED_CHECK_HINT} afterHeadline={<ToleranceResults view={view.tolerance} />} />;
+  }
   if (view.status === 'error') {
     return (
       <div class="error-box">
@@ -94,14 +110,21 @@ function Results({ view }: { view: TraceWidthView }) {
 }
 
 export default function TraceWidth() {
+  return <TraceWidthOn today={useToday()} />;
+}
+
+function TraceWidthOn({ today }: { readonly today: string }) {
   const [init] = useState(() => fromHashState(parseHash(window.location.hash).state));
   const [state, setState] = useState<TraceWidthState>(init.state);
+  // The tolerance section starts open only when the link already carries tolerance state, so it is never hidden from the reader.
+  const [tolOpen, setTolOpen] = useState(() => hasToleranceState(init.state));
   const [notices, setNotices] = useState<readonly string[]>(init.notices);
   const applied = useRafValue(state);
   const pending = applied !== state;
   const lastHash = useRef<string | null>(null);
 
-  const view = useMemo(() => computeView(applied), [applied]);
+  const view = useMemo(() => computeView(applied, today), [applied, today]);
+  const banner = useMemo(() => profileBanner(applied.profile, today), [applied.profile, today]);
 
   // State to URL hash. replaceState does not add history entries or fire hashchange.
   useEffect(() => {
@@ -119,6 +142,7 @@ export default function TraceWidth() {
       const loaded = fromHashState(p.state);
       setState(loaded.state);
       setNotices(loaded.notices);
+      if (hasToleranceState(loaded.state)) setTolOpen(true);
     };
     window.addEventListener('hashchange', on);
     return () => window.removeEventListener('hashchange', on);
@@ -130,6 +154,7 @@ export default function TraceWidth() {
     setNotices([]);
   };
   const fe: FieldErrors = 'fieldErrors' in view ? view.fieldErrors : {};
+  const tolErrors = view.status === 'error' ? (view.tolErrors ?? {}) : {};
   const solve = state.solveFor;
   const weightMode = state.copperBy === 'weight';
   const widthPrefs = echoPrefs(state.units, 'width');
@@ -142,6 +167,7 @@ export default function TraceWidth() {
         Solve for the trace width, the current capacity or the temperature rise from the other two. This is the legacy IPC-2221 curve fit,
         for comparison and compatibility: it is not an IPC-2152 analysis.
       </p>
+      {banner !== undefined && <ProfileBanner b={banner} />}
       {notices.length > 0 && (
         <div class="banner" role="status">
           <div class="banner-body">
@@ -373,6 +399,37 @@ export default function TraceWidth() {
             onChange={(v) => set({ units: (v === 'imperial' ? 'imperial' : 'metric') as Units })}
           />
           <p class="help">Results always show mm and mil together (copper thickness as µm and mil).</p>
+          <ToleranceSection
+            fields={toleranceFields(state)}
+            tol={state.tol}
+            onTol={(key, t) => setState((s) => ({ ...s, tol: { ...s.tol, [key]: t } }))}
+            errors={tolErrors}
+            thickness={{ mode: state.thickMode, options: thicknessModesOffered(state), onMode: (thickMode) => set({ thickMode }), weight: weightMode }}
+            prefs={otherPrefs}
+            open={tolOpen}
+            onToggle={setTolOpen}
+            lockedReason={state.widthProfile && profileWidthOffered(state) ? { width: PROFILE_WIDTH_LOCKED } : {}}
+          >
+            <RadioGroup
+              name="profile"
+              legend={PROFILE_QUESTION}
+              value={state.profile}
+              options={[
+                { value: 'bundled', label: BUNDLED_LABEL },
+                { value: 'none', label: NONE_LABEL },
+              ]}
+              onChange={(v) => {
+                if (isProfileChoice(v)) setState((s) => withProfile(s, v));
+              }}
+            />
+            <p class="help">{PROFILE_HELP}</p>
+            {profileWidthOffered(state) && (
+              <div class="radio">
+                <input id="tol-width-profile" type="checkbox" checked={state.widthProfile} onChange={(e) => set({ widthProfile: (e.currentTarget as HTMLInputElement).checked })} />
+                <label for="tol-width-profile">{PROFILE_WIDTH_LABEL}</label>
+              </div>
+            )}
+          </ToleranceSection>
           <ResetButton onReset={reset} />
         </form>
         <section class="panel output" aria-labelledby="result-h" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>

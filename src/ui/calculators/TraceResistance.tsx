@@ -7,6 +7,8 @@ import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
 import { ResetButton } from '../components/ResetButton';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
+import { ToleranceResults } from '../components/ToleranceResults';
+import { ToleranceSection } from '../components/ToleranceInputs';
 import { BASES, BASIS_LABEL, CONVENTION_IDS, LAYERS, conventionOptionLabel, conventionSpreadText, echoPrefs } from '../components/prefs';
 import { useRafValue } from '../hooks';
 import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
@@ -20,8 +22,11 @@ import {
   computeView,
   fieldDim,
   fromHashState,
+  hasToleranceState,
   hintForCheck,
+  thicknessModesOffered,
   toHashState,
+  toleranceFields,
   type FieldErrors,
   type TraceResistanceState,
   type TraceResistanceView,
@@ -53,7 +58,15 @@ function liveSummary(v: TraceResistanceView): string {
 
 function Results({ view }: { view: TraceResistanceView }) {
   if (view.status === 'ok') {
-    return <ResultsPanel view={view.result} failedCheckHint={RANGE_HINT} failedHintFor={hintForCheck} {...(view.callout !== undefined ? { callout: view.callout } : {})} />;
+    return (
+      <ResultsPanel
+        view={view.result}
+        failedCheckHint={RANGE_HINT}
+        failedHintFor={hintForCheck}
+        {...(view.callout !== undefined ? { callout: view.callout } : {})}
+        afterHeadline={<ToleranceResults view={view.tolerance} />}
+      />
+    );
   }
   if (view.status === 'error') {
     return (
@@ -89,6 +102,7 @@ export default function TraceResistance() {
   const [notices, setNotices] = useState<readonly string[]>(init.notices);
   // The overrides section starts open only when the link already carries an override, so it is never hidden from the reader.
   const [advancedOpen, setAdvancedOpen] = useState(init.state.resistivity.trim() !== '' || init.state.alpha.trim() !== '');
+  const [tolOpen, setTolOpen] = useState(() => hasToleranceState(init.state));
   const applied = useRafValue(state);
   const pending = applied !== state;
   const lastHash = useRef<string | null>(null);
@@ -112,6 +126,7 @@ export default function TraceResistance() {
       setState(loaded.state);
       setNotices(loaded.notices);
       if (loaded.state.resistivity.trim() !== '' || loaded.state.alpha.trim() !== '') setAdvancedOpen(true);
+      if (hasToleranceState(loaded.state)) setTolOpen(true);
     };
     window.addEventListener('hashchange', on);
     return () => window.removeEventListener('hashchange', on);
@@ -123,6 +138,7 @@ export default function TraceResistance() {
     setNotices([]);
   };
   const fe: FieldErrors = 'fieldErrors' in view ? view.fieldErrors : {};
+  const tolErrors = view.status === 'error' ? (view.tolErrors ?? {}) : {};
   const weightMode = state.copperBy === 'weight';
   const lengthPrefs = echoPrefs(state.units, 'width');
   const otherPrefs = echoPrefs(state.units, 'other');
@@ -355,6 +371,16 @@ export default function TraceResistance() {
             onChange={(v) => set({ units: (v === 'imperial' ? 'imperial' : 'metric') as Units })}
           />
           <p class="help">Results always show mm and mil together (copper thickness and skin depth as µm and mil).</p>
+          <ToleranceSection
+            fields={toleranceFields(state)}
+            tol={state.tol}
+            onTol={(key, t) => setState((s) => ({ ...s, tol: { ...s.tol, [key]: t } }))}
+            errors={tolErrors}
+            thickness={{ mode: state.thickMode, options: thicknessModesOffered(state), onMode: (thickMode) => set({ thickMode }), weight: weightMode }}
+            prefs={otherPrefs}
+            open={tolOpen}
+            onToggle={setTolOpen}
+          />
           <ResetButton onReset={reset} />
         </form>
         <section class="panel output" aria-labelledby="result-h" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>

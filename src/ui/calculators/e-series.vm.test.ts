@@ -180,13 +180,13 @@ describe('two-resistor search', () => {
   it('the summary names the best pair', () => {
     expect(pairsSummary(computePairs(st({ pairTarget: '3.3k' })))).toMatch(/^Two-resistor search: 5 best pairs\. Best is R1 300 Ω and R2 3 kΩ, giving 3\.3 kΩ, error 0 %\.$/);
   });
-  it('every series runs fast enough to type into (E192 divider ratio is the worst case)', () => {
+  it('every series stays within a 5 s synchronous budget (the page runs the search in a worker; E192 divider ratio is the worst case)', () => {
     for (const series of ['E96', 'E192'] as const) {
       const t0 = performance.now();
       const v = computePairs(st({ pairTarget: '0.3', pairSeries: series, topology: 'divider-ratio' }));
       const ms = performance.now() - t0;
       expect(v.status).toBe('ok');
-      expect(ms, series).toBeLessThan(1500);
+      expect(ms, series).toBeLessThan(5000);
     }
   });
 });

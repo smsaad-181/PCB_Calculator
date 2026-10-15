@@ -1,6 +1,6 @@
 // View-model for the trace width / current / temperature rise page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/trace-width compute().
-import { compute, type Inputs } from '../../core/calculators/trace-width/calc';
+import { compute, type Inputs, type Tolerances } from '../../core/calculators/trace-width/calc';
 import type { Layer } from '../../core/calculators/trace-width/guards';
 import { meta } from '../../core/calculators/trace-width/meta';
 import { DEFAULT_FOIL_CONVENTION, foilSpreadPercent } from '../../core/data/constants';
@@ -9,6 +9,24 @@ import type { CalcResult, CopperBasisKind } from '../../core/result';
 import { DEFAULT_DISPLAY_PREFS, DIM, FOIL_CONVENTIONS, type Dim, type DisplayPrefs, type FoilConvention, type Quantity } from '../../core/units';
 import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
 import { buildResultView, factorText, MAX_FIELD_CHARS, parseField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
+import { bundledProfile, choiceFromHash, choiceToHash, type ProfileChoice } from './fab-profile-choice';
+import {
+  buildToleranceView,
+  collectTolerances,
+  effectiveThickMode,
+  thickModeFromHash,
+  thickModeToHash,
+  thicknessOptionsFor,
+  tolFromHash,
+  tolKeyOfCoreField,
+  tolProblems,
+  tolToHash,
+  type ThicknessMode,
+  type ThicknessOption,
+  type TolFieldDef,
+  type TolState,
+  type ToleranceView,
+} from './tolerance-view';
 
 import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, weightSourceFromHash, type WeightSource } from './copper-source';
 export const CALCULATOR_ID = 'trace-width';
@@ -38,6 +56,14 @@ export interface TraceWidthState {
   readonly derating: string;
   readonly maxTemp: string;
   readonly units: Units;
+  /** Optional input tolerances as typed, by core tolerance key. Empty means none: no tolerance is ever assumed. */
+  readonly tol: TolState;
+  /** '' means not chosen: there is no default thickness tolerance. */
+  readonly thickMode: ThicknessMode;
+  /** '' means not chosen: the fab profile is never pre-selected. */
+  readonly profile: ProfileChoice;
+  /** Use the chosen profile's track-width tolerance. Only meaningful with a chosen profile. */
+  readonly widthProfile: boolean;
 }
 
 export const DEFAULT_STATE: TraceWidthState = Object.freeze({
@@ -57,6 +83,10 @@ export const DEFAULT_STATE: TraceWidthState = Object.freeze({
   derating: '',
   maxTemp: '',
   units: 'metric',
+  tol: {},
+  thickMode: '',
+  profile: '',
+  widthProfile: false,
 });
 
 export const SOLVE_OPTIONS: readonly { readonly value: SolveFor; readonly label: string }[] = [
@@ -115,8 +145,54 @@ export function echoPrefs(units: Units, kind: 'width' | 'thickness' | 'other' = 
 // ---------------------------------------------------------------------------
 const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
 
-/** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (and `u`, which is reserved). */
-export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS, 'u'];
+/** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (and `fp` and `u`, which are reserved). */
+export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS, 'fp', 'u'];
+
+// ---------------------------------------------------------------------------
+// Optional tolerances
+// ---------------------------------------------------------------------------
+/** The fab profile can be chosen and its width tolerance used only when a profile is selected and its data parses. */
+export function profileWidthOffered(s: Pick<TraceWidthState, 'profile'>): boolean {
+  return s.profile === 'bundled' && bundledProfile() !== null;
+}
+
+const widthFromProfile = (s: Pick<TraceWidthState, 'profile' | 'widthProfile'>): boolean => s.widthProfile && profileWidthOffered(s);
+
+export const PROFILE_QUESTION = 'Which fab profile do you want to use for the width tolerance?';
+export const PROFILE_HELP = 'No default: choose one. A profile is used only for the width tolerance below, and only if you tick the box that appears. None means only your own values are used.';
+export const PROFILE_WIDTH_LABEL = 'Use the fab profile width tolerance (JLCPCB example, UNVERIFIED)';
+export const PROFILE_WIDTH_LOCKED = 'Taken from the fab profile you chose (untick the box to type your own).';
+
+/** The tolerance fields for the current choices. A field is offered only for an input the user actually supplied. */
+export function toleranceFields(s: TraceWidthState): readonly TolFieldDef[] {
+  const solve = s.solveFor;
+  const fromProfile = widthFromProfile(s);
+  return [
+    { key: 'current', hash: 'tcur', id: 'tol-current', label: 'Current', kind: 'relative', offered: solve !== 'current', whyNot: 'the current is the solved quantity here, not an input.', help: 'Tolerance on the current you entered, for example 5%.' },
+    { key: 'deltaT', hash: 'trise', id: 'tol-rise', label: 'Temperature rise', kind: 'relative', offered: solve !== 'deltaT', whyNot: 'the temperature rise is the solved quantity here, not an input.', help: 'Tolerance on the temperature rise you entered, as a percent of that rise.' },
+    {
+      key: 'width', hash: 'twid', id: 'tol-width', label: 'Trace width', kind: 'relative', offered: true,
+      help: solve === 'width' ? 'The width is solved here, so this is the fabricator width tolerance: the result adds the drawn width that covers the minus side.' : 'Tolerance on the finished width you entered, for example from your fabricator.',
+      fromProfile,
+    },
+    { key: 'copperThickness', hash: 'tthk', id: 'tol-copper', label: 'Copper thickness', kind: 'relative', offered: true, thickness: true, help: 'Tolerance on the copper thickness, for example 10%.' },
+    { key: 'ambient', hash: 'tamb', id: 'tol-ambient', label: 'Ambient', kind: 'temperature', offered: s.ambient.trim() !== '', whyNot: 'enter an ambient temperature above first; the 25 °C default is an assumption and is not toleranced.', help: 'Tolerance on the ambient you entered, as a temperature difference, for example 5 K.' },
+  ];
+}
+
+export function thicknessModesOffered(s: Pick<TraceWidthState, 'copperBy'>): readonly ThicknessOption[] {
+  return thicknessOptionsFor(s.copperBy);
+}
+
+/** Picks a profile; a width-from-profile tick without a chosen profile cannot survive. */
+export function withProfile(s: TraceWidthState, profile: ProfileChoice): TraceWidthState {
+  return { ...s, profile, widthProfile: profile === 'bundled' ? s.widthProfile : false };
+}
+
+/** True when any optional tolerance state is set (the section then starts open so it is never hidden from the reader). */
+export function hasToleranceState(s: TraceWidthState): boolean {
+  return Object.keys(s.tol).length > 0 || s.thickMode !== '' || s.profile !== '' || s.widthProfile;
+}
 
 const SF_TO_HASH: Readonly<Record<SolveFor, string>> = { width: 'width', current: 'current', deltaT: 'rise' };
 
@@ -142,6 +218,12 @@ export function toHashState(s: TraceWidthState): Record<string, string> {
   text('cd', s.derating);
   text('mt', s.maxTemp);
   if (s.units !== DEFAULT_STATE.units) out['u'] = s.units;
+  tolToHash(out, toleranceFields(DEFAULT_STATE), s.tol);
+  const km = thickModeToHash(s.thickMode);
+  if (km !== undefined) out['tkch'] = km;
+  const fp = choiceToHash(s.profile);
+  if (fp !== undefined) out['fp'] = fp;
+  if (s.profile === 'bundled' && s.widthProfile) out['twpf'] = '1';
   return out;
 }
 
@@ -200,6 +282,19 @@ export function fromHashState(h: HashState): LoadedState {
   if (u === 'metric' || u === 'imperial') {
     if (RESERVED_STATE_KEYS.u.isValid(u)) s = { ...s, units: u };
   }
+  const fp = get('fp');
+  if (fp !== undefined) {
+    const c = choiceFromHash(fp);
+    if (c !== undefined) s = { ...s, profile: c };
+    else notices.push('The fab profile in the link is not one this version knows: no profile is chosen. Choose one, or none.');
+  }
+  const twpf = get('twpf');
+  if (twpf !== undefined) {
+    if (twpf === '1' && s.profile === 'bundled') s = { ...s, widthProfile: true };
+    else if (twpf === '1') notices.push('The link asks for the fab profile width tolerance, but no profile is chosen: the profile tolerance is not used.');
+    else notices.push('The width-from-profile setting was not recognised: it is off.');
+  }
+  s = { ...s, tol: tolFromHash(get, toleranceFields(DEFAULT_STATE), notices), thickMode: thickModeFromHash(get('tkch'), notices) };
   // Mode A is never selectable from a link. Mode B ("B") needs no notice; anything else is said out loud.
   const mode = get('mode');
   if (mode !== undefined && mode !== 'B') notices.push(MODE_A_NOTICE);
@@ -319,8 +414,31 @@ const CORE_FIELD: Readonly<Record<string, FieldKey>> = {
 // ---------------------------------------------------------------------------
 export type TraceWidthView =
   | { readonly status: 'needs-input'; readonly needs: readonly string[]; readonly notes: readonly string[] }
-  | { readonly status: 'error'; readonly problems: readonly string[]; readonly fieldErrors: FieldErrors; readonly notes: readonly string[] }
-  | { readonly status: 'ok'; readonly result: ResultView; readonly raw: CalcResult; readonly fieldErrors: FieldErrors; readonly notes: readonly string[] };
+  | {
+      readonly status: 'error';
+      readonly problems: readonly string[];
+      readonly fieldErrors: FieldErrors;
+      readonly notes: readonly string[];
+      /** Error text per tolerance key (present only when a tolerance is the problem). */
+      readonly tolErrors?: Readonly<Record<string, string>>;
+    }
+  | {
+      readonly status: 'ok';
+      readonly result: ResultView;
+      readonly raw: CalcResult;
+      readonly fieldErrors: FieldErrors;
+      readonly notes: readonly string[];
+      /** Present only when tolerances were entered and the core returned something to show. */
+      readonly tolerance?: ToleranceView;
+    };
+
+const DRAWN_WIDTH_NAME = 'drawn width covering the width tolerance';
+
+/** The profile and the evaluation date for a width tolerance taken from the profile (the core reads no clock). */
+function profileInputs(today: string | undefined): Pick<Inputs, 'fabProfile' | 'today'> {
+  const p = bundledProfile();
+  return { ...(p !== null ? { fabProfile: p } : {}), ...(today !== undefined ? { today } : {}) };
+}
 
 const HEADLINE: Readonly<Record<SolveFor, { name: string; label: string }>> = {
   width: { name: 'width', label: 'Minimum trace width' },
@@ -397,7 +515,7 @@ function widthBasis(raw: CalcResult): string {
   return `width ×${g(dv.derating.factor)} (margin ×${g(m.value.si)} on current)`;
 }
 
-export function computeView(s: TraceWidthState): TraceWidthView {
+export function computeView(s: TraceWidthState, today?: string): TraceWidthView {
   const notes: string[] = [];
   const active = activeFields(s);
   const parsed = new Map<FieldKey, FieldView>();
@@ -412,7 +530,12 @@ export function computeView(s: TraceWidthState): TraceWidthView {
       fieldErrors[k] = v.message;
     }
   }
-  if (problems.length > 0) return { status: 'error', problems, fieldErrors, notes };
+  const tolFields = toleranceFields(s);
+  const col = collectTolerances(tolFields, s.tol, effectiveThickMode(s.thickMode, s.copperBy), echoPrefs(s.units, 'other'));
+  problems.push(...tolProblems(col.errors, tolFields));
+  if (problems.length > 0) {
+    return { status: 'error', problems, fieldErrors, notes, ...(Object.keys(col.errors).length > 0 ? { tolErrors: col.errors } : {}) };
+  }
 
   if (s.copperBy === 'weight' && s.weightSource === 'finished') return { status: 'needs-input', needs: [FINISHED_NEEDS], notes };
   if (s.copperBy === 'weight' && s.weightSource === '' && parsed.get('copperWeight')?.status === 'ok') notes.push(NOT_ANSWERED_NOTE);
@@ -422,6 +545,7 @@ export function computeView(s: TraceWidthState): TraceWidthView {
     if (parsed.get(k)?.status === 'empty' && NEEDS_TEXT[k] !== undefined) needs.push(NEEDS_TEXT[k] as string);
   }
   if (s.layer === '') needs.push('Choose a copper layer: outer or inner. It is not assumed.');
+  needs.push(...col.needs);
   if (needs.length > 0) return { status: 'needs-input', needs, notes };
 
   const q = (k: FieldKey): Quantity | undefined => {
@@ -443,9 +567,16 @@ export function computeView(s: TraceWidthState): TraceWidthView {
     ...optional('designMargin', q('designMargin')),
     ...optional('currentDerating', q('derating')),
     ...optional('maxAllowedTemp', q('maxTemp')),
+    ...(col.tolerances !== undefined ? { tolerances: col.tolerances as Tolerances } : {}),
+    ...(col.tolerances?.['width'] === 'profile' ? profileInputs(today) : {}),
   };
   const out = compute(inputs);
   if (!out.ok) {
+    const tk = tolKeyOfCoreField(out.error.field, tolFields);
+    if (tk !== undefined) {
+      const errors = { [tk]: out.error.message };
+      return { status: 'error', problems: tolProblems(errors, tolFields), fieldErrors, notes, tolErrors: errors };
+    }
     const key = CORE_FIELD[out.error.field ?? ''];
     const label = key !== undefined ? FIELD_LABEL[key] : 'Inputs';
     if (key !== undefined) fieldErrors[key] = out.error.message;
@@ -459,14 +590,28 @@ export function computeView(s: TraceWidthState): TraceWidthView {
   if (s.solveFor === 'deltaT') {
     notes.push('A predicted temperature rise has no recommended design value. Compare the maximum conductor temperature with what your materials and the board allow.');
   }
-  const result = buildResultView(raw, {
+  const tolBuild =
+    col.tolerances === undefined
+      ? undefined
+      : buildToleranceView(
+          raw,
+          {
+            accuracyClass: meta.accuracyClass,
+            prefs,
+            labels: { [head.name]: head.label, 'maximum conductor temperature': RESULT_LABELS['maximum conductor temperature'] ?? '', [DRAWN_WIDTH_NAME]: 'Drawn width covering the width tolerance' },
+            phrases: { width: 'required width' },
+          },
+          [head.name, 'maximum conductor temperature'],
+        );
+  const forView: CalcResult = tolBuild === undefined ? raw : { ...raw, warnings: tolBuild.warnings };
+  const result = buildResultView(forView, {
     headline: head.name,
     accuracyClass: meta.accuracyClass,
     prefs,
     lengthRole: 'geometry',
     lengthRoleByName: THICKNESS_NAMES,
     labels: { ...RESULT_LABELS, [head.name]: head.label, ...(s.solveFor === 'width' ? {} : { width: 'Trace width' }) },
-    skip,
+    skip: [...skip, ...(tolBuild?.skipNames ?? [])],
     designNotes: {
       width: { noun: 'margin', defaulted: s.designMargin.trim() === '', basis: widthBasis(raw) },
       'current capacity': { noun: 'derating', defaulted: s.derating.trim() === '' },
@@ -476,5 +621,5 @@ export function computeView(s: TraceWidthState): TraceWidthView {
     pinWarningCodes: ['LEGACY_METHOD'],
     extraProvenance: provenance(s),
   });
-  return { status: 'ok', result, raw, fieldErrors, notes };
+  return tolBuild === undefined ? { status: 'ok', result, raw, fieldErrors, notes } : { status: 'ok', result, raw, fieldErrors, notes, tolerance: tolBuild.view };
 }

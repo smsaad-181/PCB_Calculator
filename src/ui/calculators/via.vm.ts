@@ -1,6 +1,6 @@
 // View-model for the via barrel resistance and axial thermal page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/via compute().
-import { compute, type Inputs } from '../../core/calculators/via/calc';
+import { compute, type Inputs, type Tolerances } from '../../core/calculators/via/calc';
 import { meta } from '../../core/calculators/via/meta';
 import { copperThermalConductivity, type CopperKMaterial } from '../../core/data/constants';
 import { formatResult } from '../../core/format-result';
@@ -9,6 +9,8 @@ import { DIM, q, type Dim, type DisplayPrefs, type Quantity } from '../../core/u
 import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
 import { echoPrefs, headlinePrefs, type Units } from '../components/prefs';
 import { buildResultView, MAX_FIELD_CHARS, parseField, type FieldView, type LedgerEntryView, type ProvenanceRow, type ResultView } from '../components/view';
+
+import { buildToleranceView, collectTolerances, tolFromHash, tolKeyOfCoreField, tolProblems, tolToHash, type TolFieldDef, type TolState, type ToleranceView } from './tolerance-view';
 
 export const CALCULATOR_ID = 'via';
 export type { Units };
@@ -32,6 +34,8 @@ export interface ViaState {
   /** '' means the default material (an assumption, marked as such). */
   readonly kMaterial: KChoice;
   readonly units: Units;
+  /** Optional input tolerances as typed, by core tolerance key. Empty means none: no tolerance is ever assumed. */
+  readonly tol: TolState;
 }
 
 export const DEFAULT_STATE: ViaState = Object.freeze({
@@ -44,6 +48,7 @@ export const DEFAULT_STATE: ViaState = Object.freeze({
   resistivity: '',
   kMaterial: '',
   units: 'metric',
+  tol: {},
 });
 
 export const METHOD_TEXT = 'Method: plated barrel as a copper annulus; DC resistance, axial thermal conduction, ideal parallel for N vias';
@@ -125,11 +130,31 @@ export function fieldDim(k: Exclude<TextKey, 'count'>): Dim {
   return FIELD_DIM[k];
 }
 
+const entered = (t: string): boolean => t.trim() !== '';
+
+/** The tolerance fields for the current inputs. The via count is exact and has none. A field is offered only for an input the user supplied. */
+export function toleranceFields(s: ViaState): readonly TolFieldDef[] {
+  return [
+    { key: 'finishedHoleDiameter', hash: 'tdia', id: 'tol-hole', label: 'Finished hole diameter', kind: 'relative', offered: true, help: 'Tolerance on the finished hole, for example 10%. R depends strongly on it.' },
+    { key: 'platingThickness', hash: 'tpla', id: 'tol-plating', label: 'Plating thickness', kind: 'relative', offered: true, help: 'Tolerance on the plating thickness, for example 20%.' },
+    { key: 'barrelLength', hash: 'tlen', id: 'tol-length', label: 'Barrel length', kind: 'relative', offered: true, help: 'Tolerance on the barrel length (board thickness), for example 10%.' },
+    { key: 'resistivity', hash: 'trho', id: 'tol-resistivity', label: 'Plated resistivity override', kind: 'relative', offered: entered(s.resistivity), whyNot: 'it needs the plated resistivity override (Advanced); the default copper value is a definition and is not toleranced.', help: 'Tolerance on the resistivity override you entered.' },
+    { key: 'conductorTemperature', hash: 'ttmp', id: 'tol-temperature', label: 'Conductor temperature', kind: 'temperature', offered: entered(s.temperature), whyNot: 'enter a conductor temperature above first; the 25 °C default is an assumption and is not toleranced.', help: 'Tolerance on the temperature you entered, as a temperature difference, for example 5 K.' },
+    { key: 'current', hash: 'tcur', id: 'tol-current', label: 'Current', kind: 'relative', offered: entered(s.current), whyNot: 'enter a current above first.', help: 'Tolerance on the current you entered, for example 5%.' },
+  ];
+}
+
+/** True when any optional tolerance state is set (the section then starts open so it is never hidden from the reader). */
+export function hasToleranceState(s: ViaState): boolean {
+  return Object.keys(s.tol).length > 0;
+}
+
 export function toHashState(s: ViaState): Record<string, string> {
   const out: Record<string, string> = {};
   for (const k of TEXT_KEYS) if (s[k].trim() !== '') out[TEXT_HASH_KEY[k]] = s[k].slice(0, MAX_FIELD_CHARS);
   if (s.kMaterial !== '') out['km'] = s.kMaterial;
   if (s.units !== DEFAULT_STATE.units) out['u'] = s.units;
+  tolToHash(out, toleranceFields(DEFAULT_STATE), s.tol);
   return out;
 }
 
@@ -173,6 +198,7 @@ export function fromHashState(h: HashState): LoadedState {
     current: text('current'),
     temperature: text('temperature'),
     resistivity: text('resistivity'),
+    tol: tolFromHash(get, toleranceFields(DEFAULT_STATE), notices),
   };
   return { state: s, notices };
 }
@@ -267,13 +293,22 @@ const NEEDS: Readonly<Record<'diameter' | 'plating' | 'length' | 'count', string
 
 export type ViaView =
   | { readonly status: 'needs-input'; readonly needs: readonly string[]; readonly notes: readonly string[] }
-  | { readonly status: 'error'; readonly problems: readonly string[]; readonly fieldErrors: FieldErrors; readonly notes: readonly string[] }
+  | {
+      readonly status: 'error';
+      readonly problems: readonly string[];
+      readonly fieldErrors: FieldErrors;
+      readonly notes: readonly string[];
+      /** Error text per tolerance key (present only when a tolerance is the problem). */
+      readonly tolErrors?: Readonly<Record<string, string>>;
+    }
   | {
       readonly status: 'ok';
       readonly result: ResultView;
       readonly raw: CalcResult;
       readonly fieldErrors: FieldErrors;
       readonly notes: readonly string[];
+      /** Present only when tolerances were entered and the core returned something to show. */
+      readonly tolerance?: ToleranceView;
       readonly cautions: readonly CautionView[];
       readonly ledgerRows: readonly LedgerRowView[];
     };
@@ -303,7 +338,12 @@ export function computeView(s: ViaState): ViaView {
     problems.push(`${FIELD_LABEL.count}: ${count.message}`);
     fieldErrors.count = count.message;
   }
-  if (problems.length > 0) return { status: 'error', problems, fieldErrors, notes };
+  const tolFields = toleranceFields(s);
+  const col = collectTolerances(tolFields, s.tol, '', echoPrefs(s.units, 'other'));
+  problems.push(...tolProblems(col.errors, tolFields));
+  if (problems.length > 0) {
+    return { status: 'error', problems, fieldErrors, notes, ...(Object.keys(col.errors).length > 0 ? { tolErrors: col.errors } : {}) };
+  }
 
   for (const k of ['diameter', 'plating', 'length'] as const) if (parsed.get(k)?.status === 'empty') needs.push(NEEDS[k]);
   if (count.status === 'empty') needs.push(NEEDS.count);
@@ -325,9 +365,15 @@ export function computeView(s: ViaState): ViaView {
     ...optional('current', qty('current')),
     ...optional('resistivity', qty('resistivity')),
     ...(s.kMaterial !== '' ? { kMaterial: s.kMaterial } : {}),
+    ...(col.tolerances !== undefined ? { tolerances: col.tolerances as Tolerances } : {}),
   } satisfies Inputs;
   const out = compute(inputs);
   if (!out.ok) {
+    const tk = tolKeyOfCoreField(out.error.field, tolFields);
+    if (tk !== undefined) {
+      const errors = { [tk]: out.error.message };
+      return { status: 'error', problems: tolProblems(errors, tolFields), fieldErrors, notes, tolErrors: errors };
+    }
     const key = CORE_FIELD[out.error.field ?? ''];
     const label = key !== undefined ? FIELD_LABEL[key as TextKey] ?? 'Thermal conductivity material' : 'Inputs';
     if (key !== undefined) fieldErrors[key] = out.error.message;
@@ -340,7 +386,23 @@ export function computeView(s: ViaState): ViaView {
     const w = raw.warnings.find((x) => x.code === code);
     return w === undefined ? [] : [{ code, heading: CAUTION_HEADING[code], text: w.message }];
   });
-  const forView: CalcResult = { ...raw, warnings: raw.warnings.filter((w) => w.code === undefined || !(CAUTION_CODES as readonly string[]).includes(w.code)) };
+  const tolBuild =
+    col.tolerances === undefined
+      ? undefined
+      : buildToleranceView(
+          raw,
+          {
+            accuracyClass: meta.accuracyClass,
+            prefs,
+            labels: RESULT_LABELS,
+            phrases: { [HEADLINE.name]: 'via resistance', 'axial thermal resistance (all barrels, ideal parallel)': 'axial thermal resistance' },
+          },
+          [HEADLINE.name, 'axial thermal resistance (all barrels, ideal parallel)', 'voltage drop', 'power loss'],
+        );
+  const forView: CalcResult = {
+    ...raw,
+    warnings: (tolBuild?.warnings ?? raw.warnings).filter((w) => w.code === undefined || !(CAUTION_CODES as readonly string[]).includes(w.code)),
+  };
 
   const extra: ProvenanceRow[] = [
     s.kMaterial === ''
@@ -358,11 +420,12 @@ export function computeView(s: ViaState): ViaView {
     lengthRole: 'geometry',
     lengthRoleByName: THICKNESS_NAMES,
     labels: RESULT_LABELS,
+    ...(tolBuild !== undefined ? { skip: tolBuild.skipNames } : {}),
     extraProvenance: extra,
     pinWarningCodes: ['PLATING_EXCEEDS_HOLE', 'VIA_ONLY_SCOPE'],
   });
   const ledgerRows: LedgerRowView[] = result.ledger.entries.map((e) => ({ ...e, role: LEDGER_ROLE[e.id] ?? e.item }));
-  return { status: 'ok', result, raw, fieldErrors, notes, cautions, ledgerRows };
+  return { status: 'ok', result, raw, fieldErrors, notes, cautions, ledgerRows, ...(tolBuild !== undefined ? { tolerance: tolBuild.view } : {}) };
 }
 
 /** Text for the screen-reader live region. */

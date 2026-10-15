@@ -431,7 +431,7 @@ describe('hash state', () => {
   });
   it('writes only documented keys, and never a reserved key other than u', () => {
     const keys = Object.keys(toHashState(full));
-    const documented = new Set([...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'u']);
+    const documented = new Set([...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'fp', 'u']);
     for (const k of keys) expect(documented.has(k)).toBe(true);
     for (const k of WRITTEN_KEYS) expect(documented.has(k)).toBe(true);
     expect(keys.filter((k) => Object.prototype.hasOwnProperty.call(RESERVED_STATE_KEYS, k))).toEqual(['u']);

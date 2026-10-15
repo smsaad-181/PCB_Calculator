@@ -99,7 +99,7 @@ describe('trace pages', () => {
     expect(fin.status).toBe('needs-input');
     expect(tw.computeView({ ...s, weightSource: 'foil' }).notes).not.toContain(NOT_ANSWERED_NOTE);
     expect(tw.fromHashState(parseHash(serializeHash({ name: 'calc', id: 'trace-width' }, tw.toHashState({ ...s, weightSource: 'finished' }))).state).state.weightSource).toBe('finished');
-    expect([...tw.WRITTEN_KEYS].sort()).toEqual([...Object.keys(CALCULATOR_STATE_KEYS['trace-width']), 'u'].sort());
+    expect([...tw.WRITTEN_KEYS].sort()).toEqual([...Object.keys(CALCULATOR_STATE_KEYS['trace-width']), 'fp', 'u'].sort());
   });
   it('trace resistance: finished weight gives needs-input, not a number', () => {
     const s = { ...tr.DEFAULT_STATE, length: '100 mm', width: '0.25 mm', layer: 'outer' as const, copperWeight: '1 oz' };

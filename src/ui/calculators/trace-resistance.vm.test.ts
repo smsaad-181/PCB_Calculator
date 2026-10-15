@@ -413,7 +413,7 @@ describe('hash state', () => {
     for (const k of keys) expect(documented.has(k)).toBe(true);
     for (const k of WRITTEN_KEYS) expect(documented.has(k)).toBe(true);
     expect(keys.filter((k) => Object.prototype.hasOwnProperty.call(RESERVED_STATE_KEYS, k))).toEqual(['u']);
-    expect(Object.keys(doc).sort()).toEqual(['al', 'am', 'cb', 'conv', 'cs', 'ct', 'cw', 'dt', 'f', 'i', 'l', 'ly', 'rho', 'w', 'wsrc']);
+    expect(Object.keys(doc).sort()).toEqual(['al', 'am', 'cb', 'conv', 'cs', 'ct', 'cw', 'dt', 'f', 'i', 'l', 'ly', 'rho', 'tamb', 'tcur', 'tkch', 'tlen', 'trho', 'tthk', 'twid', 'w', 'wsrc']);
     for (const k of Object.keys(doc)) expect(doc[k as keyof typeof doc].length).toBeGreaterThan(20);
     expect(Object.keys(doc).filter((k) => Object.prototype.hasOwnProperty.call(RESERVED_STATE_KEYS, k) || k === 'v')).toEqual([]);
   });
