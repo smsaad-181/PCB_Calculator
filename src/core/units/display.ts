@@ -3,6 +3,7 @@ import { InvalidValueError } from './errors';
 import { formatQuantity } from './format';
 import { parseQuantity } from './parse';
 import { q, type Quantity } from './quantity';
+import { ceilGuarded, floorGuarded, ROUND_GUARD, tieNudged } from './round-guard';
 import { toUnit } from './units-table';
 
 /** User display preferences. Conversion happens here, at the boundary; quantities stay SI. */
@@ -140,7 +141,8 @@ function decimalsForUnit(dim: Dim, unit: string): number | undefined {
 
 /** Nearest to `sig` significant figures. */
 function round(v: number, sig: number): number {
-  return Number(v.toPrecision(sig));
+  if (v === 0) return 0;
+  return Number(tieNudged(v, sig - 1 - decadeOf(Math.abs(v))).toPrecision(sig));
 }
 
 /** Decade (floor of log10) of a positive finite number, corrected for log10 noise at exact powers of ten. */
@@ -153,12 +155,12 @@ function decadeOf(a: number): number {
 
 const MAX_DEC = 60;
 
-/** Integer n for v*10^dec rounded in direction dir; `snapped` when v sits on the grid up to float noise. */
+/** Integer n for v*10^dec rounded in direction dir; `snapped` when v sits on the grid up to float noise (4 ulp). */
 function stepsOf(v: number, dec: number, dir: 'up' | 'down'): { n: number; snapped: boolean } {
   const s = dec >= 0 ? v * 10 ** dec : v / 10 ** -dec;
   const r = Math.round(s);
-  if (Math.abs(s - r) <= 1e-9 * Math.abs(s)) return { n: r, snapped: true };
-  return { n: dir === 'up' ? Math.ceil(s) : Math.floor(s), snapped: false };
+  if (Math.abs(s - r) <= ROUND_GUARD * Math.abs(s)) return { n: r, snapped: true };
+  return { n: dir === 'up' ? ceilGuarded(s) : floorGuarded(s), snapped: false };
 }
 
 function textOfSteps(n: number, dec: number): string {
@@ -190,7 +192,7 @@ function directedText(
   dec: number,
   dir: 'up' | 'down',
   mk: (num: string) => string,
-  slack = 0,
+  slack = ROUND_GUARD,
 ): string {
   const first = stepsOf(v, dec, dir);
   let n = first.n;
@@ -227,9 +229,9 @@ function plainText(x: Quantity, v: number, decimals: number | undefined, sig: nu
   return text;
 }
 
-function plainRaw(x: Quantity, v: number, decimals: number | undefined, sig: number, dir: RoundDirection, label: string, slack = 0): string {
+function plainRaw(x: Quantity, v: number, decimals: number | undefined, sig: number, dir: RoundDirection, label: string, slack = ROUND_GUARD): string {
   if (dir === 'nearest') {
-    const n = decimals === undefined ? round(v, sig) : Number(v.toFixed(decimals));
+    const n = decimals === undefined ? round(v, sig) : Number(tieNudged(v, decimals).toFixed(decimals));
     return `${String(n)} ${label}`;
   }
   const mk = (num: string): string => `${num} ${label}`;

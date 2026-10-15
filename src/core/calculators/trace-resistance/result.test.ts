@@ -118,9 +118,9 @@ describe('result metadata', () => {
   it('recommendation is the fixed text', () => {
     for (const inp of [clean, weightDefaults, withExtra({ frequency: hz(1e9) })]) expect(ok(inp).recommendation).toBe(RECOMMENDATION);
   });
-  it('dataStatus: VERIFIED by default (S-004, S-006; S-003 excluded) and with a frequency (S-013 VERIFIED); UNVERIFIED with a resistivity override (S-012)', () => {
+  it('dataStatus: VERIFIED by default (S-004, S-006; S-003 excluded) and with a frequency (S-013 VERIFIED); UNVERIFIED with a resistivity override (S-012); a nominal weight with an S-009 figure adds S-009 (PAYWALLED), see finished-copper-status.test.ts', () => {
     expect(r.dataStatus).toBe('VERIFIED');
-    expect(ok(weightDefaults).dataStatus).toBe('VERIFIED');
+    expect(ok(weightDefaults).dataStatus).toBe('PAYWALLED');
     expect(ok(withExtra({ frequency: hz(1e6) })).dataStatus).toBe('VERIFIED');
     expect(ok(withExtra({ resistivity: rhoUohmCm(1.9) })).dataStatus).toBe('UNVERIFIED');
     expect(ok(withExtra({ resistivity: rhoUohmCm(1.9), frequency: hz(1e6) })).dataStatus).toBe('UNVERIFIED');

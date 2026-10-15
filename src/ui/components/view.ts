@@ -167,7 +167,7 @@ export interface ResultView {
     readonly formula: string;
     readonly steps: readonly { label: string; expr: string; text: string }[];
     readonly assumptions: readonly string[];
-    readonly validity: readonly { name: string; ok: boolean; detail: string }[];
+    readonly validity: readonly { name: string; ok: boolean; detail: string; informational?: boolean }[];
     readonly inputs: readonly ProvenanceRow[];
   };
 }
@@ -197,6 +197,8 @@ export interface BuildOptions {
   readonly skipInputs?: readonly string[];
   /** Warning codes shown before all other warnings. */
   readonly pinWarningCodes?: readonly string[];
+  /** Validity check names that are information, not a pass/fail test: they are listed without a pass mark and are not counted as failed. */
+  readonly informationalChecks?: readonly string[];
 }
 
 const MEANING: Readonly<Record<Bound, string>> = {
@@ -270,7 +272,7 @@ export function buildResultView(r: CalcResult, o: BuildOptions): ResultView {
       formula: r.formula,
       steps: r.steps.map((s) => ({ label: s.label, expr: s.expr, text: formatStep(s, optsFor(s.label)) })),
       assumptions: [...r.assumptions],
-      validity: r.validityChecks.map((v) => ({ ...v })),
+      validity: r.validityChecks.map((v) => ((o.informationalChecks ?? []).includes(v.name) ? { ...v, informational: true } : { ...v })),
       inputs: [...r.inputs.filter((i) => !(o.skipInputs ?? []).includes(i.name)).map((i) => inputRow(i, label(i.name), optsFor(i.name))), ...(o.extraProvenance ?? [])],
     },
   };

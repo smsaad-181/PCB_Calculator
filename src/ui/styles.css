@@ -123,6 +123,7 @@ input, select { max-width: 100%; }
 .checks { list-style: none; padding: 0; margin: 0.25rem 0 0.75rem; }
 .check { padding: 0.25rem 0.5rem; margin-bottom: 0.4rem; border-left: 5px solid var(--border); background: var(--bg); border-radius: 4px; }
 .check p { margin: 0.1rem 0; }
+.check.info { border-left-color: var(--muted); }
 .check.fail { border: 3px solid var(--err-fg); background: var(--err-bg); color: var(--err-fg); padding: 0.4rem 0.75rem; }
 .check.fail .muted { color: var(--err-fg); }
 .check-hint { font-weight: 700; }
@@ -196,3 +197,10 @@ td.num { font-variant-numeric: tabular-nums; }
 .over-tag { border-style: double; border-width: 4px; }
 .netclass .cmp-tag { display: inline-block; margin: 0 0.25rem 0.25rem 0; }
 .netclass-text { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; font-size: 0.875rem; background: var(--bg); color: var(--fg); border: 2px solid var(--border); border-radius: 4px; padding: 0.5rem; }
+.tolerance-results { margin: 1rem 0; }
+.tolerance-results h3 { font-size: 1.05rem; margin: 0.75rem 0 0.25rem; }
+.tolerance-results caption { text-align: left; color: var(--muted); font-size: 0.875rem; padding: 0.25rem 0; }
+.tolerance-results table.sensitivity td { overflow-wrap: anywhere; }
+.tol-field { border: 1px solid var(--border); border-radius: 6px; margin: 0.75rem 0; padding: 0.25rem 0.75rem 0.5rem; }
+.tol-field legend { font-weight: 600; padding: 0 0.25rem; }
+.tol-absent { margin: 0.5rem 0; }

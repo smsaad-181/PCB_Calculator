@@ -223,3 +223,12 @@ describe('copper basis helpers are exported from constants (detailed tests in co
     expect(typeof copperBasisFactors).toBe('function');
   });
 });
+
+describe('PV-8: vacuum permeability lives in the constants module with its ledger link', () => {
+  it('MU0_H_PER_M is 4 pi x 1e-7 H/m (ledger S-013 states it; deviation from CODATA 2022 below 1e-9 relative) and names S-013', async () => {
+    const mod = await import('./constants');
+    expect(mod.MU0_H_PER_M).toBe(4e-7 * Math.PI);
+    expect(Math.abs(mod.MU0_H_PER_M - 1.25663706127e-6) / 1.25663706127e-6).toBeLessThan(1e-9);
+    expect(mod.MU0_LEDGER_ID).toBe('S-013');
+  });
+});

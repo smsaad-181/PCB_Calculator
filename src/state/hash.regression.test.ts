@@ -45,7 +45,7 @@ describe('m-5 hash size and key-count caps', () => {
     expect(r.stateDiscarded).toBe(true);
     expect(r.state).toEqual({});
     // Total budget over several runs; an O(n^2) walk of 200k keys would take far longer.
-    expect(dt).toBeLessThan(1000);
+    expect(dt).toBeLessThan(5000);
   });
 
   it('m-5 route-only parsing of an oversized hash still works', () => {

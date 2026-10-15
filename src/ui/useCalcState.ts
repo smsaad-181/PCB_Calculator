@@ -13,6 +13,8 @@ interface Options<S> {
   readonly defaultState: S;
   readonly fromHash: (h: HashState) => LoadedState<S>;
   readonly toHash: (s: S) => Record<string, string>;
+  /** Called with the new state when the URL is edited while the page is open (for example to open a collapsed section). */
+  readonly onExternalLoad?: (s: S) => void;
 }
 
 /**
@@ -43,6 +45,7 @@ export function useCalcState<S>(o: Options<S>) {
       const loaded = o.fromHash(p.state);
       setState(loaded.state);
       setNotices(loaded.notices);
+      o.onExternalLoad?.(loaded.state);
     };
     window.addEventListener('hashchange', on);
     return () => window.removeEventListener('hashchange', on);
@@ -53,5 +56,5 @@ export function useCalcState<S>(o: Options<S>) {
     setState(o.defaultState);
     setNotices([]);
   };
-  return { state, applied, pending, notices, setNotices, patch, reset };
+  return { state, setState, applied, pending, notices, setNotices, patch, reset };
 }

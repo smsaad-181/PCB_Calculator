@@ -124,6 +124,11 @@ const thickness: fc.Arbitrary<number> = fc.oneof(
   fc.integer({ min: 10, max: 99900 }).map((n) => n * 1e-8),
   fc.integer({ min: 1, max: 3930 }).map((n) => n * MIL_UNIT), // on the 0.01 mil grid, up to 998 µm
 );
+/** Display rounding absorbs float noise up to 4 ulp (relative) of a rounding boundary (src/core/units/round-guard.ts). */
+const NOISE = 4 * Number.EPSILON;
+const noLess = (x: number): number => x - NOISE * Math.abs(x);
+const noMore = (x: number): number => x + NOISE * Math.abs(x);
+
 const direction = fc.constantFrom<RoundDirection>('up', 'down', 'nearest');
 
 describe('formatDualThickness: properties', () => {
@@ -147,10 +152,10 @@ describe('formatDualThickness: properties', () => {
         for (const [p, unit] of parts) {
           const si = siOf(p);
           if (round === 'up') {
-            expect(si >= v, `${text} up`).toBe(true);
+            expect(si >= noLess(v), `${text} up`).toBe(true);
             expect(si - v).toBeLessThan(unit * (1 + 1e-9));
           } else if (round === 'down') {
-            expect(si <= v, `${text} down`).toBe(true);
+            expect(si <= noMore(v), `${text} down`).toBe(true);
             expect(v - si).toBeLessThan(unit * (1 + 1e-9));
           } else {
             expect(Math.abs(si - v)).toBeLessThanOrEqual(0.5 * unit * (1 + 1e-9));

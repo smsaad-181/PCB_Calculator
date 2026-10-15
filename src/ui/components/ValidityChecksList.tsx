@@ -2,6 +2,8 @@ interface Check {
   readonly name: string;
   readonly ok: boolean;
   readonly detail: string;
+  /** Information, not a pass/fail test: shown without a pass mark and never counted as failed. */
+  readonly informational?: boolean;
 }
 
 interface Props {
@@ -14,11 +16,12 @@ interface Props {
 
 /**
  * Validity checks with the exact bound text from the calculator. Pass or fail is carried by a mark and by words,
- * never by colour alone. A failed check is a bordered block with its own heading line.
+ * never by colour alone. A failed check is a bordered block with its own heading line. An informational entry has no
+ * pass mark at all (an estimate against your own number is not a pass) and is not counted as failed.
  */
 export function ValidityChecksList({ checks, failedHint, hintFor }: Props) {
   if (checks.length === 0) return null;
-  const failed = checks.filter((c) => !c.ok).length;
+  const failed = checks.filter((c) => c.informational !== true && !c.ok).length;
   return (
     <section class="validity" aria-labelledby="validity-h">
       <h3 id="validity-h">
@@ -28,16 +31,26 @@ export function ValidityChecksList({ checks, failedHint, hintFor }: Props) {
         </span>
       </h3>
       <ul class="checks">
-        {checks.map((c) => (
-          <li key={c.name} class={c.ok ? 'check ok' : 'check fail'}>
-            <p class="check-head">
-              <span aria-hidden="true">{c.ok ? '✔ ' : '✖ '}</span>
-              <strong>{c.ok ? 'Within range' : 'OUTSIDE RANGE'}:</strong> {c.name}
-            </p>
-            {!c.ok && <p class="check-hint">{hintFor?.(c.name) ?? failedHint}</p>}
-            <p class="muted check-detail">{c.detail}</p>
-          </li>
-        ))}
+        {checks.map((c) =>
+          c.informational === true ? (
+            <li key={c.name} class="check info">
+              <p class="check-head">
+                <span aria-hidden="true">{'ℹ '}</span>
+                <strong>Informational (an estimate, not a test):</strong> {c.name}
+              </p>
+              <p class="muted check-detail">{c.detail}</p>
+            </li>
+          ) : (
+            <li key={c.name} class={c.ok ? 'check ok' : 'check fail'}>
+              <p class="check-head">
+                <span aria-hidden="true">{c.ok ? '✔ ' : '✖ '}</span>
+                <strong>{c.ok ? 'Within range' : 'OUTSIDE RANGE'}:</strong> {c.name}
+              </p>
+              {!c.ok && <p class="check-hint">{hintFor?.(c.name) ?? failedHint}</p>}
+              <p class="muted check-detail">{c.detail}</p>
+            </li>
+          ),
+        )}
       </ul>
     </section>
   );

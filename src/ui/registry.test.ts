@@ -30,8 +30,8 @@ describe('registry', () => {
     expect(calculatorsIn('trace').map((x) => x.id)).toEqual(expect.arrayContaining(['copper-converter', 'trace-width', 'trace-resistance']));
     expect(typeof e?.load).toBe('function');
   });
-  it('lists the three circuit-value calculators under Circuit values as lazy phase-1 entries', () => {
-    for (const id of ['ohm-power', 'resistor-divider', 'e-series']) {
+  it('lists the circuit-value calculators under Circuit values as lazy phase-1 entries', () => {
+    for (const id of ['ohm-power', 'resistor-divider', 'feedback-divider', 'led-resistor', 'rc-lc', 'reactance', 'e-series']) {
       const e = findCalculator(id);
       expect(e, id).toBeDefined();
       expect(e?.category).toBe('circuit');
@@ -39,10 +39,15 @@ describe('registry', () => {
       expect(typeof e?.load).toBe('function');
       expect(e?.title.length).toBeGreaterThan(5);
     }
-    expect(calculatorsIn('circuit').map((x) => x.id)).toEqual(['ohm-power', 'resistor-divider', 'e-series']);
+    expect(calculatorsIn('circuit').map((x) => x.id)).toEqual(['ohm-power', 'resistor-divider', 'feedback-divider', 'led-resistor', 'rc-lc', 'reactance', 'e-series']);
+    const titles = Object.fromEntries(REGISTRY.map((x) => [x.id, x.title]));
+    expect(titles['feedback-divider']).toBe('Regulator feedback divider');
+    expect(titles['led-resistor']).toBe('LED series resistor');
+    expect(titles['rc-lc']).toBe('RC and LC (time constant, cutoff, resonance)');
+    expect(titles['reactance']).toBe('Reactance (inductor and capacitor)');
   });
   it('the circuit-value loaders resolve to a component module with a default export', async () => {
-    for (const id of ['ohm-power', 'resistor-divider', 'e-series']) {
+    for (const id of ['ohm-power', 'resistor-divider', 'feedback-divider', 'led-resistor', 'rc-lc', 'reactance', 'e-series']) {
       const m = await findCalculator(id)?.load();
       expect(typeof m?.default, id).toBe('function');
     }

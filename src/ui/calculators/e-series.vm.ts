@@ -2,8 +2,10 @@
 // The E-series library returns plain results (no CalcResult), so this page has its own small view-model and shows
 // no confidence rating. Every value is printed as a catalog number through format-result.
 import { ESERIES, ESERIES_SOURCE } from '../../core/data/eseries';
-import { bestPairs, nearest, valuesInDecade, type Pair, type SeriesName, type Topology } from '../../core/eseries';
+import { bestPairs, dropNoisePairs, nearest, nearestRatio, valuesInDecade, type Pair, type SeriesName, type Topology } from '../../core/eseries';
+import type { CalcError, Result } from '../../core/result';
 import { DIM, type Dim } from '../../core/units';
+import type { SearchTask } from '../../workers/pair-search.protocol';
 import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
 import { MAX_FIELD_CHARS, parseField, parseFractionField, type FieldView } from '../components/view';
 import { ALL_SERIES, LOOKUP_MODES, TOPOLOGIES, catalogRatio, catalogResistance, isSeriesName, isTopology, signedPercent } from './circuit-choices';
@@ -28,6 +30,10 @@ export const DEFAULT_STATE: ESeriesState = Object.freeze({
 
 export const METHOD_TEXT = 'Method: lookup in the E-series preferred-value lists; no calculation beyond the error against your target';
 export const PAIR_COUNT = 5;
+/** How many pairs the search returns: more than are shown, so hiding noise pairs (PCB-12) still leaves PAIR_COUNT to list. */
+export const PAIR_FETCH = 60;
+/** A single value is announced when its error is no larger than this (percent, prints as 0 %) or the best pair's error. */
+const SINGLE_HIT_PERCENT = 0.005;
 
 /** The status shown above the results: the lists are ledger S-016, not yet checked against the standard. */
 export const SOURCE_STATUS = ESERIES_SOURCE.status;
@@ -116,10 +122,21 @@ export interface DecadeView {
   readonly values: readonly { readonly text: string; readonly chosen: boolean }[];
 }
 
+export const ARITHMETIC_LABEL = 'Nearest = the smallest difference in ohms (target minus value), not the smallest ratio.';
+export const RATIO_LABEL = 'Nearest by ratio (geometric neighbour)';
+
 export type NearestView =
   | { readonly status: 'needs-input'; readonly needs: readonly string[] }
   | { readonly status: 'error'; readonly problems: readonly string[] }
-  | { readonly status: 'ok'; readonly rows: readonly LookupRow[]; readonly decade: DecadeView; readonly exact: boolean };
+  | {
+      readonly status: 'ok';
+      readonly rows: readonly LookupRow[];
+      readonly decade: DecadeView;
+      readonly exact: boolean;
+      readonly arithmeticLabel: string;
+      /** The ratio-nearest value, only when it differs from the arithmetic nearest (coarse series). */
+      readonly ratio: LookupRow | undefined;
+    };
 
 export function computeNearest(s: ESeriesState): NearestView {
   const f = parseNearestTarget(s);
@@ -145,7 +162,10 @@ export function computeNearest(s: ESeriesState): NearestView {
     title: `${s.nearestSeries} values from ${first === undefined ? '' : catalogResistance(first)} to ${last === undefined ? '' : catalogResistance(last)} (${String(list.length)} values in this decade)`,
     values: list.map((v) => ({ text: catalogResistance(v), chosen: v === nearestValue })),
   };
-  return { status: 'ok', rows, decade: decadeView, exact: nearestValue === target };
+  const g = nearestRatio(target, s.nearestSeries);
+  const ratio: LookupRow | undefined =
+    g.ok && g.value.value !== nearestValue ? { label: RATIO_LABEL, value: catalogResistance(g.value.value), error: signedPercent(g.value.errorPercent / 100) } : undefined;
+  return { status: 'ok', rows, decade: decadeView, exact: nearestValue === target, arithmeticLabel: ARITHMETIC_LABEL, ratio };
 }
 
 // ---------------------------------------------------------------------------
@@ -182,7 +202,17 @@ export interface PairRow {
 export type PairsView =
   | { readonly status: 'needs-input'; readonly needs: readonly string[] }
   | { readonly status: 'error'; readonly problems: readonly string[] }
-  | { readonly status: 'ok'; readonly rows: readonly PairRow[]; readonly resultHeading: string; readonly window: string };
+  | {
+      readonly status: 'ok';
+      readonly rows: readonly PairRow[];
+      readonly resultHeading: string;
+      readonly window: string;
+      /** Set when one stock value already hits the target (series and parallel only). */
+      readonly single: string | undefined;
+      /** Pairs not listed because one resistor has negligible effect. */
+      readonly hidden: number;
+      readonly hiddenText: string | undefined;
+    };
 
 function pairRow(p: Pair, t: Topology): PairRow {
   return {
@@ -193,20 +223,53 @@ function pairRow(p: Pair, t: Topology): PairRow {
   };
 }
 
-export function computePairs(s: ESeriesState): PairsView {
+/** What to do for the two-resistor search: show a view now, or run a search (in a worker) and then call finishPairs. */
+export type PairsPlan =
+  | { readonly kind: 'view'; readonly view: PairsView }
+  | { readonly kind: 'search'; readonly task: Extract<SearchTask, { kind: 'e-pairs' }>; readonly state: ESeriesState };
+
+export function planPairs(s: ESeriesState): PairsPlan {
   const f = parsePairTarget(s);
   if (f.status === 'empty') {
-    return { status: 'needs-input', needs: [s.topology === 'divider-ratio' ? 'Enter a target ratio between 0 and 1 (for example 0.25 or 25%).' : 'Enter a target resistance (for example 4k7 or 4.7 kΩ).'] };
+    return {
+      kind: 'view',
+      view: { status: 'needs-input', needs: [s.topology === 'divider-ratio' ? 'Enter a target ratio between 0 and 1 (for example 0.25 or 25%).' : 'Enter a target resistance (for example 4k7 or 4.7 kΩ).'] },
+    };
   }
-  if (f.status === 'error') return { status: 'error', problems: [`${pairTargetLabel(s.topology)}: ${f.message}`] };
-  const r = bestPairs(f.value.si, s.pairSeries, s.topology, PAIR_COUNT);
+  if (f.status === 'error') return { kind: 'view', view: { status: 'error', problems: [`${pairTargetLabel(s.topology)}: ${f.message}`] } };
+  return { kind: 'search', task: { kind: 'e-pairs', target: f.value.si, series: s.pairSeries, topology: s.topology, count: PAIR_FETCH }, state: s };
+}
+
+/** The view for a finished search (from a worker or from bestPairs on this thread). */
+export function finishPairs(s: ESeriesState, r: Result<Pair[], CalcError>): PairsView {
   if (!r.ok) return { status: 'error', problems: [`${pairTargetLabel(s.topology)}: ${r.error.message}`] };
+  const f = parsePairTarget(s);
+  const target = f.status === 'ok' ? f.value.si : Number.NaN;
+  const { kept, hidden } = dropNoisePairs(r.value, target, s.topology, PAIR_COUNT);
+  let single: string | undefined;
+  if (s.topology !== 'divider-ratio') {
+    const first = LOOKUP_MODES[0];
+    const n = first === undefined ? undefined : nearest(target, s.pairSeries, first.mode);
+    const bestErr = Math.abs(r.value[0]?.errorPercent ?? 0);
+    if (n?.ok === true && Math.abs(n.value.errorPercent) <= Math.max(SINGLE_HIT_PERCENT, bestErr)) {
+      single = `A single ${s.pairSeries} value matches: ${catalogResistance(n.value.value)} (error ${signedPercent(n.value.errorPercent / 100)}).`;
+    }
+  }
   return {
     status: 'ok',
-    rows: r.value.map((p) => pairRow(p, s.topology)),
+    rows: kept.map((p) => pairRow(p, s.topology)),
     resultHeading: TOPOLOGY_FORMULA[s.topology],
     window: SEARCH_WINDOW_TEXT[s.topology],
+    single,
+    hidden,
+    hiddenText: hidden > 0 ? `${String(hidden)} pair${hidden === 1 ? '' : 's'} hidden: one resistor has negligible effect.` : undefined,
   };
+}
+
+/** Plan and search on this thread (tests, and the page's fallback when it has no worker). */
+export function computePairs(s: ESeriesState): PairsView {
+  const p = planPairs(s);
+  return p.kind === 'view' ? p.view : finishPairs(p.state, bestPairs(p.task.target, p.task.series, p.task.topology, p.task.count));
 }
 
 export function nearestSummary(v: NearestView): string {

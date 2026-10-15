@@ -1,13 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 import { FOIL_CONVENTIONS } from '../../core/units';
-import { parseHash, serializeHash, type Route } from '../../state/hash';
+import { NearResultNotes } from '../components/NearResultNotes';
+import { ProfileBanner } from '../components/ProfileBanner';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
 import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
 import { ResetButton } from '../components/ResetButton';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
-import { useRafValue } from '../hooks';
+import { ToleranceResults } from '../components/ToleranceResults';
+import { ToleranceSection } from '../components/ToleranceInputs';
+import { parseFractionField } from '../components/view';
+import { useToday } from '../hooks';
+import { useCalcState } from '../useCalcState';
+import { BUNDLED_LABEL, NONE_LABEL, isProfileChoice } from './fab-profile-choice';
+import { profileBanner } from './fab-profile-banner';
+import { PERIOD_HELP, PERIOD_LABEL, PERIOD_QUESTION } from './pulse-labels';
 import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
 import {
   BASES,
@@ -17,17 +25,33 @@ import {
   DEFAULT_TEXT,
   FAILED_CHECK_HINT,
   LAYERS,
+  LAYER_COUNT_HELP,
+  LAYER_COUNT_OPTIONS,
+  LAYER_COUNT_QUESTION,
   METHOD_TEXT,
   MODE_A_HINT,
   MODE_A_LABEL,
-  SOLVE_OPTIONS,
+  PROFILE_HELP,
+  PROFILE_QUESTION,
+  PROFILE_WIDTH_LABEL,
+  PROFILE_WIDTH_LOCKED,
+  PULSE_SECTION_LEGEND,
+  PULSE_SOLVE_CURRENT_TEXT,
+  PULSE_STEADY_HELP,
   computeView,
   conventionOptionLabel,
   conventionSpreadText,
   echoPrefs,
   fieldDim,
   fromHashState,
+  hasToleranceState,
+  isLayerCount,
+  profileWidthOffered,
+  solveOptions,
+  thicknessModesOffered,
   toHashState,
+  toleranceFields,
+  withProfile,
   type SolveFor,
   type TraceWidthState,
   type TraceWidthView,
@@ -35,7 +59,6 @@ import {
   type Units,
 } from './trace-width.vm';
 
-const ROUTE: Route = { name: 'calc', id: CALCULATOR_ID };
 
 // Expected dimensions per field come from the view-model's field table, so the page and the tests share one source.
 const fieldDimWidth = fieldDim('width');
@@ -45,6 +68,7 @@ const fieldDimWeight = fieldDim('copperWeight');
 const fieldDimThickness = fieldDim('copperThickness');
 const fieldDimAbsTemp = fieldDim('ambient');
 const fieldDimFactor = fieldDim('designMargin');
+const fieldDimDuty = fieldDim('duty');
 
 const BASIS_LABEL: Readonly<Record<string, string>> = {
   nominal: 'Nominal (default)',
@@ -55,7 +79,7 @@ const BASIS_LABEL: Readonly<Record<string, string>> = {
 function liveSummary(v: TraceWidthView): string {
   switch (v.status) {
     case 'ok':
-      return `Result: ${v.result.headline.label} ${v.result.headline.text}. ${v.result.headline.meaning}. Confidence ${v.result.confidence.level}. ${String(v.result.details.validity.filter((c) => !c.ok).length)} validity checks failed.`;
+      return `Result: ${v.result.headline.label} ${v.result.headline.text}. ${v.result.headline.meaning}. Confidence ${v.result.confidence.level}. ${String(v.result.details.validity.filter((c) => c.informational !== true && !c.ok).length)} validity checks failed.${v.callout !== undefined ? ` ${v.callout.heading}.` : ''}`;
     case 'error':
       return `No result. ${v.problems.join(' ')}`;
     default:
@@ -64,7 +88,21 @@ function liveSummary(v: TraceWidthView): string {
 }
 
 function Results({ view }: { view: TraceWidthView }) {
-  if (view.status === 'ok') return <ResultsPanel view={view.result} failedCheckHint={FAILED_CHECK_HINT} />;
+  if (view.status === 'ok') {
+    return (
+      <ResultsPanel
+        view={view.result}
+        failedCheckHint={FAILED_CHECK_HINT}
+        {...(view.callout !== undefined ? { callout: view.callout } : {})}
+        afterHeadline={
+          <>
+            <NearResultNotes view={view.nearResult} />
+            <ToleranceResults view={view.tolerance} />
+          </>
+        }
+      />
+    );
+  }
   if (view.status === 'error') {
     return (
       <div class="error-box">
@@ -94,43 +132,30 @@ function Results({ view }: { view: TraceWidthView }) {
 }
 
 export default function TraceWidth() {
-  const [init] = useState(() => fromHashState(parseHash(window.location.hash).state));
-  const [state, setState] = useState<TraceWidthState>(init.state);
-  const [notices, setNotices] = useState<readonly string[]>(init.notices);
-  const applied = useRafValue(state);
-  const pending = applied !== state;
-  const lastHash = useRef<string | null>(null);
+  return <TraceWidthOn today={useToday()} />;
+}
 
-  const view = useMemo(() => computeView(applied), [applied]);
+function TraceWidthOn({ today }: { readonly today: string }) {
+  const { state, setState, applied, pending, notices, setNotices, patch: set, reset } = useCalcState<TraceWidthState>({
+    id: CALCULATOR_ID,
+    defaultState: DEFAULT_STATE,
+    fromHash: fromHashState,
+    toHash: toHashState,
+    onExternalLoad: (s) => {
+      if (hasToleranceState(s)) setTolOpen(true);
+    },
+  });
+  // The tolerance section starts open only when the link already carries tolerance state, so it is never hidden from the reader.
+  const [tolOpen, setTolOpen] = useState(() => hasToleranceState(state));
 
-  // State to URL hash. replaceState does not add history entries or fire hashchange.
-  useEffect(() => {
-    const h = serializeHash(ROUTE, toHashState(applied));
-    lastHash.current = h;
-    if (window.location.hash !== h) window.history.replaceState(null, '', h);
-  }, [applied]);
+  const view = useMemo(() => computeView(applied, today), [applied, today]);
+  const banner = useMemo(() => profileBanner(applied.profile, today), [applied.profile, today]);
 
-  // The user edits or pastes the URL while the page is open.
-  useEffect(() => {
-    const on = () => {
-      if (window.location.hash === lastHash.current) return;
-      const p = parseHash(window.location.hash);
-      if (p.route.name !== 'calc' || p.route.id !== CALCULATOR_ID) return;
-      const loaded = fromHashState(p.state);
-      setState(loaded.state);
-      setNotices(loaded.notices);
-    };
-    window.addEventListener('hashchange', on);
-    return () => window.removeEventListener('hashchange', on);
-  }, []);
-
-  const set = (patch: Partial<TraceWidthState>) => setState((s) => ({ ...s, ...patch }));
-  const reset = () => {
-    setState(DEFAULT_STATE);
-    setNotices([]);
-  };
   const fe: FieldErrors = 'fieldErrors' in view ? view.fieldErrors : {};
+  const tolErrors = view.status === 'error' ? (view.tolErrors ?? {}) : {};
   const solve = state.solveFor;
+  const pulse = state.currentMode === 'pulse';
+  const pulseConflict = pulse && solve === 'current';
   const weightMode = state.copperBy === 'weight';
   const widthPrefs = echoPrefs(state.units, 'width');
   const otherPrefs = echoPrefs(state.units, 'other');
@@ -142,6 +167,7 @@ export default function TraceWidth() {
         Solve for the trace width, the current capacity or the temperature rise from the other two. This is the legacy IPC-2221 curve fit,
         for comparison and compatibility: it is not an IPC-2152 analysis.
       </p>
+      {banner !== undefined && <ProfileBanner b={banner} />}
       {notices.length > 0 && (
         <div class="banner" role="status">
           <div class="banner-body">
@@ -167,9 +193,69 @@ export default function TraceWidth() {
             name="solve"
             legend="Solve for (the other two are entered)"
             value={solve}
-            options={SOLVE_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+            options={solveOptions(state).map((o) => ({ value: o.value, label: o.label, ...(o.disabled === true ? { disabled: true } : {}), ...(o.hint !== undefined ? { hint: o.hint } : {}) }))}
             onChange={(v) => set({ solveFor: v as SolveFor })}
           />
+          {pulseConflict && (
+            <p class="field-error" role="alert">
+              Pulsed current cannot be combined with solving for current. {PULSE_SOLVE_CURRENT_TEXT} Choose width or temperature rise to solve for, or switch the current back to steady.
+            </p>
+          )}
+          <RadioGroup
+            name="cmode"
+            legend={PULSE_SECTION_LEGEND}
+            value={state.currentMode}
+            options={[
+              { value: 'steady', label: 'Steady (DC or RMS)' },
+              { value: 'pulse', label: 'Pulsed (peak, duty cycle): RMS-equivalent mean heating' },
+            ]}
+            onChange={(v) => {
+              if (v === 'pulse') set({ currentMode: 'pulse', ...(solve === 'current' ? { solveFor: 'width' as SolveFor } : {}) });
+              else set({ currentMode: 'steady' });
+            }}
+          />
+          {pulse && <p class="help">{PULSE_STEADY_HELP}</p>}
+          {pulse && (
+            <>
+              <QuantityField
+                id="peak"
+                label="Peak current"
+                unitHint="A or mA"
+                text={state.peakCurrent}
+                onText={(peakCurrent) => set({ peakCurrent })}
+                expectedDim={fieldDimCurrent}
+                echoPrefs={otherPrefs}
+                help="Examples: 10 A, 800 mA. Rectangular pulses."
+                placeholder="10 A"
+                required
+                externalError={fe.peakCurrent}
+              />
+              <QuantityField
+                id="duty"
+                label="Duty cycle"
+                unitHint="percent or fraction, above 0 up to 100 %"
+                text={state.duty}
+                onText={(duty) => set({ duty })}
+                expectedDim={fieldDimDuty}
+                parser={parseFractionField}
+                help="Write 25% or 0.25. Fraction of the period the current is on."
+                placeholder="25%"
+                required
+                externalError={fe.duty}
+              />
+              <RadioGroup
+                name="period"
+                legend={PERIOD_QUESTION}
+                value={state.periodVsTau}
+                options={[
+                  { value: 'much-shorter', label: PERIOD_LABEL['much-shorter'] },
+                  { value: 'comparable-or-longer', label: PERIOD_LABEL['comparable-or-longer'] },
+                ]}
+                onChange={(v) => set({ periodVsTau: v === 'much-shorter' || v === 'comparable-or-longer' ? v : '' })}
+              />
+              <p class="help">{PERIOD_HELP}</p>
+            </>
+          )}
           {solve !== 'width' && (
             <QuantityField
               id="width"
@@ -185,7 +271,7 @@ export default function TraceWidth() {
               externalError={fe.width}
             />
           )}
-          {solve !== 'current' && (
+          {!pulse && solve !== 'current' && (
             <QuantityField
               id="current"
               label="Current"
@@ -342,13 +428,13 @@ export default function TraceWidth() {
           )}
           <QuantityField
             id="maxtemp"
-            label="Maximum allowed conductor temperature (optional)"
+            label="Maximum allowed conductor temperature (optional, informational)"
             unitHint="°C, K or °F"
             text={state.maxTemp}
             onText={(maxTemp) => set({ maxTemp })}
             expectedDim={fieldDimAbsTemp}
             echoPrefs={otherPrefs}
-            help="Absolute temperature, for example 105 °C. When given, ambient plus rise is checked against it."
+            help="Absolute temperature, for example 105 °C. When given, ambient plus rise is shown against it as an informational estimate. It is an estimate, not a design check: this legacy relation does not model ambient."
             placeholder="105 °C"
             externalError={fe.maxTemp}
           />
@@ -373,6 +459,49 @@ export default function TraceWidth() {
             onChange={(v) => set({ units: (v === 'imperial' ? 'imperial' : 'metric') as Units })}
           />
           <p class="help">Results always show mm and mil together (copper thickness as µm and mil).</p>
+          <ToleranceSection
+            fields={toleranceFields(state)}
+            tol={state.tol}
+            onTol={(key, t) => setState((s) => ({ ...s, tol: { ...s.tol, [key]: t } }))}
+            errors={tolErrors}
+            thickness={{ mode: state.thickMode, options: thicknessModesOffered(state), onMode: (thickMode) => set({ thickMode }), weight: weightMode }}
+            prefs={otherPrefs}
+            open={tolOpen}
+            onToggle={setTolOpen}
+            lockedReason={state.widthProfile && profileWidthOffered(state) ? { width: PROFILE_WIDTH_LOCKED } : {}}
+          >
+            <RadioGroup
+              name="profile"
+              legend={PROFILE_QUESTION}
+              value={state.profile}
+              options={[
+                { value: 'bundled', label: BUNDLED_LABEL },
+                { value: 'none', label: NONE_LABEL },
+              ]}
+              onChange={(v) => {
+                if (isProfileChoice(v)) setState((s) => withProfile(s, v));
+              }}
+            />
+            <p class="help">{PROFILE_HELP}</p>
+            {profileWidthOffered(state) && (
+              <div class="radio">
+                <input id="tol-width-profile" type="checkbox" checked={state.widthProfile} onChange={(e) => set({ widthProfile: (e.currentTarget as HTMLInputElement).checked })} />
+                <label for="tol-width-profile">{PROFILE_WIDTH_LABEL}</label>
+              </div>
+            )}
+            {profileWidthOffered(state) && (
+              <>
+                <RadioGroup
+                  name="layercount"
+                  legend={LAYER_COUNT_QUESTION}
+                  value={state.layerCount}
+                  options={LAYER_COUNT_OPTIONS.map((o) => ({ value: o.value, label: o.label }))}
+                  onChange={(v) => set({ layerCount: isLayerCount(v) ? v : '' })}
+                />
+                <p class="help">{LAYER_COUNT_HELP}</p>
+              </>
+            )}
+          </ToleranceSection>
           <ResetButton onReset={reset} />
         </form>
         <section class="panel output" aria-labelledby="result-h" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>

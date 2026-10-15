@@ -6,9 +6,27 @@ import { assertCalcResult } from '../../result';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from '../../result';
 import { DIM, fromUnit, q, toUnit } from '../../units';
 import type { Quantity } from '../../units';
+import { envelopeResult, hasTolerances, planTolerances, stripEnvelopeInputs } from '../tolerance-shared';
+import type { FieldSpec, OutputPlan, TolValue } from '../tolerance-shared';
 import { validate } from './guards';
 import type { ValidInputs } from './guards';
 import { meta } from './meta';
+
+/**
+ * Optional input tolerances (task 9). Absent means no envelope and no sensitivity readout; there are no default tolerances,
+ * and no tolerance is taken from a fab profile (JLCPCB publishes no via hole or plating tolerance: vias are not controlled,
+ * S-019i, S-019m). finishedHoleDiameter, platingThickness and barrelLength are relative; conductorTemperature is an absolute
+ * temperature-difference tolerance and needs a user-supplied temperature; resistivity needs the plated-copper override and
+ * current needs a current. The via count is exact and is never toleranced.
+ */
+export interface Tolerances {
+  finishedHoleDiameter?: TolValue;
+  platingThickness?: TolValue;
+  barrelLength?: TolValue;
+  resistivity?: TolValue;
+  conductorTemperature?: TolValue;
+  current?: TolValue;
+}
 
 export interface Inputs {
   /** FINISHED (inside) hole diameter after plating, not the drill diameter. */
@@ -26,6 +44,7 @@ export interface Inputs {
   /** Plated copper resistivity at 20 degC (S-012, UNVERIFIED); replaces the pure-copper default. */
   resistivity?: Quantity;
   kMaterial?: 'pure-401' | 'c11000-391';
+  tolerances?: Tolerances;
 }
 
 const RECOMMENDATION =
@@ -217,10 +236,37 @@ function build(raw: unknown): CalcOutcome {
   return { ok: true, value: result };
 }
 
+/** Nominal result plus the tolerance envelope and sensitivities (task 9). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const fields: FieldSpec[] = [
+    { key: 'finishedHoleDiameter', input: 'finishedHoleDiameter', label: 'finished hole diameter', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'platingThickness', input: 'platingThickness', label: 'plating thickness', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'barrelLength', input: 'barrelLength', label: 'barrel length', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'resistivity', input: 'resistivity', label: 'plated copper resistivity', kind: 'relative', present: inp.resistivity !== undefined, absentMessage: 'resistivity tolerance needs the plated-copper resistivity override; the default copper value is a definition (S-004) and is not toleranced.' },
+    { key: 'conductorTemperature', input: 'conductorTemperature', label: 'conductor temperature', kind: 'temperature', present: inp.conductorTemperature !== undefined, absentMessage: 'conductorTemperature tolerance needs a user-supplied conductor temperature; the 25 degC default is an assumption and is not toleranced.' },
+    { key: 'current', input: 'current', label: 'current', kind: 'relative', present: inp.current !== undefined, absentMessage: 'current tolerance needs a current; none was given.' },
+  ];
+  const planRes = planTolerances(raw.tolerances, fields, {});
+  if (!planRes.ok) return { ok: false, error: planRes.error };
+  const plan = planRes.value;
+  const nominalRes = build(stripEnvelopeInputs(raw));
+  if (!nominalRes.ok) return nominalRes;
+  const nominal = nominalRes.value;
+  const outputs: OutputPlan[] = [
+    { name: 'resistance at conductor temperature', sensitivity: true },
+    { name: 'axial thermal resistance (all barrels, ideal parallel)', sensitivity: true },
+  ];
+  if (inp.current !== undefined) outputs.push({ name: 'voltage drop', sensitivity: true }, { name: 'power loss', sensitivity: true });
+  return envelopeResult({ compute: (i: Inputs) => build(i), base: stripEnvelopeInputs(raw), nominal, plan, outputs });
+}
+
 /** Via barrel resistance, drop, power loss and axial thermal resistance. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

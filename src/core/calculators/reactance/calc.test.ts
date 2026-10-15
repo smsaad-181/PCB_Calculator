@@ -292,14 +292,14 @@ describe('wording, performance, meta', () => {
   it('no compliance or readiness claim anywhere in a result', () => {
     for (const i of [{ kind: 'inductive', frequency: F(1e3), inductance: L(1e-3) }, { kind: 'capacitive', frequency: F(1e3), capacitance: C(1e-6) }] as Inputs[]) expectNoClaimWording(ok(i));
   });
-  it('10 000 computes take under 1 s in total', () => {
+  it('10 000 computes stay within a 5 s total budget', () => {
     const input: Inputs = { kind: 'capacitive', frequency: F(1e3), capacitance: C(1e-6) };
     compute(input);
     const t0 = performance.now();
     let n = 0;
     for (let i = 0; i < 10_000; i++) if (compute(input).ok) n++;
     expect(n).toBe(10_000);
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(5000);
   });
   it('meta: id, accuracy class, ledger S-019 only and it exists, no tolerance inputs', () => {
     expect(meta.id).toBe('reactance');

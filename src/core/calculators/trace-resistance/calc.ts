@@ -4,18 +4,39 @@ import {
   COPPER_ALPHA_20C,
   COPPER_RESISTIVITY_20C,
   DEFAULT_FOIL_CONVENTION,
+  FINISHED_COPPER_LEDGER_ID,
   FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
+  MU0_H_PER_M,
   copperBasisFactors,
   copperBasisFromFoil,
+  usesFinishedCopperStatement,
 } from '../../data/constants';
 import { dataStatusForLedgerIds } from '../../data-status';
 import { assertCalcResult } from '../../result';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning, CopperBasis, CopperBasisKind } from '../../result';
 import { DIM, FOIL_CONVENTIONS, add, foilThickness, fromUnit, q, toUnit } from '../../units';
 import type { FoilConvention, Quantity } from '../../units';
+import { envelopeResult, hasTolerances, planTolerances, stripEnvelopeInputs } from '../tolerance-shared';
+import type { FieldSpec, OutputPlan, ThicknessChoice, TolValue } from '../tolerance-shared';
 import { validate } from './guards';
 import type { Layer } from './guards';
 import { meta } from './meta';
+
+/**
+ * Optional input tolerances (task 9). Absent means no envelope and no sensitivity readout; there are no default tolerances.
+ * length, width and copperThickness are relative tolerances (copperThickness may instead be an explicit choice of
+ * 'foil-convention-spread' (S-003) or 'finished-copper-s009' (S-009, thin side only)). ambient is an absolute
+ * temperature-difference tolerance on the conductor temperature and needs a user-supplied ambient. resistivity needs the
+ * override and current needs a current. No tolerance is taken from a fab profile here.
+ */
+export interface Tolerances {
+  length?: TolValue;
+  width?: TolValue;
+  copperThickness?: TolValue | ThicknessChoice;
+  ambient?: TolValue;
+  resistivity?: TolValue;
+  current?: TolValue;
+}
 
 export interface Inputs {
   layer: Layer;
@@ -31,6 +52,7 @@ export interface Inputs {
   alpha?: Quantity;
   frequency?: Quantity;
   current?: Quantity;
+  tolerances?: Tolerances;
 }
 
 const RECOMMENDATION =
@@ -48,16 +70,11 @@ export const VOLTAGE_DROP_SCOPE =
 const SKIN_MESSAGE = 'DC formula is optimistic: skin depth is below half the copper thickness';
 
 const REL_TOL = 1e-9;
-const MU0 = 4e-7 * Math.PI;
+const MU0 = MU0_H_PER_M; // ledger S-013 (VERIFIED) states 4 pi x 1e-7 H/m; see src/core/data/constants.ts
 const T20_C = 20;
 const V = meta.validity;
 const REF_IDS: readonly string[] = meta.reference.ledgerIds;
-const STATUS_DEFAULT = dataStatusForLedgerIds([...REF_IDS], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_FREQ = dataStatusForLedgerIds([...REF_IDS, 'S-013'], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_RHO = dataStatusForLedgerIds([...REF_IDS, 'S-012'], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_RHO_FREQ = dataStatusForLedgerIds([...REF_IDS, 'S-012', 'S-013'], undefined, {
-  exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
-});
+const EXCLUDE = { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE };
 
 /** Thrown for a value outside the representable or modelled range; mapped to OUT_OF_DOMAIN by compute. */
 class RangeFailure extends Error {}
@@ -76,7 +93,7 @@ function nominalBasis(layer: Layer, weight: Quantity, convention: FoilConvention
   return { ...b, thickness: q(b.thickness.si, b.thickness.dim) };
 }
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -256,21 +273,29 @@ function build(raw: unknown): CalcOutcome {
   // Confidence.
   const defaultedAssumptions = ambientDefaulted ? ['ambient'] : [];
   const safetyRelevantDefaults = [...copperBasisFactors(basis).safetyRelevantDefaults];
-  const dataStatus = rhoDiffers ? (inp.frequency !== undefined ? STATUS_RHO_FREQ : STATUS_RHO) : inp.frequency !== undefined ? STATUS_FREQ : STATUS_DEFAULT;
+  // Ledger rows whose data the printed statements rest on. S-009 is added only when an S-009-based statement is present.
+  const usesS009 = usesFinishedCopperStatement(basis);
+  const ledgerIds = [...REF_IDS];
+  if (inp.frequency !== undefined) ledgerIds.push('S-013');
+  if (rhoOverride) ledgerIds.push('S-012');
+  if (usesS009) ledgerIds.push(FINISHED_COPPER_LEDGER_ID);
+  for (const id of extraLedgerIds) if (!ledgerIds.includes(id)) ledgerIds.push(id);
+  // An override equal to the default value is still cited (S-012) but does not change the data being relied on.
+  const ratedIds = rhoOverride && !rhoDiffers ? ledgerIds.filter((id) => id !== 'S-012') : ledgerIds;
+  const dataStatus = dataStatusForLedgerIds(ratedIds, undefined, EXCLUDE);
+  // The confidence rule does not count the implicit S-009 row a second time: the same uncertainty is already counted as the
+  // nominal-copper safety-relevant default. S-009 chosen explicitly through a thickness tolerance (extraLedgerIds) still counts.
+  const confidenceStatus = usesS009 && !extraLedgerIds.includes(FINISHED_COPPER_LEDGER_ID) ? dataStatusForLedgerIds(ratedIds.filter((id) => id !== FINISHED_COPPER_LEDGER_ID), undefined, EXCLUDE) : dataStatus;
   const confidence = rateConfidence({
     outOfRangeInputs: outOfRange,
     defaultedAssumptions,
     safetyRelevantDefaults,
     accuracyClass: meta.accuracyClass,
-    dataStatus,
+    dataStatus: confidenceStatus,
   });
   if (safetyRelevantDefaults.length > 0) {
     confidence.reasons.push('Resistance is inversely proportional to copper thickness, so any difference between nominal and finished copper carries straight into the resistance.');
   }
-
-  const ledgerIds = [...REF_IDS];
-  if (inp.frequency !== undefined) ledgerIds.push('S-013');
-  if (rhoOverride) ledgerIds.push('S-012');
 
   const result: CalcResult = {
     method: meta.method,
@@ -296,10 +321,38 @@ function build(raw: unknown): CalcOutcome {
   return { ok: true, value: result };
 }
 
+/** Nominal result plus the tolerance envelope and sensitivities (task 9). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const fields: FieldSpec[] = [
+    { key: 'length', input: 'length', label: 'length', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'width', input: 'width', label: 'width', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'copperThickness', input: inp.copperWeight !== undefined ? 'copperWeight' : 'copperThickness', label: 'copper thickness', kind: 'relative', present: true, absentMessage: '', allow: 'thickness' },
+    { key: 'ambient', input: 'ambient', label: 'ambient', kind: 'temperature', present: inp.ambient !== undefined, absentMessage: 'ambient tolerance needs a user-supplied ambient; the 25 degC default is an assumption and is not toleranced.' },
+    { key: 'resistivity', input: 'resistivity', label: 'resistivity', kind: 'relative', present: inp.resistivity !== undefined, absentMessage: 'resistivity tolerance needs the resistivity override; the default copper value is a definition (S-004) and is not toleranced.' },
+    { key: 'current', input: 'current', label: 'current', kind: 'relative', present: inp.current !== undefined, absentMessage: 'current tolerance needs a current; none was given.' },
+  ];
+  const planRes = planTolerances(raw.tolerances, fields, {
+    layer: inp.layer,
+    ...(inp.copperWeight !== undefined ? { copperWeight: inp.copperWeight } : {}),
+    ...(inp.convention !== undefined ? { convention: inp.convention } : {}),
+  });
+  if (!planRes.ok) return { ok: false, error: planRes.error };
+  const plan = planRes.value;
+  const nominalRes = build(stripEnvelopeInputs(raw), plan.ledgerIds);
+  if (!nominalRes.ok) return nominalRes;
+  const nominal = nominalRes.value;
+  const outputs: OutputPlan[] = [{ name: 'resistance at conductor temperature', sensitivity: true }];
+  if (inp.current !== undefined) outputs.push({ name: 'voltage drop', sensitivity: true }, { name: 'power loss', sensitivity: true });
+  return envelopeResult({ compute: (i: Inputs) => build(i), base: stripEnvelopeInputs(raw), nominal, plan, outputs });
+}
+
 /** Trace resistance at the conductor temperature, with voltage drop, power loss and a skin-depth screen. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

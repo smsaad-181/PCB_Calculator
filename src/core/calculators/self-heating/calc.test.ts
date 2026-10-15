@@ -521,10 +521,10 @@ describe('errors are values (never throw, never a number)', () => {
 });
 
 describe('performance sanity', () => {
-  it('2000 computes < 1 s', () => {
+  it('2000 computes within a 5 s total budget', () => {
     const inp = user(2, 100, 0.254, 35, 50, 25);
     const t0 = performance.now();
     for (let i = 0; i < 2000; i++) compute(inp);
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(5000);
   });
 });

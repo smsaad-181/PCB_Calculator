@@ -2244,6 +2244,291 @@ GOLDEN.extend((n, got, _CIRCUIT2_PINNED[n], tol, ids, note) for n, got, tol, ids
 
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Task 9: tolerance envelope (corner analysis) and normalised sensitivities. Independent of src/.
+# Corner analysis: every output below is monotone in every tolerated input, so min/max sit at corners of the tolerance box
+# (brute-force product over (1 - minus, 1 + plus), or nominal -/+ amount for an absolute temperature tolerance). typ is the
+# nominal evaluation. Sensitivities S = d ln(out)/d ln(in) are the ANALYTIC closed-form exponents (not differences): the
+# legacy exponents 0.44 and 0.725 (S-001), the L/(w t) product form, and A = pi t (d + t) for the via barrel.
+# Every geometry, tolerance and current is a TEST value, not fab data or a recommendation.
+# ---------------------------------------------------------------------------------------------------------------
+import itertools
+
+def _env_corners(fn, nominal, tols):
+    """fn(dict) -> dict of outputs; tols: name -> (minus, plus, 'rel' | 'abs'). Returns {output: (min, typ, max)}."""
+    typ = fn(nominal)
+    names = list(tols)
+    lo, hi = dict(typ), dict(typ)
+    for signs in itertools.product((-1, 1), repeat=len(names)):
+        pt = dict(nominal)
+        for n, sg in zip(names, signs):
+            minus, plus, kind = tols[n]
+            amt = plus if sg > 0 else -minus
+            pt[n] = nominal[n] * (1.0 + amt) if kind == "rel" else nominal[n] + amt
+        o = fn(pt)
+        for k, v in o.items():
+            lo[k] = min(lo[k], v)
+            hi[k] = max(hi[k], v)
+    return {k: (lo[k], typ[k], hi[k]) for k in typ}
+
+def _env_vectors(tag, fn, nominal, tols, units, ids, note):
+    out = []
+    for k, (a, b, c) in _env_corners(fn, nominal, tols).items():
+        for label, v in (("min", a), ("typ", b), ("max", c)):
+            out.append(("env_%s_%s_%s_%s" % (tag, k, units[k], label), v, 1e-9, ids, note))
+    return out
+
+def _sens_vectors(tag, table, ids, note):
+    return [("sens_%s_%s_to_%s" % (tag, o, i), v, 1e-9, ids, note) for (o, i), v in table.items()]
+
+_TW_IDS = ("S-001", "S-003", "S-006")
+
+# Trace width (legacy IPC-2221, S-001).
+def _tw_width(n, layer):    # solve width: I [A], dT [K], t [um]
+    return {"width_mil": ipc2221_width_mil(n["I"], n["dT"], layer, n["t"])}
+
+def _tw_current(n, layer):  # solve current: w [mil], dT [K], t [um]
+    return {"current_A": ipc2221_current_A(n["w"], n["dT"], layer, n["t"])}
+
+def _tw_rise(n, layer):     # solve dT: I [A], w [mil], t [um], ambient [degC]
+    dT = ipc2221_dT_C(n["I"], n["w"], layer, n["t"])
+    return {"rise_K": dT, "tmax_degC": n["amb"] + dT}
+
+# A: outer, solve width, 1 oz at 35 um; tolerances on I, dT and thickness; a 20 % width tolerance as a drawn-width allowance.
+_TW9_A = dict(I=3.0, dT=20.0, t=35.0)
+_TW9_A_TOL = {"I": (0.05, 0.05, "rel"), "dT": (0.1, 0.1, "rel"), "t": (0.1, 0.05, "rel")}
+_TW9 = _env_vectors("tw_A_outer_width_I3_dT20_1oz", lambda n: _tw_width(n, "outer"), _TW9_A, _TW9_A_TOL,
+                    {"width_mil": "mil"}, _TW_IDS, "solve width; I +-5 %, dT +-10 %, thickness -10/+5 % (TEST tolerances)")
+_wA = _env_corners(lambda n: _tw_width(n, "outer"), _TW9_A, _TW9_A_TOL)["width_mil"]
+_TW9 += [("env_tw_A_drawn_width_mil_%s" % lab, v / (1.0 - 0.2), 1e-9, _TW_IDS, "required width / (1 - 0.2): drawn width covering a +-20 % finished-width tolerance (TEST value)")
+         for lab, v in zip(("min", "typ", "max"), _wA)]
+_TW9 += _sens_vectors("tw_A_width", {("width", "current"): 1.0 / C_AREA, ("width", "deltaT"): -B_DT / C_AREA, ("width", "thickness"): -1.0},
+                      ("S-001",), "closed-form exponents of A = (I/(k dT^0.44))^(1/0.725), width = A/t")
+# B: inner, solve current: width 0.5 mm, dT 30, 2 oz (70 um); tolerances on width, dT and thickness.
+_TW9_B = dict(w=0.5 / 0.0254, dT=30.0, t=70.0)
+_TW9_B_TOL = {"w": (0.2, 0.2, "rel"), "dT": (0.05, 0.05, "rel"), "t": (0.1, 0.0, "rel")}
+_TW9 += _env_vectors("tw_B_inner_current_w0.5mm_dT30_2oz", lambda n: _tw_current(n, "inner"), _TW9_B, _TW9_B_TOL,
+                     {"current_A": "A"}, _TW_IDS, "solve current capacity; width +-20 %, dT +-5 %, thickness -10/+0 % (TEST tolerances)")
+_TW9 += _sens_vectors("tw_B_current", {("current", "width"): C_AREA, ("current", "deltaT"): B_DT, ("current", "thickness"): C_AREA},
+                      ("S-001",), "closed-form exponents of I = k dT^0.44 (w t)^0.725")
+# C: outer, solve dT: I 2 A, width 1 mm, 1 oz; ambient 25 degC +-5 K for the maximum conductor temperature.
+_TW9_C = dict(I=2.0, w=1.0 / 0.0254, t=35.0, amb=25.0)
+_TW9_C_TOL = {"I": (0.1, 0.1, "rel"), "w": (0.2, 0.2, "rel"), "t": (0.1, 0.1, "rel"), "amb": (5.0, 5.0, "abs")}
+_TW9 += _env_vectors("tw_C_outer_rise_I2_w1mm_1oz", lambda n: _tw_rise(n, "outer"), _TW9_C, _TW9_C_TOL,
+                     {"rise_K": "K", "tmax_degC": "degC"}, _TW_IDS, "solve rise; I +-10 %, width +-20 %, thickness +-10 %, ambient 25 degC +-5 K (TEST tolerances)")
+_TW9 += _sens_vectors("tw_C_rise", {("rise", "current"): 1.0 / B_DT, ("rise", "width"): -C_AREA / B_DT, ("rise", "thickness"): -C_AREA / B_DT},
+                      ("S-001",), "closed-form exponents of dT = (I/(k A^0.725))^(1/0.44)")
+# D and E: thickness tolerance from the foil-convention spread and from the S-009 finished-copper minimum (one-sided).
+_conv = [copper_thickness_um(1.0, c) for c in FOIL_CONVENTIONS]
+_TW9_D_TOL = {"t": ((FOIL_UM_PER_OZ - min(_conv)) / FOIL_UM_PER_OZ, max(0.0, (max(_conv) - FOIL_UM_PER_OZ) / FOIL_UM_PER_OZ), "rel")}
+_TW9 += _env_vectors("tw_D_outer_width_I3_dT20_1oz_foilspread", lambda n: _tw_width(n, "outer"), _TW9_A, _TW9_D_TOL,
+                     {"width_mil": "mil"}, _TW_IDS, "thickness tolerance = spread of the three S-003 conventions around 35 um (explicit user choice)")
+_TW9 += [("env_tw_D_thickness_minus_fraction", _TW9_D_TOL["t"][0], 1e-9, ("S-003", "S-003d", "S-006"), "(35 - min convention)/35 at 1 oz"),
+         ("env_tw_D_thickness_plus_fraction", _TW9_D_TOL["t"][1], 1e-9, ("S-003", "S-003d", "S-006"), "(max convention - 35)/35 at 1 oz; 35 um is the largest, so 0")]
+_S009_INNER_1OZ_UM = 24.9   # ledger S-009 (secondhand IPC-6012 inner-layer MINIMUM, restated here; a minimum, not a typical value)
+_TW9_E_TOL = {"t": (1.0 - _S009_INNER_1OZ_UM / FOIL_UM_PER_OZ, 0.0, "rel")}
+_TW9 += _env_vectors("tw_E_inner_width_I3_dT20_1oz_s009", lambda n: _tw_width(n, "inner"), _TW9_A, _TW9_E_TOL,
+                     {"width_mil": "mil"}, ("S-001", "S-003", "S-006", "S-009"), "thickness tolerance = thin side down to the S-009 inner 1 oz minimum 24.9 um (explicit user choice)")
+_TW9 += [("env_tw_E_thickness_minus_fraction", _TW9_E_TOL["t"][0], 1e-9, ("S-009",), "1 - 24.9/35")]
+
+# Trace resistance (S-004). nominal: L [mm], w [mm], t [um], T [degC] (the conductor temperature), I [A], rho20 [ohm.m]
+def _tr9(n):
+    R = trace_resistance_ohm(n["L"], n["w"], n["t"], n["T"], n.get("rho", RHO_CU_20C))
+    o = {"R_ohm": R}
+    if "I" in n:
+        o["vdrop_V"] = n["I"] * R
+        o["power_W"] = n["I"] ** 2 * R
+    return o
+
+_TR9_A = dict(L=100.0, w=0.254, t=35.0, T=85.0, I=3.0)
+_TR9_A_TOL = {"L": (0.01, 0.01, "rel"), "w": (0.2, 0.2, "rel"), "t": (0.1, 0.1, "rel"), "T": (5.0, 5.0, "abs"), "I": (0.02, 0.02, "rel")}
+_TR9 = _env_vectors("tr_A_L100mm_w0.254mm_t35um_T85C_I3A", _tr9, _TR9_A, _TR9_A_TOL,
+                    {"R_ohm": "ohm", "vdrop_V": "V", "power_W": "W"}, ("S-004", "S-006"), "L +-1 %, w +-20 %, t +-10 %, T +-5 K, I +-2 % (TEST tolerances)")
+_a85 = ALPHA_CU / (1.0 + ALPHA_CU * (85.0 - 20.0))
+_TR9 += _sens_vectors("tr_A", {("R", "length"): 1.0, ("R", "width"): -1.0, ("R", "thickness"): -1.0, ("R", "temperatureK"): _a85,
+                               ("vdrop", "current"): 1.0, ("vdrop", "length"): 1.0, ("power", "current"): 2.0, ("power", "width"): -1.0},
+                      ("S-004",), "R = rho(T) L/(w t): unit exponents; temperature semi-log alpha/(1 + alpha (T - 20)) per K")
+_TR9_B = dict(L=1000.0, w=1.0, t=70.0, T=25.0, rho=1.9e-8)
+_TR9_B_TOL = {"L": (0.005, 0.005, "rel"), "w": (0.1, 0.1, "rel"), "t": (0.1, 0.0, "rel"), "T": (10.0, 10.0, "abs"), "rho": (0.05, 0.1, "rel")}
+_TR9 += _env_vectors("tr_B_L1000mm_w1mm_t70um_T25C_rho1.9uohmcm", _tr9, _TR9_B, _TR9_B_TOL,
+                     {"R_ohm": "ohm"}, ("S-004", "S-006"), "L +-0.5 %, w +-10 %, t -10/+0 %, T +-10 K, rho -5/+10 % (TEST tolerances; rho override S-012 unverified)")
+_TR9 += _sens_vectors("tr_B", {("R", "resistivity"): 1.0, ("R", "temperatureK"): ALPHA_CU / (1.0 + ALPHA_CU * 5.0)},
+                      ("S-004",), "R proportional to rho20; semi-log alpha/(1 + alpha (T - 20)) per K at 25 degC")
+
+# Via (S-004 R(T), S-007 theta): d, L [mm], t [um], N, T [degC], I [A], rho20 override [ohm.m], k [W/m.K]
+def _via9(n, N, k):
+    d, t, L = n["d"] * 1e-3, n["t"] * 1e-6, n["L"] * 1e-3
+    A = via_area_m2(d, t) * N
+    rho = n.get("rho", RHO_CU_20C)
+    R = rho * (1.0 + ALPHA_CU * (n["T"] - 20.0)) * L / A
+    o = {"R_mohm": R * 1e3, "theta_KperW": L / (k * A)}
+    if "I" in n:
+        o["vdrop_mV"] = n["I"] * R * 1e3
+        o["power_mW"] = n["I"] ** 2 * R * 1e3
+    return o
+
+_V9_A = dict(d=0.3, t=25.0, L=1.6, T=85.0, I=2.0)
+_V9_A_TOL = {"d": (0.1, 0.1, "rel"), "t": (0.2, 0.1, "rel"), "L": (0.05, 0.05, "rel"), "T": (10.0, 10.0, "abs"), "I": (0.05, 0.05, "rel")}
+_V9 = _env_vectors("via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A", lambda n: _via9(n, 4, 401.0), _V9_A, _V9_A_TOL,
+                   {"R_mohm": "mohm", "theta_KperW": "KperW", "vdrop_mV": "mV", "power_mW": "mW"}, ("S-004", "S-007"),
+                   "d +-10 %, t -20/+10 %, L +-5 %, T +-10 K, I +-5 % (TEST tolerances; k = 401)")
+_dd, _tt = 0.3e-3, 25e-6
+_sd = -_dd / (_dd + _tt)
+_st = -(_dd + 2 * _tt) / (_dd + _tt)
+_a85v = ALPHA_CU / (1.0 + ALPHA_CU * 65.0)
+_V9 += _sens_vectors("via_A", {("R", "finishedHole"): _sd, ("R", "plating"): _st, ("R", "barrelLength"): 1.0, ("R", "temperatureK"): _a85v,
+                               ("theta", "finishedHole"): _sd, ("theta", "plating"): _st, ("theta", "barrelLength"): 1.0, ("theta", "temperatureK"): 0.0,
+                               ("vdrop", "current"): 1.0, ("power", "current"): 2.0},
+                     ("S-004",), "A = pi t (d + t): d ln A / d ln d = d/(d + t), d ln A / d ln t = (d + 2t)/(d + t)")
+_V9_B = dict(d=0.2, t=18.0, L=0.8, T=105.0, rho=2.0e-8)
+_V9_B_TOL = {"d": (0.05, 0.05, "rel"), "t": (0.15, 0.0, "rel"), "L": (0.1, 0.1, "rel"), "rho": (0.1, 0.1, "rel"), "T": (5.0, 5.0, "abs")}
+_V9 += _env_vectors("via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm", lambda n: _via9(n, 1, 401.0), _V9_B, _V9_B_TOL,
+                    {"R_mohm": "mohm", "theta_KperW": "KperW"}, ("S-004", "S-007"),
+                    "d +-5 %, t -15/+0 %, L +-10 %, rho +-10 %, T +-5 K (TEST tolerances; rho override S-012 unverified)")
+_V9 += _sens_vectors("via_B", {("R", "resistivity"): 1.0, ("theta", "resistivity"): 0.0}, ("S-004",), "R proportional to rho20; theta independent of rho")
+
+_ENV9 = _TW9 + _TR9 + _V9
+
+# Pinned literals recorded from this oracle (regression pins, same policy as _VIA_PINNED).
+_ENV9_PINNED = {
+    'env_tw_A_outer_width_I3_dT20_1oz_width_mil_mil_min': 29.594738138017807,
+    'env_tw_A_outer_width_I3_dT20_1oz_width_mil_mil_typ': 35.33873019422759,
+    'env_tw_A_outer_width_I3_dT20_1oz_width_mil_mil_max': 44.77185756090238,
+    'env_tw_A_drawn_width_mil_min': 36.99342267252226,
+    'env_tw_A_drawn_width_mil_typ': 44.17341274278448,
+    'env_tw_A_drawn_width_mil_max': 55.96482195112797,
+    'sens_tw_A_width_width_to_current': 1.3793103448275863,
+    'sens_tw_A_width_width_to_deltaT': -0.6068965517241379,
+    'sens_tw_A_width_width_to_thickness': -1.0,
+    'env_tw_B_inner_current_w0.5mm_dT30_2oz_current_A_A_min': 1.4939961664123407,
+    'env_tw_B_inner_current_w0.5mm_dT30_2oz_current_A_A_typ': 1.939032270159414,
+    'env_tw_B_inner_current_w0.5mm_dT30_2oz_current_A_A_max': 2.2610737695341787,
+    'sens_tw_B_current_current_to_width': 0.725,
+    'sens_tw_B_current_current_to_deltaT': 0.44,
+    'sens_tw_B_current_current_to_thickness': 0.725,
+    'env_tw_C_outer_rise_I2_w1mm_1oz_rise_K_K_min': 3.3178110306385764,
+    'env_tw_C_outer_rise_I2_w1mm_1oz_rise_K_K_typ': 6.660685045364097,
+    'env_tw_C_outer_rise_I2_w1mm_1oz_rise_K_K_max': 14.212494815447364,
+    'env_tw_C_outer_rise_I2_w1mm_1oz_tmax_degC_degC_min': 23.317811030638577,
+    'env_tw_C_outer_rise_I2_w1mm_1oz_tmax_degC_degC_typ': 31.660685045364097,
+    'env_tw_C_outer_rise_I2_w1mm_1oz_tmax_degC_degC_max': 44.212494815447364,
+    'sens_tw_C_rise_rise_to_current': 2.272727272727273,
+    'sens_tw_C_rise_rise_to_width': -1.6477272727272727,
+    'sens_tw_C_rise_rise_to_thickness': -1.6477272727272727,
+    'env_tw_D_outer_width_I3_dT20_1oz_foilspread_width_mil_mil_min': 35.33873019422759,
+    'env_tw_D_outer_width_I3_dT20_1oz_foilspread_width_mil_mil_typ': 35.33873019422759,
+    'env_tw_D_outer_width_I3_dT20_1oz_foilspread_width_mil_mil_max': 36.070444934323874,
+    'env_tw_D_thickness_minus_fraction': 0.02028571428571431,
+    'env_tw_D_thickness_plus_fraction': 0.0,
+    'env_tw_E_inner_width_I3_dT20_1oz_s009_width_mil_mil_min': 91.93158064743616,
+    'env_tw_E_inner_width_I3_dT20_1oz_s009_width_mil_mil_typ': 91.93158064743616,
+    'env_tw_E_inner_width_I3_dT20_1oz_s009_width_mil_mil_max': 129.221097295593,
+    'env_tw_E_thickness_minus_fraction': 0.2885714285714286,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_R_ohm_ohm_min': 0.17975447034637912,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_R_ohm_ohm_typ': 0.24348357317404298,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_R_ohm_ohm_max': 0.34689925612746686,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_vdrop_V_V_min': 0.5284781428183546,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_vdrop_V_V_typ': 0.7304507195221289,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_vdrop_V_V_max': 1.0615117237500487,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_power_W_W_min': 1.5537257398859625,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_power_W_W_typ': 2.191352158566387,
+    'env_tr_A_L100mm_w0.254mm_t35um_T85C_I3A_power_W_W_max': 3.2482258746751485,
+    'sens_tr_A_R_to_length': 1.0,
+    'sens_tr_A_R_to_width': -1.0,
+    'sens_tr_A_R_to_thickness': -1.0,
+    'sens_tr_A_R_to_temperatureK': 0.003130351666733044,
+    'sens_tr_A_vdrop_to_current': 1.0,
+    'sens_tr_A_vdrop_to_length': 1.0,
+    'sens_tr_A_power_to_current': 2.0,
+    'sens_tr_A_power_to_width': -1.0,
+    'env_tr_B_L1000mm_w1mm_t70um_T25C_rho1.9uohmcm_R_ohm_ohm_min': 0.2286602715909091,
+    'env_tr_B_L1000mm_w1mm_t70um_T25C_rho1.9uohmcm_R_ohm_ohm_typ': 0.2767621428571429,
+    'env_tr_B_L1000mm_w1mm_t70um_T25C_rho1.9uohmcm_R_ohm_ohm_max': 0.39228774735449734,
+    'sens_tr_B_R_to_resistivity': 1.0,
+    'sens_tr_B_R_to_temperatureK': 0.0038542637179424318,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_R_mohm_mohm_min': 0.2579788690555161,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_R_mohm_mohm_typ': 0.33920182205575816,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_R_mohm_mohm_max': 0.5145520944034321,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_theta_KperW_KperW_min': 30.681784223444048,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_theta_KperW_KperW_typ': 39.07890411617611,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_theta_KperW_KperW_max': 57.48136219674612,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_vdrop_mV_mV_min': 0.49015985120548056,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_vdrop_mV_mV_typ': 0.6784036441115163,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_vdrop_mV_mV_max': 1.0805593982472075,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_power_mW_mW_min': 0.9313037172904132,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_power_mW_mW_typ': 1.3568072882230326,
+    'env_via_A_d0.3mm_t25um_L1.6mm_N4_T85C_I2A_power_mW_mW_max': 2.2691747363191355,
+    'sens_via_A_R_to_finishedHole': -0.923076923076923,
+    'sens_via_A_R_to_plating': -1.0769230769230769,
+    'sens_via_A_R_to_barrelLength': 1.0,
+    'sens_via_A_R_to_temperatureK': 0.003130351666733044,
+    'sens_via_A_theta_to_finishedHole': -0.923076923076923,
+    'sens_via_A_theta_to_plating': -1.0769230769230769,
+    'sens_via_A_theta_to_barrelLength': 1.0,
+    'sens_via_A_theta_to_temperatureK': 0.0,
+    'sens_via_A_vdrop_to_current': 1.0,
+    'sens_via_A_power_to_current': 2.0,
+    'env_via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm_R_mohm_mohm_min': 1.3212205717893932,
+    'env_via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm_R_mohm_mohm_typ': 1.7314630118796572,
+    'env_via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm_R_mohm_mohm_max': 2.6558132237747634,
+    'env_via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm_theta_KperW_KperW_min': 139.26144558944333,
+    'env_via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm_theta_KperW_KperW_typ': 161.8328725504235,
+    'env_via_B_d0.2mm_t18um_L0.8mm_N1_T105C_rho2uohmcm_theta_KperW_KperW_max': 222.38630891717463,
+    'sens_via_B_R_to_resistivity': 1.0,
+    'sens_via_B_theta_to_resistivity': 0.0,
+}
+GOLDEN.extend((n, got, _ENV9_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _ENV9)
+
+
+# ---------------------------------------------------------------------------------------------------------------
+# Trace width, RMS-equivalent pulse input (Phase 1 task 2 advanced input, PV-3). Independent of src/.
+# Rectangular pulse, period much shorter than the thermal time constant (the user's declaration): I_rms = I_pk sqrt(D)
+# (S-019e, VERIFIED); the legacy IPC-2221 relation (S-001, PAYWALLED) is then evaluated at I_rms. S-019f (validity of the
+# mean-rise reading) is UNVERIFIED. The result is the MEAN (duty-averaged) rise, not the peak.
+# ---------------------------------------------------------------------------------------------------------------
+def tw_rms_A(i_pk, duty):
+    return i_pk * math.sqrt(duty)
+
+# (layer, I_pk A, duty, dT degC, oz)
+TW_RMS_WIDTH_CASES = [("outer", 10, 0.25, 20, 1), ("inner", 5, 0.64, 15, 2), ("outer", 8, 0.36, 30, 0.5)]
+# (layer, I_pk A, duty, width mil, oz)
+TW_RMS_DT_CASES = [("outer", 8, 0.25, 40, 1), ("inner", 10, 0.36, 60, 1), ("outer", 6, 1, 30, 2)]
+
+def _tw_rms_tag(layer, ipk, d, x, oz, xname):
+    return "%s_Ipk%sA_D%s_%s%s_%soz" % (layer, _g(ipk), _g(d), xname, _g(x), _g(oz))
+
+_TW_RMS_PINNED = {
+    'trace_width_rms_current_A_Ipk10A_D0.25': 5.0,
+    'trace_width_rms_width_mil_outer_Ipk10A_D0.25_dT20C_1oz': 71.49064502936493,
+    'trace_width_rms_current_A_Ipk5A_D0.64': 4.0,
+    'trace_width_rms_width_mil_inner_Ipk5A_D0.64_dT15C_2oz': 81.39334781696346,
+    'trace_width_rms_current_A_Ipk8A_D0.36': 4.8,
+    'trace_width_rms_width_mil_outer_Ipk8A_D0.36_dT30C_0.5oz': 105.67118110165315,
+    'trace_width_rms_dT_C_outer_Ipk8A_D0.25_w40mil_1oz': 31.35588252680571,
+    'trace_width_rms_dT_C_inner_Ipk10A_D0.36_w60mil_1oz': 195.22487196692123,
+    'trace_width_rms_dT_C_outer_Ipk6A_D1_w30mil_2oz': 40.39950702142782,
+}
+_TW_RMS_IDS = ("S-001", "S-019e", "S-019f", "S-006", "S-003")
+
+def _tw_rms_vectors():
+    out = []
+    for layer, ipk, d, dt, oz in TW_RMS_WIDTH_CASES:
+        i = tw_rms_A(ipk, d)
+        out.append(("trace_width_rms_current_A_Ipk%sA_D%s" % (_g(ipk), _g(d)), i, 1e-12, _TW_RMS_IDS,
+                    "I_rms = I_pk sqrt(D) (S-019e)"))
+        out.append(("trace_width_rms_width_mil_" + _tw_rms_tag(layer, ipk, d, dt, oz, "dT").replace("dT%s_" % _g(dt), "dT%sC_" % _g(dt)),
+                    ipc2221_width_mil(i, dt, layer, FOIL_UM_PER_OZ * oz), 1e-9, _TW_RMS_IDS,
+                    "legacy IPC-2221 minimum width at I_rms (mean heating); LEGACY, not an IPC-2152 result"))
+    for layer, ipk, d, w, oz in TW_RMS_DT_CASES:
+        i = tw_rms_A(ipk, d)
+        out.append(("trace_width_rms_dT_C_" + _tw_rms_tag(layer, ipk, d, w, oz, "w").replace("w%s_" % _g(w), "w%smil_" % _g(w)),
+                    ipc2221_dT_C(i, w, layer, FOIL_UM_PER_OZ * oz), 1e-9, _TW_RMS_IDS,
+                    "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"))
+    return out
+
+GOLDEN.extend((n, got, _TW_RMS_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _tw_rms_vectors())
+
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:

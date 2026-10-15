@@ -9,7 +9,8 @@ import { SelectField } from '../components/SelectField';
 import { UnverifiedBadge } from '../components/UnverifiedBadge';
 import { parseFractionField } from '../components/view';
 import { useCalcState } from '../useCalcState';
-import { isSeriesName, isTopology } from './circuit-choices';
+import { useSearch } from '../useSearch';
+import { NEAREST_NOTE, isSeriesName, isTopology } from './circuit-choices';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
@@ -22,11 +23,12 @@ import {
   TOPOLOGY_OPTIONS,
   TOPOLOGY_FORMULA,
   computeNearest,
-  computePairs,
+  finishPairs,
   fromHashState,
   nearestSummary,
   pairTargetLabel,
   pairsSummary,
+  planPairs,
   toHashState,
   type ESeriesState,
   type NearestView,
@@ -56,9 +58,22 @@ function Nearest({ view }: { view: NearestView }) {
                 <td class="num">{r.error}</td>
               </tr>
             ))}
+            {view.ratio !== undefined && (
+              <tr key="ratio" class="ratio-row">
+                <th scope="row">{view.ratio.label}</th>
+                <td class="num">{view.ratio.value}</td>
+                <td class="num">{view.ratio.error}</td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
+      {view.ratio !== undefined && (
+        <p class="notice" role="note">
+          <strong>The two neighbours differ in this series.</strong> {view.arithmeticLabel} The geometric neighbour is the one whose ratio to your target is
+          smaller. Pick the one your circuit needs; this page does not choose for you.
+        </p>
+      )}
       {view.exact && <p class="muted">The target is itself a value of this series, so all three rows agree.</p>}
       <p class="muted">Error is (value − target) / target. Its size is rounded away from zero, so it is never understated.</p>
       <details class="more">
@@ -78,12 +93,26 @@ function Nearest({ view }: { view: NearestView }) {
   );
 }
 
-function Pairs({ view, topology }: { view: PairsView; topology: ESeriesState['topology'] }) {
+function Pairs({ view, topology }: { view: PairsView | 'searching'; topology: ESeriesState['topology'] }) {
+  if (view === 'searching') {
+    return (
+      <div class="needs" role="status">
+        <p>
+          <strong>Searching...</strong> Looking for the best pairs in the series. The page stays responsive; no result is shown until the search finishes.
+        </p>
+      </div>
+    );
+  }
   if (view.status === 'needs-input') return <ResultStatus status="needs-input" items={view.needs} />;
   if (view.status === 'error') return <ResultStatus status="error" items={view.problems} />;
   const divider = topology === 'divider-ratio';
   return (
     <div class="results">
+      {view.single !== undefined && (
+        <p class="notice" role="status">
+          <strong>{view.single}</strong> A pair is only needed if you want a different value.
+        </p>
+      )}
       <div class="table-wrap">
         <table>
           <caption class="visually-hidden">The best pairs of series values for your target, closest first</caption>
@@ -109,6 +138,7 @@ function Pairs({ view, topology }: { view: PairsView; topology: ESeriesState['to
           </tbody>
         </table>
       </div>
+      {view.hiddenText !== undefined && <p class="muted">{view.hiddenText}</p>}
       <p class="muted">
         <strong>Result</strong> is {view.resultHeading}. {view.window} Pairs are ordered by error, then by fewer significant digits. Error size is rounded away from zero.
       </p>
@@ -124,7 +154,13 @@ export default function ESeries() {
     toHash: toHashState,
   });
   const nearest = useMemo(() => computeNearest(applied), [applied]);
-  const pairs = useMemo(() => computePairs(applied), [applied]);
+  const pairPlan = useMemo(() => planPairs(applied), [applied]);
+  const search = useSearch(pairPlan.kind === 'search' ? pairPlan.task : null);
+  const pairs = useMemo((): PairsView | 'searching' => {
+    if (pairPlan.kind === 'view') return pairPlan.view;
+    if (search.status === 'done' && search.reply.kind === 'e-pairs') return finishPairs(pairPlan.state, search.reply.result);
+    return 'searching';
+  }, [pairPlan, search]);
   const ratio = state.topology === 'divider-ratio';
 
   return (
@@ -139,8 +175,11 @@ export default function ESeries() {
       <NoticeBanner notices={notices} onDismiss={() => setNotices([])} />
       <p class="method-line">{METHOD_TEXT}</p>
       <div class="visually-hidden" role="status" aria-live="polite" aria-atomic="true">
-        {nearestSummary(nearest)} {pairsSummary(pairs)}
+        {nearestSummary(nearest)} {pairs === 'searching' ? 'Two-resistor search: searching, no result yet.' : pairsSummary(pairs)}
       </div>
+      <p class="muted" id="nearest-note">
+        {NEAREST_NOTE}
+      </p>
       <div class="calc-stack" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>
         <section class="panel" aria-labelledby="near-h">
           <h2 id="near-h">Nearest value</h2>

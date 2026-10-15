@@ -426,6 +426,13 @@ describe('checkEnvelope (min <= typ <= max, same dimension)', () => {
     expect(r.ok).toBe(true);
     if (r.ok) expect(r.value.name).toBe('width');
   });
+  it('accepts the optional rounding bound and rejects an unknown one (task 9, additive field)', () => {
+    for (const b of ['min-requirement', 'max-capacity', 'nominal', 'prediction'] as const) {
+      expect(checkEnvelope({ ...envOk(), bound: b }).ok).toBe(true);
+    }
+    expect(checkEnvelope(envOk()).ok).toBe(true);
+    expect(bad({ ...envOk(), bound: 'worst' as unknown as 'nominal' })).toContain('unknown bound');
+  });
   it('accepts a degenerate envelope (min = typ = max)', () => {
     const e = envOk();
     e.min = e.typ = e.max = q(2, DIM.LENGTH);

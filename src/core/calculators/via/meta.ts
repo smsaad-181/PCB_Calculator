@@ -30,5 +30,20 @@ export const meta = {
   },
   defaults: { conductorTempC: 25 },
   accuracyClass: 'analytical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  toleranceInputs: ['finishedHoleDiameter', 'platingThickness', 'barrelLength', 'resistivity', 'conductorTemperature', 'current'] as string[],
+  /**
+   * Min/typ/max envelope and normalised sensitivities (task 9), optional, only when the user supplies tolerances. Generic
+   * helper: src/core/sensitivity.ts (no physics). Worst-case corner range over the listed tolerances (2^k corners, k <= 6)
+   * plus axis probes. R, theta, drop and power are monotone in every tolerated input, so corners are exact. Sensitivities:
+   * barrel length 1, resistivity 1 (R only), finished hole -d/(d + t), plating thickness -(d + 2t)/(d + t) (from A = pi t (d + t)),
+   * current 1 and 2 on drop and power, temperature the semi-log alpha / (1 + alpha (T - 20)) per kelvin on R and 0 on theta.
+   * All outputs are predictions and round up. No tolerance is taken from a fab profile (vias are 'not controlled' by the
+   * example fabricator, S-019i); the via count is exact.
+   */
+  envelope: {
+    method: 'Worst-case corner analysis of the tolerance box with axis monotonicity probes; local log-log sensitivities by central difference.',
+    maxToleratedInputs: 6,
+    sensitivityRelativeStep: 1e-4,
+    outputs: ['resistance at conductor temperature', 'axial thermal resistance (all barrels, ideal parallel)', 'voltage drop', 'power loss'],
+  },
 } as const;

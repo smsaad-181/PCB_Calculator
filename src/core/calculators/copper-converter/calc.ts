@@ -32,24 +32,21 @@ const ONE_OZ = fromUnit(1, 'oz/ft2');
 // Static data: computed once (the ledger and conventions are constants), keeping repeated computes cheap.
 const SPREAD_PCT = foilSpreadPercent();
 const SPREAD_TEXT = SPREAD_PCT.toFixed(2);
-const DATA_STATUS = dataStatusForLedgerIds(['S-003', 'S-003d', 'S-006'], undefined, {
+// The finished-copper caution (S-009, secondhand, PAYWALLED-USER-MUST-VERIFY) is always printed, so S-009 sets the result's dataStatus.
+const DATA_STATUS = dataStatusForLedgerIds(['S-003', 'S-003d', 'S-006', 'S-009'], undefined, {
+  exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
+});
+// The confidence rule does not count S-009 a second time: for a nominal weight the same uncertainty is already counted as the
+// nominal-copper safety-relevant default (copperBasisFactors), and the conversion itself rests only on S-003d and S-006.
+const CONFIDENCE_DATA_STATUS = dataStatusForLedgerIds(['S-003', 'S-003d', 'S-006'], undefined, {
   exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
 });
 const [W_LO, W_HI] = meta.validity.weightOzFt2;
 const [T_LO, T_HI] = meta.validity.thicknessUm;
 
-// copperBasisFromFoil is pure but re-derives the convention spread each call; memoise it (bounded) for repeated evaluation.
-const BASIS_CACHE = new Map<string, CopperBasis>();
-const BASIS_CACHE_MAX = 256;
 function nominalBasis(layer: Layer, weight: Quantity, convention: FoilConvention): CopperBasis {
-  const key = `${layer}|${String(weight.si)}|${convention}`;
-  let b = BASIS_CACHE.get(key);
-  if (b === undefined) {
-    b = copperBasisFromFoil(layer, weight, convention);
-    if (BASIS_CACHE.size >= BASIS_CACHE_MAX) BASIS_CACHE.clear();
-    BASIS_CACHE.set(key, b);
-  }
-  return { ...b };
+  const b = copperBasisFromFoil(layer, weight, convention);
+  return { ...b, thickness: q(b.thickness.si, b.thickness.dim) };
 }
 
 function internal(message: string): CalcOutcome {
@@ -184,7 +181,7 @@ function build(raw: unknown): CalcOutcome {
     defaultedAssumptions: factors.defaultedAssumptions,
     safetyRelevantDefaults: factors.safetyRelevantDefaults,
     accuracyClass: meta.accuracyClass,
-    dataStatus,
+    dataStatus: CONFIDENCE_DATA_STATUS,
   });
 
   const result: CalcResult = {

@@ -114,6 +114,12 @@ export interface Envelope {
   typ: Quantity;
   max: Quantity;
   toleranceInputs: string[];
+  /**
+   * Rounding direction for min, typ and max (additive, optional): 'min-requirement' and 'prediction' round up, 'max-capacity'
+   * rounds down, so a requirement or prediction envelope is never understated and a capacity envelope never overstated.
+   * Absent keeps the older behaviour (the viewer chooses).
+   */
+  bound?: Bound;
 }
 
 export interface CalcResult {
@@ -234,6 +240,8 @@ export function checkEnvelope(e: Envelope): Result<Envelope, string> {
   }
   if (e.min.si > e.typ.si) return fail('min must not exceed typ.');
   if (e.typ.si > e.max.si) return fail('typ must not exceed max.');
+  const b: unknown = (e as { bound?: unknown }).bound;
+  if (b !== undefined && (typeof b !== 'string' || !BOUNDS.includes(b))) return fail(`unknown bound "${String(b)}".`);
   return { ok: true, value: e };
 }
 

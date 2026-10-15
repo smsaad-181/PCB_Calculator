@@ -59,13 +59,18 @@ function designValue(direction: DesignDirection, x: Quantity, factor: number): D
   return { name: 'x', direction, calculated: x, recommended: q(x.si * factor, x.dim), derating: { factor, rationale: 'p' } };
 }
 
+/** Display rounding absorbs float noise up to 4 ulp (relative) of a rounding boundary (src/core/units/round-guard.ts). */
+const NOISE = 4 * Number.EPSILON;
+const noLess = (x: number): number => x - NOISE * Math.abs(x);
+const noMore = (x: number): number => x + NOISE * Math.abs(x);
+
 describe('formatResult directions', () => {
   it('min-requirement and prediction never print below the SI value', () => {
     fc.assert(
       fc.property(positiveQuantity, accuracyClass, prefs, fc.constantFrom('min-requirement' as const, 'prediction' as const), (x, c, p, bound) => {
         const s = formatResult({ value: x, bound }, { accuracyClass: c, prefs: p });
         noBadTokens(s);
-        expect(primarySi(s, x.dim)).toBeGreaterThanOrEqual(x.si);
+        expect(primarySi(s, x.dim)).toBeGreaterThanOrEqual(noLess(x.si));
       }),
       RUNS,
     );
@@ -75,7 +80,7 @@ describe('formatResult directions', () => {
       fc.property(positiveQuantity, accuracyClass, prefs, (x, c, p) => {
         const s = formatResult({ value: x, bound: 'max-capacity' }, { accuracyClass: c, prefs: p });
         noBadTokens(s);
-        expect(primarySi(s, x.dim)).toBeLessThanOrEqual(x.si);
+        expect(primarySi(s, x.dim)).toBeLessThanOrEqual(noMore(x.si));
       }),
       RUNS,
     );
@@ -93,8 +98,8 @@ describe('formatDesignValue directions', () => {
           const b = formatDesignValue(lo, which, { accuracyClass: c, prefs: p });
           noBadTokens(a);
           noBadTokens(b);
-          expect(primarySi(a, x.dim)).toBeGreaterThanOrEqual(hi[which].si);
-          expect(primarySi(b, x.dim)).toBeLessThanOrEqual(lo[which].si);
+          expect(primarySi(a, x.dim)).toBeGreaterThanOrEqual(noLess(hi[which].si));
+          expect(primarySi(b, x.dim)).toBeLessThanOrEqual(noMore(lo[which].si));
         }
       }),
       RUNS,
@@ -118,7 +123,7 @@ describe('formatMargin', () => {
         };
         const s = formatMargin(e, { accuracyClass: c, prefs: p });
         noBadTokens(s);
-        expect(primarySi(s, m.dim)).toBeLessThanOrEqual(m.si);
+        expect(primarySi(s, m.dim)).toBeLessThanOrEqual(noMore(m.si));
         expect(s.startsWith(m.si < 0 ? '-' : '+')).toBe(true);
         expect(s.includes('over limit')).toBe(m.si < 0);
       }),

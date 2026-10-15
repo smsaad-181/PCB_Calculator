@@ -1,4 +1,4 @@
-import { useMemo } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 import { DIM } from '../../core/units';
 import { Callout } from '../components/Callout';
 import { LedgerRowBadges } from '../components/LedgerRowBadges';
@@ -9,6 +9,8 @@ import { ResetButton } from '../components/ResetButton';
 import { ResultStatus } from '../components/ResultStatus';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
+import { ToleranceResults } from '../components/ToleranceResults';
+import { ToleranceSection } from '../components/ToleranceInputs';
 import { echoPrefs } from '../components/prefs';
 import { useCalcState } from '../useCalcState';
 import {
@@ -24,10 +26,12 @@ import {
   computeView,
   fieldDim,
   fromHashState,
+  hasToleranceState,
   kOptions,
   liveSummary,
   parseCountField,
   toHashState,
+  toleranceFields,
   type FieldErrors,
   type KChoice,
   type ViaState,
@@ -42,6 +46,7 @@ function Results({ view }: { view: ViaView }) {
         failedCheckHint={RANGE_HINT}
         afterHeadline={
           <>
+            <ToleranceResults view={view.tolerance} />
             {view.cautions.map((c) => (
               <Callout key={c.code} heading={c.heading} text={c.text} />
             ))}
@@ -63,7 +68,9 @@ export default function Via() {
     toHash: toHashState,
   });
   const view = useMemo(() => computeView(applied), [applied]);
+  const [tolOpen, setTolOpen] = useState(() => hasToleranceState(state));
   const fe: FieldErrors = 'fieldErrors' in view ? view.fieldErrors : {};
+  const tolErrors = view.status === 'error' ? (view.tolErrors ?? {}) : {};
   const widthPrefs = echoPrefs(state.units, 'width');
   const thickPrefs = echoPrefs(state.units, 'thickness');
   const otherPrefs = echoPrefs(state.units, 'other');
@@ -190,6 +197,16 @@ export default function Via() {
             onChange={(v) => patch({ units: v === 'imperial' ? 'imperial' : 'metric' })}
           />
           <p class="help">Results always show mm and mil together (plating as µm and mil).</p>
+          <ToleranceSection
+            fields={toleranceFields(state)}
+            tol={state.tol}
+            onTol={(key, t) => patch({ tol: { ...state.tol, [key]: t } })}
+            errors={tolErrors}
+            thickness={{ mode: '', options: [], onMode: () => undefined, weight: true }}
+            prefs={otherPrefs}
+            open={tolOpen}
+            onToggle={setTolOpen}
+          />
           <ResetButton onReset={reset} />
         </form>
         <section class="panel output" aria-labelledby="result-h" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>

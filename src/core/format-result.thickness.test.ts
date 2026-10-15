@@ -141,6 +141,11 @@ describe('formatDesignValue with lengthRole thickness', () => {
   });
 });
 
+/** Display rounding absorbs float noise up to 4 ulp (relative) of a rounding boundary (src/core/units/round-guard.ts). */
+const NOISE = 4 * Number.EPSILON;
+const noLess = (x: number): number => x - NOISE * Math.abs(x);
+const noMore = (x: number): number => x + NOISE * Math.abs(x);
+
 describe('formatMargin with lengthRole thickness', () => {
   it('positive margin: plus sign, rounded down, µm form, no over-limit', () => {
     const e = el(q(30e-6, DIM.LENGTH), q(35e-6, DIM.LENGTH));
@@ -150,7 +155,7 @@ describe('formatMargin with lengthRole thickness', () => {
     const head = (s.split(' (')[0] as string).replace(/^\+/, '');
     const r = parseQuantity(head, DIM.LENGTH);
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.value.si).toBeLessThanOrEqual(e.margin.si);
+    if (r.ok) expect(r.value.si).toBeLessThanOrEqual(noMore(e.margin.si));
   });
   it('exact value: margin 5.5 µm prints "+5.5 µm" with the mil part rounded down from SI', () => {
     const e = el(q(0, DIM.LENGTH), q(5.5e-6, DIM.LENGTH)); // margin = 5.5e-6, 0.216535 mil
@@ -163,7 +168,7 @@ describe('formatMargin with lengthRole thickness', () => {
     const head = s.split(' (')[0] as string;
     const r = parseQuantity(head, DIM.LENGTH);
     expect(r.ok).toBe(true);
-    if (r.ok) expect(r.value.si).toBeLessThanOrEqual(e.margin.si);
+    if (r.ok) expect(r.value.si).toBeLessThanOrEqual(noMore(e.margin.si));
   });
   it('a margin of 1 mm or more (either sign) uses the geometry form', () => {
     const pos = formatMargin(el(q(0.5e-3, DIM.LENGTH), q(2e-3, DIM.LENGTH)), { accuracyClass: 'estimate', ...T });
@@ -203,8 +208,8 @@ describe('thickness role: properties', () => {
         const s = formatResult({ value: x, bound: b }, { accuracyClass: c, lengthRole: 'thickness' });
         expect(s).not.toMatch(/NaN|Infinity|,|\^|<|1000 µm/);
         expect(s).toBe(formatDualThickness(x, { round: roundDirectionFor(b) }));
-        if (b === 'min-requirement' || b === 'prediction') expect(primarySi(s)).toBeGreaterThanOrEqual(v);
-        if (b === 'max-capacity') expect(primarySi(s)).toBeLessThanOrEqual(v);
+        if (b === 'min-requirement' || b === 'prediction') expect(primarySi(s)).toBeGreaterThanOrEqual(noLess(v));
+        if (b === 'max-capacity') expect(primarySi(s)).toBeLessThanOrEqual(noMore(v));
       }),
       { numRuns: 500 },
     );
@@ -217,7 +222,7 @@ describe('thickness role: properties', () => {
         const e: ElementResult = { id: 'e', name: 'E', kind: 'trace', load: q(limit.si - m.si, DIM.LENGTH), limit, utilisation: (limit.si - m.si) / limit.si, margin: m };
         const s = formatMargin(e, { accuracyClass: 'estimate', lengthRole: 'thickness' });
         expect(s).not.toMatch(/NaN|Infinity|,|\^|<|1000 µm/);
-        expect(primarySi(s)).toBeLessThanOrEqual(m.si);
+        expect(primarySi(s)).toBeLessThanOrEqual(noMore(m.si));
         expect(s.startsWith(neg ? '-' : '+')).toBe(true);
         expect(s.includes('over limit')).toBe(neg);
       }),

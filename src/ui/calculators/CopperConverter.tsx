@@ -1,13 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useMemo } from 'preact/hooks';
 import { DIM, FOIL_CONVENTIONS } from '../../core/units';
-import { parseHash, serializeHash, type Route } from '../../state/hash';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
 import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
 import { ResetButton } from '../components/ResetButton';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
-import { useRafValue } from '../hooks';
+import { useCalcState } from '../useCalcState';
 import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
 import {
   BASES,
@@ -28,7 +27,6 @@ import {
   type Units,
 } from './copper-converter.vm';
 
-const ROUTE: Route = { name: 'calc', id: CALCULATOR_ID };
 
 const BASIS_LABEL: Readonly<Record<string, string>> = {
   nominal: 'Nominal (default)',
@@ -78,41 +76,14 @@ function Results({ view }: { view: ConverterView }) {
 }
 
 export default function CopperConverter() {
-  const [init] = useState(() => fromHashState(parseHash(window.location.hash).state));
-  const [state, setState] = useState<ConverterState>(init.state);
-  const [notices, setNotices] = useState<readonly string[]>(init.notices);
-  const applied = useRafValue(state);
-  const pending = applied !== state;
-  const lastHash = useRef<string | null>(null);
+  const { state, applied, pending, notices, setNotices, patch: set, reset } = useCalcState<ConverterState>({
+    id: CALCULATOR_ID,
+    defaultState: DEFAULT_STATE,
+    fromHash: fromHashState,
+    toHash: toHashState,
+  });
 
   const view = useMemo(() => computeView(applied), [applied]);
-
-  // State to URL hash. replaceState does not add history entries or fire hashchange.
-  useEffect(() => {
-    const h = serializeHash(ROUTE, toHashState(applied));
-    lastHash.current = h;
-    if (window.location.hash !== h) window.history.replaceState(null, '', h);
-  }, [applied]);
-
-  // The user edits or pastes the URL while the page is open.
-  useEffect(() => {
-    const on = () => {
-      if (window.location.hash === lastHash.current) return;
-      const p = parseHash(window.location.hash);
-      if (p.route.name !== 'calc' || p.route.id !== CALCULATOR_ID) return;
-      const loaded = fromHashState(p.state);
-      setState(loaded.state);
-      setNotices(loaded.notices);
-    };
-    window.addEventListener('hashchange', on);
-    return () => window.removeEventListener('hashchange', on);
-  }, []);
-
-  const set = (patch: Partial<ConverterState>) => setState((s) => ({ ...s, ...patch }));
-  const reset = () => {
-    setState(DEFAULT_STATE);
-    setNotices([]);
-  };
   const prefs = echoPrefs(state.units);
   const weightMode = state.by === 'weight';
   const fe: FieldErrors = 'fieldErrors' in view ? view.fieldErrors : {};

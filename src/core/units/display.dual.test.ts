@@ -13,6 +13,11 @@ const MM: DisplayPrefs = { length: 'mm', temperature: 'C', area: 'mm2' };
 const MIL: DisplayPrefs = { length: 'mil', temperature: 'F', area: 'mil2' };
 const UM_K: DisplayPrefs = { length: 'um', temperature: 'K', area: 'mm2' };
 
+/** Display rounding absorbs float noise up to 4 ulp (relative) of a rounding boundary (src/core/units/round-guard.ts). */
+const NOISE = 4 * Number.EPSILON;
+const noLess = (x: number): number => x - NOISE * Math.abs(x);
+const noMore = (x: number): number => x + NOISE * Math.abs(x);
+
 describe('formatDual: length', () => {
   it('0.254 mm (10 mil)', () => {
     expect(formatDual(q(0.254e-3, DIM.LENGTH))).toBe('0.254 mm (10 mil)');
@@ -46,8 +51,8 @@ describe('formatDual: length', () => {
         for (const p of parts) {
           const r = parseQuantity(p, DIM.LENGTH);
           expect(r.ok, p).toBe(true);
-          if (r.ok && round === 'up') expect(r.value.si >= v, `${text} up`).toBe(true);
-          if (r.ok && round === 'down') expect(r.value.si <= v, `${text} down`).toBe(true);
+          if (r.ok && round === 'up') expect(r.value.si >= noLess(v), `${text} up`).toBe(true);
+          if (r.ok && round === 'down') expect(r.value.si <= noMore(v), `${text} down`).toBe(true);
         }
       }),
     );

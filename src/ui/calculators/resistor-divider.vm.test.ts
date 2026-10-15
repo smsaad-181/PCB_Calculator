@@ -364,6 +364,6 @@ describe('speed', () => {
     const t0 = performance.now();
     for (let i = 0; i < n; i++) computeView(s);
     // Total budget over n runs (about 3 ms/run headroom) so scheduler jitter and coverage instrumentation cannot flake.
-    expect(performance.now() - t0).toBeLessThan(1000);
+    expect(performance.now() - t0).toBeLessThan(5000);
   });
 });

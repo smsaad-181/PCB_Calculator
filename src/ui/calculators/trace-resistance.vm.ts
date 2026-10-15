@@ -1,6 +1,6 @@
 // View-model for the trace resistance page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/trace-resistance compute().
-import { compute, type Inputs } from '../../core/calculators/trace-resistance/calc';
+import { compute, type Inputs, type Tolerances } from '../../core/calculators/trace-resistance/calc';
 import { meta } from '../../core/calculators/trace-resistance/meta';
 import { DEFAULT_FOIL_CONVENTION } from '../../core/data/constants';
 import { formatResult } from '../../core/format-result';
@@ -11,6 +11,23 @@ import { echoPrefs, headlinePrefs, conventionSpreadText, type CopperLayer, type 
 import { buildResultView, MAX_FIELD_CHARS, parseField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
 
 import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, weightSourceFromHash, type WeightSource } from './copper-source';
+import {
+  buildToleranceView,
+  collectTolerances,
+  effectiveThickMode,
+  thickModeFromHash,
+  thickModeToHash,
+  thicknessOptionsFor,
+  tolFromHash,
+  tolKeyOfCoreField,
+  tolProblems,
+  tolToHash,
+  type ThicknessMode,
+  type ThicknessOption,
+  type TolFieldDef,
+  type TolState,
+  type ToleranceView,
+} from './tolerance-view';
 export const CALCULATOR_ID = 'trace-resistance';
 
 export type CopperBy = 'weight' | 'thickness';
@@ -39,6 +56,10 @@ export interface TraceResistanceState {
   readonly frequency: string;
   readonly current: string;
   readonly units: Units;
+  /** Optional input tolerances as typed, by core tolerance key. Empty means none: no tolerance is ever assumed. */
+  readonly tol: TolState;
+  /** '' means not chosen: there is no default thickness tolerance. */
+  readonly thickMode: ThicknessMode;
 }
 
 export const DEFAULT_STATE: TraceResistanceState = Object.freeze({
@@ -58,6 +79,8 @@ export const DEFAULT_STATE: TraceResistanceState = Object.freeze({
   frequency: '',
   current: '',
   units: 'metric',
+  tol: {},
+  thickMode: '',
 });
 
 export const METHOD_TEXT = 'Method: DC resistance of a rectangular copper conductor with linear temperature dependence';
@@ -85,6 +108,32 @@ export function hintForCheck(name: string): string | undefined {
 // Hash state
 // ---------------------------------------------------------------------------
 const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+
+// ---------------------------------------------------------------------------
+// Optional tolerances
+// ---------------------------------------------------------------------------
+const entered = (t: string): boolean => t.trim() !== '';
+
+/** The tolerance fields for the current inputs. A field is offered only for an input the user actually supplied. */
+export function toleranceFields(s: TraceResistanceState): readonly TolFieldDef[] {
+  return [
+    { key: 'length', hash: 'tlen', id: 'tol-length', label: 'Trace length', kind: 'relative', offered: true, help: 'Tolerance on the trace length you entered, for example 1%.' },
+    { key: 'width', hash: 'twid', id: 'tol-width', label: 'Trace width', kind: 'relative', offered: true, help: 'Tolerance on the finished trace width, for example 20% from your fabricator.' },
+    { key: 'copperThickness', hash: 'tthk', id: 'tol-copper', label: 'Copper thickness', kind: 'relative', offered: true, thickness: true, help: 'Tolerance on the copper thickness, for example 10%.' },
+    { key: 'ambient', hash: 'tamb', id: 'tol-ambient', label: 'Ambient', kind: 'temperature', offered: entered(s.ambient), whyNot: 'enter an ambient temperature above first; the 25 °C default is an assumption and is not toleranced.', help: 'Tolerance on the ambient you entered, as a temperature difference, for example 5 K.' },
+    { key: 'resistivity', hash: 'trho', id: 'tol-resistivity', label: 'Resistivity override', kind: 'relative', offered: entered(s.resistivity), whyNot: 'it needs a resistivity override (Advanced); the default copper value is a definition and is not toleranced.', help: 'Tolerance on the resistivity override you entered.' },
+    { key: 'current', hash: 'tcur', id: 'tol-current', label: 'Current', kind: 'relative', offered: entered(s.current), whyNot: 'enter a current above first.', help: 'Tolerance on the current you entered, for example 5%.' },
+  ];
+}
+
+export function thicknessModesOffered(s: Pick<TraceResistanceState, 'copperBy'>): readonly ThicknessOption[] {
+  return thicknessOptionsFor(s.copperBy);
+}
+
+/** True when any optional tolerance state is set (the section then starts open so it is never hidden from the reader). */
+export function hasToleranceState(s: TraceResistanceState): boolean {
+  return Object.keys(s.tol).length > 0 || s.thickMode !== '';
+}
 
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (and `u`, which is reserved). */
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS, 'u'];
@@ -116,6 +165,9 @@ export function toHashState(s: TraceResistanceState): Record<string, string> {
   if (s.weightSource !== '') out['wsrc'] = s.weightSource;
   if (s.convention !== '') out['conv'] = s.convention;
   if (s.units !== DEFAULT_STATE.units) out['u'] = s.units;
+  tolToHash(out, toleranceFields(DEFAULT_STATE), s.tol);
+  const km = thickModeToHash(s.thickMode);
+  if (km !== undefined) out['tkch'] = km;
   return out;
 }
 
@@ -183,6 +235,8 @@ export function fromHashState(h: HashState): LoadedState {
     alpha: text('alpha'),
     frequency: text('frequency'),
     current: text('current'),
+    tol: tolFromHash(get, toleranceFields(DEFAULT_STATE), notices),
+    thickMode: thickModeFromHash(get('tkch'), notices),
   };
   return { state: s, notices };
 }
@@ -261,13 +315,22 @@ const CORE_FIELD: Readonly<Record<string, FieldKey>> = {
 // ---------------------------------------------------------------------------
 export type TraceResistanceView =
   | { readonly status: 'needs-input'; readonly needs: readonly string[]; readonly notes: readonly string[] }
-  | { readonly status: 'error'; readonly problems: readonly string[]; readonly fieldErrors: FieldErrors; readonly notes: readonly string[] }
+  | {
+      readonly status: 'error';
+      readonly problems: readonly string[];
+      readonly fieldErrors: FieldErrors;
+      readonly notes: readonly string[];
+      /** Error text per tolerance key (present only when a tolerance is the problem). */
+      readonly tolErrors?: Readonly<Record<string, string>>;
+    }
   | {
       readonly status: 'ok';
       readonly result: ResultView;
       readonly raw: CalcResult;
       readonly fieldErrors: FieldErrors;
       readonly notes: readonly string[];
+      /** Present only when tolerances were entered and the core returned something to show. */
+      readonly tolerance?: ToleranceView;
       /** Present only when the skin-depth check failed: shown prominently under the headline. */
       readonly callout?: { readonly heading: string; readonly text: string };
     };
@@ -356,7 +419,12 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
       fieldErrors[k] = v.message;
     }
   }
-  if (problems.length > 0) return { status: 'error', problems, fieldErrors, notes };
+  const tolFields = toleranceFields(s);
+  const col = collectTolerances(tolFields, s.tol, effectiveThickMode(s.thickMode, s.copperBy), echoPrefs(s.units, 'other'));
+  problems.push(...tolProblems(col.errors, tolFields));
+  if (problems.length > 0) {
+    return { status: 'error', problems, fieldErrors, notes, ...(Object.keys(col.errors).length > 0 ? { tolErrors: col.errors } : {}) };
+  }
 
   if (s.copperBy === 'weight' && s.weightSource === 'finished') return { status: 'needs-input', needs: [FINISHED_NEEDS], notes };
   if (s.copperBy === 'weight' && s.weightSource === '' && parsed.get('copperWeight')?.status === 'ok') notes.push(NOT_ANSWERED_NOTE);
@@ -366,6 +434,7 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
     if (parsed.get(k)?.status === 'empty' && NEEDS_TEXT[k] !== undefined) needs.push(NEEDS_TEXT[k] as string);
   }
   if (s.layer === '') needs.push('Choose a copper layer: outer or inner. It is not assumed.');
+  needs.push(...col.needs);
   if (needs.length > 0) return { status: 'needs-input', needs, notes };
 
   const q = (k: TextKey): Quantity | undefined => {
@@ -387,9 +456,15 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
     ...optional('alpha', q('alpha')),
     ...optional('frequency', q('frequency')),
     ...optional('current', q('current')),
+    ...(col.tolerances !== undefined ? { tolerances: col.tolerances as Tolerances } : {}),
   } satisfies Inputs;
   const out = compute(inputs);
   if (!out.ok) {
+    const tk = tolKeyOfCoreField(out.error.field, tolFields);
+    if (tk !== undefined) {
+      const errors = { [tk]: out.error.message };
+      return { status: 'error', problems: tolProblems(errors, tolFields), fieldErrors, notes, tolErrors: errors };
+    }
     const key = CORE_FIELD[out.error.field ?? ''];
     const label = key !== undefined ? FIELD_LABEL[key] : 'Inputs';
     if (key !== undefined) fieldErrors[key] = out.error.message;
@@ -401,13 +476,28 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
   if (s.deltaT.trim() === '') {
     notes.push('No temperature rise was entered, so the conductor is taken to be at the ambient temperature (no self-heating). Enter a rise if the trace runs warm.');
   }
-  const result = buildResultView(raw, {
+  const tolBuild =
+    col.tolerances === undefined
+      ? undefined
+      : buildToleranceView(
+          raw,
+          {
+            accuracyClass: meta.accuracyClass,
+            prefs,
+            labels: { ...RESULT_LABELS, [HEADLINE.name]: HEADLINE.label },
+            phrases: { [HEADLINE.name]: 'resistance' },
+          },
+          [HEADLINE.name, 'voltage drop', 'power loss'],
+        );
+  const forView: CalcResult = tolBuild === undefined ? raw : { ...raw, warnings: tolBuild.warnings };
+  const result = buildResultView(forView, {
     headline: HEADLINE.name,
     accuracyClass: meta.accuracyClass,
     prefs,
     lengthRole: 'geometry',
     lengthRoleByName: THICKNESS_NAMES,
     labels: { ...RESULT_LABELS, [HEADLINE.name]: HEADLINE.label },
+    ...(tolBuild !== undefined ? { skip: tolBuild.skipNames } : {}),
     extraRows: [{ label: 'Copper used', text: copperBasisLine(raw, prefs) }],
     pinWarningCodes: ['SKIN_EFFECT'],
     rowWarnings: { 'voltage drop': 'VOLTAGE_DROP_SCOPE' },
@@ -415,5 +505,6 @@ export function computeView(s: TraceResistanceState): TraceResistanceView {
   });
   const skin = result.details.validity.find((c) => c.name === SKIN_CHECK_NAME);
   const callout = skin !== undefined && !skin.ok ? { heading: SKIN_HEADING, text: `The resistance above is the DC value. ${skin.detail}` } : undefined;
-  return callout === undefined ? { status: 'ok', result, raw, fieldErrors, notes } : { status: 'ok', result, raw, fieldErrors, notes, callout };
+  const tolerance = tolBuild === undefined ? {} : { tolerance: tolBuild.view };
+  return callout === undefined ? { status: 'ok', result, raw, fieldErrors, notes, ...tolerance } : { status: 'ok', result, raw, fieldErrors, notes, callout, ...tolerance };
 }

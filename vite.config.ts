@@ -3,7 +3,7 @@ import type { Plugin } from 'vite';
 import preact from '@preact/preset-vite';
 
 export const PRODUCTION_CSP =
-  "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'";
+  "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'none'; worker-src 'self'; base-uri 'none'; form-action 'none'";
 
 /** Injects a CSP meta tag into the production build only (dev server/HMR untouched). */
 export function cspPlugin(csp: string = PRODUCTION_CSP): Plugin {
