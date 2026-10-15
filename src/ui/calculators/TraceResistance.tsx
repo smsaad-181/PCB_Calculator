@@ -1,6 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 import { FOIL_CONVENTIONS } from '../../core/units';
-import { parseHash, serializeHash, type Route } from '../../state/hash';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
 import { FinishedCopperGuidance } from '../components/FinishedCopperGuidance';
@@ -10,7 +9,7 @@ import { SelectField } from '../components/SelectField';
 import { ToleranceResults } from '../components/ToleranceResults';
 import { ToleranceSection } from '../components/ToleranceInputs';
 import { BASES, BASIS_LABEL, CONVENTION_IDS, LAYERS, conventionOptionLabel, conventionSpreadText, echoPrefs } from '../components/prefs';
-import { useRafValue } from '../hooks';
+import { useCalcState } from '../useCalcState';
 import { WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, isWeightSource } from './copper-source';
 import {
   ADVANCED_CAUTION,
@@ -33,7 +32,6 @@ import {
   type Units,
 } from './trace-resistance.vm';
 
-const ROUTE: Route = { name: 'calc', id: CALCULATOR_ID };
 
 // Expected dimensions per field come from the view-model's field table, so the page and the tests share one source.
 const DIM_LENGTH = fieldDim('length');
@@ -96,47 +94,25 @@ function Results({ view }: { view: TraceResistanceView }) {
   );
 }
 
+const hasOverride = (s: TraceResistanceState): boolean => s.resistivity.trim() !== '' || s.alpha.trim() !== '';
+
 export default function TraceResistance() {
-  const [init] = useState(() => fromHashState(parseHash(window.location.hash).state));
-  const [state, setState] = useState<TraceResistanceState>(init.state);
-  const [notices, setNotices] = useState<readonly string[]>(init.notices);
+  const { state, setState, applied, pending, notices, setNotices, patch: set, reset } = useCalcState<TraceResistanceState>({
+    id: CALCULATOR_ID,
+    defaultState: DEFAULT_STATE,
+    fromHash: fromHashState,
+    toHash: toHashState,
+    onExternalLoad: (s) => {
+      if (hasOverride(s)) setAdvancedOpen(true);
+      if (hasToleranceState(s)) setTolOpen(true);
+    },
+  });
   // The overrides section starts open only when the link already carries an override, so it is never hidden from the reader.
-  const [advancedOpen, setAdvancedOpen] = useState(init.state.resistivity.trim() !== '' || init.state.alpha.trim() !== '');
-  const [tolOpen, setTolOpen] = useState(() => hasToleranceState(init.state));
-  const applied = useRafValue(state);
-  const pending = applied !== state;
-  const lastHash = useRef<string | null>(null);
+  const [advancedOpen, setAdvancedOpen] = useState(() => hasOverride(state));
+  const [tolOpen, setTolOpen] = useState(() => hasToleranceState(state));
 
   const view = useMemo(() => computeView(applied), [applied]);
 
-  // State to URL hash. replaceState does not add history entries or fire hashchange.
-  useEffect(() => {
-    const h = serializeHash(ROUTE, toHashState(applied));
-    lastHash.current = h;
-    if (window.location.hash !== h) window.history.replaceState(null, '', h);
-  }, [applied]);
-
-  // The user edits or pastes the URL while the page is open.
-  useEffect(() => {
-    const on = () => {
-      if (window.location.hash === lastHash.current) return;
-      const p = parseHash(window.location.hash);
-      if (p.route.name !== 'calc' || p.route.id !== CALCULATOR_ID) return;
-      const loaded = fromHashState(p.state);
-      setState(loaded.state);
-      setNotices(loaded.notices);
-      if (loaded.state.resistivity.trim() !== '' || loaded.state.alpha.trim() !== '') setAdvancedOpen(true);
-      if (hasToleranceState(loaded.state)) setTolOpen(true);
-    };
-    window.addEventListener('hashchange', on);
-    return () => window.removeEventListener('hashchange', on);
-  }, []);
-
-  const set = (patch: Partial<TraceResistanceState>) => setState((s) => ({ ...s, ...patch }));
-  const reset = () => {
-    setState(DEFAULT_STATE);
-    setNotices([]);
-  };
   const fe: FieldErrors = 'fieldErrors' in view ? view.fieldErrors : {};
   const tolErrors = view.status === 'error' ? (view.tolErrors ?? {}) : {};
   const weightMode = state.copperBy === 'weight';

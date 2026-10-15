@@ -165,26 +165,26 @@ Reports: `phase-1-calc.md`, `phase-1-phase.md`, `phase-1-pcb.md` (all PASS-WITH-
 | PV-2 | OPEN_RISKS stale | orchestrator | This section | FIXED |
 | F-1 | Inner layer above 17.5 A (S-010 CONFLICT) | calc-implementer | Warning `INNER_CURRENT_ABOVE_17_5A`; limit itself still R-28 | FIXED (warning); R-28 open |
 | F-2 | Converter ignored `thicknessBasis` with a weight | calc-implementer | Reject | FIXED |
-| F-3 | Finished-copper cautions rest on paywalled S-009 but overall status shows VERIFIED | calc-implementer + ui-engineer | Status must reflect S-009 | OPEN |
+| F-3 | Finished-copper cautions rest on paywalled S-009 but overall status shows VERIFIED | calc-implementer + ui-engineer | Status must reflect S-009 | FIXED (core): copper converter always, trace-width and trace-resistance whenever a nominal weight with an S-009 figure (0.5, 1, 2 oz) prints the S-009 statement, cite S-009 in `reference.ledgerIds` and take dataStatus PAYWALLED; thickness entries, finished or measured basis and weights without a table figure do not. S-003 stays excluded. Decision: the confidence rule does not count S-009 a second time (the nominal-copper safety-relevant default already carries it), so confidence scores are unchanged. UI badge for the new status: ui-engineer to confirm. |
 | F-4 | E-series "nearest" is arithmetic, not stated (E3: 3.3 → 2.2) | ui-engineer | Say so on the page, or offer geometric | OPEN |
 | PCB-1 | Weight meaning (finished vs base) | standards-researcher, calc, ui | S-019c row, profile corrected, UI question | IN PROGRESS; S-019c pairing of labels to values unconfirmed (human: check JLCPCB stackup page) |
 | PCB-2 | Outer caution / plating estimate wording | calc | Reword, upper-estimate label | FIXED |
 | PCB-3 | Width margin vs current derating inconsistent | calc | One margin basis plus round trip test | FIXED |
 | PCB-4 | Voltage-drop scope label | calc + ui | Caution under the result | FIXED |
 | PCB-5 | Divider resistor working voltage | calc + ui | Voltages shown, rated-voltage input, creepage note; no datasheet default (not read) | FIXED (core); UI IN PROGRESS |
-| PCB-6 | Inner finished-copper shortfall only in confidence text | calc | Per-layer finished thickness in stackup object | OPEN |
+| PCB-6 | Inner finished-copper shortfall only in confidence text | calc | Per-layer finished thickness in stackup object | FIXED (numeric caution) `INNER_FINISHED_COPPER_THINNER` on trace-width inner layers when copper is given by weight: the percentage and um come from the S-009 table through `finished-copper.ts` (secondhand, PAYWALLED), with the 1/thickness width factor; headline numbers unchanged. A per-layer stackup object is not built (needs a stackup design; not requested). |
 | PCB-7 | Divider "worst case" applied tolerance to load | calc + ui | Renamed, own load tolerance | FIXED (core); UI IN PROGRESS |
-| PCB-8 | "Max conductor temperature" reads like a design pass; ambient ignored by legacy fit | calc + ui | Reword, state ambient not modelled | OPEN |
+| PCB-8 | "Max conductor temperature" reads like a design pass; ambient ignored by legacy fit | calc + ui | Reword, state ambient not modelled | FIXED (core): check renamed "Estimated conductor temperature vs your stated maximum (informational)"; text says the legacy relation does not model ambient and gives the % resistivity difference between 25 degC and ambient + rise (alpha from S-004, computed); failure semantic kept (not ok, MAX_TEMP_EXCEEDED). UI wording of the result row "maximum conductor temperature": ui-engineer. |
 | PCB-9 | Headline vs Steps rounding | calc + ui | `formatStep` | FIXED |
-| PCB-10 | Fab minimum width and width tolerance unused | calc | Use profile limits in a fab note | OPEN |
+| PCB-10 | Fab minimum width and width tolerance unused | calc | Use profile limits in a fab note | FIXED (minimum width, trace-width): with `fabProfile` + `today` + `layerCount` the minimum and recommended width (or the entered width) are compared with the exact-scope `traceWidth` min (layer count, copper weight, layer side; no fallback); below / meets / not published notes carry profile id, age, UNVERIFIED and S-019l. Width tolerance from the profile was already used (task 9). Profile data remains UNVERIFIED (R-21, T7-2). UI inputs for layerCount: ui-engineer. |
 | PCB-11 | Data badge lumped paywalled with conflict | ui | Grouped badges | FIXED |
 | PCB-12 | E-series pair search: single exact value and noise pairs | ui + calc | Say when one value hits, filter pairs | OPEN |
 | PCB-13 | Internal "R-8" shown to users; "KiCad-compatible" without cross-check record | ui | Tag removed; cross-check record still needed | PARTLY FIXED |
-| PV-3 | Task 2 advanced inputs (RMS peak/duty, adjacent plane, cooling) neither built nor deferred | orchestrator | Build or mark deferred in phase-1.md | OPEN |
+| PV-3 | Task 2 advanced inputs (RMS peak/duty, adjacent plane, cooling) neither built nor deferred | orchestrator | Build or mark deferred in phase-1.md | FIXED / DEFERRED: RMS pulse input built for trace-width (S-019e VERIFIED, S-019f UNVERIFIED; period statement is the user's declaration; mean rise labelled, peak-is-higher warning). Adjacent plane and cooling DEFERRED: no verified source for a correction to the legacy relation; the result states "not modelled". phase-1.md task 2 updated. UI inputs for the pulse: ui-engineer. |
 | PV-4 | E-series page returns no `CalcResult`; search on main thread; `src/workers/` empty | calc + ui | SPEC exception or wrap; worker | OPEN |
 | PV-5 | `package-lock.json` header stale | devops | Regenerate with approved `npm install` | OPEN |
 | PV-6 | RUNBOOK says every push runs verify (only main + PRs); setup-node 7.1.0 available | devops | Fix text; Dependabot bump | OPEN |
-| PV-8 | Mutable cache in `trace-width/calc.ts:50`; µ0 literal in trace-resistance not in constants | calc | Move/immutable | OPEN |
+| PV-8 | Mutable cache in `trace-width/calc.ts:50`; µ0 literal in trace-resistance not in constants | calc | Move/immutable | FIXED: the trace-width and copper-converter basis caches and the lazy foil-spread cache are removed (pure computation, spread computed once at load); µ0 = 4 pi x 1e-7 H/m now lives in `src/core/data/constants.ts` (`MU0_H_PER_M`, `MU0_LEDGER_ID` = S-013, whose row states this value and its < 1e-9 deviation from CODATA 2022). No new constant added. |
 | PV-9 | Three pages copy `useCalcState` logic | ui | Use the hook | OPEN |
 | PV-10 | Coverage excludes `src/state` and view-models (V-8) | test-engineer | Include them | OPEN |
 

@@ -1,14 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import pageSrc from './ESeries.tsx?raw';
 import { ESERIES } from '../../core/data/eseries';
-import { bestPairs, nearest, valuesInDecade } from '../../core/eseries';
+import { bestPairs, dropNoisePairs, nearest, nearestRatio, valuesInDecade } from '../../core/eseries';
 import { parseQuantity, DIM } from '../../core/units';
 import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
-import { catalogResistance } from './circuit-choices';
+import feedbackSrc from './FeedbackDivider.tsx?raw';
+import dividerSrc from './ResistorDivider.tsx?raw';
+import { NEAREST_NOTE, catalogResistance } from './circuit-choices';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
   PAIR_COUNT,
+  PAIR_FETCH,
   SEARCH_WINDOW_TEXT,
   SERIES_OPTIONS,
   SOURCE_ADVICE,
@@ -17,6 +20,7 @@ import {
   WRITTEN_KEYS,
   computeNearest,
   computePairs,
+  planPairs,
   fromHashState,
   nearestSummary,
   pairTargetLabel,
@@ -122,9 +126,10 @@ describe('two-resistor search', () => {
     const v = computePairs(st({ pairTarget: '3.3k', pairSeries: 'E24', topology: 'series' }));
     if (v.status !== 'ok') throw new Error(v.status);
     expect(v.rows).toHaveLength(PAIR_COUNT);
-    const lib = bestPairs(3300, 'E24', 'series', PAIR_COUNT);
+    const lib = bestPairs(3300, 'E24', 'series', PAIR_FETCH);
     if (!lib.ok) throw new Error('lib');
-    expect(v.rows.map((r) => [ohms(r.r1), ohms(r.r2)])).toEqual(lib.value.map((p) => [p.r1, p.r2]));
+    const shown = dropNoisePairs(lib.value, 3300, 'series', PAIR_COUNT).kept;
+    expect(v.rows.map((r) => [ohms(r.r1), ohms(r.r2)])).toEqual(shown.map((p) => [p.r1, p.r2]));
     expect(v.rows[0]?.error).toBe('0 %');
     expect(v.resultHeading).toBe('R1 + R2');
     for (const r of v.rows) expect(ohms(r.value)).toBeGreaterThan(3000);
@@ -229,5 +234,68 @@ describe('hash state', () => {
     expect(parseHash(hostile[1] as string).stateDiscarded).toBe(true);
     expect(fromHashState(parseHash(hostile[1] as string).state).state).toEqual(DEFAULT_STATE);
     expect(fromHashState(parseHash(hostile[0] as string).state).notices.join(' ')).toMatch(/lookup target was too long/);
+  });
+});
+
+describe('F-4: nearest means the smallest difference in ohms', () => {
+  it('E3 3.3 (as 3k3 against the E3 list): arithmetic nearest 2.2 kOhm and, labelled, the ratio nearest 4.7 kOhm', () => {
+    const v = computeNearest(st({ nearestTarget: '3k3', nearestSeries: 'E3' }));
+    if (v.status !== 'ok') throw new Error(v.status);
+    expect(v.rows[0]?.value).toBe('2.2 kΩ');
+    expect(v.ratio?.value).toBe('4.7 kΩ');
+    expect(v.ratio?.label).toMatch(/ratio/i);
+    expect(v.ratio?.error).toBe('+42.43 %');
+    expect(v.arithmeticLabel).toMatch(/difference in ohms/i);
+  });
+  it('no ratio row when both agree, and the ratio value is the library helper', () => {
+    const same = computeNearest(st({ nearestTarget: '4.7k', nearestSeries: 'E96' }));
+    if (same.status !== 'ok') throw new Error(same.status);
+    expect(same.ratio).toBeUndefined();
+    const g = nearestRatio(3300, 'E3');
+    if (!g.ok) throw new Error('lib');
+    const v = computeNearest(st({ nearestTarget: '3k3', nearestSeries: 'E3' }));
+    if (v.status !== 'ok') throw new Error(v.status);
+    expect(ohms(v.ratio?.value ?? '')).toBe(g.value.value);
+  });
+  it('the note is shown on the E-series page and on both divider pages, in one wording', () => {
+    expect(NEAREST_NOTE).toMatch(/smallest difference in ohms, not the smallest ratio/);
+    for (const src of [pageSrc, dividerSrc, feedbackSrc]) expect(src).toContain('NEAREST_NOTE');
+  });
+});
+
+describe('PCB-12: a single value, and no noise pairs', () => {
+  const search = (p: Partial<ESeriesState>) => {
+    const v = computePairs(st({ pairSeries: 'E12', topology: 'series', ...p }));
+    if (v.status !== 'ok') throw new Error(v.status);
+    return v;
+  };
+  it('3.3k series in E12: says a single E12 value matches, hides the 10 + 3.3k pair and reports the count', () => {
+    const v = search({ pairTarget: '3.3k' });
+    expect(v.single).toBe('A single E12 value matches: 3.3 kΩ (error 0 %).');
+    expect(v.rows).toHaveLength(PAIR_COUNT);
+    expect(v.rows.some((r) => [r.r1, r.r2].includes('10 Ω') && [r.r1, r.r2].includes('3.3 kΩ'))).toBe(false);
+    expect(v.hidden).toBeGreaterThan(0);
+    expect(v.hiddenText).toBe(`${String(v.hidden)} pair${v.hidden === 1 ? '' : 's'} hidden: one resistor has negligible effect.`);
+  });
+  it('the best pair is the library best pair', () => {
+    const v = search({ pairTarget: '3.3k' });
+    const lib = bestPairs(3300, 'E12', 'series', 1);
+    if (!lib.ok) throw new Error('lib');
+    expect([ohms(v.rows[0]?.r1 ?? ''), ohms(v.rows[0]?.r2 ?? '')]).toEqual([lib.value[0]?.r1, lib.value[0]?.r2]);
+  });
+  it('no single-value line when no stock value is that close, and none for a divider ratio', () => {
+    expect(search({ pairTarget: '3.35k' }).single).toBeUndefined();
+    expect(search({ pairTarget: '0.25', topology: 'divider-ratio' }).single).toBeUndefined();
+    expect(search({ pairTarget: '0.25', topology: 'divider-ratio' }).hidden).toBe(0);
+  });
+  it('parallel works the same way', () => {
+    const v = search({ pairTarget: '3.3k', topology: 'parallel' });
+    expect(v.single).toMatch(/^A single E12 value matches: 3\.3 kΩ/);
+  });
+  it('the search asks the worker for more pairs than are shown, so filtering can still fill the list', () => {
+    const p = planPairs(st({ pairTarget: '3.3k' }));
+    if (p.kind !== 'search') throw new Error('expected a search');
+    expect(PAIR_FETCH).toBeGreaterThan(PAIR_COUNT);
+    expect(p.task.count).toBe(PAIR_FETCH);
   });
 });

@@ -67,6 +67,10 @@ export function isSeriesName(v: string): v is SeriesName {
   return (ALL_SERIES as readonly string[]).includes(v);
 }
 
+/** What 'nearest' means wherever a value is snapped to a series (F-4). Shown on the E-series, divider and feedback pages. */
+export const NEAREST_NOTE =
+  'Nearest means the smallest difference in ohms, not the smallest ratio. In a coarse series (E3, E6) the two can pick different values; the E-series page shows both.';
+
 /** The three answers of a lookup, in display order. */
 export const LOOKUP_MODES: readonly { readonly mode: Mode; readonly label: string }[] = [
   { mode: 'nearest', label: 'Nearest' },

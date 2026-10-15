@@ -3,7 +3,6 @@
 import { compute, type Inputs } from '../../core/calculators/annular-ring/calc';
 import { HOLE_TYPE_INPUTS, LAYER_COUNT_INPUTS, LAYER_SIDE_INPUTS, RING_REFERENCES, type HoleType, type LayerCountInput, type LayerSideInput, type RingReference } from '../../core/calculators/annular-ring/guards';
 import { meta } from '../../core/calculators/annular-ring/meta';
-import { fabProfileAgeDays, fabProfileStale } from '../../core/fab/profile';
 import { formatResult, formatStep, type HeadlineOpts } from '../../core/format-result';
 import type { Bound, CalcInput, CalcResult } from '../../core/result';
 import { DIM, type Dim, type DisplayPrefs, type Quantity } from '../../core/units';
@@ -11,6 +10,7 @@ import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../.
 import { echoPrefs, headlinePrefs, type Units } from '../components/prefs';
 import { buildResultView, ledgerView, MAX_FIELD_CHARS, parseField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
 import { BUNDLED_LABEL, bundledProfile, choiceFromHash, choiceToHash, type ProfileChoice } from './fab-profile-choice';
+import { profileBanner as sharedProfileBanner, type ProfileBanner } from './fab-profile-banner';
 
 export const CALCULATOR_ID = 'annular-ring';
 export type { Units };
@@ -237,54 +237,11 @@ export function fromHashState(h: HashState): LoadedState {
 // ---------------------------------------------------------------------------
 // Fab profile banner
 // ---------------------------------------------------------------------------
-export interface ProfileBanner {
-  readonly title: string;
-  readonly id: string;
-  readonly fabricator: string;
-  readonly profileDate: string;
-  /** Whole days from the profile date to today, or undefined when today is not a valid date. */
-  readonly ageDays: number | undefined;
-  readonly ageText: string;
-  readonly stale: boolean;
-  readonly staleText: string;
-  readonly status: string;
-  readonly unverified: boolean;
-  readonly unverifiedText: string;
-  readonly ledgerIds: readonly string[];
-}
-
-const plural = (n: number, w: string): string => `${String(n)} ${w}${n === 1 ? '' : 's'}`;
+export type { ProfileBanner };
 
 /** The banner for an active profile (shown on every state of the page). Undefined when no profile is in use. */
 export function profileBanner(s: Pick<AnnularRingState, 'profile'>, today: string): ProfileBanner | undefined {
-  if (s.profile !== 'bundled') return undefined;
-  const p = bundledProfile();
-  if (p === null) return undefined;
-  let ageDays: number | undefined;
-  let stale = false;
-  try {
-    ageDays = fabProfileAgeDays(p, today);
-    stale = fabProfileStale(p, today);
-  } catch {
-    ageDays = undefined;
-  }
-  const unverified = p.status !== 'VERIFIED';
-  return {
-    title: `Fab profile in use: ${BUNDLED_LABEL}`,
-    id: p.id,
-    fabricator: p.fabricator,
-    profileDate: p.profileDate,
-    ageDays,
-    ageText: ageDays === undefined ? 'age unknown (today is not a valid date)' : ageDays < 0 ? 'dated in the future' : `${plural(ageDays, 'day')} old`,
-    stale,
-    staleText: 'Stale: this profile is old and the fabricator may have changed these limits. Re-read them on its own page.',
-    status: p.status,
-    unverified,
-    unverifiedText: unverified
-      ? `UNVERIFIED: every value from this profile is example data with status ${p.status} (ledger ${p.ledgerIds.join(', ')}). Re-read your fabricator's page and enter your own values.`
-      : `Status ${p.status} (ledger ${p.ledgerIds.join(', ')}).`,
-    ledgerIds: [...p.ledgerIds],
-  };
+  return sharedProfileBanner(s.profile, today);
 }
 
 // ---------------------------------------------------------------------------

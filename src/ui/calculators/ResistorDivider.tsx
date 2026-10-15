@@ -8,7 +8,7 @@ import { ResultStatus } from '../components/ResultStatus';
 import { ResultsPanel } from '../components/ResultsPanel';
 import { SelectField } from '../components/SelectField';
 import { useCalcState } from '../useCalcState';
-import { DIVIDER_SERIES, SNAP_CHOICES, isDividerSeries, isSnapChoice, parseToleranceField } from './circuit-choices';
+import { DIVIDER_SERIES, NEAREST_NOTE, SNAP_CHOICES, isDividerSeries, isSnapChoice, parseToleranceField } from './circuit-choices';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
@@ -174,7 +174,7 @@ export default function ResistorDivider() {
                   onChange={(v) => {
                     if (isSnapChoice(v)) patch({ snap: v });
                   }}
-                  help="Nearest is closest to the ideal value. Up or down picks the next stock value above or below it."
+                  help={`${NEAREST_NOTE} Up or down picks the next stock value above or below it.`}
                 />
               )}
             </>

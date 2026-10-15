@@ -4,9 +4,12 @@ import {
   COPPER_ALPHA_20C,
   COPPER_RESISTIVITY_20C,
   DEFAULT_FOIL_CONVENTION,
+  FINISHED_COPPER_LEDGER_ID,
   FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
+  MU0_H_PER_M,
   copperBasisFactors,
   copperBasisFromFoil,
+  usesFinishedCopperStatement,
 } from '../../data/constants';
 import { dataStatusForLedgerIds } from '../../data-status';
 import { assertCalcResult } from '../../result';
@@ -67,16 +70,11 @@ export const VOLTAGE_DROP_SCOPE =
 const SKIN_MESSAGE = 'DC formula is optimistic: skin depth is below half the copper thickness';
 
 const REL_TOL = 1e-9;
-const MU0 = 4e-7 * Math.PI;
+const MU0 = MU0_H_PER_M; // ledger S-013 (VERIFIED) states 4 pi x 1e-7 H/m; see src/core/data/constants.ts
 const T20_C = 20;
 const V = meta.validity;
 const REF_IDS: readonly string[] = meta.reference.ledgerIds;
-const STATUS_DEFAULT = dataStatusForLedgerIds([...REF_IDS], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_FREQ = dataStatusForLedgerIds([...REF_IDS, 'S-013'], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_RHO = dataStatusForLedgerIds([...REF_IDS, 'S-012'], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE });
-const STATUS_RHO_FREQ = dataStatusForLedgerIds([...REF_IDS, 'S-012', 'S-013'], undefined, {
-  exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
-});
+const EXCLUDE = { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE };
 
 /** Thrown for a value outside the representable or modelled range; mapped to OUT_OF_DOMAIN by compute. */
 class RangeFailure extends Error {}
@@ -275,33 +273,29 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
   // Confidence.
   const defaultedAssumptions = ambientDefaulted ? ['ambient'] : [];
   const safetyRelevantDefaults = [...copperBasisFactors(basis).safetyRelevantDefaults];
-  const dataStatus =
-    extraLedgerIds.length > 0
-      ? dataStatusForLedgerIds([...REF_IDS, ...(rhoDiffers ? ['S-012'] : []), ...(inp.frequency !== undefined ? ['S-013'] : []), ...extraLedgerIds], undefined, {
-          exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
-        })
-      : rhoDiffers
-        ? inp.frequency !== undefined
-          ? STATUS_RHO_FREQ
-          : STATUS_RHO
-        : inp.frequency !== undefined
-          ? STATUS_FREQ
-          : STATUS_DEFAULT;
+  // Ledger rows whose data the printed statements rest on. S-009 is added only when an S-009-based statement is present.
+  const usesS009 = usesFinishedCopperStatement(basis);
+  const ledgerIds = [...REF_IDS];
+  if (inp.frequency !== undefined) ledgerIds.push('S-013');
+  if (rhoOverride) ledgerIds.push('S-012');
+  if (usesS009) ledgerIds.push(FINISHED_COPPER_LEDGER_ID);
+  for (const id of extraLedgerIds) if (!ledgerIds.includes(id)) ledgerIds.push(id);
+  // An override equal to the default value is still cited (S-012) but does not change the data being relied on.
+  const ratedIds = rhoOverride && !rhoDiffers ? ledgerIds.filter((id) => id !== 'S-012') : ledgerIds;
+  const dataStatus = dataStatusForLedgerIds(ratedIds, undefined, EXCLUDE);
+  // The confidence rule does not count the implicit S-009 row a second time: the same uncertainty is already counted as the
+  // nominal-copper safety-relevant default. S-009 chosen explicitly through a thickness tolerance (extraLedgerIds) still counts.
+  const confidenceStatus = usesS009 && !extraLedgerIds.includes(FINISHED_COPPER_LEDGER_ID) ? dataStatusForLedgerIds(ratedIds.filter((id) => id !== FINISHED_COPPER_LEDGER_ID), undefined, EXCLUDE) : dataStatus;
   const confidence = rateConfidence({
     outOfRangeInputs: outOfRange,
     defaultedAssumptions,
     safetyRelevantDefaults,
     accuracyClass: meta.accuracyClass,
-    dataStatus,
+    dataStatus: confidenceStatus,
   });
   if (safetyRelevantDefaults.length > 0) {
     confidence.reasons.push('Resistance is inversely proportional to copper thickness, so any difference between nominal and finished copper carries straight into the resistance.');
   }
-
-  const ledgerIds = [...REF_IDS];
-  if (inp.frequency !== undefined) ledgerIds.push('S-013');
-  if (rhoOverride) ledgerIds.push('S-012');
-  for (const id of extraLedgerIds) if (!ledgerIds.includes(id)) ledgerIds.push(id);
 
   const result: CalcResult = {
     method: meta.method,

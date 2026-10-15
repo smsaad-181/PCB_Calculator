@@ -300,7 +300,8 @@ describe('overrides: cautions shown, values never defaulted', () => {
     expect(ADVANCED_CAUTION).toMatch(/Nothing here is prefilled/);
     expect(pageSrc).toMatch(/Advanced \(overrides\)/);
     expect(pageSrc).toMatch(/ADVANCED_CAUTION/);
-    expect(pageSrc).toMatch(/useState\(init\.state\.resistivity\.trim\(\) !== '' \|\| init\.state\.alpha\.trim\(\) !== ''\)/);
+    expect(pageSrc).toMatch(/useState\(\(\) => hasOverride\(state\)\)/);
+    expect(pageSrc).toMatch(/s\.resistivity\.trim\(\) !== '' \|\| s\.alpha\.trim\(\) !== ''/);
   });
   it('an override that gives a non-positive resistivity is an error value', () => {
     expect(computeView(st({ ...BASE, resistivity: '0 Ω·m' })).status).toBe('error');
@@ -479,7 +480,7 @@ describe('accessibility wiring', () => {
     expect(pageSrc).toMatch(/role="status" aria-live="polite" aria-atomic="true"/);
     expect(pageSrc).toMatch(/aria-label="Trace resistance inputs"/);
     expect(pageSrc).toMatch(/aria-labelledby="result-h"/);
-    expect(pageSrc).toMatch(/useRafValue/);
+    expect(pageSrc).toMatch(/useCalcState/); // the shared hook debounces with requestAnimationFrame (useRafValue)
   });
   it('every quantity field announces its unit in the label', () => {
     expect(fieldSrc).toMatch(/<span class="unit">\(\{p\.unitHint\}\)<\/span>/);
@@ -517,5 +518,17 @@ describe('voltage-drop scope is shown beside the voltage drop', () => {
     const v = computeView(st({ ...BASE }));
     if (v.status !== 'ok') throw new Error('expected ok');
     expect(v.result.rows.every((r) => r.note === undefined)).toBe(true);
+  });
+});
+
+describe('ledger badge: a weight-based trace resistance shows PAYWALLED', () => {
+  it('the ledger view groups S-009 as paywalled and the badge text says so', async () => {
+    const v = ok(st(BASE));
+    expect(v.raw.dataStatus).toBe('PAYWALLED');
+    expect(v.result.ledger.unverifiedIds).toContain('S-009');
+    const g = v.result.ledger.groups.find((x) => x.status === 'PAYWALLED-USER-MUST-VERIFY');
+    expect(g?.ids).toContain('S-009');
+    const { badgeText } = await import('../components/UnverifiedBadge');
+    expect(badgeText('PAYWALLED-USER-MUST-VERIFY', g?.ids ?? [])).toMatch(/paywalled/);
   });
 });

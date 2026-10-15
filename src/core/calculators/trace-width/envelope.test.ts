@@ -278,11 +278,11 @@ describe('choices that cannot be applied are reported, never guessed', () => {
     expect(r.envelope).toBeUndefined();
     expect(r.warnings.some((w) => w.code === 'TOLERANCE_CHOICE_NOT_AVAILABLE')).toBe(true);
   });
-  it('S-009 outer 1 oz minimum is above nominal: no thin side, no thickness tolerance from it, S-009 not counted as used', () => {
+  it('S-009 outer 1 oz minimum is above nominal: no thin side, no thickness tolerance from it (S-009 is cited once, for the nominal-copper caution, not for a tolerance)', () => {
     const r = run({ ...A, tolerances: { copperThickness: { source: 'finished-copper-s009' } } });
     expect(r.envelope).toBeUndefined();
     expect(r.warnings.some((w) => w.code === 'TOLERANCE_CHOICE_NO_THIN_SIDE')).toBe(true);
-    expect(r.reference.ledgerIds).not.toContain('S-009');
+    expect(r.reference.ledgerIds.filter((x) => x === 'S-009').length).toBe(1);
   });
   it('a user thickness with a user percentage still works', () => {
     const r = run({ mode: 'B', layer: 'outer', current: amp(3), deltaT: dT(20), copperThickness: fromUnit(35, 'um'), tolerances: { copperThickness: frac(0.1) } });

@@ -203,6 +203,11 @@ export const CALCULATOR_STATE_KEYS = {
     tkch: 'Copper thickness tolerance choice: foil (spread between the three foil conventions, ledger S-003), finished (finished-copper thin side only, ledger S-009, secondhand and paywalled), pct (your own percent, tthk) or none. Absent means not chosen: no thickness tolerance. foil and finished need the copper given as a weight.',
     tamb: 'Ambient tolerance as a temperature DIFFERENCE, for example "5 K" or "5 °C", or a pair "minus|plus" (at most 81 characters). Absent means none. Only used when an ambient is entered.',
     twpf: 'Width tolerance from the fab profile: 1 means use the track-width tolerance of the chosen fab profile (reserved key fp; JLCPCB example, ledger S-019l, UNVERIFIED). Absent means not used. Ignored without a chosen profile.',
+    cm: 'Current type: "steady" or "pulse" (optional pulsed current, RMS-equivalent mean heating). Absent means steady. A pulse replaces the steady current i and cannot be combined with solving for current (the page then shows the core error).',
+    ip: 'Entered pulse peak current text, for example "10 A" (at most 40 characters; used when the current type is pulse).',
+    du: 'Entered pulse duty cycle text, a percent or fraction such as "25%" or "0.25" (at most 40 characters; used when the current type is pulse).',
+    pt: 'Pulse period versus the thermal time constant: "much-shorter" (evaluate at I_pk x sqrt(D), a mean-heating result) or "comparable-or-longer" (peak held continuously, no rms result). Absent means not chosen: there is no default and no pulse result without it.',
+    lc: 'Board layer count that scopes the fab profile minimum trace width note: "1", "2" or "multilayer". Absent means not given: no note. Only used with a chosen fab profile (reserved key fp); dropped with a notice otherwise.',
   },
   'trace-resistance': {
     l: 'Entered trace length text, for example "100 mm", "4 in" or "250 mil" (at most 40 characters).',

@@ -2,6 +2,8 @@ import { DIM, FOIL_CONVENTIONS } from '../../units';
 import type { FoilConvention, Quantity } from '../../units';
 import type { CalcError, CopperBasisKind, Result } from '../../result';
 import { guardQuantity } from '../copper-converter/guards';
+import { PERIOD_VS_TAU_CHOICES } from '../pulse-shared';
+import type { PeriodVsTau } from '../pulse-shared';
 
 export type Layer = 'outer' | 'inner';
 
@@ -18,6 +20,10 @@ export interface ValidInputs {
   readonly convention: FoilConvention | undefined;
   readonly width?: Quantity;
   readonly current?: Quantity;
+  /** Pulse input (replaces current): peak, duty and the user's period-versus-time-constant statement. */
+  readonly peakCurrent?: Quantity;
+  readonly duty?: Quantity;
+  readonly periodVsTau?: PeriodVsTau;
   readonly deltaT?: Quantity;
   readonly copperWeight?: Quantity;
   readonly copperThickness?: Quantity;
@@ -31,6 +37,8 @@ export interface ValidInputs {
 type QField =
   | 'width'
   | 'current'
+  | 'peakCurrent'
+  | 'duty'
   | 'deltaT'
   | 'copperWeight'
   | 'copperThickness'
@@ -42,6 +50,8 @@ type QField =
 const SPEC: Record<QField, { dim: Quantity['dim']; name: string }> = {
   width: { dim: DIM.LENGTH, name: 'length' },
   current: { dim: DIM.CURRENT, name: 'current (A)' },
+  peakCurrent: { dim: DIM.CURRENT, name: 'current (A)' },
+  duty: { dim: DIM.DIMENSIONLESS, name: 'dimensionless duty cycle in (0, 1]' },
   deltaT: { dim: DIM.TEMPERATURE_DIFFERENCE, name: 'temperature difference (not an absolute temperature)' },
   copperWeight: { dim: DIM.AREAL_MASS, name: 'foil weight (oz/ft2)' },
   copperThickness: { dim: DIM.LENGTH, name: 'length' },
@@ -83,11 +93,35 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
     return { ok: false, error: err('INVALID_INPUT', 'copperBasis', `copperBasis must be one of ${BASES.join(', ')}.`) };
   }
 
-  const given = (['width', 'current', 'deltaT'] as const).filter((f) => raw[f] !== undefined);
+  // Current: a steady current, or a pulse (peakCurrent with duty and periodVsTau). A pulse takes the place of the current.
+  const hasPk = raw['peakCurrent'] !== undefined;
+  const periodRaw = raw['periodVsTau'];
+  if (hasPk) {
+    if (raw['current'] !== undefined) {
+      return { ok: false, error: err('INVALID_INPUT', 'current', 'Give current (steady) or peakCurrent (pulse, with duty and periodVsTau), not both.') };
+    }
+    if (raw['duty'] === undefined) return { ok: false, error: err('INVALID_INPUT', 'duty', 'duty (0 < D <= 1) is required with peakCurrent.') };
+    if (typeof periodRaw !== 'string' || !PERIOD_VS_TAU_CHOICES.includes(periodRaw)) {
+      return {
+        ok: false,
+        error: err('INVALID_INPUT', 'periodVsTau', `periodVsTau must be exactly one of ${PERIOD_VS_TAU_CHOICES.join(', ')} with peakCurrent; it is never defaulted.`),
+      };
+    }
+  } else if (raw['duty'] !== undefined || periodRaw !== undefined) {
+    return {
+      ok: false,
+      error: err('INVALID_INPUT', raw['duty'] !== undefined ? 'duty' : 'periodVsTau', 'duty and periodVsTau are only allowed together with peakCurrent.'),
+    };
+  }
+  const given = (['width', 'current', 'deltaT'] as const).filter((f) => raw[f] !== undefined || (f === 'current' && hasPk));
   if (given.length !== 2) {
     return {
       ok: false,
-      error: err('INVALID_INPUT', 'width', 'Give exactly two of width, current and deltaT; the third is solved. Not none, one or all three.'),
+      error: err(
+        'INVALID_INPUT',
+        'width',
+        'Give exactly two of width, current (or a peakCurrent pulse, which takes the place of the current) and deltaT; the third is solved. Not none, one or all three.',
+      ),
     };
   }
   const hasW = raw['copperWeight'] !== undefined;
@@ -103,7 +137,8 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   }
 
   const out: Partial<Record<QField, Quantity>> = {};
-  const fields: QField[] = [...given, hasW ? 'copperWeight' : 'copperThickness'];
+  const fields: QField[] = [...given.filter((f) => raw[f] !== undefined), hasW ? 'copperWeight' : 'copperThickness'];
+  if (hasPk) fields.push('peakCurrent', 'duty');
   for (const f of ['ambient', 'designMargin', 'currentDerating', 'maxAllowedTemp'] as const) {
     if (raw[f] !== undefined) fields.push(f);
   }
@@ -111,6 +146,9 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
     const g = guardQuantity(f, raw[f], SPEC[f].dim, SPEC[f].name);
     if (!g.ok) return g;
     out[f] = g.value;
+  }
+  if (out.duty !== undefined && out.duty.si > 1) {
+    return { ok: false, error: err('INVALID_INPUT', 'duty', 'duty must be in (0, 1].') };
   }
   const dm = out.designMargin;
   if (dm !== undefined && dm.si < 1) {
@@ -128,6 +166,9 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       convention: conv as FoilConvention | undefined,
       ...(out.width !== undefined ? { width: out.width } : {}),
       ...(out.current !== undefined ? { current: out.current } : {}),
+      ...(out.peakCurrent !== undefined ? { peakCurrent: out.peakCurrent } : {}),
+      ...(out.duty !== undefined ? { duty: out.duty } : {}),
+      ...(typeof periodRaw === 'string' && hasPk ? { periodVsTau: periodRaw as PeriodVsTau } : {}),
       ...(out.deltaT !== undefined ? { deltaT: out.deltaT } : {}),
       ...(out.copperWeight !== undefined ? { copperWeight: out.copperWeight } : {}),
       ...(out.copperThickness !== undefined ? { copperThickness: out.copperThickness } : {}),

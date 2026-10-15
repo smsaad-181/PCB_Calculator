@@ -237,7 +237,7 @@ describe('validity checks (S-010 chart range, secondhand and paywalled) and exac
     dT: /temperature rise within chart range \(.*100/,
     weight: /copper weight within chart range \(0\.5-3/,
     width: /width within chart range \(.*400 mil/,
-    maxT: /maximum conductor temperature within allowed/,
+    maxT: /Estimated conductor temperature vs your stated maximum \(informational\)/,
   };
   it('in-range case: all four checks present and ok, each detail names its bound and S-010; no maxAllowedTemp check', () => {
     const r = ok(solveWidth('outer', 3, 10, 1));

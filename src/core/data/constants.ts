@@ -14,6 +14,13 @@ export const COPPER_RESISTIVITY_20C = 1 / 58e6;
 /** Temperature coefficient of resistance of copper at 20 C, per K [S-004, VERIFIED]. */
 export const COPPER_ALPHA_20C = 0.00393;
 
+/**
+ * Vacuum permeability mu0, H/m: 4 pi x 1e-7. Ledger S-013 (VERIFIED) states this value for the skin-depth relation and records
+ * that it deviates from CODATA 2022 (1.256 637 061 27e-6) by less than 1e-9 relative (docs/sources/notes/skin-depth.md).
+ */
+export const MU0_H_PER_M = 4e-7 * Math.PI;
+export const MU0_LEDGER_ID = 'S-013';
+
 export type CopperKMaterial = 'pure-401' | 'c11000-391';
 export const DEFAULT_COPPER_K_MATERIAL: CopperKMaterial = 'pure-401';
 
@@ -54,19 +61,18 @@ export function copperThermalConductivity(material: CopperKMaterial): CopperTher
 
 export const DEFAULT_FOIL_CONVENTION: FoilConvention = 'nominal-35um';
 
-/** Spread of the three foil thickness conventions at 1 oz/ft2, as a percent of the smallest. */
-/** The spread depends only on the fixed convention table, so it is computed once on first use. */
-let cachedFoilSpreadPercent: number | undefined;
+/** Spread of the three foil thickness conventions at 1 oz/ft2, as a percent of the smallest (a pure function of the fixed convention table, computed once at load). */
+function computeFoilSpreadPercent(): number {
+  const oneOz = fromUnit(1, 'oz/ft2');
+  const t = (Object.keys(FOIL_CONVENTIONS) as FoilConvention[]).map((c) => foilThickness(oneOz, c).thickness.si);
+  const lo = Math.min(...t);
+  const hi = Math.max(...t);
+  return ((hi - lo) / lo) * 100;
+}
+const FOIL_SPREAD_PERCENT: number = computeFoilSpreadPercent();
 
 export function foilSpreadPercent(): number {
-  if (cachedFoilSpreadPercent === undefined) {
-    const oneOz = fromUnit(1, 'oz/ft2');
-    const t = (Object.keys(FOIL_CONVENTIONS) as FoilConvention[]).map((c) => foilThickness(oneOz, c).thickness.si);
-    const lo = Math.min(...t);
-    const hi = Math.max(...t);
-    cachedFoilSpreadPercent = ((hi - lo) / lo) * 100;
-  }
-  return cachedFoilSpreadPercent;
+  return FOIL_SPREAD_PERCENT;
 }
 
 export function foilAssumptionText(): string {
@@ -123,6 +129,19 @@ function nominalCopperText(basis: CopperBasis): string {
       ? 'thinner than nominal is the non-conservative direction for current capacity and heating'
       : 'thicker than nominal lowers resistance but plated outer copper is not uniform';
   return `${lead}: ${figure}; ${direction}.`;
+}
+
+/** Ledger row behind every finished-versus-nominal copper statement (secondhand IPC-6012 minimums, PAYWALLED-USER-MUST-VERIFY). */
+export const FINISHED_COPPER_LEDGER_ID = 'S-009';
+
+/**
+ * True when the copper basis makes the result print an S-009-based statement (a finished-copper minimum in um and its percent
+ * against the nominal thickness): a nominal basis from a foil weight that the S-009 table covers. A thickness entry, a finished
+ * or measured basis, and a weight without a table figure make no S-009 statement, so they do not cite S-009.
+ */
+export function usesFinishedCopperStatement(basis: CopperBasis): boolean {
+  if (basis.basis !== 'nominal' || basis.weightOzFt2 === undefined) return false;
+  return finishedVsNominal(basis.layer, basis.weightOzFt2, basis.thickness.si * 1e6) !== undefined;
 }
 
 /** Confidence factors implied by a copper basis. Only a nominal basis is a safety-relevant default. */

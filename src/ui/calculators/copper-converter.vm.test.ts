@@ -301,3 +301,17 @@ describe('speed', () => {
     expect(performance.now() - t0).toBeLessThan(5000);
   });
 });
+
+describe('ledger badge: the converter shows PAYWALLED (S-009 statement is always printed)', () => {
+  it('the ledger view groups S-009 as paywalled and the badge text says so', async () => {
+    const v = computeView(st({ weight: '1 oz', layer: 'outer' }));
+    if (v.status !== 'ok') throw new Error(`expected ok, got ${v.status}`);
+    expect(v.raw.dataStatus).toBe('PAYWALLED');
+    expect(v.result.ledger.unverifiedIds).toContain('S-009');
+    const g = v.result.ledger.groups.find((x) => x.status === 'PAYWALLED-USER-MUST-VERIFY');
+    expect(g?.ids).toContain('S-009');
+    const { badgeText } = await import('../components/UnverifiedBadge');
+    expect(badgeText('PAYWALLED-USER-MUST-VERIFY', g?.ids ?? [])).toMatch(/paywalled/);
+    expect(resultsSrc).toMatch(/UNVERIFIED/);
+  });
+});

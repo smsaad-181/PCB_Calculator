@@ -19,6 +19,7 @@ import {
   type WarningView,
 } from '../components/view';
 import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, weightSourceFromHash, type WeightSource } from './copper-source';
+import { PEAK_HIGHER_HEADING, PERIOD_LABEL, type PeriodChoice } from './pulse-labels';
 
 export const CALCULATOR_ID = 'self-heating';
 
@@ -26,7 +27,7 @@ export type CopperBy = 'weight' | 'thickness';
 export type ThermalLawChoice = '' | 'user-theta' | 'legacy-ipc2221-calibrated';
 export type ThetaBy = 'theta' | 'per-length';
 export type CurrentMode = 'steady' | 'pulse';
-export type PeriodChoice = '' | 'much-shorter' | 'comparable-or-longer';
+export type { PeriodChoice } from './pulse-labels';
 export type { Units };
 
 /** Everything the form holds. Strings are exactly what the user typed. Empty means "not entered" (or "use the default"). */
@@ -90,10 +91,7 @@ export const LAW_HELP: Readonly<Record<'user-theta' | 'legacy-ipc2221-calibrated
   'legacy-ipc2221-calibrated':
     'Legacy: the thermal resistance is derived from the legacy IPC-2221 curve fit (a fit to a chart, not a heat-flow model), so coupling it with the temperature-dependent resistance is an extrapolation.',
 };
-export const PERIOD_LABEL: Readonly<Record<'much-shorter' | 'comparable-or-longer', string>> = {
-  'much-shorter': 'Much shorter than the thermal time constant (result is a mean rise from the rms current)',
-  'comparable-or-longer': 'Comparable to or longer than the thermal time constant (peak current held continuously, not an rms result)',
-};
+export { PERIOD_LABEL, PEAK_HIGHER_HEADING } from './pulse-labels';
 
 export const DEFAULT_TEXT = {
   ambient: `${String(meta.defaults.ambientC)} °C (engineering default, not from a standard)`,
@@ -101,8 +99,6 @@ export const DEFAULT_TEXT = {
 
 export const RANGE_HINT =
   'Outside the stated plausibility range (an engineering range, not a standard), or no steady state was found, so the result is less reliable. See the confidence reasons.';
-
-export const PEAK_HIGHER_HEADING = 'Mean temperature rise only: the peak is higher';
 
 // ---------------------------------------------------------------------------
 // Hash state

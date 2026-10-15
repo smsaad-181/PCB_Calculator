@@ -16,6 +16,7 @@ import type { FoilConvention, Quantity } from '../../units';
 import { compute as computeLegacyWidth } from '../trace-width/calc';
 import type { Inputs as LegacyInputs } from '../trace-width/calc';
 import { VOLTAGE_DROP_SCOPE } from '../trace-resistance/calc';
+import { PEAK_HIGHER_WARNING, PEAK_WARNING, RMS_INFO, effectiveHeatingCurrent } from '../pulse-shared';
 import { validate } from './guards';
 import type { Layer, PeriodVsTau, ThermalLaw } from './guards';
 import { meta } from './meta';
@@ -74,12 +75,6 @@ const LINEAR_INFO =
   'The temperature coefficient is the linear coefficient at 20 °C for 100 % IACS copper (ledger S-004); its change with temperature and the effect of alloying, plating and impurities are not modelled.';
 const STEADY_INFO =
   'Steady state only: the thermal time constant and transient heating are not computed. DC resistance only: skin effect and AC resistance are not included. Fusing (Onderdonk / Preece) is a different calculation and is out of scope.';
-const RMS_INFO =
-  'Pulse: I_rms = I_pk x sqrt(D) (ledger S-019e) is used because you stated that the period is much shorter than the thermal time constant. That statement is your declaration, not a computed or checked threshold, and the condition itself is UNVERIFIED (ledger S-019f).';
-const PEAK_HIGHER_WARNING =
-  'Pulse: the result is the mean (duty-averaged) temperature rise, not the peak. The peak rise is higher by up to (1 - D) x P_pk x Z(t_on), where Z(t_on) is the transient thermal impedance over one on-time. That is not computed: there is no transient thermal impedance for a trace in this calculator. Peak temperature needs the peak power, not the average power.';
-const PEAK_WARNING =
-  'Pulse: the period is comparable to or longer than the thermal time constant, so an rms-based result would be wrong and none is given. The value shown is the steady rise at the peak current held continuously, a conservative bound for that case, and not an rms result.';
 
 const REL_TOL = 1e-9;
 const T20_C = 20;
@@ -170,7 +165,7 @@ function build(raw: unknown): CalcOutcome {
   const peakBased = pulse && inp.periodVsTau === 'comparable-or-longer';
   let iEffSi: number;
   if (inp.current !== undefined) iEffSi = inp.current.si;
-  else if (inp.peakCurrent !== undefined && inp.duty !== undefined) iEffSi = rmsUsed ? inp.peakCurrent.si * Math.sqrt(inp.duty.si) : inp.peakCurrent.si;
+  else if (inp.peakCurrent !== undefined && inp.duty !== undefined && inp.periodVsTau !== undefined) iEffSi = effectiveHeatingCurrent(inp.peakCurrent.si, inp.duty.si, inp.periodVsTau);
   else throw new RangeFailure('No current reached the calculation.');
   positive(iEffSi, 'Effective current');
 

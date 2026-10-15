@@ -12,7 +12,7 @@ import { SelectField } from '../components/SelectField';
 import { TextField } from '../components/TextField';
 import { useCalcState } from '../useCalcState';
 import { useSearch } from '../useSearch';
-import { FEEDBACK_SERIES, SNAP_CHOICES, isFeedbackSeries, isSnapChoice, parseCountFieldView, parseToleranceField } from './circuit-choices';
+import { FEEDBACK_SERIES, NEAREST_NOTE, SNAP_CHOICES, isFeedbackSeries, isSnapChoice, parseCountFieldView, parseToleranceField } from './circuit-choices';
 import {
   BIAS_OPTIONS,
   CALCULATOR_ID,
@@ -221,6 +221,7 @@ export default function FeedbackDivider() {
               }}
             />
           )}
+          {showSnap && <p class="help">{NEAREST_NOTE}</p>}
           {showPairs && (
             <QuantityField
               id="fb-pairs"

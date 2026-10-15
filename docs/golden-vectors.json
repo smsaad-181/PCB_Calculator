@@ -20794,6 +20794,204 @@
       },
       "status": "VERIFIED",
       "note": "R proportional to rho20; theta independent of rho"
+    },
+    {
+      "name": "trace_width_rms_current_A_Ipk10A_D0.25",
+      "oracle_value": 5.0,
+      "pinned_expected": 5.0,
+      "rel_tol": 1e-12,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_rms = I_pk sqrt(D) (S-019e)"
+    },
+    {
+      "name": "trace_width_rms_width_mil_outer_Ipk10A_D0.25_dT20C_1oz",
+      "oracle_value": 71.49064502936493,
+      "pinned_expected": 71.49064502936493,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "legacy IPC-2221 minimum width at I_rms (mean heating); LEGACY, not an IPC-2152 result"
+    },
+    {
+      "name": "trace_width_rms_current_A_Ipk5A_D0.64",
+      "oracle_value": 4.0,
+      "pinned_expected": 4.0,
+      "rel_tol": 1e-12,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_rms = I_pk sqrt(D) (S-019e)"
+    },
+    {
+      "name": "trace_width_rms_width_mil_inner_Ipk5A_D0.64_dT15C_2oz",
+      "oracle_value": 81.39334781696346,
+      "pinned_expected": 81.39334781696346,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "legacy IPC-2221 minimum width at I_rms (mean heating); LEGACY, not an IPC-2152 result"
+    },
+    {
+      "name": "trace_width_rms_current_A_Ipk8A_D0.36",
+      "oracle_value": 4.8,
+      "pinned_expected": 4.8,
+      "rel_tol": 1e-12,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "I_rms = I_pk sqrt(D) (S-019e)"
+    },
+    {
+      "name": "trace_width_rms_width_mil_outer_Ipk8A_D0.36_dT30C_0.5oz",
+      "oracle_value": 105.67118110165315,
+      "pinned_expected": 105.67118110165315,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "legacy IPC-2221 minimum width at I_rms (mean heating); LEGACY, not an IPC-2152 result"
+    },
+    {
+      "name": "trace_width_rms_dT_C_outer_Ipk8A_D0.25_w40mil_1oz",
+      "oracle_value": 31.35588252680571,
+      "pinned_expected": 31.35588252680571,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"
+    },
+    {
+      "name": "trace_width_rms_dT_C_inner_Ipk10A_D0.36_w60mil_1oz",
+      "oracle_value": 195.22487196692123,
+      "pinned_expected": 195.22487196692123,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"
+    },
+    {
+      "name": "trace_width_rms_dT_C_outer_Ipk6A_D1_w30mil_2oz",
+      "oracle_value": 40.39950702142782,
+      "pinned_expected": 40.39950702142782,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-001",
+        "S-019e",
+        "S-019f",
+        "S-006",
+        "S-003"
+      ],
+      "ledger_status": {
+        "S-001": "PAYWALLED-USER-MUST-VERIFY",
+        "S-019e": "VERIFIED",
+        "S-019f": "UNVERIFIED",
+        "S-006": "VERIFIED",
+        "S-003": "CONFLICT"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"
     }
   ]
 }

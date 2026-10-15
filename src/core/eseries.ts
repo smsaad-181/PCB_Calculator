@@ -136,6 +136,55 @@ export function nearest(value: number, series: SeriesName, mode: Mode): Result<N
   return { ok: true, value: { value: pick.value, mantissa: pick.mantissa, decade: pick.decade, errorPercent: ((pick.value - value) / value) * 100 } };
 }
 
+/**
+ * The series value nearest to the target by RATIO (smallest |ln(found / target)|, the geometric neighbour), as opposed to
+ * nearest(..., 'nearest') which minimises the arithmetic difference. The two differ in coarse series: in E3, 3.3 is 1.1 from
+ * 2.2 but 1.4 from 4.7, yet 4.7 is nearer by ratio (1.424 against 1.5). It is always the 'up' or the 'down' neighbour; a tie
+ * (up x down = target squared) goes up, as for nearest(). Same validation, window and errorPercent as nearest().
+ */
+export function nearestRatio(value: number, series: SeriesName): Result<Nearest, CalcError> {
+  const up = nearest(value, series, 'up');
+  if (!up.ok) return up;
+  const down = nearest(value, series, 'down');
+  if (!down.ok) return down;
+  if (up.value.value === down.value.value) return up;
+  return up.value.value * down.value.value <= value * value ? up : down;
+}
+
+/** Relative slack (of the target) when comparing a part's effect with the pair's error, so an exact tie counts as a tie. */
+const NOISE_TOL = 1e-9;
+
+/**
+ * True when one resistor of the pair is noise: it moves the result by no more than the pair's own error against the target.
+ * Series: the smaller part is the candidate, its effect is |value - larger|. Parallel: the larger part is, its effect is
+ * |value - smaller|. In both cases the effect is how far the result sits from the dominant part alone. Example: 10 + 3300 for a
+ * 3300 target (effect 10, error 10). A pair with zero error is never noise, and divider-ratio pairs are never filtered (both
+ * parts always matter for a ratio). Pure; the pair must come from bestPairs for the same target and topology.
+ */
+export function isNegligiblePair(p: Pair, target: number, topology: Topology): boolean {
+  if (topology === 'divider-ratio') return false;
+  const dominant = topology === 'series' ? Math.max(p.r1, p.r2) : Math.min(p.r1, p.r2);
+  const effect = Math.abs(p.value - dominant);
+  const error = Math.abs(p.value - target);
+  return effect <= error + NOISE_TOL * target && error > NOISE_TOL * target;
+}
+
+/**
+ * Drop noise pairs (see isNegligiblePair) from a best-first list and keep the first `limit` others. The first pair (the best)
+ * is never dropped. `hidden` counts the pairs dropped before the last one kept (or in the whole list when fewer than `limit`
+ * remain), so it is the number a reader would otherwise have scrolled past.
+ */
+export function dropNoisePairs(pairs: readonly Pair[], target: number, topology: Topology, limit: number): { kept: Pair[]; hidden: number } {
+  const kept: Pair[] = [];
+  let hidden = 0;
+  for (let i = 0; i < pairs.length && kept.length < limit; i++) {
+    const p = pairs[i] as Pair;
+    if (i > 0 && isNegligiblePair(p, target, topology)) hidden++;
+    else kept.push(p);
+  }
+  return { kept, hidden };
+}
+
 /** Significant digits of a mantissa with trailing zeros dropped: 1 -> 1, 4.7 -> 2, 4.75 -> 3. */
 const sigDigits = (m: number): number => Math.max(1, String(m).replace('.', '').replace(/0+$/, '').length);
 

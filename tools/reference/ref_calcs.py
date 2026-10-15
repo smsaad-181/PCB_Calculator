@@ -2480,6 +2480,55 @@ _ENV9_PINNED = {
 GOLDEN.extend((n, got, _ENV9_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _ENV9)
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Trace width, RMS-equivalent pulse input (Phase 1 task 2 advanced input, PV-3). Independent of src/.
+# Rectangular pulse, period much shorter than the thermal time constant (the user's declaration): I_rms = I_pk sqrt(D)
+# (S-019e, VERIFIED); the legacy IPC-2221 relation (S-001, PAYWALLED) is then evaluated at I_rms. S-019f (validity of the
+# mean-rise reading) is UNVERIFIED. The result is the MEAN (duty-averaged) rise, not the peak.
+# ---------------------------------------------------------------------------------------------------------------
+def tw_rms_A(i_pk, duty):
+    return i_pk * math.sqrt(duty)
+
+# (layer, I_pk A, duty, dT degC, oz)
+TW_RMS_WIDTH_CASES = [("outer", 10, 0.25, 20, 1), ("inner", 5, 0.64, 15, 2), ("outer", 8, 0.36, 30, 0.5)]
+# (layer, I_pk A, duty, width mil, oz)
+TW_RMS_DT_CASES = [("outer", 8, 0.25, 40, 1), ("inner", 10, 0.36, 60, 1), ("outer", 6, 1, 30, 2)]
+
+def _tw_rms_tag(layer, ipk, d, x, oz, xname):
+    return "%s_Ipk%sA_D%s_%s%s_%soz" % (layer, _g(ipk), _g(d), xname, _g(x), _g(oz))
+
+_TW_RMS_PINNED = {
+    'trace_width_rms_current_A_Ipk10A_D0.25': 5.0,
+    'trace_width_rms_width_mil_outer_Ipk10A_D0.25_dT20C_1oz': 71.49064502936493,
+    'trace_width_rms_current_A_Ipk5A_D0.64': 4.0,
+    'trace_width_rms_width_mil_inner_Ipk5A_D0.64_dT15C_2oz': 81.39334781696346,
+    'trace_width_rms_current_A_Ipk8A_D0.36': 4.8,
+    'trace_width_rms_width_mil_outer_Ipk8A_D0.36_dT30C_0.5oz': 105.67118110165315,
+    'trace_width_rms_dT_C_outer_Ipk8A_D0.25_w40mil_1oz': 31.35588252680571,
+    'trace_width_rms_dT_C_inner_Ipk10A_D0.36_w60mil_1oz': 195.22487196692123,
+    'trace_width_rms_dT_C_outer_Ipk6A_D1_w30mil_2oz': 40.39950702142782,
+}
+_TW_RMS_IDS = ("S-001", "S-019e", "S-019f", "S-006", "S-003")
+
+def _tw_rms_vectors():
+    out = []
+    for layer, ipk, d, dt, oz in TW_RMS_WIDTH_CASES:
+        i = tw_rms_A(ipk, d)
+        out.append(("trace_width_rms_current_A_Ipk%sA_D%s" % (_g(ipk), _g(d)), i, 1e-12, _TW_RMS_IDS,
+                    "I_rms = I_pk sqrt(D) (S-019e)"))
+        out.append(("trace_width_rms_width_mil_" + _tw_rms_tag(layer, ipk, d, dt, oz, "dT").replace("dT%s_" % _g(dt), "dT%sC_" % _g(dt)),
+                    ipc2221_width_mil(i, dt, layer, FOIL_UM_PER_OZ * oz), 1e-9, _TW_RMS_IDS,
+                    "legacy IPC-2221 minimum width at I_rms (mean heating); LEGACY, not an IPC-2152 result"))
+    for layer, ipk, d, w, oz in TW_RMS_DT_CASES:
+        i = tw_rms_A(ipk, d)
+        out.append(("trace_width_rms_dT_C_" + _tw_rms_tag(layer, ipk, d, w, oz, "w").replace("w%s_" % _g(w), "w%smil_" % _g(w)),
+                    ipc2221_dT_C(i, w, layer, FOIL_UM_PER_OZ * oz), 1e-9, _TW_RMS_IDS,
+                    "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"))
+    return out
+
+GOLDEN.extend((n, got, _TW_RMS_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _tw_rms_vectors())
+
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:
