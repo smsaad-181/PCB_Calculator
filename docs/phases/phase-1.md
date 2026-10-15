@@ -26,3 +26,8 @@ Every calculator: solve-for-any-unknown where the relation allows; validity rang
 - [ ] Self-heating: convergence ≤ 50 iterations; runaway case handled
 - [ ] Performance: closed-form < 1 ms (benchmarked); fuzz test no NaN/throw
 - [ ] Three validator reports PASS/PASS-WITH-CONDITIONS
+
+## Closure status (2026-10-15)
+
+Built: tasks 0-9 (core, pages, validators). Task 10: kit prepared, awaiting HUMAN-run KiCad/twc outputs (carried into Phase 2 by user decision).
+Deferred by decision (logged in `docs/validation/OPEN_RISKS.md`, 'Phase 1 closure record'): task 2 Mode A estimate side by side (blocked by R-8; the page shows Mode A disabled), task 2 adjacent plane and cooling (qualitative only), task 6 parallel branches and per-segment temperature coupling, via current rating (PCB-F3, pointer text only), per-layer stackup object, in-app profile editor. Validators: `phase-1-calc-final.md`, `phase-1-phase-final.md`, `phase-1-pcb-final.md` all PASS-WITH-CONDITIONS; record `docs/validation/reports/phase-1-closure.md`.
