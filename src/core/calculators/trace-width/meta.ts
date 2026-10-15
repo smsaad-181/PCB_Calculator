@@ -29,5 +29,23 @@ export const meta = {
   },
   defaults: { ambientC: 25, designMargin: 1.25, currentDerating: 0.8 },
   accuracyClass: 'empirical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  toleranceInputs: ['current', 'deltaT', 'width', 'copperThickness', 'ambient'] as string[],
+  /**
+   * Min/typ/max envelope and normalised sensitivities (task 9), all optional and only when the user supplies tolerances.
+   * Generic helper: src/core/sensitivity.ts (no physics). The envelope is a worst-case corner range over the listed
+   * tolerances (2^k corners, k <= 6) plus axis probes; outputs monotone in every tolerated input are exact at corners, others
+   * are labelled corners-only. Sensitivities are d ln(output)/d ln(input) by central difference (relative step 1e-4), reported
+   * as results named "sensitivity of <output> to <input>". Rounding: a required width rounds up, a capacity rounds down, a
+   * rise or temperature is a prediction (rounds up). The thickness tolerance may be an explicit choice of the S-003
+   * foil-convention spread or the S-009 finished-copper minimum (thin side only, secondhand); the width tolerance may come from
+   * a fab profile only when the user selects it and the profile publishes it (JLCPCB +/-20 %, S-019l, UNVERIFIED).
+   */
+  envelope: {
+    method: 'Worst-case corner analysis of the tolerance box with axis monotonicity probes; local log-log sensitivities by central difference.',
+    maxToleratedInputs: 6,
+    sensitivityRelativeStep: 1e-4,
+    outputs: ['width', 'current capacity', 'temperature rise', 'maximum conductor temperature'],
+    thicknessChoices: { 'foil-convention-spread': 'S-003', 'finished-copper-s009': 'S-009' },
+    profileTolerance: { key: 'traceWidthTolerancePct', ledgerId: 'S-019l' },
+  },
 } as const;

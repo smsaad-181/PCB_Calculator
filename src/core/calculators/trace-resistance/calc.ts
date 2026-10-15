@@ -13,9 +13,27 @@ import { assertCalcResult } from '../../result';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning, CopperBasis, CopperBasisKind } from '../../result';
 import { DIM, FOIL_CONVENTIONS, add, foilThickness, fromUnit, q, toUnit } from '../../units';
 import type { FoilConvention, Quantity } from '../../units';
+import { envelopeResult, hasTolerances, planTolerances, stripEnvelopeInputs } from '../tolerance-shared';
+import type { FieldSpec, OutputPlan, ThicknessChoice, TolValue } from '../tolerance-shared';
 import { validate } from './guards';
 import type { Layer } from './guards';
 import { meta } from './meta';
+
+/**
+ * Optional input tolerances (task 9). Absent means no envelope and no sensitivity readout; there are no default tolerances.
+ * length, width and copperThickness are relative tolerances (copperThickness may instead be an explicit choice of
+ * 'foil-convention-spread' (S-003) or 'finished-copper-s009' (S-009, thin side only)). ambient is an absolute
+ * temperature-difference tolerance on the conductor temperature and needs a user-supplied ambient. resistivity needs the
+ * override and current needs a current. No tolerance is taken from a fab profile here.
+ */
+export interface Tolerances {
+  length?: TolValue;
+  width?: TolValue;
+  copperThickness?: TolValue | ThicknessChoice;
+  ambient?: TolValue;
+  resistivity?: TolValue;
+  current?: TolValue;
+}
 
 export interface Inputs {
   layer: Layer;
@@ -31,6 +49,7 @@ export interface Inputs {
   alpha?: Quantity;
   frequency?: Quantity;
   current?: Quantity;
+  tolerances?: Tolerances;
 }
 
 const RECOMMENDATION =
@@ -76,7 +95,7 @@ function nominalBasis(layer: Layer, weight: Quantity, convention: FoilConvention
   return { ...b, thickness: q(b.thickness.si, b.thickness.dim) };
 }
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -256,7 +275,18 @@ function build(raw: unknown): CalcOutcome {
   // Confidence.
   const defaultedAssumptions = ambientDefaulted ? ['ambient'] : [];
   const safetyRelevantDefaults = [...copperBasisFactors(basis).safetyRelevantDefaults];
-  const dataStatus = rhoDiffers ? (inp.frequency !== undefined ? STATUS_RHO_FREQ : STATUS_RHO) : inp.frequency !== undefined ? STATUS_FREQ : STATUS_DEFAULT;
+  const dataStatus =
+    extraLedgerIds.length > 0
+      ? dataStatusForLedgerIds([...REF_IDS, ...(rhoDiffers ? ['S-012'] : []), ...(inp.frequency !== undefined ? ['S-013'] : []), ...extraLedgerIds], undefined, {
+          exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE,
+        })
+      : rhoDiffers
+        ? inp.frequency !== undefined
+          ? STATUS_RHO_FREQ
+          : STATUS_RHO
+        : inp.frequency !== undefined
+          ? STATUS_FREQ
+          : STATUS_DEFAULT;
   const confidence = rateConfidence({
     outOfRangeInputs: outOfRange,
     defaultedAssumptions,
@@ -271,6 +301,7 @@ function build(raw: unknown): CalcOutcome {
   const ledgerIds = [...REF_IDS];
   if (inp.frequency !== undefined) ledgerIds.push('S-013');
   if (rhoOverride) ledgerIds.push('S-012');
+  for (const id of extraLedgerIds) if (!ledgerIds.includes(id)) ledgerIds.push(id);
 
   const result: CalcResult = {
     method: meta.method,
@@ -296,10 +327,38 @@ function build(raw: unknown): CalcOutcome {
   return { ok: true, value: result };
 }
 
+/** Nominal result plus the tolerance envelope and sensitivities (task 9). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const fields: FieldSpec[] = [
+    { key: 'length', input: 'length', label: 'length', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'width', input: 'width', label: 'width', kind: 'relative', present: true, absentMessage: '' },
+    { key: 'copperThickness', input: inp.copperWeight !== undefined ? 'copperWeight' : 'copperThickness', label: 'copper thickness', kind: 'relative', present: true, absentMessage: '', allow: 'thickness' },
+    { key: 'ambient', input: 'ambient', label: 'ambient', kind: 'temperature', present: inp.ambient !== undefined, absentMessage: 'ambient tolerance needs a user-supplied ambient; the 25 degC default is an assumption and is not toleranced.' },
+    { key: 'resistivity', input: 'resistivity', label: 'resistivity', kind: 'relative', present: inp.resistivity !== undefined, absentMessage: 'resistivity tolerance needs the resistivity override; the default copper value is a definition (S-004) and is not toleranced.' },
+    { key: 'current', input: 'current', label: 'current', kind: 'relative', present: inp.current !== undefined, absentMessage: 'current tolerance needs a current; none was given.' },
+  ];
+  const planRes = planTolerances(raw.tolerances, fields, {
+    layer: inp.layer,
+    ...(inp.copperWeight !== undefined ? { copperWeight: inp.copperWeight } : {}),
+    ...(inp.convention !== undefined ? { convention: inp.convention } : {}),
+  });
+  if (!planRes.ok) return { ok: false, error: planRes.error };
+  const plan = planRes.value;
+  const nominalRes = build(stripEnvelopeInputs(raw), plan.ledgerIds);
+  if (!nominalRes.ok) return nominalRes;
+  const nominal = nominalRes.value;
+  const outputs: OutputPlan[] = [{ name: 'resistance at conductor temperature', sensitivity: true }];
+  if (inp.current !== undefined) outputs.push({ name: 'voltage drop', sensitivity: true }, { name: 'power loss', sensitivity: true });
+  return envelopeResult({ compute: (i: Inputs) => build(i), base: stripEnvelopeInputs(raw), nominal, plan, outputs });
+}
+
 /** Trace resistance at the conductor temperature, with voltage drop, power loss and a skin-depth screen. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

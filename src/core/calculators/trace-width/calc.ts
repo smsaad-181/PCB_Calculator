@@ -10,9 +10,36 @@ import { assertCalcResult } from '../../result';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning, CopperBasis, CopperBasisKind, DesignValue } from '../../result';
 import { DIM, FOIL_CONVENTIONS, add, div, foilThickness, fromUnit, mul, q, toUnit } from '../../units';
 import type { FoilConvention, Quantity } from '../../units';
+import type { ParsedFabProfile } from '../../fab/profile';
+import {
+  checkProfileInputs,
+  envelopeResult,
+  fabProfileRecord,
+  fabProfileWarnings,
+  hasTolerances,
+  planTolerances,
+  stripEnvelopeInputs,
+} from '../tolerance-shared';
+import type { DerivedOutput, FieldSpec, OutputPlan, ThicknessChoice, TolValue } from '../tolerance-shared';
 import { validate } from './guards';
 import type { Layer } from './guards';
 import { meta } from './meta';
+
+/**
+ * Optional input tolerances (task 9). Absent means no envelope and no sensitivity readout; there are no default tolerances.
+ * current, deltaT and width apply only to quantities you supply (a solved quantity has no input tolerance, except that a
+ * width tolerance in the solved-width case adds the drawn width that covers it). copperThickness is a tolerance on the foil
+ * weight or entered thickness, or an explicit choice of 'foil-convention-spread' (S-003) or 'finished-copper-s009' (S-009,
+ * thin side only). width may be 'profile' to use the fab profile track-width tolerance (S-019l, UNVERIFIED) when the profile
+ * publishes it. ambient is an absolute temperature-difference tolerance and needs a user-supplied ambient.
+ */
+export interface Tolerances {
+  current?: TolValue;
+  deltaT?: TolValue;
+  width?: TolValue | 'profile';
+  copperThickness?: TolValue | ThicknessChoice;
+  ambient?: TolValue;
+}
 
 export interface Inputs {
   mode: 'B';
@@ -28,6 +55,10 @@ export interface Inputs {
   designMargin?: Quantity;
   currentDerating?: Quantity;
   maxAllowedTemp?: Quantity;
+  tolerances?: Tolerances;
+  /** A parsed fab profile and the injected evaluation date (YYYY-MM-DD); used only when tolerances.width is 'profile'. */
+  fabProfile?: ParsedFabProfile;
+  today?: string;
 }
 
 const MANDATORY_CAUTION =
@@ -83,7 +114,7 @@ interface Chart {
   given: boolean;
 }
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -360,7 +391,12 @@ function build(raw: unknown): CalcOutcome {
   if (solved === 'width' && marginDefaulted) safetyRelevantDefaults.push('designMargin defaulted to 1.25 (engineering default, not from a standard)');
   if (solved === 'current' && derateDefaulted) safetyRelevantDefaults.push('currentDerating defaulted to 0.8 (engineering default, not from a standard)');
   safetyRelevantDefaults.push(...copperBasisFactors(basis).safetyRelevantDefaults);
-  const dataStatus = layer === 'inner' ? STATUS_INNER : STATUS_OUTER;
+  const dataStatus =
+    extraLedgerIds.length > 0
+      ? dataStatusForLedgerIds([...REF_IDS, ...(layer === 'inner' ? ['S-018'] : []), ...extraLedgerIds], undefined, { exclude: FOIL_LEDGER_IDS_EXCLUDED_FROM_CONFIDENCE })
+      : layer === 'inner'
+        ? STATUS_INNER
+        : STATUS_OUTER;
   const confidence = rateConfidence({
     outOfRangeInputs: outOfRange,
     defaultedAssumptions: [],
@@ -375,7 +411,7 @@ function build(raw: unknown): CalcOutcome {
     reference: {
       standard: meta.reference.standard,
       edition: meta.reference.edition,
-      ledgerIds: layer === 'inner' ? [...meta.reference.ledgerIds, 'S-018'] : [...meta.reference.ledgerIds],
+      ledgerIds: [...new Set([...meta.reference.ledgerIds, ...(layer === 'inner' ? ['S-018'] : []), ...extraLedgerIds])],
     },
     formula: meta.formula,
     inputs,
@@ -398,10 +434,71 @@ function build(raw: unknown): CalcOutcome {
   return { ok: true, value: result };
 }
 
+const DRAWN_WIDTH = 'drawn width covering the width tolerance';
+
+/** Nominal result plus the tolerance envelope and sensitivities (task 9). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const solved: 'width' | 'current' | 'deltaT' = inp.width === undefined ? 'width' : inp.current === undefined ? 'current' : 'deltaT';
+  const tolRaw = raw.tolerances as unknown;
+  const wantsProfile = typeof tolRaw === 'object' && tolRaw !== null && (tolRaw as { width?: unknown }).width === 'profile';
+  const pe = checkProfileInputs(raw, wantsProfile);
+  if (pe !== undefined) return { ok: false, error: pe };
+  const solvedMsg = (n: string): string => `${n} is the solved quantity here, not an input, so it has no input tolerance. Give ${n} as an input (and solve another quantity) to tolerance it.`;
+  const fields: FieldSpec[] = [
+    { key: 'current', input: 'current', label: 'current', kind: 'relative', present: inp.current !== undefined, absentMessage: solvedMsg('current') },
+    { key: 'deltaT', input: 'deltaT', label: 'temperature rise', kind: 'relative', present: inp.deltaT !== undefined, absentMessage: solvedMsg('deltaT') },
+    { key: 'width', input: 'width', label: 'width', kind: 'relative', present: true, absentMessage: '', scaleOnly: solved === 'width', allow: 'profile-width' },
+    { key: 'copperThickness', input: inp.copperWeight !== undefined ? 'copperWeight' : 'copperThickness', label: 'copper thickness', kind: 'relative', present: true, absentMessage: '', allow: 'thickness' },
+    { key: 'ambient', input: 'ambient', label: 'ambient', kind: 'temperature', present: inp.ambient !== undefined, absentMessage: 'ambient tolerance needs a user-supplied ambient; the 25 degC default is an assumption and is not toleranced.' },
+  ];
+  const planRes = planTolerances(raw.tolerances, fields, {
+    layer: inp.layer,
+    ...(inp.copperWeight !== undefined ? { copperWeight: inp.copperWeight } : {}),
+    ...(inp.convention !== undefined ? { convention: inp.convention } : {}),
+    ...(raw.fabProfile !== undefined ? { profile: raw.fabProfile } : {}),
+    ...(raw.today !== undefined ? { today: raw.today } : {}),
+  });
+  if (!planRes.ok) return { ok: false, error: planRes.error };
+  const plan = planRes.value;
+
+  const nominalRes = build(stripEnvelopeInputs(raw), plan.ledgerIds);
+  if (!nominalRes.ok) return nominalRes;
+  let nominal = nominalRes.value;
+  if (plan.profileUsed && raw.fabProfile !== undefined && raw.today !== undefined) {
+    const rec = fabProfileRecord(raw.fabProfile, raw.today);
+    nominal = { ...nominal, fabProfile: rec, warnings: [...nominal.warnings, ...fabProfileWarnings(raw.fabProfile, rec)] };
+  }
+  // Solved width with a width tolerance: the drawn width must cover the minus side so the finished width still meets the requirement.
+  const derived: DerivedOutput[] = [];
+  const wTol = plan.planned.find((p) => p.key === 'width');
+  if (solved === 'width' && wTol !== undefined && wTol.minus > 0) {
+    const factor = 1 / (1 - wTol.minus);
+    const w = nominal.results.find((r) => r.name === 'width') as CalcResult['results'][number];
+    const drawn = q(w.value.si * factor, DIM.LENGTH);
+    derived.push({ name: DRAWN_WIDTH, from: 'width', factor, bound: 'min-requirement', note: '' });
+    nominal = {
+      ...nominal,
+      results: [...nominal.results, { name: DRAWN_WIDTH, value: drawn, role: 'secondary', bound: 'min-requirement' }],
+      steps: [...nominal.steps, { label: 'Drawn width covering the width tolerance', expr: 'drawn = required width / (1 - width tolerance, minus side)', value: drawn, bound: 'min-requirement' }],
+      assumptions: [...nominal.assumptions, 'The required width is the finished (as-etched) width. If the fabricator can deliver a finished width that low by the minus tolerance, draw the trace wider by 1 / (1 - minus); the plus side does not reduce the requirement.'],
+    };
+  }
+
+  const primary = solved === 'width' ? 'width' : solved === 'current' ? 'current capacity' : 'temperature rise';
+  const outputs: OutputPlan[] = [
+    { name: primary, sensitivity: true },
+    { name: 'maximum conductor temperature', sensitivity: false, onlyIfVaries: true },
+  ];
+  return envelopeResult({ compute: (i: Inputs) => build(i), base: stripEnvelopeInputs(raw), nominal, plan, outputs, derived });
+}
+
 /** Legacy IPC-2221 trace width / current capacity / temperature rise (Mode B only). Never throws; errors are returned as values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

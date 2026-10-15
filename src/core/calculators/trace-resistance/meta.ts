@@ -26,5 +26,21 @@ export const meta = {
   },
   defaults: { ambientC: 25 },
   accuracyClass: 'analytical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  toleranceInputs: ['length', 'width', 'copperThickness', 'ambient', 'resistivity', 'current'] as string[],
+  /**
+   * Min/typ/max envelope and normalised sensitivities (task 9), optional, only when the user supplies tolerances. Generic
+   * helper: src/core/sensitivity.ts (no physics). Worst-case corner range over the listed tolerances (2^k corners, k <= 6)
+   * plus axis probes; resistance, drop and power are monotone in every tolerated input, so corners are exact. Sensitivities are
+   * d ln(output)/d ln(input) (exactly 1, -1, -1 for length, width, thickness of R; 1 and 2 for current on drop and power) and
+   * the temperature one is the semi-log alpha / (1 + alpha (T - 20)) per kelvin. All three outputs are predictions and round up.
+   * The thickness tolerance may be an explicit S-003 foil-convention spread or S-009 finished-copper minimum (thin side only).
+   * No tolerance is taken from a fab profile for resistance.
+   */
+  envelope: {
+    method: 'Worst-case corner analysis of the tolerance box with axis monotonicity probes; local log-log sensitivities by central difference.',
+    maxToleratedInputs: 6,
+    sensitivityRelativeStep: 1e-4,
+    outputs: ['resistance at conductor temperature', 'voltage drop', 'power loss'],
+    thicknessChoices: { 'foil-convention-spread': 'S-003', 'finished-copper-s009': 'S-009' },
+  },
 } as const;
