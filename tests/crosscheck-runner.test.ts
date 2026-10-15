@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import type { CrosscheckAdapter } from './crosscheck/adapters';
 import {
   evaluateCase,
+  formatObtained,
   formatSummary,
   summarize,
   validateRecord,
@@ -170,5 +171,56 @@ describe('summarize / formatSummary', () => {
   });
   it('zero records prints the README message', () => {
     expect(formatSummary(summarize(0, []))).toBe('0 cross-check records');
+  });
+});
+
+// Task 10: records waiting for a human run carry the sentinel in toolVersion and retrieved while every toolOutput is null.
+const SENTINEL = 'TO BE FILLED BY HUMAN';
+
+describe('pending records (sentinel allowed only while every toolOutput is null)', () => {
+  it('accepts the sentinel in toolVersion and retrieved when all outputs are null', () => {
+    const v = validateRecord(rec({ toolVersion: SENTINEL, retrieved: SENTINEL, cases: [caseOf({ toolOutputs: { y: null } })] }));
+    expect(v.ok, v.ok ? '' : v.errors.join()).toBe(true);
+  });
+  it('rejects the sentinel in toolVersion once any output is a number', () => {
+    const v = validateRecord(rec({ toolVersion: SENTINEL, cases: [caseOf({ toolOutputs: { y: 100 } })] }));
+    expect(v.ok).toBe(false);
+    if (!v.ok) expect(v.errors.join()).toContain('toolVersion');
+  });
+  it('rejects the sentinel in retrieved once any output is a number', () => {
+    const v = validateRecord(rec({ retrieved: SENTINEL, cases: [caseOf({ toolOutputs: { y: 100 } })] }));
+    expect(v.ok).toBe(false);
+    if (!v.ok) expect(v.errors.join()).toContain('retrieved');
+  });
+  it('rejects the sentinel when only one of several cases has a number', () => {
+    const v = validateRecord(
+      rec({
+        toolVersion: SENTINEL,
+        retrieved: SENTINEL,
+        cases: [caseOf({ id: 'a', toolOutputs: { y: null } }), caseOf({ id: 'b', toolOutputs: { y: 1 } })],
+      }),
+    );
+    expect(v.ok).toBe(false);
+  });
+  it('still rejects other malformed dates while pending', () => {
+    expect(validateRecord(rec({ retrieved: '2026-02-30', cases: [caseOf({ toolOutputs: { y: null } })] })).ok).toBe(false);
+  });
+});
+
+describe('formatObtained', () => {
+  it('reports 0 of N when every case is pending', () => {
+    const results = [
+      { caseId: 'a', status: 'pending' as const, messages: [] },
+      { caseId: 'b', status: 'pending' as const, messages: [] },
+    ];
+    expect(formatObtained('X-01-demo.json', results)).toBe('X-01-demo.json: 0 of 2 cases obtained');
+  });
+  it('counts passed and failed as obtained', () => {
+    const results = [
+      { caseId: 'a', status: 'pass' as const, messages: [] },
+      { caseId: 'b', status: 'fail' as const, messages: [] },
+      { caseId: 'c', status: 'pending' as const, messages: [] },
+    ];
+    expect(formatObtained('f.json', results)).toBe('f.json: 2 of 3 cases obtained');
   });
 });

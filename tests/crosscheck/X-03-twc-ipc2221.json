@@ -1,0 +1,214 @@
+{
+  "tool": "twc (ymic9963/twc), IPC-2221 method only",
+  "toolId": "X-03",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "HUMAN builds and runs twc from a scratch directory OUTSIDE this repo at the pinned commit 308002ff79933fda6a9fb5aa86b889f76c7aedba (ledger S-050) or records the commit actually used in toolVersion. IPC-2221 method ONLY. twc has three further methods labelled IPC-2152 (A NinjaCalc fit, B SMPS.us fit, C Sierra Circuits fit, ledger S-050); they are web-calculator curve fits, NOT the model of our legacy Mode B, and are out of scope for this comparison. Our IPC-2152-informed Mode A is blocked by open risk R-8, so no twc IPC-2152 number may be recorded here or compared to anything of ours. Copper is typed in oz in twc (1 oz = 1.378 mil there) and given to our adapter as 35 um or 70 um thickness; the resulting 3.43e-5 relative difference is expected. Record the width exactly as displayed in whichever of mil or mm the tool shows; leave the other key null. Do not type numbers from memory or from our app. A pass verifies no ledger row.",
+  "cases": [
+    {
+      "id": "twc-2221-ext-1A-dT10-1oz",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 1,
+        "deltaT_K": 10,
+        "thickness_um": 35,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 1,
+        "temperatureRise_degC": 10,
+        "copper_oz": 1,
+        "layer": "external",
+        "method": "IPC-2221 only",
+        "note": "twc takes foil weight; 1 oz is 1.378 mil in twc (S-050), i.e. 35.0012 um, which is why 35 um versus 1.378 mil is an expected difference, not a bug"
+      },
+      "toolOutputs": {
+        "width_mil": null,
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mil",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        },
+        {
+          "output": "width_mm",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        }
+      ]
+    },
+    {
+      "id": "twc-2221-int-1A-dT10-1oz",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 1,
+        "deltaT_K": 10,
+        "thickness_um": 35,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 1,
+        "temperatureRise_degC": 10,
+        "copper_oz": 1,
+        "layer": "internal",
+        "method": "IPC-2221 only",
+        "note": "twc takes foil weight; 1 oz is 1.378 mil in twc (S-050), i.e. 35.0012 um, which is why 35 um versus 1.378 mil is an expected difference, not a bug"
+      },
+      "toolOutputs": {
+        "width_mil": null,
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mil",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        },
+        {
+          "output": "width_mm",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        }
+      ]
+    },
+    {
+      "id": "twc-2221-ext-3A-dT20-1oz",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 3,
+        "deltaT_K": 20,
+        "thickness_um": 35,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 3,
+        "temperatureRise_degC": 20,
+        "copper_oz": 1,
+        "layer": "external",
+        "method": "IPC-2221 only",
+        "note": "twc takes foil weight; 1 oz is 1.378 mil in twc (S-050), i.e. 35.0012 um, which is why 35 um versus 1.378 mil is an expected difference, not a bug"
+      },
+      "toolOutputs": {
+        "width_mil": null,
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mil",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        },
+        {
+          "output": "width_mm",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        }
+      ]
+    },
+    {
+      "id": "twc-2221-int-3A-dT20-2oz",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 3,
+        "deltaT_K": 20,
+        "thickness_um": 70,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 3,
+        "temperatureRise_degC": 20,
+        "copper_oz": 2,
+        "layer": "internal",
+        "method": "IPC-2221 only",
+        "note": "twc takes foil weight; 1 oz is 1.378 mil in twc (S-050), i.e. 35.0012 um, which is why 35 um versus 1.378 mil is an expected difference, not a bug"
+      },
+      "toolOutputs": {
+        "width_mil": null,
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mil",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        },
+        {
+          "output": "width_mm",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        }
+      ]
+    },
+    {
+      "id": "twc-2221-ext-10A-dT30-2oz",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 10,
+        "deltaT_K": 30,
+        "thickness_um": 70,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 10,
+        "temperatureRise_degC": 30,
+        "copper_oz": 2,
+        "layer": "external",
+        "method": "IPC-2221 only",
+        "note": "twc takes foil weight; 1 oz is 1.378 mil in twc (S-050), i.e. 35.0012 um, which is why 35 um versus 1.378 mil is an expected difference, not a bug"
+      },
+      "toolOutputs": {
+        "width_mil": null,
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mil",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        },
+        {
+          "output": "width_mm",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        }
+      ]
+    },
+    {
+      "id": "twc-2221-int-10A-dT30-1oz",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 10,
+        "deltaT_K": 30,
+        "thickness_um": 35,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 10,
+        "temperatureRise_degC": 30,
+        "copper_oz": 1,
+        "layer": "internal",
+        "method": "IPC-2221 only",
+        "note": "twc takes foil weight; 1 oz is 1.378 mil in twc (S-050), i.e. 35.0012 um, which is why 35 um versus 1.378 mil is an expected difference, not a bug"
+      },
+      "toolOutputs": {
+        "width_mil": null,
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mil",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        },
+        {
+          "output": "width_mm",
+          "relTol": 0.001,
+          "why": "Provisional, to be confirmed by the human BEFORE the first run (worksheet section 3.4); never edited after seeing results. Derived part: twc converts 1 oz to 1.378 mil (ledger S-050, twc.h) = 35.0012 um (1 mil = 25.4 um exactly), while this record gives our calculator 35 um, so twc thickness is larger by 3.428e-5 relative and its width is smaller by the same fraction (area is independent of thickness). The rest is rounding of the displayed digits, which is unknown until the human sees the tool output: 1e-3 is a conservative placeholder that covers 2 displayed decimals of a width of about 5 mil or more. Replace by 3.43e-5 + 0.5 x 10^-d / (smallest displayed width) once d is known."
+        }
+      ]
+    }
+  ]
+}

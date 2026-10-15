@@ -1,0 +1,226 @@
+{
+  "tool": "KiCad pcb_calculator, Track Width tab",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "HUMAN runs the KiCad pcb_calculator GUI (Track Width tab), IPC-2221 versions only (7.0 to 10.0 branch per docs/research/kicad-pcb-calculator.md section 5; NOT master, whose app uses the Brooks and Adam IPC-2152 fit, a different model than our legacy Mode B). Record Help > About version string and OS in toolVersion. Copper thickness is typed in mm in the tool and given as thickness_um to our adapter, so no oz-to-thickness convention can cause a mismatch. Widths are read in mm, as displayed (all displayed digits). Inputs and outputs per docs/validation/crosscheck-phase1.md section 2. Do not type numbers from memory or from our app. A pass verifies no ledger row.",
+  "cases": [
+    {
+      "id": "kicad-tw-ext-1A-dT10-35um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 1,
+        "deltaT_K": 10,
+        "thickness_um": 35,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 1,
+        "temperatureRise_degC": 10,
+        "traceThickness_mm": 0.035,
+        "column": "External",
+        "flow": "type the current and the temperature rise; read the width in the External column (width in mm)"
+      },
+      "toolOutputs": {
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mm",
+          "relTol": 0.00001,
+          "why": "Derived before any run, not tuned: same constants as ledger S-001 (k 0.048/0.024, exponents 0.44/0.725) and thickness typed in mm so no oz convention applies (docs/research/kicad-pcb-calculator.md section 2, values consistent with 1 mil = 0.0254 mm); the only expected difference is rounding of the displayed digits. 1e-5 = half a unit of the 6th decimal in mm (as in the K-IMG7 screenshot) divided by the smallest width in this file (about 0.05 mm, a lower bound, not a result). If the tool shows fewer than 6 decimals, or this is KiCad master (Brooks and Adam fit, a different model), the human must recompute or reclassify BEFORE running (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-int-1A-dT10-35um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 1,
+        "deltaT_K": 10,
+        "thickness_um": 35,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 1,
+        "temperatureRise_degC": 10,
+        "traceThickness_mm": 0.035,
+        "column": "Internal",
+        "flow": "type the current and the temperature rise; read the width in the Internal column (width in mm)"
+      },
+      "toolOutputs": {
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mm",
+          "relTol": 0.00001,
+          "why": "Derived before any run, not tuned: same constants as ledger S-001 (k 0.048/0.024, exponents 0.44/0.725) and thickness typed in mm so no oz convention applies (docs/research/kicad-pcb-calculator.md section 2, values consistent with 1 mil = 0.0254 mm); the only expected difference is rounding of the displayed digits. 1e-5 = half a unit of the 6th decimal in mm (as in the K-IMG7 screenshot) divided by the smallest width in this file (about 0.05 mm, a lower bound, not a result). If the tool shows fewer than 6 decimals, or this is KiCad master (Brooks and Adam fit, a different model), the human must recompute or reclassify BEFORE running (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-ext-3A-dT20-35um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 3,
+        "deltaT_K": 20,
+        "thickness_um": 35,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 3,
+        "temperatureRise_degC": 20,
+        "traceThickness_mm": 0.035,
+        "column": "External",
+        "flow": "type the current and the temperature rise; read the width in the External column (width in mm)"
+      },
+      "toolOutputs": {
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mm",
+          "relTol": 0.00001,
+          "why": "Derived before any run, not tuned: same constants as ledger S-001 (k 0.048/0.024, exponents 0.44/0.725) and thickness typed in mm so no oz convention applies (docs/research/kicad-pcb-calculator.md section 2, values consistent with 1 mil = 0.0254 mm); the only expected difference is rounding of the displayed digits. 1e-5 = half a unit of the 6th decimal in mm (as in the K-IMG7 screenshot) divided by the smallest width in this file (about 0.05 mm, a lower bound, not a result). If the tool shows fewer than 6 decimals, or this is KiCad master (Brooks and Adam fit, a different model), the human must recompute or reclassify BEFORE running (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-int-3A-dT20-70um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 3,
+        "deltaT_K": 20,
+        "thickness_um": 70,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 3,
+        "temperatureRise_degC": 20,
+        "traceThickness_mm": 0.07,
+        "column": "Internal",
+        "flow": "type the current and the temperature rise; read the width in the Internal column (width in mm)"
+      },
+      "toolOutputs": {
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mm",
+          "relTol": 0.00001,
+          "why": "Derived before any run, not tuned: same constants as ledger S-001 (k 0.048/0.024, exponents 0.44/0.725) and thickness typed in mm so no oz convention applies (docs/research/kicad-pcb-calculator.md section 2, values consistent with 1 mil = 0.0254 mm); the only expected difference is rounding of the displayed digits. 1e-5 = half a unit of the 6th decimal in mm (as in the K-IMG7 screenshot) divided by the smallest width in this file (about 0.05 mm, a lower bound, not a result). If the tool shows fewer than 6 decimals, or this is KiCad master (Brooks and Adam fit, a different model), the human must recompute or reclassify BEFORE running (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-ext-10A-dT30-70um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 10,
+        "deltaT_K": 30,
+        "thickness_um": 70,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 10,
+        "temperatureRise_degC": 30,
+        "traceThickness_mm": 0.07,
+        "column": "External",
+        "flow": "type the current and the temperature rise; read the width in the External column (width in mm)"
+      },
+      "toolOutputs": {
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mm",
+          "relTol": 0.00001,
+          "why": "Derived before any run, not tuned: same constants as ledger S-001 (k 0.048/0.024, exponents 0.44/0.725) and thickness typed in mm so no oz convention applies (docs/research/kicad-pcb-calculator.md section 2, values consistent with 1 mil = 0.0254 mm); the only expected difference is rounding of the displayed digits. 1e-5 = half a unit of the 6th decimal in mm (as in the K-IMG7 screenshot) divided by the smallest width in this file (about 0.05 mm, a lower bound, not a result). If the tool shows fewer than 6 decimals, or this is KiCad master (Brooks and Adam fit, a different model), the human must recompute or reclassify BEFORE running (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-int-10A-dT30-35um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "current_A": 10,
+        "deltaT_K": 30,
+        "thickness_um": 35,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "current_A": 10,
+        "temperatureRise_degC": 30,
+        "traceThickness_mm": 0.035,
+        "column": "Internal",
+        "flow": "type the current and the temperature rise; read the width in the Internal column (width in mm)"
+      },
+      "toolOutputs": {
+        "width_mm": null
+      },
+      "compare": [
+        {
+          "output": "width_mm",
+          "relTol": 0.00001,
+          "why": "Derived before any run, not tuned: same constants as ledger S-001 (k 0.048/0.024, exponents 0.44/0.725) and thickness typed in mm so no oz convention applies (docs/research/kicad-pcb-calculator.md section 2, values consistent with 1 mil = 0.0254 mm); the only expected difference is rounding of the displayed digits. 1e-5 = half a unit of the 6th decimal in mm (as in the K-IMG7 screenshot) divided by the smallest width in this file (about 0.05 mm, a lower bound, not a result). If the tool shows fewer than 6 decimals, or this is KiCad master (Brooks and Adam fit, a different model), the human must recompute or reclassify BEFORE running (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-inv-ext-w1.0mm-dT10-35um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "width_mm": 1,
+        "deltaT_K": 10,
+        "thickness_um": 35,
+        "layer": "external"
+      },
+      "toolInputsAsTyped": {
+        "traceWidth_mm": 1,
+        "temperatureRise_degC": 10,
+        "traceThickness_mm": 0.035,
+        "column": "External",
+        "flow": "type the width in the External column (it becomes the controlling value); read the current in A"
+      },
+      "toolOutputs": {
+        "current_A": null
+      },
+      "compare": [
+        {
+          "output": "current_A",
+          "relTol": 0.0001,
+          "why": "Derived before any run, not tuned: same constants and thickness as the width cases (no oz convention, no resistivity involved); only rounding of the displayed current. 1e-4 assumes at least 5 significant digits displayed (worst-case half-unit 5e-5). If fewer are displayed, the human recomputes 0.5 x 10^-(s-1) BEFORE the first run and edits this value (worksheet section 2.4)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tw-inv-int-w2.0mm-dT20-70um",
+      "calculator": "trace-width-ipc2221",
+      "inputs": {
+        "width_mm": 2,
+        "deltaT_K": 20,
+        "thickness_um": 70,
+        "layer": "internal"
+      },
+      "toolInputsAsTyped": {
+        "traceWidth_mm": 2,
+        "temperatureRise_degC": 20,
+        "traceThickness_mm": 0.07,
+        "column": "Internal",
+        "flow": "type the width in the Internal column (it becomes the controlling value); read the current in A"
+      },
+      "toolOutputs": {
+        "current_A": null
+      },
+      "compare": [
+        {
+          "output": "current_A",
+          "relTol": 0.0001,
+          "why": "Derived before any run, not tuned: same constants and thickness as the width cases (no oz convention, no resistivity involved); only rounding of the displayed current. 1e-4 assumes at least 5 significant digits displayed (worst-case half-unit 5e-5). If fewer are displayed, the human recomputes 0.5 x 10^-(s-1) BEFORE the first run and edits this value (worksheet section 2.4)."
+        }
+      ]
+    }
+  ]
+}
