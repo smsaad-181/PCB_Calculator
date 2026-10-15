@@ -1,0 +1,232 @@
+{
+  "tool": "KiCad pcb_calculator, Track Width tab (resistance, voltage drop, power loss)",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "HUMAN runs the KiCad pcb_calculator GUI (Track Width tab), width-driven flow: the External width is typed and becomes the controlling value; resistance, voltage drop and power loss are read from the External column (docs/research/kicad-pcb-calculator.md section 2). KiCad has no temperature field and applies no temperature correction; our side is run at 20 degC. The voltage drop and power use the current KiCad derives from the width, so that displayed current is copied into inputs.current_A (an input here only because it is a tool output; it is exact to the displayed digits). The -rho172 cases repeat the resistance comparison with OUR resistivity overridden to the tool value 1.72e-8 ohm m to separate the constant from the arithmetic; they reuse the same tool resistance number. Record the version and the displayed resistivity. Do not type numbers from memory or from our app. A pass verifies no ledger row.",
+  "cases": [
+    {
+      "id": "kicad-tr-L50-W0.5-35um",
+      "calculator": "trace-resistance",
+      "inputs": {
+        "length_mm": 50,
+        "width_mm": 0.5,
+        "thickness_um": 35,
+        "temperature_C": 20,
+        "layer": "external",
+        "current_A": null
+      },
+      "toolInputsAsTyped": {
+        "conductorLength_mm": 50,
+        "traceWidth_mm_externalColumn": 0.5,
+        "traceThickness_mm": 0.035,
+        "copperResistivity_ohm_m": "leave at the tool value (greyed, expected 1.72e-8; record the value displayed)",
+        "flow": "type the External width (it becomes the controlling value); read resistance, voltage drop and power loss in the External column; copy the displayed current into inputs.current_A before running"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null,
+        "voltage_drop_V": null,
+        "power_W": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0025,
+          "why": "Derived before any run: KiCad copper resistivity 1.72e-8 ohm m (docs/research/kicad-pcb-calculator.md C-K18) versus ours 1/58e6 ohm m (ledger S-004, exact): relative difference of the constants = 2.4058e-3 (our value over theirs minus 1, computed from the two constants only). KiCad applies no temperature correction, ours is run at 20 degC so none applies either. Plus an allowance of 5e-5 for rounding of the displayed resistance (assumes at least 5 significant digits). 2.5e-3 = 2.4058e-3 + 5e-5 rounded up. A difference larger than this is NOT explained by the constant and must be classified."
+        },
+        {
+          "output": "voltage_drop_V",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 (see resistance entry) + 5e-5 rounding of R + 5e-5 rounding of the copied current = 2.506e-3, rounded up to 2.6e-3. V = I x R in both tools; the current is copied from KiCad (width-driven flow), so its displayed rounding enters."
+        },
+        {
+          "output": "power_W",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 + 5e-5 rounding of R + 2 x 5e-5 rounding of the copied current (P = I^2 x R) = 2.556e-3, rounded up to 2.6e-3. Current is copied from KiCad (width-driven flow)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tr-L100-W1.0-35um",
+      "calculator": "trace-resistance",
+      "inputs": {
+        "length_mm": 100,
+        "width_mm": 1,
+        "thickness_um": 35,
+        "temperature_C": 20,
+        "layer": "external",
+        "current_A": null
+      },
+      "toolInputsAsTyped": {
+        "conductorLength_mm": 100,
+        "traceWidth_mm_externalColumn": 1,
+        "traceThickness_mm": 0.035,
+        "copperResistivity_ohm_m": "leave at the tool value (greyed, expected 1.72e-8; record the value displayed)",
+        "flow": "type the External width (it becomes the controlling value); read resistance, voltage drop and power loss in the External column; copy the displayed current into inputs.current_A before running"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null,
+        "voltage_drop_V": null,
+        "power_W": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0025,
+          "why": "Derived before any run: KiCad copper resistivity 1.72e-8 ohm m (docs/research/kicad-pcb-calculator.md C-K18) versus ours 1/58e6 ohm m (ledger S-004, exact): relative difference of the constants = 2.4058e-3 (our value over theirs minus 1, computed from the two constants only). KiCad applies no temperature correction, ours is run at 20 degC so none applies either. Plus an allowance of 5e-5 for rounding of the displayed resistance (assumes at least 5 significant digits). 2.5e-3 = 2.4058e-3 + 5e-5 rounded up. A difference larger than this is NOT explained by the constant and must be classified."
+        },
+        {
+          "output": "voltage_drop_V",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 (see resistance entry) + 5e-5 rounding of R + 5e-5 rounding of the copied current = 2.506e-3, rounded up to 2.6e-3. V = I x R in both tools; the current is copied from KiCad (width-driven flow), so its displayed rounding enters."
+        },
+        {
+          "output": "power_W",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 + 5e-5 rounding of R + 2 x 5e-5 rounding of the copied current (P = I^2 x R) = 2.556e-3, rounded up to 2.6e-3. Current is copied from KiCad (width-driven flow)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tr-L200-W2.0-70um",
+      "calculator": "trace-resistance",
+      "inputs": {
+        "length_mm": 200,
+        "width_mm": 2,
+        "thickness_um": 70,
+        "temperature_C": 20,
+        "layer": "external",
+        "current_A": null
+      },
+      "toolInputsAsTyped": {
+        "conductorLength_mm": 200,
+        "traceWidth_mm_externalColumn": 2,
+        "traceThickness_mm": 0.07,
+        "copperResistivity_ohm_m": "leave at the tool value (greyed, expected 1.72e-8; record the value displayed)",
+        "flow": "type the External width (it becomes the controlling value); read resistance, voltage drop and power loss in the External column; copy the displayed current into inputs.current_A before running"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null,
+        "voltage_drop_V": null,
+        "power_W": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0025,
+          "why": "Derived before any run: KiCad copper resistivity 1.72e-8 ohm m (docs/research/kicad-pcb-calculator.md C-K18) versus ours 1/58e6 ohm m (ledger S-004, exact): relative difference of the constants = 2.4058e-3 (our value over theirs minus 1, computed from the two constants only). KiCad applies no temperature correction, ours is run at 20 degC so none applies either. Plus an allowance of 5e-5 for rounding of the displayed resistance (assumes at least 5 significant digits). 2.5e-3 = 2.4058e-3 + 5e-5 rounded up. A difference larger than this is NOT explained by the constant and must be classified."
+        },
+        {
+          "output": "voltage_drop_V",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 (see resistance entry) + 5e-5 rounding of R + 5e-5 rounding of the copied current = 2.506e-3, rounded up to 2.6e-3. V = I x R in both tools; the current is copied from KiCad (width-driven flow), so its displayed rounding enters."
+        },
+        {
+          "output": "power_W",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 + 5e-5 rounding of R + 2 x 5e-5 rounding of the copied current (P = I^2 x R) = 2.556e-3, rounded up to 2.6e-3. Current is copied from KiCad (width-driven flow)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tr-L10-W0.2-35um",
+      "calculator": "trace-resistance",
+      "inputs": {
+        "length_mm": 10,
+        "width_mm": 0.2,
+        "thickness_um": 35,
+        "temperature_C": 20,
+        "layer": "external",
+        "current_A": null
+      },
+      "toolInputsAsTyped": {
+        "conductorLength_mm": 10,
+        "traceWidth_mm_externalColumn": 0.2,
+        "traceThickness_mm": 0.035,
+        "copperResistivity_ohm_m": "leave at the tool value (greyed, expected 1.72e-8; record the value displayed)",
+        "flow": "type the External width (it becomes the controlling value); read resistance, voltage drop and power loss in the External column; copy the displayed current into inputs.current_A before running"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null,
+        "voltage_drop_V": null,
+        "power_W": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0025,
+          "why": "Derived before any run: KiCad copper resistivity 1.72e-8 ohm m (docs/research/kicad-pcb-calculator.md C-K18) versus ours 1/58e6 ohm m (ledger S-004, exact): relative difference of the constants = 2.4058e-3 (our value over theirs minus 1, computed from the two constants only). KiCad applies no temperature correction, ours is run at 20 degC so none applies either. Plus an allowance of 5e-5 for rounding of the displayed resistance (assumes at least 5 significant digits). 2.5e-3 = 2.4058e-3 + 5e-5 rounded up. A difference larger than this is NOT explained by the constant and must be classified."
+        },
+        {
+          "output": "voltage_drop_V",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 (see resistance entry) + 5e-5 rounding of R + 5e-5 rounding of the copied current = 2.506e-3, rounded up to 2.6e-3. V = I x R in both tools; the current is copied from KiCad (width-driven flow), so its displayed rounding enters."
+        },
+        {
+          "output": "power_W",
+          "relTol": 0.0026,
+          "why": "Derived before any run: resistivity constant difference 2.4058e-3 + 5e-5 rounding of R + 2 x 5e-5 rounding of the copied current (P = I^2 x R) = 2.556e-3, rounded up to 2.6e-3. Current is copied from KiCad (width-driven flow)."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tr-L50-W0.5-35um-rho172",
+      "calculator": "trace-resistance",
+      "inputs": {
+        "length_mm": 50,
+        "width_mm": 0.5,
+        "thickness_um": 35,
+        "temperature_C": 20,
+        "layer": "external",
+        "ourResistivity_ohm_m": 1.72e-8
+      },
+      "toolInputsAsTyped": {
+        "conductorLength_mm": 50,
+        "traceWidth_mm_externalColumn": 0.5,
+        "traceThickness_mm": 0.035,
+        "copperResistivity_ohm_m": "leave at the tool value (greyed, expected 1.72e-8; record the value displayed)",
+        "flow": "same tool run as the case without the rho172 suffix: copy the SAME displayed resistance here. ourResistivity_ohm_m is an OUR-side override equal to the tool constant; it is not typed into KiCad"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0001,
+          "why": "Derived before any run: our resistivity is overridden to the same 1.72e-8 ohm m that KiCad uses, so the constant difference is removed and only arithmetic and rounding remain: 5e-5 for 5 significant displayed digits, rounded up to 1e-4. A larger difference points at the geometry or arithmetic, not at the constant."
+        }
+      ]
+    },
+    {
+      "id": "kicad-tr-L100-W1.0-35um-rho172",
+      "calculator": "trace-resistance",
+      "inputs": {
+        "length_mm": 100,
+        "width_mm": 1,
+        "thickness_um": 35,
+        "temperature_C": 20,
+        "layer": "external",
+        "ourResistivity_ohm_m": 1.72e-8
+      },
+      "toolInputsAsTyped": {
+        "conductorLength_mm": 100,
+        "traceWidth_mm_externalColumn": 1,
+        "traceThickness_mm": 0.035,
+        "copperResistivity_ohm_m": "leave at the tool value (greyed, expected 1.72e-8; record the value displayed)",
+        "flow": "same tool run as the case without the rho172 suffix: copy the SAME displayed resistance here. ourResistivity_ohm_m is an OUR-side override equal to the tool constant; it is not typed into KiCad"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0001,
+          "why": "Derived before any run: our resistivity is overridden to the same 1.72e-8 ohm m that KiCad uses, so the constant difference is removed and only arithmetic and rounding remain: 5e-5 for 5 significant displayed digits, rounded up to 1e-4. A larger difference points at the geometry or arithmetic, not at the constant."
+        }
+      ]
+    }
+  ]
+}

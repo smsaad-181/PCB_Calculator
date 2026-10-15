@@ -8,7 +8,7 @@
 5. Optional custom domain: set it in Settings → Pages. A `CNAME` file in `public/` is ignored when Pages is deployed from an Actions workflow.
 
 ## Pipeline (`.github/workflows/deploy.yml`)
-- Pull requests and pushes run the `verify` job only (no deploy permissions). The `deploy` job runs only on `main`, after `verify` passes.
+- Pull requests and pushes to `main` run the `verify` job (no deploy permissions); a push to any other branch runs nothing until a PR is opened. The `deploy` job runs only on `main`, after `verify` passes.
 - Gate order in `verify`; any failure stops the pipeline:
 
 | Order | Gate | Command | What it checks |

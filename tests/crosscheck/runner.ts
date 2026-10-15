@@ -41,6 +41,8 @@ export interface CaseResult {
 }
 
 const PLACEHOLDER = 'REPLACE';
+/** Allowed in toolVersion and retrieved only while every toolOutput in the record is still null (record waiting for a human run). */
+export const PENDING_SENTINEL = 'TO BE FILLED BY HUMAN';
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 function isObject(v: unknown): v is Record<string, unknown> {
@@ -63,6 +65,11 @@ function containsPlaceholder(v: unknown): boolean {
   return false;
 }
 
+function hasAnyToolValue(cases: unknown): boolean {
+  if (!Array.isArray(cases)) return false;
+  return cases.some((c: unknown) => isObject(c) && isObject(c['toolOutputs']) && Object.values(c['toolOutputs']).some((v) => v !== null));
+}
+
 function nonEmptyString(v: unknown): v is string {
   return typeof v === 'string' && v.trim().length > 0;
 }
@@ -74,11 +81,16 @@ export function validateRecord(raw: unknown): ValidationResult {
 
   if (containsPlaceholder(raw)) errors.push(`contains placeholder value "${PLACEHOLDER}" (template not filled in)`);
 
+  const pending = !hasAnyToolValue(raw['cases']);
   for (const key of ['tool', 'toolId', 'toolVersion', 'method'] as const) {
     if (!nonEmptyString(raw[key])) errors.push(`"${key}" must be a non-empty string`);
   }
-  if (typeof raw['retrieved'] !== 'string' || !isRealDate(raw['retrieved'])) {
-    errors.push('"retrieved" must be a valid YYYY-MM-DD date');
+  if (raw['toolVersion'] === PENDING_SENTINEL && !pending) {
+    errors.push('"toolVersion" is still the sentinel but the record contains tool values: record the exact version or commit');
+  }
+  const retrievedOk = typeof raw['retrieved'] === 'string' && (isRealDate(raw['retrieved']) || (pending && raw['retrieved'] === PENDING_SENTINEL));
+  if (!retrievedOk) {
+    errors.push('"retrieved" must be a valid YYYY-MM-DD date (the sentinel is allowed only while every toolOutput is null)');
   }
   if (raw['obtainedBy'] !== 'human' && raw['obtainedBy'] !== 'agent') {
     errors.push('"obtainedBy" must be "human" or "agent"');
@@ -213,4 +225,10 @@ export function summarize(recordCount: number, results: readonly CaseResult[]): 
 export function formatSummary(s: Summary): string {
   if (s.records === 0) return '0 cross-check records';
   return `${s.records} cross-check records, ${s.cases} cases: ${s.passed} passed, ${s.pending} pending (null), ${s.failed} failed`;
+}
+
+/** One line per record file: how many cases have tool data (pass or fail) out of the total. */
+export function formatObtained(label: string, results: readonly CaseResult[]): string {
+  const obtained = results.filter((r) => r.status !== 'pending').length;
+  return `${label}: ${String(obtained)} of ${String(results.length)} cases obtained`;
 }

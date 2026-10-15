@@ -7,6 +7,7 @@ import { describe, expect, it } from 'vitest';
 import { CROSSCHECK_ADAPTERS } from './crosscheck/adapters';
 import {
   evaluateCase,
+  formatObtained,
   formatSummary,
   summarize,
   validateRecord,
@@ -24,6 +25,7 @@ const files = Object.entries(modules)
 describe('cross-check records', () => {
   const valid: { file: string; record: CrosscheckRecord }[] = [];
   const results: CaseResult[] = [];
+  const perFileResults = new Map<string, CaseResult[]>();
 
   for (const { file, data } of files) {
     describe(file, () => {
@@ -33,9 +35,12 @@ describe('cross-check records', () => {
       });
       if (!v.ok) return;
       valid.push({ file, record: v.record });
+      const fileResults: CaseResult[] = [];
+      perFileResults.set(file, fileResults);
       for (const c of v.record.cases) {
         const r = evaluateCase(c, CROSSCHECK_ADAPTERS);
         results.push(r);
+        fileResults.push(r);
         it(`case ${c.id}: ${r.status}`, () => {
           if (r.status === 'pending') return;
           expect(r.status, `${file} / ${c.id}\n${r.messages.join('\n')}`).toBe('pass');
@@ -46,7 +51,11 @@ describe('cross-check records', () => {
 
   it('prints summary', () => {
     const line = formatSummary(summarize(files.length, results));
-    console.log(line);
+    const perFile = valid.map((f) => formatObtained(f.file, perFileResults.get(f.file) ?? []));
+    const obtained = results.filter((r) => r.status !== 'pending').length;
+    const skipped = obtained === 0 && results.length > 0 ? ' (all skipped: no tool data recorded yet)' : '';
+    const total = `TOTAL: ${String(obtained)} of ${String(results.length)} cases obtained${skipped}`;
+    console.log([line, ...perFile, total].join('\n'));
     expect(line.length).toBeGreaterThan(0);
   });
 });

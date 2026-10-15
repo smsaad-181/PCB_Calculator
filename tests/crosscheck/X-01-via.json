@@ -1,0 +1,154 @@
+{
+  "tool": "KiCad pcb_calculator, Via Size tab",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "HUMAN runs the KiCad pcb_calculator GUI (Via Size tab). Only Resistance, Voltage drop and Power loss are mapped to our via calculator. KiCad also shows thermal resistance, ampacity (an IPC-2221 trace formula applied to the barrel, not an IPC via method), capacitance, inductance, rise-time degradation and reactance: these are a different model from ours (ours derives no rating and its thermal resistance is axial conduction only) and are deliberately NOT mapped or compared (docs/research/kicad-pcb-calculator.md C-K4, C-K5, C-K6). Our side is a single via at 20 degC. The finished hole diameter is typed as the finished (inside) diameter. Record the version, the displayed units and digits, and every default field left in the tool. Do not type numbers from memory or from our app. A pass verifies no ledger row.",
+  "cases": [
+    {
+      "id": "kicad-via-D0.4-T35um-L1.6",
+      "calculator": "via",
+      "inputs": {
+        "finishedHoleDiameter_mm": 0.4,
+        "platingThickness_um": 35,
+        "length_mm": 1.6,
+        "temperature_C": 20,
+        "current_A": 1
+      },
+      "toolInputsAsTyped": {
+        "finishedHoleDiameter_mm": 0.4,
+        "platingThickness_mm": 0.035,
+        "viaLength_mm": 1.6,
+        "appliedCurrent_A": 1,
+        "platingResistivity_ohm_m": "leave at the tool value (expected 1.72e-8; record it)",
+        "otherFields": "leave at the tool defaults and write them in the worksheet results table (pad diameter, clearance, Z0, epsilon_r, temperature rise, rise time)",
+        "flow": "read Resistance, Voltage drop, Power loss only"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null,
+        "voltage_drop_V": null,
+        "power_W": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0025,
+          "why": "Derived before any run, covering the resistivity constant only: KiCad plating resistivity 1.72e-8 ohm m (docs/research/kicad-pcb-calculator.md C-K18) versus ours 1/58e6 ohm m (ledger S-004): relative difference of the constants 2.4058e-3, plus an allowance 5e-5 for rounding of the displayed digits (assumes at least 5 significant digits; the tool may display in milliohm, record the digits). 2.5e-3 total. NOT established: whether KiCad uses the same barrel area pi t (d + t), whether its R includes a temperature term (its temperature rise field exists), and which length it uses. Any larger difference is a model difference to classify, not something to explain away."
+        },
+        {
+          "output": "voltage_drop_V",
+          "relTol": 0.0025,
+          "why": "Derived before any run: V = I x R and P = I^2 x R with I = 1 A typed exactly in the tool, so the same 2.5e-3 as the resistance applies (constant 2.4058e-3 plus rounding). Same NOT established points as the resistance entry."
+        },
+        {
+          "output": "power_W",
+          "relTol": 0.0025,
+          "why": "Derived before any run: V = I x R and P = I^2 x R with I = 1 A typed exactly in the tool, so the same 2.5e-3 as the resistance applies (constant 2.4058e-3 plus rounding). Same NOT established points as the resistance entry."
+        }
+      ]
+    },
+    {
+      "id": "kicad-via-D0.3-T25um-L1.6",
+      "calculator": "via",
+      "inputs": {
+        "finishedHoleDiameter_mm": 0.3,
+        "platingThickness_um": 25,
+        "length_mm": 1.6,
+        "temperature_C": 20,
+        "current_A": 1
+      },
+      "toolInputsAsTyped": {
+        "finishedHoleDiameter_mm": 0.3,
+        "platingThickness_mm": 0.025,
+        "viaLength_mm": 1.6,
+        "appliedCurrent_A": 1,
+        "platingResistivity_ohm_m": "leave at the tool value (expected 1.72e-8; record it)",
+        "otherFields": "leave at the tool defaults and write them in the worksheet results table (pad diameter, clearance, Z0, epsilon_r, temperature rise, rise time)",
+        "flow": "read Resistance, Voltage drop, Power loss only"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null,
+        "voltage_drop_V": null,
+        "power_W": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0025,
+          "why": "Derived before any run, covering the resistivity constant only: KiCad plating resistivity 1.72e-8 ohm m (docs/research/kicad-pcb-calculator.md C-K18) versus ours 1/58e6 ohm m (ledger S-004): relative difference of the constants 2.4058e-3, plus an allowance 5e-5 for rounding of the displayed digits (assumes at least 5 significant digits; the tool may display in milliohm, record the digits). 2.5e-3 total. NOT established: whether KiCad uses the same barrel area pi t (d + t), whether its R includes a temperature term (its temperature rise field exists), and which length it uses. Any larger difference is a model difference to classify, not something to explain away."
+        },
+        {
+          "output": "voltage_drop_V",
+          "relTol": 0.0025,
+          "why": "Derived before any run: V = I x R and P = I^2 x R with I = 1 A typed exactly in the tool, so the same 2.5e-3 as the resistance applies (constant 2.4058e-3 plus rounding). Same NOT established points as the resistance entry."
+        },
+        {
+          "output": "power_W",
+          "relTol": 0.0025,
+          "why": "Derived before any run: V = I x R and P = I^2 x R with I = 1 A typed exactly in the tool, so the same 2.5e-3 as the resistance applies (constant 2.4058e-3 plus rounding). Same NOT established points as the resistance entry."
+        }
+      ]
+    },
+    {
+      "id": "kicad-via-D0.4-T35um-L1.6-rho172",
+      "calculator": "via",
+      "inputs": {
+        "finishedHoleDiameter_mm": 0.4,
+        "platingThickness_um": 35,
+        "length_mm": 1.6,
+        "temperature_C": 20,
+        "ourResistivity_ohm_m": 1.72e-8
+      },
+      "toolInputsAsTyped": {
+        "finishedHoleDiameter_mm": 0.4,
+        "platingThickness_mm": 0.035,
+        "viaLength_mm": 1.6,
+        "appliedCurrent_A": 1,
+        "platingResistivity_ohm_m": "leave at the tool value (expected 1.72e-8; record it)",
+        "otherFields": "leave at the tool defaults and write them in the worksheet results table (pad diameter, clearance, Z0, epsilon_r, temperature rise, rise time)",
+        "flow": "same tool run as the case without the rho172 suffix: copy the SAME displayed resistance. ourResistivity_ohm_m is an OUR-side override equal to the tool constant; it is not typed into KiCad"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0001,
+          "why": "Derived before any run: our resistivity overridden to the tool constant 1.72e-8 ohm m, so only the geometry, arithmetic and rounding remain: 1e-4 assumes at least 5 significant displayed digits (5e-5 half-unit, rounded up). A larger difference points at a different area or length model in the tool, to be classified."
+        }
+      ]
+    },
+    {
+      "id": "kicad-via-D0.3-T25um-L1.6-rho172",
+      "calculator": "via",
+      "inputs": {
+        "finishedHoleDiameter_mm": 0.3,
+        "platingThickness_um": 25,
+        "length_mm": 1.6,
+        "temperature_C": 20,
+        "ourResistivity_ohm_m": 1.72e-8
+      },
+      "toolInputsAsTyped": {
+        "finishedHoleDiameter_mm": 0.3,
+        "platingThickness_mm": 0.025,
+        "viaLength_mm": 1.6,
+        "appliedCurrent_A": 1,
+        "platingResistivity_ohm_m": "leave at the tool value (expected 1.72e-8; record it)",
+        "otherFields": "leave at the tool defaults and write them in the worksheet results table (pad diameter, clearance, Z0, epsilon_r, temperature rise, rise time)",
+        "flow": "same tool run as the case without the rho172 suffix: copy the SAME displayed resistance. ourResistivity_ohm_m is an OUR-side override equal to the tool constant; it is not typed into KiCad"
+      },
+      "toolOutputs": {
+        "resistance_ohm": null
+      },
+      "compare": [
+        {
+          "output": "resistance_ohm",
+          "relTol": 0.0001,
+          "why": "Derived before any run: our resistivity overridden to the tool constant 1.72e-8 ohm m, so only the geometry, arithmetic and rounding remain: 1e-4 assumes at least 5 significant displayed digits (5e-5 half-unit, rounded up). A larger difference points at a different area or length model in the tool, to be classified."
+        }
+      ]
+    }
+  ]
+}
