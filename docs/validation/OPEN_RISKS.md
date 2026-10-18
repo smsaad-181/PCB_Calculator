@@ -295,3 +295,12 @@ Research: ledger rows S-020..S-025 (part A, `docs/research/impedance-models.md`)
 | P2-1 | Paywalled primaries to check: Hammerstad-Jensen 1980, Kirschning-Jansen 1982, Cohn 1954, White, Ghione-Naldi 1983, IPC-2141A, IEC/IPC protocol texts | human | Read and sign ledger rows | OPEN (human) |
 | P2-2 | Both research agents had no shell: sync/audit checks were run by the orchestrator; audit LEDGER_ID_RE read 'RS-485' as ledger id 'S-485' (false positive): fixed with a lookbehind and a test | orchestrator | n/a | FIXED |
 | P2-3 | Steer stripline Example 1 prints 42.77 ohm but its formula gives 42.32 ohm; National AN-1035 prints 50 ohm vs formula 53.05 ohm | human | Read the pages | OPEN (excluded from golden vectors) |
+
+## Phase 2 part A core (logged 2026-10-18, branch phase-2)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-4 | Research note says Z0 differs ~0.4 % between microstrip thickness procedures A and B; the equations recorded in the note give identical Z0 (only eps_eff and delay differ, A ~0.85 % lower). Implemented as recorded. | standards-researcher + human | Re-read Hammerstad-Jensen / Qucs equations (S-020a stays CONFLICT) | OPEN |
+| P2-5 | Stripline prefactor: textbook 30 pi taken as eta0/4 = 94.18 ohm (0.07 % below 30 pi) under the Q-1 default; stated in every result's assumptions | orchestrator | User may overrule Q-1 | DEFAULT |
+| P2-6 | Every impedance result carries one standing defaulted assumption (nominal user-entered stackup not verified against the fabricator), so confidence can never be 'high'; skew (S-029b UNVERIFIED) is shown in dataStatus but excluded from the confidence score (like S-009 in trace-resistance) | calc-implementer | User may require skew to count | DEFAULT |
+| P2-7 | K(1/sqrt2) test cites NIST DLMF section 19.20 only (equation number not read) | standards-researcher | Read the equation number | MINOR |

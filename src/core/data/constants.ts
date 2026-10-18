@@ -151,3 +151,18 @@ export function copperBasisFactors(basis: CopperBasis): CopperBasisFactors {
     safetyRelevantDefaults: basis.basis === 'nominal' ? [nominalCopperText(basis)] : [],
   };
 }
+
+/** Speed of light in vacuum, m/s: exact by the SI definition of the metre [S-029, VERIFIED]. Never 3e8 or an app-note figure (Q-16). */
+export const C_M_PER_S = 299792458;
+export const C_LEDGER_ID = 'S-029';
+
+/**
+ * Impedance of free space eta0 = mu0 x c, ohm (about 376.730). mu0 is the S-013 value (4 pi x 1e-7 H/m) and c is exact
+ * [S-029]. Phase 2 decision Q-1 (OPEN_RISKS.md): the transmission-line prefactors use eta0 from these constants instead of the
+ * rounded 60 ohm or 30 pi ohm printed in textbooks; the difference is about 0.07 % in Z0.
+ */
+export const ETA0_OHM = MU0_H_PER_M * C_M_PER_S;
+/** eta0 / (2 pi), ohm (about 59.958): the microstrip air-line and coax prefactor that textbooks round to 60. */
+export const Z_PREFACTOR_OHM = ETA0_OHM / (2 * Math.PI);
+/** eta0 / 4, ohm (about 94.18): the stripline prefactor that textbooks write as 30 pi (94.25). */
+export const Z_STRIPLINE_PREFACTOR_OHM = ETA0_OHM / 4;

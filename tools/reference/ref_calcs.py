@@ -2529,6 +2529,15 @@ def _tw_rms_vectors():
 GOLDEN.extend((n, got, _TW_RMS_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _tw_rms_vectors())
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Phase 2 part A: impedance models (microstrip S-020/S-020a, stripline S-021/S-021a wide, coax S-024, elliptic S-023b,
+# delay S-029/S-029a/S-029b). The oracle lives in ref_impedance.py (written from the recorded equations, independent of src/).
+# ---------------------------------------------------------------------------------------------------------------
+import ref_impedance
+ref_impedance.self_checks()
+GOLDEN.extend(ref_impedance.pinned_vectors())
+
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:
