@@ -508,7 +508,7 @@ describe('determinism and speed', () => {
       const r = run(c);
       expectNoClaimWording(r);
       expect(r.recommendation).toMatch(/must be verified against the PCB manufacturer/);
-      expect(warningText(r)).toMatch(/worst-case corner range/);
+      expect(warningText(r)).toMatch(/tolerance-corner range/);
     }
   });
 });

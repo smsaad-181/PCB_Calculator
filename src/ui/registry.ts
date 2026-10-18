@@ -119,6 +119,13 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/Cpwg'),
   },
   {
+    id: 'quarter-wave',
+    title: 'Quarter-wave stub length (transmission line)',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/QuarterWave'),
+  },
+  {
     id: 'path-load',
     title: 'Path and load (weakest link)',
     category: 'load',

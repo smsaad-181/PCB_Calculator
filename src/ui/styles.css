@@ -204,6 +204,12 @@ td.num { font-variant-numeric: tabular-nums; }
 .tol-field { border: 1px solid var(--border); border-radius: 6px; margin: 0.75rem 0; padding: 0.25rem 0.75rem 0.5rem; }
 .tol-field legend { font-weight: 600; padding: 0 0.25rem; }
 .tol-absent { margin: 0.5rem 0; }
+.loss-results { margin: 1rem 0; }
+.loss-results h3 { font-size: 1.05rem; margin: 0.75rem 0 0.25rem; }
+.loss-caption { border-left: 4px solid var(--warn-border); background: var(--warn-bg); color: var(--warn-fg); padding: 0.25rem 0.75rem; margin: 0.5rem 0; }
+.needs-list { margin: 0.5rem 0; padding-left: 1.25rem; }
+.profile-controls { margin: 0.75rem 0; }
+.profile-controls h4 { margin: 0.75rem 0 0.25rem; font-size: 1rem; }
 .rating-pointer { border: 2px dashed var(--muted); border-radius: 6px; padding: 0.1rem 0.75rem; margin: 0.75rem 0; font-size: 0.9375rem; }
 .rating-pointer p { margin: 0.4rem 0; }
 

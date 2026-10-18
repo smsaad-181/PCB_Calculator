@@ -351,3 +351,11 @@ Scope: Phase 2 tasks 3 (quarter-wave helper), 5 (envelope and sensitivity) and 6
 | P2-30 | Oracle: 308 new vectors in tools/reference/ref_impedance.py (part D). Envelope corners are evaluated through the oracle's own model functions and each case is checked monotone along every tolerated axis, so corners hold the extremes; sensitivities use a 1e-6 step against the app's 1e-4 (compared at 1e-6 relative plus 1e-8 absolute). Loss, skin depth and quarter-wave formulas were written from the recorded equations. They verify the implementation against the notes, no ledger row | calc-validator | State in validator report | NOTED |
 | P2-31 | Quarter-wave helper (S-029c UNVERIFIED): transmission-line stub or resonator only, eps_eff user-entered (inherits the badge of its model), end effects (open-end extension) not modelled, no dispersion, no antenna length computed; the free-space lambda0/4 is shown only as a labelled comparison. Confidence medium (score 1, the UNVERIFIED row) | orchestrator | none | DEFAULT |
 | P2-32 | Deferred (UI): tolerance inputs, loss inputs (tan delta with source label, resistivity, length), the quarter-wave page and the loss/envelope result panels; not modelled: conductor loss for the geometries in P2-22, roughness (Hammerstad K_r, tier 4), rho(T), dispersion, loss envelope (alpha is not an enveloped output), an impedance acceptance band against a published tolerance | ui-engineer | Later task | DEFERRED |
+
+## Phase 2 UI D: tolerances, loss, quarter-wave pages (logged 2026-10-18)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-33 | Envelope scope warning text changed from 'worst-case corner range' to 'tolerance-corner range' in core (tolerance-shared.ts) and its pinned tests, matching the page labels; corners are arithmetic, not a guaranteed worst case | orchestrator | none | FIXED |
+| P2-34 | Core prints the delay-per-length envelope as a raw SI unit; UI works around it with formatDelayPerLength | calc-implementer | Print ps/mm in core | OPEN (minor) |
+| P2-35 | Total gzip JS 364.3 KB of 400 KB after the Phase 2 pages (largest route 134.7 KB of 150): about 36 KB headroom before any more pages; the agent-reported 'about 55 of 100' progress figure is not the weighted figure | devops / ui-engineer | Watch; split or trim before Phase 3 pages | WATCH |

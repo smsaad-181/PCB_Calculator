@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'preact/hooks';
 import { MODEL_STATUS_HEADING, THICKNESS_IGNORED_HELP, type DiffVm, type FieldName, type SolveMode } from '../calculators/diff.vm';
+import { useToday } from '../hooks';
 import { useCalcState } from '../useCalcState';
 import { PresetComparison, PresetPicker, TerminationNotes } from './DiffPresets';
 import { ErFields, ImpedanceResults, Q, SolveChoice, UnitsChoice } from './ImpedanceCommon';
+import { ExtSections } from './ImpedanceExt';
 import { LedgerRowBadges } from './LedgerRowBadges';
 import { NoticeBanner } from './NoticeBanner';
 import { ResetButton } from './ResetButton';
@@ -27,7 +29,8 @@ export function DiffPage({ vm, kind, stackupKey, formLabel, examples }: Props) {
     fromHash: vm.fromHashState,
     toHash: vm.toHashState,
   });
-  const view = useMemo(() => vm.computeView(applied), [applied, vm]);
+  const today = useToday();
+  const view = useMemo(() => vm.computeView(applied, today), [applied, today, vm]);
   const [locked, setLocked] = useState(false);
   const fe = 'fieldErrors' in view ? view.fieldErrors : {};
   const active = vm.activeFields(state);
@@ -179,6 +182,7 @@ export function DiffPage({ vm, kind, stackupKey, formLabel, examples }: Props) {
             error={fe['mismatch']}
           />
           <UnitsChoice value={state.units} onChange={(units) => patch({ units })} />
+          <ExtSections form={vm.extForm(state, today)} state={state} patch={patch} errors={fe} />
           <PresetPicker
             preset={state.preset}
             tolerance={state.tolerance}

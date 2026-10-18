@@ -3,6 +3,7 @@
 import { compute, type Inputs } from '../../core/calculators/microstrip/calc';
 import { THICKNESS_MODELS, meta, type ThicknessModel } from '../../core/calculators/microstrip/meta';
 import type { HashState } from '../../state/hash';
+import { EXT_DEFAULTS, extFormOf, type ExtForm, tolEr, tolHeight, tolThickness, tolWidth, type ExtState } from './impedance-ext.vm';
 import {
   ER_HELP,
   ER_SOURCE_HELP,
@@ -29,7 +30,7 @@ export const PAGE_INTRO =
 export type SolveFor = 'z0' | 'width';
 
 /** Everything the form holds. Strings are exactly what the user typed. Empty means "not entered". Nothing is pre-filled. */
-export type MicrostripState = {
+export type MicrostripState = ExtState & {
   readonly solveFor: SolveFor;
   readonly width: string;
   readonly targetZ0: string;
@@ -46,6 +47,7 @@ export type MicrostripState = {
 };
 
 export const DEFAULT_STATE: MicrostripState = Object.freeze({
+  ...EXT_DEFAULTS,
   solveFor: 'z0',
   width: '',
   targetZ0: '',
@@ -162,6 +164,10 @@ const SPEC: ImpedanceSpec<MicrostripState> = {
   accuracyClass: meta.accuracyClass,
   thicknessNames: { height: 'thickness', thickness: 'thickness' },
   netClass: true,
+  ext: {
+    tol: [tolWidth('Trace width w', 'width'), tolHeight('height', 'Dielectric height h', 'height'), tolEr(), tolThickness('Trace copper thickness t', 'thickness')],
+    thicknessUsed: (s) => s['thicknessModel'] !== 'none',
+  },
 };
 
 export const WRITTEN_KEYS: readonly string[] = writtenKeysOf(SPEC);
@@ -174,8 +180,8 @@ export function fromHashState(h: HashState): Loaded<MicrostripState> {
   return fromHashStateOf(SPEC, h);
 }
 
-export function computeView(s: MicrostripState): ImpedanceView {
-  return computeViewOf(SPEC, s);
+export function computeView(s: MicrostripState, today?: string): ImpedanceView {
+  return computeViewOf(SPEC, s, today);
 }
 
 export function liveSummary(v: ImpedanceView): string {
@@ -185,4 +191,9 @@ export function liveSummary(v: ImpedanceView): string {
 /** Which text fields the current choices use (the page hides the others). */
 export function activeFields(s: MicrostripState): readonly string[] {
   return SPEC.active(s);
+}
+
+/** The tolerance and fab-profile form model of the optional sections. */
+export function extForm(s: MicrostripState, today: string): ExtForm {
+  return extFormOf(SPEC.ext, s, SPEC.active(s), today);
 }

@@ -23,6 +23,7 @@ import {
   type TextDef,
   type Units,
 } from './impedance.vm';
+import { EXT_DEFAULTS, extFormOf, type ExtForm, tolEr, tolHeight, tolSpacing, tolWidth, type ExtState } from './impedance-ext.vm';
 import {
   buildPresetView,
   offeredPresetIds,
@@ -42,7 +43,7 @@ export const THICKNESS_IGNORED_HELP =
   'Optional. Ignored by the coupled model: it has no finite-thickness form, so t does not change the result. If you enter it the page echoes it and the calculator adds a warning.';
 
 /** Everything the form holds. Strings are exactly what the user typed. Empty means "not entered". Nothing is pre-filled. */
-export type DiffState = {
+export type DiffState = ExtState & {
   readonly solveFor: SolveMode;
   readonly width: string;
   /** Edge-to-edge gap s of the pair. */
@@ -108,7 +109,8 @@ export interface DiffVm {
   readonly WRITTEN_KEYS: readonly string[];
   readonly toHashState: (s: DiffState) => Record<string, string>;
   readonly fromHashState: (h: HashState) => Loaded<DiffState>;
-  readonly computeView: (s: DiffState) => DiffView;
+  readonly computeView: (s: DiffState, today?: string) => DiffView;
+  readonly extForm: (s: DiffState, today: string) => ExtForm;
   readonly liveSummary: (v: ImpedanceView) => string;
   readonly activeFields: (s: DiffState) => readonly FieldName[];
   readonly modelStatusRows: () => LedgerRowBadge[];
@@ -118,6 +120,7 @@ export interface DiffVm {
 
 export function makeDiffVm(def: DiffKindDef): DiffVm {
   const DEFAULT_STATE: DiffState = Object.freeze({
+    ...EXT_DEFAULTS,
     solveFor: 'zdiff',
     width: '',
     spacing: '',
@@ -231,12 +234,13 @@ export function makeDiffVm(def: DiffKindDef): DiffVm {
     pinCodes: ['OUT_OF_RANGE', 'MODEL_UNVERIFIED', 'WEAK_COUPLING_FIT', 'FINITE_THICKNESS_NOT_MODELLED', 'ISOLATED_MODEL_MISMATCH'],
     informational: ['Zodd < Z0 < Zeven', 't/h reported', 't/b reported'],
     netClassText,
+    ext: { tol: [tolWidth(def.widthLabel, 'width'), tolSpacing('edgeSpacing', 'Edge-to-edge spacing s', 'spacing'), tolHeight(def.sizeCoreField, def.size.label, 'size'), tolEr()] },
   };
 
   const WRITTEN_KEYS = writtenKeysOf(SPEC);
 
-  function computeView(s: DiffState): DiffView {
-    const base = computeViewOf(SPEC, s);
+  function computeView(s: DiffState, today?: string): DiffView {
+    const base = computeViewOf(SPEC, s, today);
     const zdiff = base.status === 'ok' ? base.raw.results.find((r) => r.name === ZDIFF)?.value : undefined;
     const preset = buildPresetView({ preset: s.preset, tolerance: s.tolerance, solveMode: s.solveFor, targetText: s.targetZ, ...(zdiff !== undefined ? { zdiff } : {}) });
     return { ...base, preset };
@@ -266,6 +270,7 @@ export function makeDiffVm(def: DiffKindDef): DiffVm {
     toHashState: (s) => toHashStateOf(SPEC, s),
     fromHashState: (h) => fromHashStateOf(SPEC, h),
     computeView,
+    extForm: (s, today) => extFormOf(SPEC.ext, s, SPEC.active(s), today),
     liveSummary: liveSummaryOf,
     activeFields: (s) => SPEC.active(s) as readonly FieldName[],
     modelStatusRows: () => ledgerView([def.modelLedgerId]).entries.map((e) => ({ id: e.id, status: e.status, role: LEDGER_ROLE[e.id] ?? e.item })),

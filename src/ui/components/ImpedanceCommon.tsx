@@ -3,11 +3,14 @@ import { DIM } from '../../core/units';
 import { ER_HELP, ER_SOURCE_HELP, dimOfKind, echoOf, parseNumberField, type ImpedanceView, type TextDef, type Units } from '../calculators/impedance.vm';
 import { Callout } from './Callout';
 import { LedgerRowBadges } from './LedgerRowBadges';
+import { LossResults } from './LossResults';
+import { NearResultNotes } from './NearResultNotes';
 import { QuantityField } from './QuantityField';
 import { RadioGroup } from './RadioGroup';
 import { ResultStatus } from './ResultStatus';
 import { ResultsPanel } from './ResultsPanel';
 import { TextField } from './TextField';
+import { ToleranceResults } from './ToleranceResults';
 import { UnverifiedBadge } from './UnverifiedBadge';
 import type { LedgerStatus } from '../../core/data/ledger';
 
@@ -167,9 +170,13 @@ export function ImpedanceResults({ view, extra }: { readonly view: ImpedanceView
         view={view.result}
         failedCheckHint={RANGE_HINT}
         callout={view.banner}
+        {...(view.callouts !== undefined ? { callouts: view.callouts } : {})}
         afterHeadline={
           <>
             {extra}
+            <NearResultNotes view={view.near} />
+            <ToleranceResults view={view.tolerance} />
+            <LossResults loss={view.loss} needs={view.lossNeeds} />
             {view.netClass !== undefined && (
               <section class="netclass" aria-labelledby="nc-h">
                 <h3 id="nc-h">Starting value for a net class (mm and mil)</h3>

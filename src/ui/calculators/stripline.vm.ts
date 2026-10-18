@@ -3,6 +3,7 @@
 import { compute, type Inputs } from '../../core/calculators/stripline/calc';
 import { STRIPLINE_THICKNESS_MODELS, meta, type StriplineThicknessModel } from '../../core/calculators/stripline/meta';
 import type { HashState } from '../../state/hash';
+import { EXT_DEFAULTS, extFormOf, type ExtForm, tolEr, tolHeight, tolThickness, tolWidth, type ExtState } from './impedance-ext.vm';
 import {
   ER_HELP,
   ER_SOURCE_HELP,
@@ -29,7 +30,7 @@ export const PAGE_INTRO =
 export type SolveFor = 'z0' | 'width';
 
 /** Everything the form holds. Strings are exactly what the user typed. Empty means "not entered". Nothing is pre-filled. */
-export type StriplineState = {
+export type StriplineState = ExtState & {
   readonly solveFor: SolveFor;
   readonly width: string;
   readonly targetZ0: string;
@@ -47,6 +48,7 @@ export type StriplineState = {
 };
 
 export const DEFAULT_STATE: StriplineState = Object.freeze({
+  ...EXT_DEFAULTS,
   solveFor: 'z0',
   width: '',
   targetZ0: '',
@@ -161,6 +163,10 @@ const SPEC: ImpedanceSpec<StriplineState> = {
   accuracyClass: meta.accuracyClass,
   thicknessNames: { thickness: 'thickness' },
   netClass: true,
+  ext: {
+    tol: [tolWidth('Strip width w', 'width'), tolHeight('spacing', 'Plane-to-plane spacing b', 'spacing'), tolEr(), tolThickness('Strip copper thickness t', 'thickness')],
+    thicknessUsed: (s) => s['thicknessModel'] !== 'none',
+  },
 };
 
 export const WRITTEN_KEYS: readonly string[] = writtenKeysOf(SPEC);
@@ -173,8 +179,8 @@ export function fromHashState(h: HashState): Loaded<StriplineState> {
   return fromHashStateOf(SPEC, h);
 }
 
-export function computeView(s: StriplineState): ImpedanceView {
-  return computeViewOf(SPEC, s);
+export function computeView(s: StriplineState, today?: string): ImpedanceView {
+  return computeViewOf(SPEC, s, today);
 }
 
 export function liveSummary(v: ImpedanceView): string {
@@ -184,4 +190,9 @@ export function liveSummary(v: ImpedanceView): string {
 /** Which text fields the current choices use (the page hides the others). */
 export function activeFields(s: StriplineState): readonly string[] {
   return SPEC.active(s);
+}
+
+/** The tolerance and fab-profile form model of the optional sections. */
+export function extForm(s: StriplineState, today: string): ExtForm {
+  return extFormOf(SPEC.ext, s, SPEC.active(s), today);
 }

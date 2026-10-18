@@ -36,6 +36,7 @@ export const {
   toHashState,
   fromHashState,
   computeView,
+  extForm,
   liveSummary,
   activeFields,
   modelStatusRows,

@@ -270,7 +270,7 @@ describe('hash state', () => {
     expect(back.notices).toEqual([]);
     expect(back.state).toEqual(s);
     for (const k of Object.keys(toHashState(s))) expect([...WRITTEN_KEYS]).toContain(k);
-    for (const k of WRITTEN_KEYS) expect([...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'u']).toContain(k);
+    for (const k of WRITTEN_KEYS) expect([...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'fp', 'u']).toContain(k);
   });
   it('the solve-for choice round-trips and the default is not written', () => {
     expect(toHashState(st({ solveFor: 'width' }))['sf']).toBe('width');

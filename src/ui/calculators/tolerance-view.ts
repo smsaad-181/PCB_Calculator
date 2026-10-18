@@ -5,7 +5,7 @@
 import type { ThicknessChoice, TolValue } from '../../core/calculators/tolerance-shared';
 import { formatResult, formatSignedPercent } from '../../core/format-result';
 import type { Bound, CalcResult, CalcWarning, Envelope } from '../../core/result';
-import { DIM, sameDim, q, type DisplayPrefs } from '../../core/units';
+import { DIM, sameDim, q, type DisplayPrefs, type Quantity } from '../../core/units';
 import type { EnvelopeRow } from '../components/EnvelopeTable';
 import { MAX_FIELD_CHARS, parseField, parseFractionField, type FieldView } from '../components/view';
 
@@ -354,6 +354,8 @@ export interface ToleranceViewOpts {
   readonly phrases?: Readonly<Record<string, string>>;
   /** Names that print as micrometre-scale thicknesses. */
   readonly thicknessNames?: readonly string[];
+  /** Per output name: a printer for a quantity that format-result prints badly (for example a delay per length). */
+  readonly printers?: Readonly<Record<string, (value: Quantity, bound: Bound) => string>>;
 }
 
 export interface ToleranceBuild {
@@ -365,7 +367,8 @@ export interface ToleranceBuild {
 }
 
 const SENSITIVITY_PREFIX = 'sensitivity of ';
-const lower = (s: string): string => s.toLowerCase();
+/** First letter lower-cased for use inside a sentence; the rest is kept so names such as "Z0" stay as they are. */
+const lower = (s: string): string => (s === '' ? s : s.charAt(0).toLowerCase() + s.slice(1));
 
 function envelopeView(e: Envelope, raw: CalcResult, o: ToleranceViewOpts): EnvelopeView | undefined {
   // A point is not a range: when every corner equals the nominal value there is nothing to tabulate.
@@ -375,6 +378,8 @@ function envelopeView(e: Envelope, raw: CalcResult, o: ToleranceViewOpts): Envel
   const h = { accuracyClass: o.accuracyClass, prefs: o.prefs, lengthRole: role } as const;
   const cornersOnly = raw.warnings.some((w) => w.code === 'ENVELOPE_CORNERS_ONLY' && w.message.includes(`"${e.name}"`));
   const bound: Bound = e.bound ?? 'nominal';
+  const printer = o.printers?.[e.name];
+  const print = (v: Quantity): string => (printer !== undefined ? printer(v, bound) : formatResult({ value: v, bound }, h));
   const boundName = BOUND_NAME[bound];
   return {
     name: e.name,
@@ -384,9 +389,9 @@ function envelopeView(e: Envelope, raw: CalcResult, o: ToleranceViewOpts): Envel
       label: `${label} (${boundName}), tolerance corners${cornersOnly ? ': corners and axis points only' : ''}`,
       // All three values use the rounding direction of the core Envelope.bound, the same as the headline: a requirement or a
       // prediction is never printed below its computed value, a capacity never above it.
-      min: formatResult({ value: e.min, bound }, h),
-      typ: formatResult({ value: e.typ, bound }, h),
-      max: formatResult({ value: e.max, bound }, h),
+      min: print(e.min),
+      typ: print(e.typ),
+      max: print(e.max),
       note: `Tolerance corners: every combination of the limits of ${e.toleranceInputs.join(', ')}, plus points along each axis; every other input stays at its stated value. Each value is rounded in the safe direction for what it means (requirements and predictions up, capacities down), as the headline is; the typical value is the nominal result. Initial tolerances only: no ageing, drift or process distribution. An arithmetic range over what you entered, not a statistical range and not a verdict on the design.`,
     },
   };

@@ -3,6 +3,7 @@
 import { compute, type Inputs } from '../../core/calculators/coax/calc';
 import { meta } from '../../core/calculators/coax/meta';
 import type { HashState } from '../../state/hash';
+import { EXT_DEFAULTS, extFormOf, type ExtForm, tolDiameter, tolEr, type ExtState } from './impedance-ext.vm';
 import {
   ER_HELP,
   ER_SOURCE_HELP,
@@ -29,7 +30,7 @@ export const PAGE_INTRO =
 export type SolveFor = 'z0' | 'outer' | 'inner';
 
 /** Everything the form holds. Strings are exactly what the user typed. Empty means "not entered". Nothing is pre-filled. */
-export type CoaxState = {
+export type CoaxState = ExtState & {
   readonly solveFor: SolveFor;
   readonly outerDiameter: string;
   readonly innerDiameter: string;
@@ -43,6 +44,7 @@ export type CoaxState = {
 };
 
 export const DEFAULT_STATE: CoaxState = Object.freeze({
+  ...EXT_DEFAULTS,
   solveFor: 'z0',
   outerDiameter: '',
   innerDiameter: '',
@@ -131,6 +133,7 @@ const SPEC: ImpedanceSpec<CoaxState> = {
   accuracyClass: meta.accuracyClass,
   thicknessNames: {},
   netClass: false,
+  ext: { tol: [tolDiameter('outerDiameter', 'Outer diameter D', 'outerDiameter'), tolDiameter('innerDiameter', 'Inner diameter d', 'innerDiameter'), tolEr()] },
 };
 
 export const WRITTEN_KEYS: readonly string[] = writtenKeysOf(SPEC);
@@ -143,8 +146,8 @@ export function fromHashState(h: HashState): Loaded<CoaxState> {
   return fromHashStateOf(SPEC, h);
 }
 
-export function computeView(s: CoaxState): ImpedanceView {
-  return computeViewOf(SPEC, s);
+export function computeView(s: CoaxState, today?: string): ImpedanceView {
+  return computeViewOf(SPEC, s, today);
 }
 
 export function liveSummary(v: ImpedanceView): string {
@@ -154,4 +157,9 @@ export function liveSummary(v: ImpedanceView): string {
 /** Which text fields the current choices use (the page hides the others). */
 export function activeFields(s: CoaxState): readonly string[] {
   return SPEC.active(s);
+}
+
+/** The tolerance and fab-profile form model of the optional sections. */
+export function extForm(s: CoaxState, today: string): ExtForm {
+  return extFormOf(SPEC.ext, s, SPEC.active(s), today);
 }

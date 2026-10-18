@@ -189,7 +189,7 @@ describe('envelope structure and invariants', () => {
     expect(r.inputs.find((i) => i.name === 'current tolerance (+)')?.value.si).toBe(0.1);
     expect(r.inputs.find((i) => i.name === 'current tolerance (+)')?.source).toBe('user');
     expect(r.assumptions.join('\n')).toMatch(/current: -5 % \/ \+10 %/);
-    expect(warningText(r)).toMatch(/worst-case corner range/);
+    expect(warningText(r)).toMatch(/tolerance-corner range/);
     expect(allText(r)).toMatch(/not a statistical distribution/);
   });
   it('property: min <= typ <= max, all positive and finite, for random tolerances and solves', () => {

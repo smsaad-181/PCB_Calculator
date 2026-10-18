@@ -1,9 +1,11 @@
 import { useMemo, useState } from 'preact/hooks';
 import { ErFields, ImpedanceResults, Q, SolveChoice, ThicknessChoice, UnitsChoice } from '../components/ImpedanceCommon';
+import { ExtSections } from '../components/ImpedanceExt';
 import { NoticeBanner } from '../components/NoticeBanner';
 import { ResetButton } from '../components/ResetButton';
 import { StackupEditor } from '../components/StackupEditor';
 import type { StackupScalars } from '../components/stackup.vm';
+import { useToday } from '../hooks';
 import { useCalcState } from '../useCalcState';
 import {
   CALCULATOR_ID,
@@ -14,6 +16,7 @@ import {
   THICKNESS_HELP,
   THICKNESS_VARIANT_LEDGER_ID,
   computeView,
+  extForm,
   fromHashState,
   liveSummary,
   thicknessOptions,
@@ -32,7 +35,8 @@ export default function Microstrip() {
     fromHash: fromHashState,
     toHash: toHashState,
   });
-  const view = useMemo(() => computeView(applied), [applied]);
+  const today = useToday();
+  const view = useMemo(() => computeView(applied, today), [applied, today]);
   const [locked, setLocked] = useState(false);
   const fe = 'fieldErrors' in view ? view.fieldErrors : {};
   const solveWidth = state.solveFor === 'width';
@@ -162,6 +166,7 @@ export default function Microstrip() {
             error={fe['mismatch']}
           />
           <UnitsChoice value={state.units} onChange={(units) => patch({ units })} />
+          <ExtSections form={extForm(state, today)} state={state} patch={patch} errors={fe} />
           <StackupEditor kind="microstrip" storageKey="pcb-calc.stackup.v1.microstrip" onUse={onUse} />
           <ResetButton onReset={reset} />
         </form>

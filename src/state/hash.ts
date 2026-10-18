@@ -164,6 +164,28 @@ function pathElementKeys(what: string, prefix: string, max: number): Record<stri
   return out;
 }
 
+/** Documents a tolerance key of an impedance page (the same wording everywhere; the tolerance is only used for an entered input). */
+function impedanceTol(what: string, extra = ''): string {
+  return `Tolerance on the entered ${what}: a percent or fraction such as "5%" or "0.05" (at most 40 characters), or an asymmetric pair "minus|plus" such as "3%|10%" (at most 81 characters). Absent means no tolerance for it: nothing is assumed and there is no default. Only used when ${what} is entered (not when it is the unknown of the solve).${extra}`;
+}
+
+const IMPEDANCE_LOSS_KEYS = {
+  td: 'Entered loss tangent tan delta as a plain number, from the laminate datasheet at your frequency (at most 40 characters). Absent means no loss estimate: there is no default and no example. The estimate also needs the frequency (f) and the source note (ds).',
+  ds: 'Entered note on where the loss tangent came from (free text, at most 200 characters). Required with td: there is no loss estimate without it.',
+  rho: 'Entered conductor resistivity override for the loss estimate, for example "1.72e-8 ohm m" (at most 40 characters). Absent means copper at 20 degC (ledger S-004, shown as a default). Only used with td.',
+} as const;
+
+/** Fab-profile keys of an impedance page that has a width or a gap with a published tolerance (profile id in the reserved key fp). */
+function impedanceProfileKeys(withSpacing: boolean, what: { width: string; spacing: string }): Record<string, string> {
+  return {
+    pw: `1 means the ${what.width} tolerance is taken from the chosen fab profile (reserved key fp; JLCPCB example, ledger S-019l, UNVERIFIED). Absent means not used. Dropped with a notice without a chosen profile.`,
+    ...(withSpacing ? { ps: `1 means the ${what.spacing} tolerance is taken from the chosen fab profile (reserved key fp; ledger S-019l, UNVERIFIED). Absent means not used. Dropped with a notice without a chosen profile.` } : {}),
+    lc: 'Board layer count scope of the fab-profile tolerance lookup: "1", "2" or "multilayer". Absent means not given (a profile tolerance then asks for it).',
+    ls: 'Layer side scope of the fab-profile tolerance lookup: "inner" or "outer". Absent means not given (a profile tolerance then asks for it).',
+    cw: 'Ordered copper weight text for the fab-profile tolerance lookup, for example "1 oz" (at most 40 characters). Optional.',
+  };
+}
+
 /**
  * Calculator-local state keys, documented here so two calculators cannot silently collide with a reserved key.
  * Values are validated by the owning calculator's view-model (unknown values fall back to defaults with a notice),
@@ -396,6 +418,12 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
     l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
     dl: 'Entered length mismatch text between two traces, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+    kw: impedanceTol('trace width'),
+    kh: impedanceTol('dielectric height h'),
+    ke: impedanceTol('relative permittivity er'),
+    kt: impedanceTol('trace copper thickness t (only with a thickness variant)'),
+    ...IMPEDANCE_LOSS_KEYS,
+    ...impedanceProfileKeys(false, { width: 'trace width', spacing: '' }),
   },
   stripline: {
     sf: 'Solve for: "z0" (impedance from the geometry) or "width" (strip width from a target Z0). Absent means z0.',
@@ -410,6 +438,12 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
     l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
     dl: 'Entered length mismatch text between two traces, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+    kw: impedanceTol('strip width'),
+    kh: impedanceTol('plane-to-plane spacing b'),
+    ke: impedanceTol('relative permittivity er'),
+    kt: impedanceTol('strip copper thickness t (only with the thickness variant)'),
+    ...IMPEDANCE_LOSS_KEYS,
+    ...impedanceProfileKeys(false, { width: 'strip width', spacing: '' }),
   },
   coax: {
     sf: 'Solve for: "z0" (impedance from both diameters), "outer" (outer diameter from a target Z0 and the inner diameter) or "inner". Absent means z0.',
@@ -421,6 +455,10 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text, for example "1 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
     l: 'Entered line length text, for example "1 m" (at most 40 characters). Optional: adds the propagation delay.',
     dl: 'Entered length mismatch text between two cables, for example "5 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+    ko: impedanceTol('outer diameter'),
+    ki: impedanceTol('inner diameter'),
+    ke: impedanceTol('relative permittivity er'),
+    ...IMPEDANCE_LOSS_KEYS,
   },
   'diff-microstrip': {
     sf: 'Solve for: "zdiff" (Zdiff from the geometry), "spacing" (edge spacing for a target Zdiff) or "width" (trace width for a target Zdiff). Absent means zdiff.',
@@ -437,6 +475,12 @@ export const CALCULATOR_STATE_KEYS = {
     dl: 'Entered length mismatch text within the pair, for example "0.5 mm" (at most 40 characters). Optional: adds the intra-pair skew (ledger S-029b, UNVERIFIED).',
     pr: 'Protocol preset id: "usb2-hs-90", "ethernet-mdi-100" or "lvds-100" (a design target, not a compliance statement). Absent means none: never pre-selected.',
     tl: 'Tolerance id of the chosen preset: "usb2-tol-15", "usb2-tol-10" or "ethernet-tol-10". Absent means none chosen: never defaulted (LVDS lists none).',
+    kw: impedanceTol('trace width'),
+    ks: impedanceTol('edge-to-edge spacing'),
+    kh: impedanceTol('dielectric height h or plane spacing b'),
+    ke: impedanceTol('relative permittivity er'),
+    ...IMPEDANCE_LOSS_KEYS,
+    ...impedanceProfileKeys(true, { width: 'trace width', spacing: 'edge spacing' }),
   },
   'diff-stripline': {
     sf: 'Solve for: "zdiff" (Zdiff from the geometry), "spacing" (edge spacing for a target Zdiff) or "width" (strip width for a target Zdiff). Absent means zdiff.',
@@ -453,6 +497,12 @@ export const CALCULATOR_STATE_KEYS = {
     dl: 'Entered length mismatch text within the pair, for example "0.5 mm" (at most 40 characters). Optional: adds the intra-pair skew (ledger S-029b, UNVERIFIED).',
     pr: 'Protocol preset id: "usb2-hs-90", "ethernet-mdi-100" or "lvds-100" (a design target, not a compliance statement). Absent means none: never pre-selected.',
     tl: 'Tolerance id of the chosen preset: "usb2-tol-15", "usb2-tol-10" or "ethernet-tol-10". Absent means none chosen: never defaulted (LVDS lists none).',
+    kw: impedanceTol('trace width'),
+    ks: impedanceTol('edge-to-edge spacing'),
+    kh: impedanceTol('dielectric height h or plane spacing b'),
+    ke: impedanceTol('relative permittivity er'),
+    ...IMPEDANCE_LOSS_KEYS,
+    ...impedanceProfileKeys(true, { width: 'trace width', spacing: 'edge spacing' }),
   },
   // Coplanar waveguide pages (Phase 2). As above, the stackup layers are not in the link.
   cpw: {
@@ -468,6 +518,12 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
     l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
     dl: 'Entered length mismatch text between two lines, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+    kw: impedanceTol('centre strip width'),
+    ks: impedanceTol('gap'),
+    kh: impedanceTol('substrate or dielectric height h'),
+    ke: impedanceTol('relative permittivity er'),
+    ...IMPEDANCE_LOSS_KEYS,
+    ...impedanceProfileKeys(true, { width: 'strip width', spacing: 'gap' }),
   },
   cpwg: {
     sf: 'Solve for: "z0" (impedance from the geometry), "gap" (gap for a target Z0) or "width" (strip width for a target Z0). Absent means z0.',
@@ -482,6 +538,19 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
     l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
     dl: 'Entered length mismatch text between two lines, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+    kw: impedanceTol('centre strip width'),
+    ks: impedanceTol('gap'),
+    kh: impedanceTol('substrate or dielectric height h'),
+    ke: impedanceTol('relative permittivity er'),
+    ...IMPEDANCE_LOSS_KEYS,
+    ...impedanceProfileKeys(true, { width: 'strip width', spacing: 'gap' }),
+  },
+  'quarter-wave': {
+    ee: 'Entered effective permittivity eps_eff as a plain number, taken from your impedance result (at most 40 characters). Absent means not entered: there is no default and no result without it.',
+    md: 'What is given: "frequency" (the quarter-wave length is the result) or "length" (the quarter-wave frequency is the result). Absent means frequency.',
+    f: 'Entered frequency text, for example "5 GHz" (at most 40 characters; used when md is frequency).',
+    l: 'Entered physical length text, for example "8.7 mm" (at most 40 characters; used when md is length).',
+    es: 'Optional note on where eps_eff came from, for example the calculator and stackup (free text, at most 200 characters).',
   },
 } as const satisfies Record<string, Record<string, string>>;
 

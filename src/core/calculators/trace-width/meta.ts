@@ -32,7 +32,7 @@ export const meta = {
   toleranceInputs: ['current', 'deltaT', 'width', 'copperThickness', 'ambient'] as string[],
   /**
    * Min/typ/max envelope and normalised sensitivities (task 9), all optional and only when the user supplies tolerances.
-   * Generic helper: src/core/sensitivity.ts (no physics). The envelope is a worst-case corner range over the listed
+   * Generic helper: src/core/sensitivity.ts (no physics). The envelope is a tolerance-corner range over the listed
    * tolerances (2^k corners, k <= 6) plus axis probes; outputs monotone in every tolerated input are exact at corners, others
    * are labelled corners-only. Sensitivities are d ln(output)/d ln(input) by central difference (relative step 1e-4), reported
    * as results named "sensitivity of <output> to <input>". Rounding: a required width rounds up, a capacity rounds down, a

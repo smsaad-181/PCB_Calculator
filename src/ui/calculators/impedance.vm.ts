@@ -2,15 +2,30 @@
 // Text in, display strings out. The calculations are src/core/calculators/{microstrip,stripline,coax} compute().
 // Every number is printed by buildResultView, which prints through src/core/format-result.
 import type { AccuracyClass } from '../../core/confidence';
+import { formatDelayPerLength } from '../../core/calculators/delay-shared';
 import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
 import type { CalcOutcome, CalcResult } from '../../core/result';
 import { DIM, q, type Dim, type DisplayPrefs, type Quantity } from '../../core/units';
 import { RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
 import type { CalloutView } from '../components/Callout';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
+import type { NearNote, NearResultView } from '../components/NearResultNotes';
 import { echoPrefs, headlinePrefs, type Units } from '../components/prefs';
-import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultRowView, type ResultView } from '../components/view';
+import { MAX_FIELD_CHARS, buildResultView, orderWarnings, parseField, type FieldView, type ResultRowView, type ResultView } from '../components/view';
 import { hasKey, readText } from './circuit-view';
+import {
+  EXT_LEDGER_ROLE,
+  EXT_TEXT_LABEL,
+  collectExt,
+  extChoiceDefs,
+  extProfileFromHash,
+  extProfileToHash,
+  extStateKeyOfCoreField,
+  extTextDefs,
+  type ExtSpec,
+} from './impedance-ext.vm';
+import { LOSS_CODES, buildLossView, isLossName, type LossView } from './loss-view';
+import { buildToleranceView, type ToleranceView } from './tolerance-view';
 
 export type { Units };
 
@@ -42,6 +57,8 @@ export interface TextDef {
   readonly echo?: 'geometry' | 'thickness' | 'other';
   /** Longest accepted text; defaults to MAX_FIELD_CHARS (a note defaults to MAX_NOTE_CHARS). */
   readonly max?: number;
+  /** What a plain-number field is, for its echo and error text (default: relative permittivity). */
+  readonly what?: string;
 }
 
 export interface ChoiceDef {
@@ -67,14 +84,14 @@ export function dimOfKind(k: FieldKind): Dim {
 const PLAIN_NUMBER = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/;
 
 /** A plain number with no unit (relative permittivity). Input validation only; the core refuses values below 1. */
-export function parseNumberField(text: string): FieldView {
+export function parseNumberField(text: string, what = 'relative permittivity'): FieldView {
   const t = text.trim();
   if (t === '') return { status: 'empty' };
   if (t.length > MAX_FIELD_CHARS) return { status: 'error', message: `Too long (at most ${String(MAX_FIELD_CHARS)} characters).` };
-  if (!PLAIN_NUMBER.test(t)) return { status: 'error', message: 'Enter a plain number without a unit, for example the Dk from your fabricator.' };
+  if (!PLAIN_NUMBER.test(t)) return { status: 'error', message: `Enter ${what} as a plain number without a unit.` };
   const n = Number(t);
   if (!Number.isFinite(n)) return { status: 'error', message: 'The value is not a finite number.' };
-  return { status: 'ok', value: q(n, DIM.DIMENSIONLESS), echo: `= ${t} (relative permittivity, dimensionless)`, warnings: [] };
+  return { status: 'ok', value: q(n, DIM.DIMENSIONLESS), echo: `= ${t} (${what}, dimensionless)`, warnings: [] };
 }
 
 function echoFor(def: TextDef, units: Units): DisplayPrefs {
@@ -83,7 +100,7 @@ function echoFor(def: TextDef, units: Units): DisplayPrefs {
 
 /** Parses one quantity field of the state. Notes are not quantities and must not be passed here. */
 export function parseDef(def: TextDef, text: string, units: Units): FieldView {
-  if (def.kind === 'number') return parseNumberField(text);
+  if (def.kind === 'number') return parseNumberField(text, def.what);
   return parseField(text, dimOfKind(def.kind), echoFor(def, units));
 }
 
@@ -130,26 +147,34 @@ export interface ImpedanceSpec<S extends ImpedanceState> {
   readonly thicknessNames: Readonly<Record<string, 'thickness'>>;
   /** When true and the headline is a width, a plain-text starting value for a net class is offered. */
   readonly netClass: boolean;
+  /** The optional tolerance and loss sections (shared by every impedance page). */
+  readonly ext: ExtSpec;
   /** Names of the result entries that are delay per length (their core note, ps/mm and ps/in, is the row text). Default: 'delay per length'. */
   readonly delayNames?: readonly string[];
   /** Warning codes shown before all others. Default: OUT_OF_RANGE and THICKNESS_VARIANT_CONFLICT. */
   readonly pinCodes?: readonly string[];
+  /** Core warning code to the heading of an Important notice: those warnings are shown as notices, not in the warning list. */
+  readonly calloutWarnings?: Readonly<Record<string, string>>;
   /** Validity check names that are information, not a test. */
   readonly informational?: readonly string[];
   /** Replaces the default net-class text (for example to give width and spacing together); undefined means offer none. */
   readonly netClassText?: (result: ResultView, s: Record<string, string>) => string | undefined;
 }
 
+const allText = <S extends ImpedanceState>(spec: ImpedanceSpec<S>): readonly TextDef[] => [...spec.text, ...extTextDefs(spec.ext)];
+const allChoices = <S extends ImpedanceState>(spec: ImpedanceSpec<S>): readonly ChoiceDef[] => [...spec.choices, ...extChoiceDefs(spec.ext)];
+
 export function toHashStateOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, s: S): Record<string, string> {
   const out: Record<string, string> = {};
-  for (const d of spec.text) {
+  for (const d of allText(spec)) {
     const v = s[d.key] ?? '';
-    if (v.trim() !== '') out[d.hash] = v.slice(0, noteMax(d));
+    if (v.trim() !== '' && v.trim() !== '|') out[d.hash] = v.slice(0, noteMax(d));
   }
-  for (const c of spec.choices) {
+  for (const c of allChoices(spec)) {
     const v = s[c.key] ?? '';
     if (v !== spec.defaults[c.key]) out[c.hash] = v;
   }
+  extProfileToHash(spec.ext, s, out);
   if (s['units'] !== spec.defaults['units']) out['u'] = s['units'] ?? 'metric';
   return out;
 }
@@ -158,20 +183,22 @@ export function toHashStateOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
 export function fromHashStateOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, h: HashState): Loaded<S> {
   const notices: string[] = [];
   const out: Record<string, string> = { ...spec.defaults };
-  for (const d of spec.text) out[d.key] = readText(h, d.hash, d.label, notices, noteMax(d));
-  for (const c of spec.choices) {
+  for (const d of allText(spec)) out[d.key] = readText(h, d.hash, d.label, notices, noteMax(d));
+  for (const c of allChoices(spec)) {
     if (!hasKey(h, c.hash)) continue;
     const v = h[c.hash] ?? '';
     if (c.values.includes(v)) out[c.key] = v;
     else notices.push(c.notice);
   }
+  extProfileFromHash(spec.ext, h, out, notices);
   const u = h['u'];
   if (u !== undefined && RESERVED_STATE_KEYS.u.isValid(u)) out['units'] = u;
   return { state: out as S, notices };
 }
 
 export function writtenKeysOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>): readonly string[] {
-  return [...spec.text.map((d) => d.hash), ...spec.choices.map((c) => c.hash), 'u'];
+  const fp = spec.ext.tol.some((d) => d.profile !== undefined) ? ['fp'] : [];
+  return [...allText(spec).map((d) => d.hash), ...allChoices(spec).map((c) => c.hash), ...fp, 'u'];
 }
 
 // ---------------------------------------------------------------------------
@@ -194,6 +221,7 @@ export const LEDGER_ROLE: Readonly<Record<string, string>> = {
   'S-029': 'Speed of light c = 299 792 458 m/s (exact), used for delay and wavelength.',
   'S-029a': 'Delay = sqrt(eps_eff)/c and guided wavelength = lambda0/sqrt(eps_eff) (independent authors agree).',
   'S-029b': 'Skew from a length mismatch, derived from the delay; one worked table only. Not part of the Z0 or eps_eff result.',
+  ...EXT_LEDGER_ROLE,
 };
 
 export function ledgerRowBadges(result: ResultView): LedgerRowBadge[] {
@@ -218,6 +246,16 @@ export type ImpedanceView =
       readonly banner: CalloutView;
       /** Plain text with the solved width in mm and mil, offered as a net-class starting value (never a design rule). */
       readonly netClass?: string;
+      /** Tolerance corners and sensitivities from the core result; absent when no tolerance was entered. */
+      readonly tolerance?: ToleranceView;
+      /** The loss block from the core result; absent when no loss was asked for or it could not be computed yet. */
+      readonly loss?: LossView;
+      /** Notes that belong right next to the result (fab profile stale or unverified, a published tolerance not usable). */
+      readonly near?: NearResultView;
+      /** What is missing for the loss estimate (the main result is shown without it). */
+      readonly lossNeeds: readonly string[];
+      /** Core warnings the page shows as Important notices (see ImpedanceSpec.calloutWarnings), in core order. */
+      readonly callouts?: readonly CalloutView[];
     };
 
 const DELAY_NAME = 'delay per length';
@@ -226,8 +264,19 @@ export function startingValueText(label: string, headlineText: string): string {
   return `${label}: ${headlineText}\nStarting value for a net class, not a design rule. ${IMPEDANCE_BANNER}`;
 }
 
-/** Parses the form and runs the calculator. 'ok' only when the core returned a result; otherwise a message, never a number. */
-export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, s: S): ImpedanceView {
+const NEAR_CODES: readonly string[] = ['FAB_PROFILE_UNVERIFIED', 'FAB_PROFILE_STALE', 'TOLERANCE_NOT_USABLE'];
+const capitalise = (s: string): string => (s === '' ? s : s.charAt(0).toUpperCase() + s.slice(1));
+
+function extLabel(ext: ExtSpec, key: string): string | undefined {
+  const d = ext.tol.find((x) => x.state === key);
+  return d !== undefined ? `${d.label} tolerance` : EXT_TEXT_LABEL[key];
+}
+
+/**
+ * Parses the form and runs the calculator. 'ok' only when the core returned a result; otherwise a message, never a number.
+ * `today` (YYYY-MM-DD) is needed only for a tolerance taken from a fab profile; the core never reads a clock.
+ */
+export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, s: S, today?: string): ImpedanceView {
   const notes: string[] = [];
   const problems: string[] = [];
   const needs: string[] = [];
@@ -254,6 +303,9 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
       fieldErrors[d.key] = v.message;
     }
   }
+  const ext = collectExt(spec.ext, s, active, { today, hasFrequency: parsed.get('frequency')?.status === 'ok' });
+  problems.push(...ext.problems);
+  Object.assign(fieldErrors, ext.fieldErrors);
   if (problems.length > 0) return { status: 'error', problems, fieldErrors, notes, banner: BANNER };
 
   const noteOf = (key: string): string | undefined => {
@@ -265,21 +317,22 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     const empty = def?.kind === 'note' ? noteOf(key) === undefined : parsed.get(key)?.status === 'empty';
     if (empty) needs.push(spec.needs[key] ?? `Enter ${def?.label ?? key}.`);
   }
-  needs.push(...(spec.needsExtra?.(s) ?? []));
+  needs.push(...(spec.needsExtra?.(s) ?? []), ...ext.needs);
   if (needs.length > 0) return { status: 'needs-input', needs, notes, banner: BANNER };
 
   const get = (key: string): Quantity | undefined => {
     const v = parsed.get(key);
     return v?.status === 'ok' ? v.value : undefined;
   };
-  const out = spec.compute(spec.build(s, get, noteOf));
+  const out = spec.compute({ ...spec.build(s, get, noteOf), ...ext.inputs });
   if (!out.ok) {
-    const key = spec.coreField[out.error.field ?? ''];
-    const def = key === undefined ? undefined : spec.text.find((d) => d.key === key);
+    const coreKey = spec.coreField[out.error.field ?? ''];
+    const key = coreKey ?? extStateKeyOfCoreField(spec.ext, out.error.field);
+    const label = key === undefined ? undefined : (spec.text.find((d) => d.key === key)?.label ?? extLabel(spec.ext, key));
     if (key !== undefined) fieldErrors[key] = out.error.message;
     return {
       status: 'error',
-      problems: [def !== undefined ? `${def.label}: ${out.error.message}` : out.error.message],
+      problems: [label !== undefined ? `${label}: ${out.error.message}` : out.error.message],
       fieldErrors,
       notes,
       banner: BANNER,
@@ -294,14 +347,28 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     return d?.note === undefined ? [] : [{ label: spec.labels[n] ?? n.charAt(0).toUpperCase() + n.slice(1), text: d.note }];
   });
   const head = spec.headline(s);
-  const result = buildResultView(raw, {
+
+  // the optional blocks come from the core result; their warnings are shown in their block, not in the general list
+  const names = [...new Set([...(raw.envelope ?? []).map((e) => e.name), ...Object.keys(spec.labels), ...delayNames])];
+  const tolLabels: Record<string, string> = { ...Object.fromEntries(names.map((n) => [n, capitalise(n)])), ...spec.labels };
+  const tb = buildToleranceView(raw, { accuracyClass: spec.accuracyClass, prefs, labels: tolLabels, thicknessNames: Object.keys(spec.thicknessNames), printers: Object.fromEntries(delayNames.map((n) => [n, formatDelayPerLength])) }, names);
+  const loss = buildLossView(raw, (id) => LEDGER_ROLE[id]);
+  const nearWarnings = tb.warnings.filter((w) => w.code !== undefined && NEAR_CODES.includes(w.code));
+  const nearNotes: NearNote[] = nearWarnings.flatMap((w) => orderWarnings([w]).map((v) => ({ ...v, code: w.code ?? '' })));
+  const near: NearResultView = { notes: nearNotes, unverified: raw.fabProfile !== undefined && raw.fabProfile.status !== 'VERIFIED' };
+  const calloutMap = spec.calloutWarnings ?? {};
+  const callouts: CalloutView[] = raw.warnings.flatMap((w) => (w.code !== undefined && calloutMap[w.code] !== undefined ? [{ heading: calloutMap[w.code] as string, text: w.message }] : []));
+  const forView = { ...raw, warnings: tb.warnings.filter((w) => w.code === undefined || !(NEAR_CODES.includes(w.code) || LOSS_CODES.includes(w.code) || calloutMap[w.code] !== undefined)) };
+  const lossNames = raw.results.filter((r) => isLossName(r.name)).map((r) => r.name);
+
+  const result = buildResultView(forView, {
     headline: head,
     accuracyClass: spec.accuracyClass,
     prefs,
     lengthRole: 'geometry',
     lengthRoleByName: spec.thicknessNames,
     labels: spec.labels,
-    skip: delayNames,
+    skip: [...delayNames, ...tb.skipNames, ...lossNames],
     extraRows,
     pinWarningCodes: spec.pinCodes ?? ['OUT_OF_RANGE', 'THICKNESS_VARIANT_CONFLICT'],
     ...(spec.informational !== undefined ? { informationalChecks: spec.informational } : {}),
@@ -312,6 +379,7 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
       : spec.netClass && /width/.test(head)
         ? startingValueText(result.headline.label, result.headline.text)
         : undefined;
+  const hasTol = tb.view.envelopes.length > 0 || tb.view.notices.length > 0 || tb.view.sensitivities.length > 0;
   return {
     status: 'ok',
     result,
@@ -320,6 +388,11 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     notes,
     ledgerRows: ledgerRowBadges(result),
     banner: BANNER,
+    lossNeeds: ext.lossNeeds,
+    ...(callouts.length > 0 ? { callouts } : {}),
+    ...(hasTol ? { tolerance: tb.view } : {}),
+    ...(loss !== undefined ? { loss } : {}),
+    ...(near.notes.length > 0 ? { near } : {}),
     ...(netClass !== undefined ? { netClass } : {}),
   };
 }
