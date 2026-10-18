@@ -359,3 +359,13 @@ Scope: Phase 2 tasks 3 (quarter-wave helper), 5 (envelope and sensitivity) and 6
 | P2-33 | Envelope scope warning text changed from 'worst-case corner range' to 'tolerance-corner range' in core (tolerance-shared.ts) and its pinned tests, matching the page labels; corners are arithmetic, not a guaranteed worst case | orchestrator | none | FIXED |
 | P2-34 | Core prints the delay-per-length envelope as a raw SI unit; UI works around it with formatDelayPerLength | calc-implementer | Print ps/mm in core | OPEN (minor) |
 | P2-35 | Total gzip JS 364.3 KB of 400 KB after the Phase 2 pages (largest route 134.7 KB of 150): about 36 KB headroom before any more pages; the agent-reported 'about 55 of 100' progress figure is not the weighted figure | devops / ui-engineer | Watch; split or trim before Phase 3 pages | WATCH |
+
+## Phase 2 phase-validator: human-only items (logged 2026-10-18, branch phase-2, report `phase-2-phase.md`)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| PV2-1 | Phase 2 exit criterion 2 (differences from reference tools documented) NOT met: 53 cross-check cases prepared (`docs/validation/crosscheck-impedance.md`, `tests/crosscheck/`), all toolOutputs null | human | Run KiCad and Qucs-S transcalc per the worksheet, or explicitly accept carrying the criterion forward (as for Phase 1 task 10) | OPEN (human) |
+| PV2-1b | Task 1 "fab-profile import/export (JSON)" not built (only the stackup JSON import/export exists) | human (accept deferral) or ui-engineer + calc-implementer (build) | Decision recorded here | OPEN |
+| PV2-8 | GitHub Pages still disabled (`has_pages: false`); Phase 2 not yet in a PR; validate-before-merge honoured so far | human | Enable Pages; open and merge the Phase 2 PR only after all three validators pass | OPEN (human) |
+
+The orchestrator must still log calc F-1..F-6 (`phase-2-calc.md`) and phase PV2-2..PV2-7 (agent-owned).
