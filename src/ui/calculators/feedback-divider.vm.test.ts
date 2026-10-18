@@ -248,6 +248,50 @@ describe('tolerance envelope', () => {
   });
 });
 
+describe('solved without FB bias (core notes shown with the values)', () => {
+  const BIASED = { vref: '0.8 V', vout: '5 V', r2: '10 kΩ', series: 'E96', snap: 'nearest', fbBias: '1 uA', biasDirection: 'into-pin' } as const;
+  it('the solved resistor carries the note, as a headline note', () => {
+    const v = ok(st(BIASED));
+    expect(v.result.headline.note).toBe('solved without FB bias');
+    expect(v.raw.warnings.map((w) => w.code)).toContain('SOLVED_WITHOUT_FB_BIAS');
+    expect(v.result.warnings.some((w) => /solved without the FB bias/i.test(w.message))).toBe(true);
+  });
+  it('the including-bias error row sits right after the ideal error row, with the core notes', () => {
+    const v = ok(st(BIASED));
+    const labels = v.result.rows.map((r) => r.label);
+    const ideal = labels.indexOf('Vout error vs target (signed; size rounded away from zero)');
+    expect(ideal).toBeGreaterThanOrEqual(0);
+    expect(labels[ideal + 1]).toBe('Vout error vs target including FB bias (signed)');
+    expect(v.result.rows[ideal]?.hint).toBe('ideal relation, without FB bias');
+    expect(v.result.rows[ideal + 1]?.hint).toMatch(/nominal/);
+    expect(v.result.rows[ideal + 1]?.text).toMatch(/^[+-]\d/);
+  });
+  it('without a bias there is no note and no including-bias row', () => {
+    const v = ok(st({ ...BIASED, fbBias: '', biasDirection: '' }));
+    expect(v.result.headline.note).toBeUndefined();
+    expect(v.result.rows.map((r) => r.label).join('|')).not.toMatch(/including FB bias/);
+  });
+});
+
+describe('envelope formatting uses the envelope accuracy class (F13)', () => {
+  it('meta has envelopeAccuracyClass analytical and the corners print with few significant figures', () => {
+    expect(meta.envelopeAccuracyClass).toBe('analytical');
+    const v = ok(st({ vref: '0.8 V', r1: '52.3 kΩ', r2: '10 kΩ', tolerance: '1%', vrefTolerance: '1.5%' }));
+    const e = v.envelopes[0];
+    expect(e).toBeDefined();
+    for (const t of [e?.min ?? '', e?.max ?? '']) expect(t.replace(/[^0-9]/g, '').replace(/^0+/, '').length).toBeLessThanOrEqual(5);
+  });
+});
+
+describe('high voltage callout on the feedback page (presentation only)', () => {
+  it('shows an Important block above the display threshold and none below it', () => {
+    const hi = ok(st({ vref: '1.2 V', vout: '150 V', r2: '10 kΩ' }));
+    expect(hi.importantCallouts).toHaveLength(1);
+    expect(hi.importantCallouts[0]?.heading).toMatch(/high voltage across one resistor/);
+    expect(ok(st(FWD)).importantCallouts).toEqual([]);
+  });
+});
+
 describe('naming caveat', () => {
   it('names the top and bottom positions; the core warning is shown first', () => {
     expect(NAMING_TEXT).toMatch(/TOP/);

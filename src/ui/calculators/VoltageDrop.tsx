@@ -269,7 +269,7 @@ function ElementTable({ rows }: { rows: readonly TableRow[] }) {
       <h3 id="elements-h">Per element</h3>
       <div class="table-wrap">
         <table>
-          <caption class="visually-hidden">Resistance, voltage drop, power loss and share of the total drop for each path element. The limiting element is marked.</caption>
+          <caption class="visually-hidden">Resistance, voltage drop, power loss and share of the total drop for each path element. The largest-drop element is marked.</caption>
           <thead>
             <tr>
               <th scope="col">Element</th>
@@ -284,7 +284,7 @@ function ElementTable({ rows }: { rows: readonly TableRow[] }) {
               <tr key={r.id} class={r.limiting ? 'limiting-row' : undefined}>
                 <th scope="row">
                   {r.name}
-                  {r.limiting && <span class="limiting-tag"> Limiting (largest drop)</span>}
+                  {r.limiting && <span class="limiting-tag"> Largest-drop element</span>}
                   <span class="muted element-src"> {r.provenance}</span>
                 </th>
                 <td class="num">{r.resistance}</td>
@@ -310,7 +310,7 @@ function Results({ view }: { view: VoltageDropView }) {
         afterHeadline={
           <>
             <p class="limiting-line">
-              <strong>Limiting element:</strong> {view.limiting.text}
+              <strong>Largest-drop element:</strong> {view.limiting.text}
             </p>
             <ElementTable rows={view.table} />
           </>

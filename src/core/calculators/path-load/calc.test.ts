@@ -103,7 +103,8 @@ function fail(inputs: unknown) {
   return out.error;
 }
 const res = (r: CalcResult, name: string) => {
-  const x = r.results.find((o) => o.name === name);
+  // 'total voltage drop' also finds the forward-path-only name used when the return is not counted (PCB-F15).
+  const x = r.results.find((o) => o.name === name || (name === 'total voltage drop' && o.name === 'total voltage drop (forward path only)'));
   if (!x) throw new Error(`result "${name}" missing; have ${r.results.map((o) => o.name).join(', ')}`);
   return x;
 };

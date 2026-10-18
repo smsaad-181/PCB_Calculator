@@ -204,3 +204,5 @@ td.num { font-variant-numeric: tabular-nums; }
 .tol-field { border: 1px solid var(--border); border-radius: 6px; margin: 0.75rem 0; padding: 0.25rem 0.75rem 0.5rem; }
 .tol-field legend { font-weight: 600; padding: 0 0.25rem; }
 .tol-absent { margin: 0.5rem 0; }
+.rating-pointer { border: 2px dashed var(--muted); border-radius: 6px; padding: 0.1rem 0.75rem; margin: 0.75rem 0; font-size: 0.9375rem; }
+.rating-pointer p { margin: 0.4rem 0; }

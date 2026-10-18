@@ -78,7 +78,8 @@ function fail(inputs: unknown) {
   return out.error;
 }
 const res = (r: CalcResult, name: string) => {
-  const x = r.results.find((o) => o.name === name);
+  // 'total voltage drop' also finds the forward-path-only name used when the return is not counted (PCB-F15).
+  const x = r.results.find((o) => o.name === name || (name === 'total voltage drop' && o.name === 'total voltage drop (forward path only)'));
   if (!x) throw new Error(`result "${name}" missing; have ${r.results.map((o) => o.name).join(', ')}`);
   return x;
 };
@@ -211,7 +212,8 @@ describe('load descriptions and the four relations', () => {
     for (const n of ['load voltage', 'power delivered to load', 'efficiency', 'maximum deliverable power']) {
       expect(res(r, n).bound, n).toBe('max-capacity');
     }
-    expect(r.results.filter((x) => x.role === 'primary').map((x) => x.name)).toEqual(['total voltage drop']);
+    expect(r.results.filter((x) => x.role === 'primary').map((x) => x.name)).toEqual([r.results.find((x) => x.role === 'primary')?.name]);
+    expect(res(r, 'total voltage drop').role).toBe('primary');
   });
   it('dimensions of the results are right', () => {
     const r = ok(base({ loadPower: W(20) }));
@@ -390,7 +392,9 @@ describe('user-supplied resistances', () => {
     expect(i?.sourceDetail).toMatch(/user-supplied/);
     expect(i?.sourceDetail).toMatch(/datasheet typical/);
     expect(r.reference.ledgerIds).toEqual(['S-019']);
-    expect(r.confidence.level).toBe('high');
+    // PCB-F1 / T5-1: user-supplied resistances count as one defaulted-type item, so the path is at most medium.
+    expect(r.confidence.level).toBe('medium');
+    expect(r.confidence.reasons.join(' ')).toMatch(/user-supplied resistance or rating is only as good as its source note/);
     expect(r.warnings.some((w) => w.code === 'USER_RESISTANCE')).toBe(true);
   });
   it('a constant-power load on a resistance-only path cites S-019h as well, and is VERIFIED', () => {
@@ -450,7 +454,8 @@ describe('limiting element', () => {
   it('is the element with the largest drop; ties go to the first', () => {
     const r = ok({ vsource: V(12), loadResistance: R(10), returnPath: 'not-counted', elements: [ohm('a', 0.1), ohm('b', 0.3), ohm('c', 0.3)] });
     expect(r.limitingElement?.name).toBe('b');
-    expect(r.limitingElement?.reason).toMatch(/Largest voltage drop/);
+    expect(r.limitingElement?.reason).toMatch(/Largest-drop element/);
+    expect(r.limitingElement?.reason).not.toMatch(/weakest/i);
     const a = analyse({ vsource: V(12), loadResistance: R(10), returnPath: 'not-counted', elements: [ohm('a', 0.1), ohm('b', 0.3)] });
     if (!a.ok) throw new Error('x');
     expect(a.value.analysis.limiting.name).toBe('b');
@@ -647,5 +652,26 @@ describe('performance sanity', () => {
     const dt = performance.now() - t0;
     expect(n).toBe(10_000);
     expect(dt).toBeLessThan(3000);
+  });
+});
+
+describe('forward path only wording (PCB-F15) and largest-drop wording (PCB-F8)', () => {
+  const base2 = { vsource: V(12), loadResistance: R(10), elements: [ohm('a', 0.1), ohm('b', 0.3)] };
+  it('return not counted: the primary result, step and assumptions say forward path only', () => {
+    const r = ok({ ...base2, returnPath: 'not-counted' });
+    expect(r.results.find((x) => x.role === 'primary')?.name).toBe('total voltage drop (forward path only)');
+    expect(r.steps.some((s) => s.label === 'Total voltage drop (forward path only)')).toBe(true);
+    expect(r.assumptions.join(' ')).toMatch(/forward path only/);
+  });
+  it('return counted: the plain name is kept', () => {
+    const r = ok({ ...base2, returnPath: 'same-as-forward' });
+    expect(r.results.find((x) => x.role === 'primary')?.name).toBe('total voltage drop');
+    expect(r.assumptions.join(' ')).not.toMatch(/forward path only/);
+  });
+  it('the budget warning says largest-drop element, never biggest contributor or weakest', () => {
+    const r = ok({ ...base2, returnPath: 'not-counted', dropBudgetPercent: fromUnit(0.5, '%') });
+    const w = r.warnings.find((x) => x.code === 'DROP_BUDGET_EXCEEDED');
+    expect(w?.message).toMatch(/largest-drop element is "b"/);
+    expect(w?.message).not.toMatch(/weakest|biggest/);
   });
 });

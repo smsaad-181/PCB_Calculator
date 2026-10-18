@@ -556,3 +556,38 @@ describe('wording, performance, meta', () => {
     expect(meta.pairWindow).toEqual({ lowDecade: 3, decades: 3 });
   });
 });
+
+describe('FB bias with a solved resistor (F4 / PCB-F4)', () => {
+  const biased = { vref: V(0.8), vout: V(5), r2: R(10e3), series: 'E96' as const, snap: 'nearest' as const, fbBiasCurrent: I(1e-6), fbBiasDirection: 'into-pin' as const };
+  it('a solved R1 says solved without FB bias in the assumption, a step, the result note and a warning', () => {
+    const r = ok(biased as Inputs);
+    expect(r.results.find((x) => x.name === 'r1')?.note).toBe('solved without FB bias');
+    expect(r.results.find((x) => x.name === 'r1')?.role).toBe('primary');
+    expect(r.steps.some((s) => /solved without FB bias/.test(s.label))).toBe(true);
+    expect(r.assumptions.join(' ')).toMatch(/solved without FB bias/);
+    expect(r.warnings.some((w) => w.code === 'SOLVED_WITHOUT_FB_BIAS')).toBe(true);
+  });
+  it('a solved R2 puts the note on r2, not r1', () => {
+    const r = ok({ vref: V(0.8), vout: V(5), r1: R(52.3e3), fbBiasCurrent: I(1e-6), fbBiasDirection: 'into-pin' } as Inputs);
+    expect(r.results.find((x) => x.name === 'r2')?.note).toBe('solved without FB bias');
+    expect(r.results.find((x) => x.name === 'r1')?.note).toBeUndefined();
+  });
+  it('the error vs target is reported both ways; the headline stays the ideal relation', () => {
+    const r = ok(biased as Inputs);
+    const r1 = si(r, 'r1');
+    const vout = 0.8 * (1 + r1 / 10e3);
+    expect(err(si(r, 'vout error vs target'), (vout - 5) / 5)).toBeLessThanOrEqual(1e-12);
+    expect(err(si(r, 'vout'), vout)).toBeLessThanOrEqual(1e-12);
+    const withBias = vout + 1e-6 * r1;
+    expect(err(si(r, 'vout error vs target including FB bias'), (withBias - 5) / 5)).toBeLessThanOrEqual(1e-12);
+    expect(si(r, 'vout error vs target including FB bias')).toBeGreaterThan(0.005);
+  });
+  it('no bias: no note, no including-bias result', () => {
+    const r = ok({ vref: V(0.8), vout: V(5), r2: R(10e3), series: 'E96' } as Inputs);
+    expect(r.results.some((x) => x.note !== undefined)).toBe(false);
+    expect(r.results.some((x) => x.name === 'vout error vs target including FB bias')).toBe(false);
+  });
+  it('envelope corners print class is analytical (4 s.f.)', () => {
+    expect(meta.envelopeAccuracyClass).toBe('analytical');
+  });
+});

@@ -65,7 +65,7 @@ function Banner({ b }: { b: ProfileBanner }) {
 function StackUpSection({ s, incomplete }: { s: StackUp; incomplete: string | undefined }) {
   return (
     <section class="stackup" aria-labelledby="stackup-h">
-      <h3 id="stackup-h">Worst-case stack-up</h3>
+      <h3 id="stackup-h">{s.partial ? 'Partial worst-case stack-up (not a complete worst case)' : 'Worst-case stack-up'}</h3>
       <p>
         <strong>{s.nominalLabel}:</strong> {s.nominal}
       </p>
@@ -107,13 +107,13 @@ function StackUpSection({ s, incomplete }: { s: StackUp; incomplete: string | un
       {s.omitted.length > 0 && s.terms.length > 0 && (
         <p class="field-warning" role="note">
           <span aria-hidden="true">{'▲ '}</span>
-          <strong>Not in the worst case:</strong> {s.omitted.join(', ')} (not supplied or not published).
+          <strong>Not in the partial worst case:</strong> {s.omitted.join(', ')} (not supplied or not published).
         </p>
       )}
       {incomplete !== undefined && (
         <p class="field-warning" role="note">
           <span aria-hidden="true">{'▲ '}</span>
-          <strong>Worst case incomplete.</strong> {incomplete}
+          <strong>Partial worst case.</strong> {incomplete}
         </p>
       )}
     </section>

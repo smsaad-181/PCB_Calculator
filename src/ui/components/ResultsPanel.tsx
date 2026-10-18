@@ -19,6 +19,8 @@ interface Props {
   readonly failedHintFor?: (name: string) => string | undefined;
   /** A prominent notice shown directly under the headline (for example a method limit that makes the headline optimistic). */
   readonly callout?: CalloutView;
+  /** More prominent notices, shown after `callout` (each one is an Important block). */
+  readonly callouts?: readonly CalloutView[];
   /** Extra content directly under the headline and its callout (for example a min/typ/max row). */
   readonly afterHeadline?: ComponentChildren;
 }
@@ -26,14 +28,18 @@ interface Props {
 const DEFAULT_FAILED_HINT = 'This input or result is outside the stated range, so the result is less reliable. See the confidence reasons.';
 
 /** Quick answer first (headline, status, confidence with reasons, warnings); details are in an expandable section. */
-export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, afterHeadline }: Props) {
+export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, callouts, afterHeadline }: Props) {
   const v = view;
   return (
     <div class="results">
       <p class="answer-label">{v.headline.label}</p>
       <p class="answer">{v.headline.text}</p>
       <p class="muted">{v.headline.meaning}</p>
+      {v.headline.note !== undefined && <p class="muted"><strong>Note:</strong> {v.headline.note}</p>}
       {callout !== undefined && <Callout heading={callout.heading} text={callout.text} />}
+      {(callouts ?? []).map((c) => (
+        <Callout key={c.heading} heading={c.heading} text={c.text} />
+      ))}
       {afterHeadline}
       {v.ledger.unverifiedIds.length > 0 && (
         <p class="unverified-line">
@@ -50,6 +56,11 @@ export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, af
             <div key={r.label} class="row">
               <dt>{r.label}</dt>
               <dd>{r.text}</dd>
+              {r.hint !== undefined && (
+                <dd class="row-note">
+                  <strong>Note:</strong> {r.hint}
+                </dd>
+              )}
               {r.note !== undefined && (
                 <dd class="row-note">
                   <strong>{r.note.label}.</strong> {r.note.message}

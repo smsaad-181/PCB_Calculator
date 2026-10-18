@@ -79,12 +79,15 @@ function fail(inputs: unknown): { code: string; field?: string; message: string 
   if (out.ok) throw new Error('expected an error value');
   return out.error;
 }
+// PCB-F2: when a tolerance term is omitted the worst-case result is named 'partial worst-case annular ring (omits: ...) (<ref>)'.
+// A lookup by the plain WC / WC_DRILL name also finds the partial name for the same reference; tests that care use isPartial.
+const isWcAlias = (want: string, got: string): boolean => (want === WC || want === WC_DRILL) && got.startsWith('partial worst-case annular ring (omits: ') && got.endsWith(want.slice('worst-case annular ring'.length));
 const res = (r: CalcResult, name: string) => {
-  const x = r.results.find((o) => o.name === name);
+  const x = r.results.find((o) => o.name === name || isWcAlias(name, o.name));
   if (!x) throw new Error(`result "${name}" missing; have ${r.results.map((o) => o.name).join(', ')}`);
   return x;
 };
-const has = (r: CalcResult, name: string): boolean => r.results.some((o) => o.name === name);
+const has = (r: CalcResult, name: string): boolean => r.results.some((o) => o.name === name || isWcAlias(name, o.name));
 const warn = (r: CalcResult, code: string) => r.warnings.filter((w) => w.code === code);
 
 // Mirrors RING_CASES in tools/reference/ref_calcs.py: [pad, hole, pad tol, hole tol plus, position tol, test minimum] (mm).
@@ -614,5 +617,37 @@ describe('no fabricator limit is hard-coded', () => {
       expect(code.toLowerCase(), file).not.toContain('jlcpcb');
       expect(code.toLowerCase(), file).not.toContain('pcbway');
     }
+  });
+});
+
+describe('partial worst case (PCB-F2)', () => {
+  const full = { padDiameter: mm(0.9), finishedHoleDiameter: mm(0.5), holeType: 'pth' as const, holeSizeTolPlus: mm(0.1), padSizeTol: mm(0.05), positionTol: mm(0.075) };
+  const names = (r: CalcResult): string[] => r.results.map((x) => x.name);
+  const without = (keys: string[]): Inputs => Object.fromEntries(Object.entries(full).filter(([k]) => !keys.includes(k))) as unknown as Inputs;
+  it('all three terms present: plain name, no partial wording, no omitted-term reason', () => {
+    const r = ok(full as Inputs);
+    expect(names(r)).toContain(WC);
+    expect(names(r).some((n) => n.startsWith('partial'))).toBe(false);
+    expect(r.confidence.reasons.join(' ')).not.toMatch(/omitted worst-case term/);
+  });
+  it('one term omitted: partial name that lists it, and a safety-relevant reason naming it', () => {
+    const r = ok(without(['padSizeTol']));
+    expect(r.results.find((x) => x.role === 'primary')?.name).toBe('partial worst-case annular ring (omits: pad size tolerance) (finished hole)');
+    expect(names(r)).not.toContain(WC);
+    expect(r.confidence.reasons.join(' ')).toMatch(/omitted worst-case term: pad size tolerance/);
+    expect(r.warnings.some((w) => w.code === 'WORST_CASE_INCOMPLETE')).toBe(true);
+  });
+  it('each omitted term adds 2 to the score and the primary is named for all of them', () => {
+    const r1 = ok(without(['padSizeTol']));
+    const r2 = ok(without(['padSizeTol', 'holeSizeTolPlus']));
+    const r0 = ok(full as Inputs);
+    expect(r1.confidence.score).toBe(r0.confidence.score + 2);
+    expect(r2.confidence.score).toBe(r0.confidence.score + 4);
+    expect(r2.results.find((x) => x.role === 'primary')?.name).toBe('partial worst-case annular ring (omits: pad size tolerance, hole size tolerance) (finished hole)');
+    expect(r2.confidence.level).toBe('low');
+  });
+  it('no term at all: nominal only, no partial wording (nothing is called a worst case)', () => {
+    const r = ok({ padDiameter: mm(0.9), finishedHoleDiameter: mm(0.5), holeType: 'pth' } as Inputs);
+    expect(names(r).some((n) => /worst-case/.test(n))).toBe(false);
   });
 });

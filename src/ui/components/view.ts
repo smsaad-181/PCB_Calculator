@@ -139,6 +139,8 @@ export interface ResultRowView {
   readonly text: string;
   /** A core warning shown directly under this row (for example the scope of a voltage drop). */
   readonly note?: { readonly label: string; readonly message: string };
+  /** A short caveat the core attached to this value (CalcResult.results[].note), shown with it. */
+  readonly hint?: string;
 }
 
 /** A calculated limit next to the recommended design value, both printed through formatDesignValue. */
@@ -154,7 +156,8 @@ export interface DesignValueView {
 }
 
 export interface ResultView {
-  readonly headline: { readonly label: string; readonly text: string; readonly meaning: string };
+  /** `note`, when present, is the core's short caveat for the headline value (for example 'solved without FB bias'). */
+  readonly headline: { readonly label: string; readonly text: string; readonly meaning: string; readonly note?: string };
   readonly rows: readonly ResultRowView[];
   readonly designValues: readonly DesignValueView[];
   readonly ledger: LedgerView;
@@ -234,7 +237,7 @@ export function buildResultView(r: CalcResult, o: BuildOptions): ResultView {
   const rows: ResultRowView[] = r.results
     .filter((x) => x !== head && !skip.has(x.name))
     .map((x): ResultRowView => {
-      const base = { label: label(x.name), text: formatResult(x, optsFor(x.name)) };
+      const base = { label: label(x.name), text: formatResult(x, optsFor(x.name)), ...(x.note !== undefined ? { hint: x.note } : {}) };
       const code = o.rowWarnings?.[x.name];
       const w = code === undefined ? undefined : r.warnings.find((k) => k.code === code);
       return w === undefined ? base : { ...base, note: { label: SEVERITY_LABEL[w.severity], message: w.message } };
@@ -259,7 +262,7 @@ export function buildResultView(r: CalcResult, o: BuildOptions): ResultView {
     };
   });
   return {
-    headline: { label: label(head.name), text: formatResult(head, optsFor(head.name)), meaning: MEANING[head.bound] },
+    headline: { label: label(head.name), text: formatResult(head, optsFor(head.name)), meaning: MEANING[head.bound], ...(head.note !== undefined ? { note: head.note } : {}) },
     rows,
     designValues,
     ledger: ledgerView(r.reference.ledgerIds),
