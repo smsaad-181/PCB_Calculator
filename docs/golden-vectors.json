@@ -20992,6 +20992,2318 @@
       },
       "status": "PAYWALLED-USER-MUST-VERIFY",
       "note": "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"
+    },
+    {
+      "name": "microstrip_z0_ohm_w600um_h635um_er4.1",
+      "oracle_value": 75.26613765215878,
+      "pinned_expected": 75.26613765215878,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w600um_h635um_er4.1",
+      "oracle_value": 2.967079608815158,
+      "pinned_expected": 2.967079608815158,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w600um_h635um_er4.1",
+      "oracle_value": 129.64752483459557,
+      "pinned_expected": 129.64752483459557,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w3150um_h1575um_er4.5",
+      "oracle_value": 48.1950904490501,
+      "pinned_expected": 48.1950904490501,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w3150um_h1575um_er4.5",
+      "oracle_value": 3.412374676493385,
+      "pinned_expected": 3.412374676493385,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w3150um_h1575um_er4.5",
+      "oracle_value": 89.02893021120876,
+      "pinned_expected": 89.02893021120876,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w300um_h150um_er4.2",
+      "oracle_value": 49.71402966781172,
+      "pinned_expected": 49.71402966781172,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w300um_h150um_er4.2",
+      "oracle_value": 3.20703999002347,
+      "pinned_expected": 3.20703999002347,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w300um_h150um_er4.2",
+      "oracle_value": 89.02893021120876,
+      "pinned_expected": 89.02893021120876,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w100um_h200um_er3.66",
+      "oracle_value": 103.24802091943532,
+      "pinned_expected": 103.24802091943532,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w100um_h200um_er3.66",
+      "oracle_value": 2.6067937974494937,
+      "pinned_expected": 2.6067937974494937,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w100um_h200um_er3.66",
+      "oracle_value": 166.69979864321255,
+      "pinned_expected": 166.69979864321255,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w1000um_h200um_er2.2",
+      "oracle_value": 35.47002128891467,
+      "pinned_expected": 35.47002128891467,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w1000um_h200um_er2.2",
+      "oracle_value": 1.9371646158271196,
+      "pinned_expected": 1.9371646158271196,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w1000um_h200um_er2.2",
+      "oracle_value": 49.36790673593956,
+      "pinned_expected": 49.36790673593956,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w6350um_h635um_er9.8",
+      "oracle_value": 10.01968115857528,
+      "pinned_expected": 10.01968115857528,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w6350um_h635um_er9.8",
+      "oracle_value": 8.388977432224959,
+      "pinned_expected": 8.388977432224959,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w6350um_h635um_er9.8",
+      "oracle_value": 29.020735493414215,
+      "pinned_expected": 29.020735493414215,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w10um_h1000um_er4.5",
+      "oracle_value": 235.73996101862164,
+      "pinned_expected": 235.73996101862164,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w10um_h1000um_er4.5",
+      "oracle_value": 2.8905984241485423,
+      "pinned_expected": 2.8905984241485423,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w10um_h1000um_er4.5",
+      "oracle_value": 400.79942349146137,
+      "pinned_expected": 400.79942349146137,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w100000um_h1000um_er4.5",
+      "oracle_value": 1.7238182643168702,
+      "pinned_expected": 1.7238182643168702,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w100000um_h1000um_er4.5",
+      "oracle_value": 4.388395730278428,
+      "pinned_expected": 4.388395730278428,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w100000um_h1000um_er4.5",
+      "oracle_value": 3.6111403650510066,
+      "pinned_expected": 3.6111403650510066,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w635um_h635um_er1",
+      "oracle_value": 126.42386513518308,
+      "pinned_expected": 126.42386513518308,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w635um_h635um_er1",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w635um_h635um_er1",
+      "oracle_value": 126.42386513518308,
+      "pinned_expected": 126.42386513518308,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w500um_h500um_er128",
+      "oracle_value": 14.036620400708804,
+      "pinned_expected": 14.036620400708804,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w500um_h500um_er128",
+      "oracle_value": 81.12094797341341,
+      "pinned_expected": 81.12094797341341,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w500um_h500um_er128",
+      "oracle_value": 126.42386513518308,
+      "pinned_expected": 126.42386513518308,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w250um_h1000um_er4.4",
+      "oracle_value": 120.53250103800275,
+      "pinned_expected": 120.53250103800275,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w250um_h1000um_er4.4",
+      "oracle_value": 2.975575537297684,
+      "pinned_expected": 2.975575537297684,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w250um_h1000um_er4.4",
+      "oracle_value": 207.91683620707826,
+      "pinned_expected": 207.91683620707826,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_z0_ohm_w1500um_h300um_er3.48",
+      "oracle_value": 28.856554337034602,
+      "pinned_expected": 28.856554337034602,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_eeff_w1500um_h300um_er3.48",
+      "oracle_value": 2.9268501070468873,
+      "pinned_expected": 2.9268501070468873,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "microstrip_z01_ohm_w1500um_h300um_er3.48",
+      "oracle_value": 49.36790673593956,
+      "pinned_expected": 49.36790673593956,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "H-J zero-thickness quasi-static (S-020); prefactor eta0/(2 pi) with eta0 = mu0 c (Q-1); tests the implementation against the recorded formula, not the paper; air-filled line impedance"
+    },
+    {
+      "name": "microstrip_thickB_z0_ohm_w3150um_h1575um_er4.5_t35um",
+      "oracle_value": 47.7807413868924,
+      "pinned_expected": 47.7807413868924,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickB_eeff_w3150um_h1575um_er4.5_t35um",
+      "oracle_value": 3.4165954415370616,
+      "pinned_expected": 3.4165954415370616,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_z0_ohm_w3150um_h1575um_er4.5_t35um",
+      "oracle_value": 47.7807413868924,
+      "pinned_expected": 47.7807413868924,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_eeff_w3150um_h1575um_er4.5_t35um",
+      "oracle_value": 3.3874994139059647,
+      "pinned_expected": 3.3874994139059647,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thick_dur_over_h_w3150um_h1575um_er4.5_t35um",
+      "oracle_value": 0.028488772034121503,
+      "pinned_expected": 0.028488772034121503,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "delta u_r (H-J form), S-020a"
+    },
+    {
+      "name": "microstrip_thickB_z0_ohm_w150um_h100um_er4.2_t18um",
+      "oracle_value": 55.57511669063431,
+      "pinned_expected": 55.57511669063431,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickB_eeff_w150um_h100um_er4.2_t18um",
+      "oracle_value": 3.1571903212729038,
+      "pinned_expected": 3.1571903212729038,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_z0_ohm_w150um_h100um_er4.2_t18um",
+      "oracle_value": 55.57511669063431,
+      "pinned_expected": 55.57511669063431,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_eeff_w150um_h100um_er4.2_t18um",
+      "oracle_value": 3.0023254162060815,
+      "pinned_expected": 3.0023254162060815,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thick_dur_over_h_w150um_h100um_er4.2_t18um",
+      "oracle_value": 0.15603248592439423,
+      "pinned_expected": 0.15603248592439423,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "delta u_r (H-J form), S-020a"
+    },
+    {
+      "name": "microstrip_thickB_z0_ohm_w400um_h200um_er3.66_t35um",
+      "oracle_value": 50.43760016120148,
+      "pinned_expected": 50.43760016120148,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickB_eeff_w400um_h200um_er3.66_t35um",
+      "oracle_value": 2.854702232404576,
+      "pinned_expected": 2.854702232404576,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_z0_ohm_w400um_h200um_er3.66_t35um",
+      "oracle_value": 50.43760016120148,
+      "pinned_expected": 50.43760016120148,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_eeff_w400um_h200um_er3.66_t35um",
+      "oracle_value": 2.7479688527870674,
+      "pinned_expected": 2.7479688527870674,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thick_dur_over_h_w400um_h200um_er3.66_t35um",
+      "oracle_value": 0.15887359869968143,
+      "pinned_expected": 0.15887359869968143,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "delta u_r (H-J form), S-020a"
+    },
+    {
+      "name": "microstrip_thickB_z0_ohm_w2000um_h200um_er4.5_t70um",
+      "oracle_value": 14.300174248228435,
+      "pinned_expected": 14.300174248228435,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickB_eeff_w2000um_h200um_er4.5_t70um",
+      "oracle_value": 3.9556146624609516,
+      "pinned_expected": 3.9556146624609516,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure B (Janssen D.3), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_z0_ohm_w2000um_h200um_er4.5_t70um",
+      "oracle_value": 14.300174248228435,
+      "pinned_expected": 14.300174248228435,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thickA_eeff_w2000um_h200um_er4.5_t70um",
+      "oracle_value": 3.8721246552066493,
+      "pinned_expected": 3.8721246552066493,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "H-J thickness variant, procedure A (Qucs 11.24-11.25), S-020a CONFLICT; oracle arithmetic only"
+    },
+    {
+      "name": "microstrip_thick_dur_over_h_w2000um_h200um_er4.5_t70um",
+      "oracle_value": 0.2512879389160148,
+      "pinned_expected": 0.2512879389160148,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "delta u_r (H-J form), S-020a"
+    },
+    {
+      "name": "microstrip_solve_w_um_Z50ohm_h200um_er4.2",
+      "oracle_value": 396.23870711311974,
+      "pinned_expected": 396.23870711311974,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-020 analysis function"
+    },
+    {
+      "name": "microstrip_solve_w_um_Z75ohm_h635um_er4.1",
+      "oracle_value": 604.5185290207519,
+      "pinned_expected": 604.5185290207519,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-020 analysis function"
+    },
+    {
+      "name": "microstrip_solve_w_um_Z50ohm_h1575um_er4.5",
+      "oracle_value": 2963.840755675808,
+      "pinned_expected": 2963.840755675808,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-020 analysis function"
+    },
+    {
+      "name": "microstrip_solve_w_um_Z100ohm_h300um_er3.48",
+      "oracle_value": 172.32503723209703,
+      "pinned_expected": 172.32503723209703,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-020 analysis function"
+    },
+    {
+      "name": "microstrip_solve_w_um_Z30ohm_h500um_er4.5",
+      "oracle_value": 2024.5008929683754,
+      "pinned_expected": 2024.5008929683754,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-020 analysis function"
+    },
+    {
+      "name": "microstrip_solve_thickA_w_um_Z50ohm_h200um_t35um_er4.2",
+      "oracle_value": 365.667722671276,
+      "pinned_expected": 365.667722671276,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0, thickness variant A (S-020a CONFLICT)"
+    },
+    {
+      "name": "microstrip_solve_thickB_w_um_Z50ohm_h200um_t35um_er4.2",
+      "oracle_value": 365.667722671276,
+      "pinned_expected": 365.667722671276,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0, thickness variant B (S-020a CONFLICT)"
+    },
+    {
+      "name": "microstrip_solve_thickA_w_um_Z60ohm_h300um_t18um_er4.5",
+      "oracle_value": 390.22336423533443,
+      "pinned_expected": 390.22336423533443,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0, thickness variant A (S-020a CONFLICT)"
+    },
+    {
+      "name": "microstrip_solve_thickB_w_um_Z60ohm_h300um_t18um_er4.5",
+      "oracle_value": 390.22336423533443,
+      "pinned_expected": 390.22336423533443,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-020",
+        "S-020a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-020": "VERIFIED",
+        "S-020a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0, thickness variant B (S-020a CONFLICT)"
+    },
+    {
+      "name": "stripline_z0_ohm_w500um_b1000um_er4",
+      "oracle_value": 50.043877983763366,
+      "pinned_expected": 50.043877983763366,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w200um_b1000um_er4",
+      "oracle_value": 76.13789681927459,
+      "pinned_expected": 76.13789681927459,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w100um_b500um_er4.2",
+      "oracle_value": 74.30297906007794,
+      "pinned_expected": 74.30297906007794,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w1500um_b1000um_er3.66",
+      "oracle_value": 25.363226351587137,
+      "pinned_expected": 25.363226351587137,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w50um_b1000um_er4",
+      "oracle_value": 117.43463636588861,
+      "pinned_expected": 117.43463636588861,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w300um_b1000um_er4.5",
+      "oracle_value": 60.11928669089411,
+      "pinned_expected": 60.11928669089411,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w350um_b1000um_er4",
+      "oracle_value": 59.53386748763759,
+      "pinned_expected": 59.53386748763759,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_z0_ohm_w5000um_b1000um_er4",
+      "oracle_value": 8.654896008586903,
+      "pinned_expected": 8.654896008586903,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "zero-thickness symmetric stripline (S-021), 30 pi taken as eta0/4 (Q-1)"
+    },
+    {
+      "name": "stripline_cohnwide_z0_ohm_w500um_b1000um_t20um_er4",
+      "oracle_value": 47.67343266844121,
+      "pinned_expected": 47.67343266844121,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-021a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-021a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "wide-strip finite-thickness form (Steer eqs 1-4; S-021a CONFLICT for narrow strips, wide only here)"
+    },
+    {
+      "name": "stripline_cohnwide_z0_ohm_w900um_b800um_t18um_er4.2",
+      "oracle_value": 28.155297551391662,
+      "pinned_expected": 28.155297551391662,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-021a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-021a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "wide-strip finite-thickness form (Steer eqs 1-4; S-021a CONFLICT for narrow strips, wide only here)"
+    },
+    {
+      "name": "stripline_cohnwide_z0_ohm_w400um_b500um_t17.5um_er3.66",
+      "oracle_value": 37.064380710827606,
+      "pinned_expected": 37.064380710827606,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-021a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-021a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "wide-strip finite-thickness form (Steer eqs 1-4; S-021a CONFLICT for narrow strips, wide only here)"
+    },
+    {
+      "name": "stripline_cohnwide_z0_ohm_w350um_b1000um_t20um_er4",
+      "oracle_value": 56.41515036445015,
+      "pinned_expected": 56.41515036445015,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-021a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-021a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "wide-strip finite-thickness form (Steer eqs 1-4; S-021a CONFLICT for narrow strips, wide only here)"
+    },
+    {
+      "name": "stripline_solve_w_um_Z50ohm_b500um_er4.2",
+      "oracle_value": 239.06392548658215,
+      "pinned_expected": 239.06392548658215,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-021 analysis function"
+    },
+    {
+      "name": "stripline_solve_w_um_Z50ohm_b1000um_er4",
+      "oracle_value": 500.8257836544264,
+      "pinned_expected": 500.8257836544264,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-021 analysis function"
+    },
+    {
+      "name": "stripline_solve_w_um_Z75ohm_b600um_er4.5",
+      "oracle_value": 107.94384404897046,
+      "pinned_expected": 107.94384404897046,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-021 analysis function"
+    },
+    {
+      "name": "stripline_solve_w_um_Z30ohm_b400um_er3.66",
+      "oracle_value": 480.00029797907507,
+      "pinned_expected": 480.00029797907507,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "width for a target Z0 by bisection on the S-021 analysis function"
+    },
+    {
+      "name": "stripline_cohnwide_solve_w_um_Z50ohm_b800um_t18um_er4.2",
+      "oracle_value": 342.3410313732332,
+      "pinned_expected": 342.3410313732332,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-021a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-021a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0, wide-strip finite-thickness form"
+    },
+    {
+      "name": "stripline_cohnwide_solve_w_um_Z40ohm_b600um_t17.5um_er4",
+      "oracle_value": 399.7282011690093,
+      "pinned_expected": 399.7282011690093,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-021",
+        "S-021a",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-021": "VERIFIED",
+        "S-021a": "CONFLICT",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0, wide-strip finite-thickness form"
+    },
+    {
+      "name": "coax_z0_ohm_D2.71828mm_d1mm_er1",
+      "oracle_value": 59.9584916,
+      "pinned_expected": 59.9584916,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Z0 = eta0/(2 pi) ln(D/d)/sqrt(er) (S-024); D/d = e, er = 1 gives eta0/(2 pi)"
+    },
+    {
+      "name": "coax_z0_ohm_D3.5mm_d1mm_er2.1",
+      "oracle_value": 51.8334311769736,
+      "pinned_expected": 51.8334311769736,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Z0 = eta0/(2 pi) ln(D/d)/sqrt(er) (S-024); D/d = e, er = 1 gives eta0/(2 pi)"
+    },
+    {
+      "name": "coax_z0_ohm_D4.6mm_d1.5mm_er2.25",
+      "oracle_value": 44.79263851709233,
+      "pinned_expected": 44.79263851709233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Z0 = eta0/(2 pi) ln(D/d)/sqrt(er) (S-024); D/d = e, er = 1 gives eta0/(2 pi)"
+    },
+    {
+      "name": "coax_z0_ohm_D9mm_d2.7mm_er1",
+      "oracle_value": 72.18839327480508,
+      "pinned_expected": 72.18839327480508,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Z0 = eta0/(2 pi) ln(D/d)/sqrt(er) (S-024); D/d = e, er = 1 gives eta0/(2 pi)"
+    },
+    {
+      "name": "coax_z0_ohm_D7.25mm_d2mm_er2.2",
+      "oracle_value": 52.06023049532594,
+      "pinned_expected": 52.06023049532594,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "Z0 = eta0/(2 pi) ln(D/d)/sqrt(er) (S-024); D/d = e, er = 1 gives eta0/(2 pi)"
+    },
+    {
+      "name": "coax_solve_D_mm_Z50ohm_d1mm_er2.1",
+      "oracle_value": 3.3482932658452524,
+      "pinned_expected": 3.3482932658452524,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "outer diameter for a target Z0 (closed-form inverse of S-024)"
+    },
+    {
+      "name": "coax_solve_D_mm_Z75ohm_d0.5mm_er2.25",
+      "oracle_value": 3.2646444353993624,
+      "pinned_expected": 3.2646444353993624,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-024",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-024": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "outer diameter for a target Z0 (closed-form inverse of S-024)"
+    },
+    {
+      "name": "elliptic_K_k0.001",
+      "oracle_value": 1.5707967194941992,
+      "pinned_expected": 1.5707967194941992,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.001",
+      "oracle_value": 8.29405146361544,
+      "pinned_expected": 8.29405146361544,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.1",
+      "oracle_value": 1.574745561517356,
+      "pinned_expected": 1.574745561517356,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.1",
+      "oracle_value": 3.6956373629898747,
+      "pinned_expected": 3.6956373629898747,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.3",
+      "oracle_value": 1.6080486199305128,
+      "pinned_expected": 1.6080486199305128,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.3",
+      "oracle_value": 2.627773332084344,
+      "pinned_expected": 2.627773332084344,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.5",
+      "oracle_value": 1.685750354812596,
+      "pinned_expected": 1.685750354812596,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.5",
+      "oracle_value": 2.1565156474996434,
+      "pinned_expected": 2.1565156474996434,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.555556",
+      "oracle_value": 1.7189786665597662,
+      "pinned_expected": 1.7189786665597662,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.555556",
+      "oracle_value": 2.0628185603686044,
+      "pinned_expected": 2.0628185603686044,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.707107",
+      "oracle_value": 1.8540746773013719,
+      "pinned_expected": 1.8540746773013719,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.707107",
+      "oracle_value": 1.8540746773013719,
+      "pinned_expected": 1.8540746773013719,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.9",
+      "oracle_value": 2.2805491384227703,
+      "pinned_expected": 2.2805491384227703,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.9",
+      "oracle_value": 1.654616667522527,
+      "pinned_expected": 1.654616667522527,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.99",
+      "oracle_value": 3.356600523361192,
+      "pinned_expected": 3.356600523361192,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.99",
+      "oracle_value": 1.5786997420390116,
+      "pinned_expected": 1.5786997420390116,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "elliptic_K_k0.999999",
+      "oracle_value": 7.947479773547967,
+      "pinned_expected": 7.947479773547967,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K(k) by AGM, modulus k (S-023b, DLMF 19.8.5)"
+    },
+    {
+      "name": "elliptic_Kprime_k0.999999",
+      "oracle_value": 1.570797112193551,
+      "pinned_expected": 1.570797112193551,
+      "rel_tol": 1e-13,
+      "ledger_ids": [
+        "S-023b"
+      ],
+      "ledger_status": {
+        "S-023b": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "K'(k) = K(sqrt(1 - k^2)) (S-023b, DLMF 19.2.9)"
+    },
+    {
+      "name": "delay_ps_per_mm_ee2.967",
+      "oracle_value": 5.745635488186738,
+      "pinned_expected": 5.745635488186738,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "t_pd = sqrt(eps_eff)/c, c exact (S-029, S-029a)"
+    },
+    {
+      "name": "guided_wavelength_mm_ee2.967_f5e+09Hz",
+      "oracle_value": 34.80903033462672,
+      "pinned_expected": 34.80903033462672,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "lambda_g = c/(f sqrt(eps_eff)) (S-029a)"
+    },
+    {
+      "name": "skew_ps_dL10mm_ee2.967",
+      "oracle_value": 57.45635488186739,
+      "pinned_expected": 57.45635488186739,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a",
+        "S-029b"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED",
+        "S-029b": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "skew = dL sqrt(eps_eff)/c (S-029b, derived, UNVERIFIED)"
+    },
+    {
+      "name": "delay_ps_per_mm_ee3.2",
+      "oracle_value": 5.966975933730233,
+      "pinned_expected": 5.966975933730233,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "t_pd = sqrt(eps_eff)/c, c exact (S-029, S-029a)"
+    },
+    {
+      "name": "guided_wavelength_mm_ee3.2_f1e+09Hz",
+      "oracle_value": 167.58907880743766,
+      "pinned_expected": 167.58907880743766,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "lambda_g = c/(f sqrt(eps_eff)) (S-029a)"
+    },
+    {
+      "name": "skew_ps_dL2.5mm_ee3.2",
+      "oracle_value": 14.917439834325586,
+      "pinned_expected": 14.917439834325586,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a",
+        "S-029b"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED",
+        "S-029b": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "skew = dL sqrt(eps_eff)/c (S-029b, derived, UNVERIFIED)"
+    },
+    {
+      "name": "delay_ps_per_mm_ee4.4",
+      "oracle_value": 6.996899489513853,
+      "pinned_expected": 6.996899489513853,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "t_pd = sqrt(eps_eff)/c, c exact (S-029, S-029a)"
+    },
+    {
+      "name": "guided_wavelength_mm_ee4.4_f2.5e+08Hz",
+      "oracle_value": 571.6817864819609,
+      "pinned_expected": 571.6817864819609,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "lambda_g = c/(f sqrt(eps_eff)) (S-029a)"
+    },
+    {
+      "name": "skew_ps_dL100mm_ee4.4",
+      "oracle_value": 699.6899489513854,
+      "pinned_expected": 699.6899489513854,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a",
+        "S-029b"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED",
+        "S-029b": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "skew = dL sqrt(eps_eff)/c (S-029b, derived, UNVERIFIED)"
+    },
+    {
+      "name": "delay_ps_per_mm_ee1",
+      "oracle_value": 3.335640951981521,
+      "pinned_expected": 3.335640951981521,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "t_pd = sqrt(eps_eff)/c, c exact (S-029, S-029a)"
+    },
+    {
+      "name": "guided_wavelength_mm_ee1_f1e+10Hz",
+      "oracle_value": 29.979245799999998,
+      "pinned_expected": 29.979245799999998,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "lambda_g = c/(f sqrt(eps_eff)) (S-029a)"
+    },
+    {
+      "name": "skew_ps_dL1mm_ee1",
+      "oracle_value": 3.335640951981521,
+      "pinned_expected": 3.335640951981521,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-029",
+        "S-029a",
+        "S-029b"
+      ],
+      "ledger_status": {
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED",
+        "S-029b": "UNVERIFIED"
+      },
+      "status": "UNVERIFIED",
+      "note": "skew = dL sqrt(eps_eff)/c (S-029b, derived, UNVERIFIED)"
     }
   ]
 }
