@@ -304,3 +304,14 @@ Research: ledger rows S-020..S-025 (part A, `docs/research/impedance-models.md`)
 | P2-5 | Stripline prefactor: textbook 30 pi taken as eta0/4 = 94.18 ohm (0.07 % below 30 pi) under the Q-1 default; stated in every result's assumptions | orchestrator | User may overrule Q-1 | DEFAULT |
 | P2-6 | Every impedance result carries one standing defaulted assumption (nominal user-entered stackup not verified against the fabricator), so confidence can never be 'high'; skew (S-029b UNVERIFIED) is shown in dataStatus but excluded from the confidence score (like S-009 in trace-resistance) | calc-implementer | User may require skew to count | DEFAULT |
 | P2-7 | K(1/sqrt2) test cites NIST DLMF section 19.20 only (equation number not read) | standards-researcher | Read the equation number | MINOR |
+
+## Phase 2 part B core: differential pairs and presets (logged 2026-10-18)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-8 | Edge-coupled microstrip and stripline rate confidence LOW (score 4 = empirical 1 + standing unverified-stackup assumption 1 + PAYWALLED 2); by the rule they cannot reach medium until S-022/S-022a are verified | human | Read Hammerstad-Jensen 1980 coupled lines and Cohn 1955 and sign the ledger rows | OPEN (human) |
+| P2-9 | H-J coupled fit scanned (not sourced): monotone in s/h only up to ~6.7; Zodd < Z0 < Zeven held on the grid only up to s/h ~ 3; at s/h = 5 Zdiff overshoots 2 Z0 by up to 0.64 %. WEAK_COUPLING_FIT warns above s/h = 3; spacing solve bracket stops at s/h = 5 | calc-implementer | Compare with the primary when read | NOTED |
+| P2-10 | S-022a records no validity range: Q-5 applied the S-021a stripline range (w/b < 0.05 forces low confidence; w/b < 0.35 a caution that says the limit is an unsourced inference) | orchestrator | Replace with the primary's range | DEFAULT |
+| P2-11 | Stripline coupled prefactor: source prints 94.15, code uses eta0/4 = 94.1826 (Q-1), 0.034 % higher | orchestrator | User may overrule Q-1 | DEFAULT |
+| P2-12 | Whether Z01 inside Z01e/Z01o is the air-filled value (taken as the note records) and the H-J 1980 constants: unverified primaries | human | Read the primary | OPEN (human) |
+| P2-13 | No published coupled-line worked example exists: all 131 coupled golden vectors are the recorded formula only; they verify the implementation, nothing about S-022/S-022a | calc-validator | State in validator report | NOTED |
