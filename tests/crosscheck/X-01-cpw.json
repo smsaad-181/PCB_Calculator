@@ -1,0 +1,199 @@
+{
+  "tool": "KiCad pcb_calculator, TransLine tab, Coplanar wave guide and Coplanar wave guide with ground plane",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "Human runs the stand-alone KiCad PCB Calculator, TransLine tab. kicad-cpw-* cases: line type \"Coplanar wave guide\" (no lower ground plane). kicad-cpwg-* cases: line type \"Coplanar wave guide with ground plane\". T = 0 in the tool (our coplanar cores model zero thickness). Strip width W and gap S (the gap on EACH side of the strip) as in the case; substrate height H as in the case. Case kicad-cpw-er4.5-h1.6-w0.75-s0.25 has h/max(W, s) = 2.13, just inside our core's h >= 2 max(W, s) guidance (ledger S-023); kicad-cpwg-er4.5-h0.2-w0.3-s0.2 is a thin-dielectric conductor-backed case where the CPW rule does not apply. If the tool asks for a ground width or other extra field, record it here; our model assumes wide grounds. Outputs to copy: Z0_ohm = characteristic impedance shown; eps_eff = effective permittivity shown. The tool documents a thickness correction and TE0-cutoff dispersion for coplanar lines (research note C-K12, unverified summary): keep T = 0 and the frequency at 1 MHz. Every toolOutputs value stays null until a human copies it from a real run of the tool (all displayed digits, no rounding, no conversion). Quasi-static comparison: frequency 1 MHz (1e6 Hz) in the tool; if it refuses, use the lowest accepted frequency and write it here. Dielectric loss tangent, conductor resistivity and roughness do not affect Z0 or eps_eff in the quasi-static model: leave them at the tool defaults and record the defaults here. Dispersion: check the tool's settings, turn dispersion off if it can be turned off, otherwise record that it is on. Soldermask or cover/top-dielectric correction: disable it (or leave the top height at its no-cover default) and record the setting. Thickness: the t0 cases need T = 0 in the tool (if refused, enter the smallest accepted value and record it); the t35um cases need T = 0.035 mm; one tool run with T = 0.035 mm feeds the three t35um cases of the same geometry (none, A, B): copy the same displayed numbers into all three. Record the tool's exact name for its thickness and dispersion models. Details, field entries per case and the digits check: docs/validation/crosscheck-impedance.md. Agreement never verifies a ledger row; no third-party source is copied.",
+  "cases": [
+    {
+      "id": "kicad-cpw-er4.5-h1.6-w0.3-s0.2",
+      "calculator": "cpw",
+      "inputs": {
+        "width_mm": 0.3,
+        "gap_mm": 0.2,
+        "height_mm": 1.6,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, CPW without a lower ground plane (ledger S-023 CONFLICT: two eps_e models, our conformal-map finite-substrate form against the empirical Steer fit stated accurate to 1.5 % for h/s >= 1). Derived before any run: eps_e may differ by 2 x 1.5 % = 3.0 % between two models, which moves Z0 (proportional to 1/sqrt(eps_e)) by 1.5 %, + 0.07 % prefactor (eta0/4 against 30 pi) + 0.02 % rounding = 1.59 %, set to 2 %. The tool is run at T = 0 so no thickness correction applies. A miss is a model-difference item (S-023), not necessarily a bug. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, CPW without a lower ground plane (ledger S-023 CONFLICT: two eps_e models). Derived before any run: 2 x 1.5 % (Steer quotes 1.5 % for its fit; two different models can differ by twice that) = 3 %. A miss is classified against S-023 (CONFLICT), not as a bug, once the tool's model is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-cpw-er4.5-h1.6-w0.75-s0.25",
+      "calculator": "cpw",
+      "inputs": {
+        "width_mm": 0.75,
+        "gap_mm": 0.25,
+        "height_mm": 1.6,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, CPW without a lower ground plane (ledger S-023 CONFLICT: two eps_e models, our conformal-map finite-substrate form against the empirical Steer fit stated accurate to 1.5 % for h/s >= 1). Derived before any run: eps_e may differ by 2 x 1.5 % = 3.0 % between two models, which moves Z0 (proportional to 1/sqrt(eps_e)) by 1.5 %, + 0.07 % prefactor (eta0/4 against 30 pi) + 0.02 % rounding = 1.59 %, set to 2 %. The tool is run at T = 0 so no thickness correction applies. A miss is a model-difference item (S-023), not necessarily a bug. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, CPW without a lower ground plane (ledger S-023 CONFLICT: two eps_e models). Derived before any run: 2 x 1.5 % (Steer quotes 1.5 % for its fit; two different models can differ by twice that) = 3 %. A miss is classified against S-023 (CONFLICT), not as a bug, once the tool's model is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-cpw-er3.5-h0.8-w0.2-s0.15",
+      "calculator": "cpw",
+      "inputs": {
+        "width_mm": 0.2,
+        "gap_mm": 0.15,
+        "height_mm": 0.8,
+        "er": 3.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, CPW without a lower ground plane (ledger S-023 CONFLICT: two eps_e models, our conformal-map finite-substrate form against the empirical Steer fit stated accurate to 1.5 % for h/s >= 1). Derived before any run: eps_e may differ by 2 x 1.5 % = 3.0 % between two models, which moves Z0 (proportional to 1/sqrt(eps_e)) by 1.5 %, + 0.07 % prefactor (eta0/4 against 30 pi) + 0.02 % rounding = 1.59 %, set to 2 %. The tool is run at T = 0 so no thickness correction applies. A miss is a model-difference item (S-023), not necessarily a bug. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, CPW without a lower ground plane (ledger S-023 CONFLICT: two eps_e models). Derived before any run: 2 x 1.5 % (Steer quotes 1.5 % for its fit; two different models can differ by twice that) = 3 %. A miss is classified against S-023 (CONFLICT), not as a bug, once the tool's model is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-cpwg-er4.5-h1.6-w0.3-s0.2",
+      "calculator": "cpwg",
+      "inputs": {
+        "width_mm": 0.3,
+        "gap_mm": 0.2,
+        "height_mm": 1.6,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, conductor-backed CPW. Ours is the Ghione-Naldi form (ledger S-023a, PAYWALLED-USER-MUST-VERIFY, only a secondary transcription read) assuming wide via-stitched top grounds and zero thickness. The tool's own model name must be recorded. Same a-priori allowance as CPW: 2 x 1.5 % eps_e (S-023 pattern) -> 1.5 % in Z0 + 0.07 % prefactor + 0.02 % rounding = 1.59 %, set to 2 %. This comparison cannot verify S-023a. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, conductor-backed CPW (ledger S-023a PAYWALLED-USER-MUST-VERIFY). A-priori allowance of 3 % (2 x 1.5 %, the S-023 pattern). Cannot verify S-023a; a miss is classified once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-cpwg-er4.5-h1.6-w0.75-s0.25",
+      "calculator": "cpwg",
+      "inputs": {
+        "width_mm": 0.75,
+        "gap_mm": 0.25,
+        "height_mm": 1.6,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, conductor-backed CPW. Ours is the Ghione-Naldi form (ledger S-023a, PAYWALLED-USER-MUST-VERIFY, only a secondary transcription read) assuming wide via-stitched top grounds and zero thickness. The tool's own model name must be recorded. Same a-priori allowance as CPW: 2 x 1.5 % eps_e (S-023 pattern) -> 1.5 % in Z0 + 0.07 % prefactor + 0.02 % rounding = 1.59 %, set to 2 %. This comparison cannot verify S-023a. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, conductor-backed CPW (ledger S-023a PAYWALLED-USER-MUST-VERIFY). A-priori allowance of 3 % (2 x 1.5 %, the S-023 pattern). Cannot verify S-023a; a miss is classified once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-cpwg-er3.5-h0.8-w0.2-s0.15",
+      "calculator": "cpwg",
+      "inputs": {
+        "width_mm": 0.2,
+        "gap_mm": 0.15,
+        "height_mm": 0.8,
+        "er": 3.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, conductor-backed CPW. Ours is the Ghione-Naldi form (ledger S-023a, PAYWALLED-USER-MUST-VERIFY, only a secondary transcription read) assuming wide via-stitched top grounds and zero thickness. The tool's own model name must be recorded. Same a-priori allowance as CPW: 2 x 1.5 % eps_e (S-023 pattern) -> 1.5 % in Z0 + 0.07 % prefactor + 0.02 % rounding = 1.59 %, set to 2 %. This comparison cannot verify S-023a. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, conductor-backed CPW (ledger S-023a PAYWALLED-USER-MUST-VERIFY). A-priori allowance of 3 % (2 x 1.5 %, the S-023 pattern). Cannot verify S-023a; a miss is classified once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-cpwg-er4.5-h0.2-w0.3-s0.2",
+      "calculator": "cpwg",
+      "inputs": {
+        "width_mm": 0.3,
+        "gap_mm": 0.2,
+        "height_mm": 0.2,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.02,
+          "why": "Z0, conductor-backed CPW. Ours is the Ghione-Naldi form (ledger S-023a, PAYWALLED-USER-MUST-VERIFY, only a secondary transcription read) assuming wide via-stitched top grounds and zero thickness. The tool's own model name must be recorded. Same a-priori allowance as CPW: 2 x 1.5 % eps_e (S-023 pattern) -> 1.5 % in Z0 + 0.07 % prefactor + 0.02 % rounding = 1.59 %, set to 2 %. This comparison cannot verify S-023a. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.03,
+          "why": "eps_eff, conductor-backed CPW (ledger S-023a PAYWALLED-USER-MUST-VERIFY). A-priori allowance of 3 % (2 x 1.5 %, the S-023 pattern). Cannot verify S-023a; a miss is classified once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    }
+  ]
+}

@@ -333,7 +333,7 @@ describe.each(KINDS)('$name', (k) => {
       const back = vm.fromHashState(parseHash(serializeHash(ROUTE, vm.toHashState(s))).state);
       expect(back.notices).toEqual([]);
       expect(back.state).toEqual(s);
-      const documented = [...Object.keys(stateKeysOf(vm.CALCULATOR_ID)), 'u'];
+      const documented = [...Object.keys(stateKeysOf(vm.CALCULATOR_ID)), 'fp', 'u'];
       for (const key of vm.WRITTEN_KEYS) expect(documented).toContain(key);
       expect(Object.keys(vm.toHashState(s))).toContain(k.sizeHash);
       expect(JSON.stringify(vm.toHashState(s))).not.toMatch(/layer|stackup":/);

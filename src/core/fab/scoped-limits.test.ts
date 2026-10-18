@@ -545,6 +545,24 @@ describe('shipped JLCPCB profile: scoped entries', () => {
   });
 });
 
+describe('published width and space tolerance (Phase 2 core D)', () => {
+  const tol = (over: Raw = {}): Raw => entry({ key: 'traceWidth', kind: 'tol-sym', value: { value: 20, unit: 'um' }, holeType: 'any', sizeBasis: 'not-applicable', layerCount: '2', copperOz: 1, layerSide: 'outer', ledgerId: 'S-019j', ...over });
+  it('traceWidth and traceSpace accept a tol-sym entry (a length) and look it up by exact scope only', () => {
+    const p = parseOk(profile([tol(), tol({ key: 'traceSpace', value: { value: 25, unit: 'um' } })]));
+    const hit = lookupLimit(p, 'traceWidth', 'tol-sym', { layerCount: '2', copperOz: 1, layerSide: 'outer' });
+    expect(hit.status).toBe('found');
+    if (hit.status === 'found') expect(relErr(hit.value.si, 20e-6)).toBeLessThanOrEqual(1e-12);
+    expect(lookupLimit(p, 'traceSpace', 'tol-sym', { layerCount: '2', copperOz: 1, layerSide: 'outer' }).status).toBe('found');
+    // no fallback to another layer count, copper weight or layer side
+    expect(lookupLimit(p, 'traceWidth', 'tol-sym', { layerCount: 'multilayer', copperOz: 1, layerSide: 'outer' }).status).toBe('not-available');
+    expect(lookupLimit(p, 'traceWidth', 'tol-sym', { layerCount: '2', copperOz: 2, layerSide: 'outer' }).status).toBe('not-available');
+    expect(lookupLimit(p, 'traceWidth', 'tol-sym', { layerCount: '2', copperOz: 1, layerSide: 'inner' }).status).toBe('not-available');
+  });
+  it('a kind that no key allows is still refused', () => {
+    expect(errorsOf(profile([tol({ key: 'annularRing' })]))).toContain('not allowed for this key');
+  });
+});
+
 describe('shipped template: scoped limits', () => {
   const key = Object.keys(files).find((k) => k.endsWith('/template.json'));
   const t = parseOk(JSON.parse(files[key ?? ''] as string) as unknown);

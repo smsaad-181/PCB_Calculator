@@ -665,8 +665,322 @@ PINNED_C = {
 PINNED.update(PINNED_C)
 
 
+# Part D pins (core D: envelope, sensitivity, loss, quarter wave): full-precision literals recorded from this oracle, regression pins only.
+PINNED_D = {
+    'env_microstrip_A_z0_min': 44.39533260071851,
+    'env_microstrip_A_z0_typ': 49.71402966781172,
+    'env_microstrip_A_z0_max': 55.734928718840045,
+    'env_microstrip_A_eeff_min': 3.0249898137280464,
+    'env_microstrip_A_eeff_typ': 3.20703999002347,
+    'env_microstrip_A_eeff_max': 3.39422773769272,
+    'env_microstrip_A_delay_min': 5.801512807713292,
+    'env_microstrip_A_delay_typ': 5.973535991911165,
+    'env_microstrip_A_delay_max': 6.14539476567824,
+    'sens_microstrip_A_z0_to_w': -0.6079826644516888,
+    'sens_microstrip_A_eeff_to_w': 0.08488684200227439,
+    'sens_microstrip_A_delay_to_w': 0.042443421001137197,
+    'sens_microstrip_A_z0_to_h': 0.6079826644516888,
+    'sens_microstrip_A_eeff_to_h': -0.08488684200227439,
+    'sens_microstrip_A_delay_to_h': -0.042443421001137197,
+    'sens_microstrip_A_z0_to_er': -0.448270676368288,
+    'sens_microstrip_A_eeff_to_er': 0.8965413521814645,
+    'sens_microstrip_A_delay_to_er': 0.4482706761462434,
+    'env_microstrip_B_z0_min': 70.53160918941325,
+    'env_microstrip_B_z0_typ': 75.26613765215878,
+    'env_microstrip_B_z0_max': 83.26827307727281,
+    'env_microstrip_B_eeff_min': 2.9280531085532395,
+    'env_microstrip_B_eeff_typ': 2.967079608815158,
+    'env_microstrip_B_eeff_max': 3.235682907536907,
+    'env_microstrip_B_delay_min': 5.707800325308984,
+    'env_microstrip_B_delay_typ': 5.745712569441438,
+    'env_microstrip_B_delay_max': 6.0001523051024925,
+    'sens_microstrip_B_z0_to_w': -0.47148473659854956,
+    'sens_microstrip_B_eeff_to_w': 0.06348532610890399,
+    'sens_microstrip_B_delay_to_w': 0.0317426632764966,
+    'sens_microstrip_B_z0_to_er': -0.43497296032851895,
+    'sens_microstrip_B_eeff_to_er': 0.869945920323971,
+    'sens_microstrip_B_delay_to_er': 0.43497296010647435,
+    'env_microstrip_T_z0_min': 43.605023498395184,
+    'env_microstrip_T_z0_typ': 47.7807413868924,
+    'env_microstrip_T_z0_max': 52.380361854981416,
+    'env_microstrip_T_eeff_min': 3.3716945783472045,
+    'env_microstrip_T_eeff_typ': 3.4165954415370616,
+    'env_microstrip_T_eeff_max': 3.4612639152493214,
+    'env_microstrip_T_delay_min': 6.124962172612742,
+    'env_microstrip_T_delay_typ': 6.1656103587063855,
+    'env_microstrip_T_delay_max': 6.205783986990302,
+    'sens_microstrip_T_z0_to_w': -0.6032019834893494,
+    'sens_microstrip_T_eeff_to_w': 0.08630179604513388,
+    'sens_microstrip_T_delay_to_w': 0.04315089807807809,
+    'sens_microstrip_T_z0_to_t': -0.007207287211676323,
+    'sens_microstrip_T_eeff_to_t': 0.0010311667076041038,
+    'sens_microstrip_T_delay_to_t': 0.0005155833538020519,
+    'sens_microstrip_T_z0_to_h': 0.6104092704789811,
+    'sens_microstrip_T_eeff_to_h': -0.08733296286376029,
+    'sens_microstrip_T_delay_to_h': -0.04366648132085784,
+    'env_stripline_A_z0_min': 69.78363920890229,
+    'env_stripline_A_z0_typ': 76.13789681927459,
+    'env_stripline_A_z0_max': 83.22350800237076,
+    'env_stripline_A_eeff_min': 3.8,
+    'env_stripline_A_eeff_typ': 4.0,
+    'env_stripline_A_eeff_max': 4.2,
+    'env_stripline_A_delay_min': 6.502361273417335,
+    'env_stripline_A_delay_typ': 6.671281903963042,
+    'env_stripline_A_delay_max': 6.83602972157465,
+    'sens_stripline_A_z0_to_w': -0.4203718675488459,
+    'sens_stripline_A_eeff_to_w': 0.0,
+    'sens_stripline_A_delay_to_w': 0.0,
+    'sens_stripline_A_z0_to_b': 0.4203718675488459,
+    'sens_stripline_A_eeff_to_b': 0.0,
+    'sens_stripline_A_delay_to_b': 0.0,
+    'sens_stripline_A_z0_to_er': -0.5000000000831001,
+    'sens_stripline_A_eeff_to_er': 0.9999999999441556,
+    'sens_stripline_A_delay_to_er': 0.5000000000831001,
+    'env_stripline_T_z0_min': 44.97306723716016,
+    'env_stripline_T_z0_typ': 47.67343266844121,
+    'env_stripline_T_z0_max': 50.486018775857936,
+    'env_stripline_T_eeff_min': 4.0,
+    'env_stripline_T_eeff_typ': 4.0,
+    'env_stripline_T_eeff_max': 4.0,
+    'env_stripline_T_delay_min': 6.671281903963042,
+    'env_stripline_T_delay_typ': 6.671281903963042,
+    'env_stripline_T_delay_max': 6.671281903963042,
+    'sens_stripline_T_z0_to_w': -0.5165112349073602,
+    'sens_stripline_T_eeff_to_w': 0.0,
+    'sens_stripline_T_delay_to_w': 0.0,
+    'sens_stripline_T_z0_to_t': -0.04137723164208655,
+    'sens_stripline_T_eeff_to_t': 0.0,
+    'sens_stripline_T_delay_to_t': 0.0,
+    'env_coax_A_z0_min': 49.44204845644881,
+    'env_coax_A_z0_typ': 51.8334311769736,
+    'env_coax_A_z0_max': 54.309509362739746,
+    'env_coax_A_eeff_min': 2.037,
+    'env_coax_A_eeff_typ': 2.1,
+    'env_coax_A_eeff_max': 2.1630000000000003,
+    'env_coax_A_delay_min': 4.7607438118231284,
+    'env_coax_A_delay_typ': 4.833802972518221,
+    'env_coax_A_delay_max': 4.905774221510788,
+    'sens_coax_A_z0_to_D': 0.798235600084626,
+    'sens_coax_A_eeff_to_D': 0.0,
+    'sens_coax_A_delay_to_D': 0.0,
+    'sens_coax_A_z0_to_d': -0.798235600084626,
+    'sens_coax_A_eeff_to_d': 0.0,
+    'sens_coax_A_delay_to_d': 0.0,
+    'sens_coax_A_z0_to_er': -0.4999999998610555,
+    'sens_coax_A_eeff_to_er': 0.9999999999996667,
+    'sens_coax_A_delay_to_er': 0.4999999999720778,
+    'env_diffmicrostrip_A_zdiff_min': 108.07694242607919,
+    'env_diffmicrostrip_A_zdiff_typ': 118.02160904758887,
+    'env_diffmicrostrip_A_zdiff_max': 128.79010669034784,
+    'env_diffmicrostrip_A_zodd_min': 54.03847121303959,
+    'env_diffmicrostrip_A_zodd_typ': 59.010804523794434,
+    'env_diffmicrostrip_A_zodd_max': 64.39505334517392,
+    'env_diffmicrostrip_A_zeven_min': 88.94651019065338,
+    'env_diffmicrostrip_A_zeven_typ': 99.15389505939397,
+    'env_diffmicrostrip_A_zeven_max': 110.70410366315579,
+    'env_diffmicrostrip_A_eeodd_min': 2.70472170392945,
+    'env_diffmicrostrip_A_eeodd_typ': 2.843164005050705,
+    'env_diffmicrostrip_A_eeodd_max': 2.9891226335340786,
+    'env_diffmicrostrip_A_eeeven_min': 3.2056005464081476,
+    'env_diffmicrostrip_A_eeeven_typ': 3.389989324730745,
+    'env_diffmicrostrip_A_eeeven_max': 3.5791887604516415,
+    'env_diffmicrostrip_A_delayodd_min': 5.4858078306540605,
+    'env_diffmicrostrip_A_delayodd_typ': 5.624452497434126,
+    'env_diffmicrostrip_A_delayodd_max': 5.7670160965206545,
+    'env_diffmicrostrip_A_delayeven_min': 5.972195264428764,
+    'env_diffmicrostrip_A_delayeven_typ': 6.141556652985325,
+    'env_diffmicrostrip_A_delayeven_max': 6.310613737936271,
+    'sens_diffmicrostrip_A_zdiff_to_w': -0.37056580160934505,
+    'sens_diffmicrostrip_A_zodd_to_w': -0.37056580160934505,
+    'sens_diffmicrostrip_A_zeven_to_w': -0.4771840611665429,
+    'sens_diffmicrostrip_A_eeodd_to_w': 0.03527129299833944,
+    'sens_diffmicrostrip_A_eeeven_to_w': 0.0617660326235003,
+    'sens_diffmicrostrip_A_delayodd_to_w': 0.01763564649916972,
+    'sens_diffmicrostrip_A_delayeven_to_w': 0.030883016256238998,
+    'sens_diffmicrostrip_A_zdiff_to_s': 0.222693909540994,
+    'sens_diffmicrostrip_A_zodd_to_s': 0.222693909540994,
+    'sens_diffmicrostrip_A_zeven_to_s': -0.10137640505104867,
+    'sens_diffmicrostrip_A_eeodd_to_s': 0.02035999358050383,
+    'sens_diffmicrostrip_A_eeeven_to_s': 0.005545495507388562,
+    'sens_diffmicrostrip_A_delayodd_to_s': 0.010179996734740763,
+    'sens_diffmicrostrip_A_delayeven_to_s': 0.002772747809205432,
+    'sens_diffmicrostrip_A_zdiff_to_h': 0.14787189206835105,
+    'sens_diffmicrostrip_A_zodd_to_h': 0.14787189206835105,
+    'sens_diffmicrostrip_A_zeven_to_h': 0.5785604666616808,
+    'sens_diffmicrostrip_A_eeodd_to_h': -0.055631286689865576,
+    'sens_diffmicrostrip_A_eeeven_to_h': -0.06731152813088886,
+    'sens_diffmicrostrip_A_delayodd_to_h': -0.027815643566977393,
+    'sens_diffmicrostrip_A_delayeven_to_h': -0.03365576406544443,
+    'sens_diffmicrostrip_A_zdiff_to_er': -0.4159248727763061,
+    'sens_diffmicrostrip_A_zodd_to_er': -0.4159248727763061,
+    'sens_diffmicrostrip_A_zeven_to_er': -0.4499520467445932,
+    'sens_diffmicrostrip_A_eeodd_to_er': 0.8318497463297683,
+    'sens_diffmicrostrip_A_eeeven_to_er': 0.8999040941553202,
+    'sens_diffmicrostrip_A_delayodd_to_er': 0.415924873109373,
+    'sens_diffmicrostrip_A_delayeven_to_er': 0.4499520471886824,
+    'env_diffmicrostrip_B_zdiff_min': 115.49993174344655,
+    'env_diffmicrostrip_B_zdiff_typ': 120.0740517376708,
+    'env_diffmicrostrip_B_zdiff_max': 129.6474397533607,
+    'env_diffmicrostrip_B_zodd_min': 57.749965871723276,
+    'env_diffmicrostrip_B_zodd_typ': 60.0370258688354,
+    'env_diffmicrostrip_B_zodd_max': 64.82371987668034,
+    'env_diffmicrostrip_B_zeven_min': 78.40601663360736,
+    'env_diffmicrostrip_B_zeven_typ': 79.93914530291562,
+    'env_diffmicrostrip_B_zeven_max': 86.33018567976512,
+    'env_diffmicrostrip_B_eeodd_min': 2.9012148051529234,
+    'env_diffmicrostrip_B_eeodd_typ': 2.9411821308418906,
+    'env_diffmicrostrip_B_eeodd_max': 2.9623772745545383,
+    'env_diffmicrostrip_B_eeeven_min': 3.4258802708031237,
+    'env_diffmicrostrip_B_eeeven_typ': 3.4562985444371335,
+    'env_diffmicrostrip_B_eeeven_max': 3.4593274210583447,
+    'env_diffmicrostrip_B_delayodd_min': 5.681581483686551,
+    'env_diffmicrostrip_B_delayodd_typ': 5.720582542665678,
+    'env_diffmicrostrip_B_delayodd_max': 5.741157758314148,
+    'env_diffmicrostrip_B_delayeven_min': 6.1739824063096265,
+    'env_diffmicrostrip_B_delayeven_typ': 6.201331122594581,
+    'env_diffmicrostrip_B_delayeven_max': 6.204047750419388,
+    'sens_diffmicrostrip_B_zdiff_to_w': -0.4555729806852617,
+    'sens_diffmicrostrip_B_zodd_to_w': -0.4555729806852617,
+    'sens_diffmicrostrip_B_zeven_to_w': -0.5070071127511636,
+    'sens_diffmicrostrip_B_eeodd_to_w': 0.05806069225553688,
+    'sens_diffmicrostrip_B_eeeven_to_w': 0.07055215856164207,
+    'sens_diffmicrostrip_B_delayodd_to_w': 0.029030346016746138,
+    'sens_diffmicrostrip_B_delayeven_to_w': 0.035276079280821035,
+    'sens_diffmicrostrip_B_zdiff_to_s': 0.16567168037877925,
+    'sens_diffmicrostrip_B_zodd_to_s': 0.16567168037877925,
+    'sens_diffmicrostrip_B_zeven_to_s': -0.10686398077835252,
+    'sens_diffmicrostrip_B_eeodd_to_s': 0.03814879001685412,
+    'sens_diffmicrostrip_B_eeeven_to_s': -0.00650685316755923,
+    'sens_diffmicrostrip_B_delayodd_to_s': 0.01907439506393821,
+    'sens_diffmicrostrip_B_delayeven_to_s': -0.003253426750313069,
+    'env_diffstripline_A_zdiff_min': 88.05406098220409,
+    'env_diffstripline_A_zdiff_typ': 95.716581094326,
+    'env_diffstripline_A_zdiff_max': 103.83954960763691,
+    'env_diffstripline_A_zodd_min': 44.027030491102046,
+    'env_diffstripline_A_zodd_typ': 47.858290547163,
+    'env_diffstripline_A_zodd_max': 51.919774803818456,
+    'env_diffstripline_A_zeven_min': 69.29678133646647,
+    'env_diffstripline_A_zeven_typ': 77.81376508062841,
+    'env_diffstripline_A_zeven_max': 87.51241314430817,
+    'env_diffstripline_A_eeff_min': 3.8,
+    'env_diffstripline_A_eeff_typ': 4.0,
+    'env_diffstripline_A_eeff_max': 4.2,
+    'env_diffstripline_A_delay_min': 6.502361273417335,
+    'env_diffstripline_A_delay_typ': 6.671281903963042,
+    'env_diffstripline_A_delay_max': 6.83602972157465,
+    'sens_diffstripline_A_zdiff_to_w': -0.30488626246689243,
+    'sens_diffstripline_A_zodd_to_w': -0.30488626268893704,
+    'sens_diffstripline_A_zeven_to_w': -0.4957207573450502,
+    'sens_diffstripline_A_eeff_to_w': 0.0,
+    'sens_diffstripline_A_delay_to_w': 0.0,
+    'sens_diffstripline_A_zdiff_to_s': 0.23243878244986393,
+    'sens_diffstripline_A_zodd_to_s': 0.23243878244986393,
+    'sens_diffstripline_A_zeven_to_s': -0.11497149144139152,
+    'sens_diffstripline_A_eeff_to_s': 0.0,
+    'sens_diffstripline_A_delay_to_s': 0.0,
+    'sens_diffstripline_A_zdiff_to_b': 0.07244748001702847,
+    'sens_diffstripline_A_zodd_to_b': 0.07244748001702847,
+    'sens_diffstripline_A_zeven_to_b': 0.6106922487864418,
+    'sens_diffstripline_A_eeff_to_b': 0.0,
+    'sens_diffstripline_A_delay_to_b': 0.0,
+    'sens_diffstripline_A_zdiff_to_er': -0.5000000000831001,
+    'sens_diffstripline_A_zodd_to_er': -0.5000000000831001,
+    'sens_diffstripline_A_zeven_to_er': -0.5000000000831001,
+    'sens_diffstripline_A_eeff_to_er': 0.9999999999441556,
+    'sens_diffstripline_A_delay_to_er': 0.5000000000831001,
+    'env_cpw_A_z0_min': 73.19720637991114,
+    'env_cpw_A_z0_typ': 79.16161633302383,
+    'env_cpw_A_z0_max': 85.69100244528752,
+    'env_cpw_A_eeff_min': 2.619947013662751,
+    'env_cpw_A_eeff_typ': 2.7359398404753934,
+    'env_cpw_A_eeff_max': 2.851463893101115,
+    'env_cpw_A_delay_min': 5.3991519626783715,
+    'env_cpw_A_delay_typ': 5.5173758407999305,
+    'env_cpw_A_delay_max': 5.632656087933848,
+    'sens_cpw_A_z0_to_w': -0.2873993731964839,
+    'sens_cpw_A_eeff_to_w': -0.005165960104272998,
+    'sens_cpw_A_delay_to_w': -0.002582980052136499,
+    'sens_cpw_A_z0_to_s': 0.2924645405932406,
+    'sens_cpw_A_eeff_to_s': -0.004964374800262735,
+    'sens_cpw_A_delay_to_s': -0.002482187455642519,
+    'sens_cpw_A_z0_to_h': -0.005065167396756716,
+    'sens_cpw_A_eeff_to_h': 0.010130335126580339,
+    'sens_cpw_A_delay_to_h': 0.005065167618801321,
+    'sens_cpw_A_z0_to_er': -0.40788957013061217,
+    'sens_cpw_A_eeff_to_er': 0.8157791405942912,
+    'sens_cpw_A_delay_to_er': 0.40788957035265677,
+    'env_cpwg_A_z0_min': 50.700049281656185,
+    'env_cpwg_A_z0_typ': 56.4952723135648,
+    'env_cpwg_A_z0_max': 62.96761184706664,
+    'env_cpwg_A_eeff_min': 2.81098099525422,
+    'env_cpwg_A_eeff_typ': 3.00357976646107,
+    'env_cpwg_A_eeff_max': 3.205955428973829,
+    'env_cpwg_A_delay_min': 5.592529089718948,
+    'env_cpwg_A_delay_typ': 5.7809455935118645,
+    'env_cpwg_A_delay_max': 5.972525837326392,
+    'sens_cpwg_A_z0_to_w': -0.5420482876027368,
+    'sens_cpwg_A_eeff_to_w': 0.08372969939828577,
+    'sens_cpwg_A_delay_to_w': 0.04186484958812058,
+    'sens_cpwg_A_z0_to_s': 0.10028398511872834,
+    'sens_cpwg_A_eeff_to_s': 0.06301282795717582,
+    'sens_cpwg_A_delay_to_s': 0.03150641392307676,
+    'sens_cpwg_A_z0_to_h': 0.4417643024840085,
+    'sens_cpwg_A_eeff_to_h': -0.14674252724443929,
+    'sens_cpwg_A_delay_to_h': -0.07337126373324195,
+    'sens_cpwg_A_z0_to_er': -0.4377607134680364,
+    'sens_cpwg_A_eeff_to_er': 0.8755214270470951,
+    'sens_cpwg_A_delay_to_er': 0.4377607134680364,
+    'skin_depth_um_f1e+06Hz_rhoCu': 66.08549310080564,
+    'surface_resistance_mohm_f1e+06Hz_rhoCu': 0.26089506942234864,
+    'skin_depth_um_f1e+09Hz_rhoCu': 2.089806784938892,
+    'surface_resistance_mohm_f1e+09Hz_rhoCu': 8.250226496823718,
+    'skin_depth_um_f1e+10Hz_rhoCu': 0.6608549310080564,
+    'surface_resistance_mohm_f1e+10Hz_rhoCu': 26.089506942234866,
+    'skin_depth_um_f1e+09Hz_rho1.9e-08': 2.1937994947148303,
+    'surface_resistance_mohm_f1e+09Hz_rho1.9e-08': 8.66077325925804,
+    'loss_microstrip_A_f1e+09Hz_tand0.02_ad_dBpm': 2.7494952405804702,
+    'loss_microstrip_A_f1e+09Hz_tand0.02_ac_dBpm': 1.5868259635257853,
+    'loss_microstrip_A_f1e+09Hz_tand0.02_total_dBpm': 4.336321204106255,
+    'loss_microstrip_A_f1e+09Hz_tand0.02_total_dB_len100mm': 0.43363212041062554,
+    'loss_microstrip_B_f5e+09Hz_tand0.004_ad_dBpm': 2.9446304525755522,
+    'loss_microstrip_B_f5e+09Hz_tand0.004_ac_dBpm': 11.278614584443273,
+    'loss_microstrip_B_f5e+09Hz_tand0.004_total_dBpm': 14.223245037018826,
+    'loss_microstrip_B_f5e+09Hz_tand0.004_total_dB_len250mm': 3.5558112592547064,
+    'loss_stripline_A_f2.5e+09Hz_tand0.01_ad_dBpm': 4.551069639790075,
+    'loss_stripline_A_f2.5e+09Hz_tand0.01_ad_dB_len50mm': 0.22755348198950376,
+    'loss_coax_A_f1e+08Hz_tand0.0003_ad_dBpm': 0.003957075884900558,
+    'loss_coax_A_f1e+08Hz_tand0.0003_ac_dBpm': 0.08946122097452713,
+    'loss_coax_A_f1e+08Hz_tand0.0003_total_dBpm': 0.0934182968594277,
+    'loss_coax_A_f1e+08Hz_tand0.0003_total_dB_len1000mm': 0.09341829685942771,
+    'loss_coax_B_f2e+09Hz_tand0.001_ad_dBpm': 0.2730641783874045,
+    'loss_coax_B_f2e+09Hz_tand0.001_ac_dBpm': 0.34286124792373796,
+    'loss_coax_B_f2e+09Hz_tand0.001_total_dBpm': 0.6159254263111424,
+    'loss_coax_B_f2e+09Hz_tand0.001_total_dB_len300mm': 0.18477762789334273,
+    'loss_diffmicrostrip_A_f3e+09Hz_tand0.015_ad_odd_dBpm': 5.756565947708891,
+    'loss_diffmicrostrip_A_f3e+09Hz_tand0.015_ad_even_dBpm': 6.835924472842615,
+    'loss_diffstripline_A_f1e+09Hz_tand0.01_ad_dBpm': 1.8204278559160303,
+    'loss_diffstripline_A_f1e+09Hz_tand0.01_ad_dB_len100mm': 0.18204278559160303,
+    'loss_cpw_A_f2e+09Hz_tand0.02_ad_dBpm': 4.912802848323813,
+    'loss_cpw_A_f2e+09Hz_tand0.02_ad_dB_len80mm': 0.3930242278659051,
+    'loss_cpwg_A_f4e+09Hz_tand0.018_ad_dBpm': 9.944027975776528,
+    'loss_cpwg_A_f4e+09Hz_tand0.018_ad_dB_len60mm': 0.5966416785465918,
+    'qw_length_mm_ee2.967_f5e+09Hz': 8.70225758365668,
+    'qw_length_mm_ee3.2_f1e+09Hz': 41.89726970185942,
+    'qw_length_mm_ee4.4_f2.5e+08Hz': 142.92044662049025,
+    'qw_length_mm_ee1_f2.4e+09Hz': 31.228381041666665,
+    'qw_freespace_length_mm_f2.5e+08Hz': 299.792458,
+    'qw_freespace_length_mm_f1e+09Hz': 74.9481145,
+    'qw_freespace_length_mm_f2.4e+09Hz': 31.228381041666665,
+    'qw_freespace_length_mm_f5e+09Hz': 14.989622899999999,
+    'qw_freq_GHz_ee2.967_L8mm': 5.438910989785425,
+    'qw_freq_GHz_ee3.2_L30mm': 1.3965756567286471,
+    'qw_freq_GHz_ee4.4_L150mm': 0.2382007443674837,
+}
+PINNED.update(PINNED_D)
+
+
 def pinned_vectors():
-    return [(n, got, PINNED[n], tol, ids, note) for n, got, tol, ids, note in vectors() + part_b_vectors() + part_c_vectors()]
+    return [(n, got, PINNED[n], tol, ids, note) for n, got, tol, ids, note in vectors() + part_b_vectors() + part_c_vectors() + part_d_vectors()]
 
 
 def self_checks():
@@ -1095,9 +1409,299 @@ def part_c_self_checks():
             prev = z
 
 
+# =====================================================================================================================
+# Phase 2 core D: tolerance envelope and sensitivity (corner evaluation through the model functions above), approximate loss
+# estimate (S-029d, S-029e, S-029f) and the quarter-wave helper (S-029c). Independent of src/. The loss and quarter-wave
+# formulas are written here from the equations recorded in docs/sources/notes/impedance-presets-and-data.md:
+#   delta = sqrt(rho / (pi f mu0)) (S-013), Rs = rho / delta
+#   microstrip alpha_c = Rs / (Z0 w) Np/m (S-029f: wide strip, smooth copper; strip plus ground each about Rs/w)
+#   coax R' = Rs/(2 pi) (1/a + 1/b), alpha_c = R'/(2 Z0) (S-029d, S-029f: Ellingson R' = 1/(2 pi a delta sigma) + 1/(2 pi b delta sigma))
+#   alpha_d = (omega/c) tan(delta) er (ee - 1) / (2 sqrt(ee) (er - 1)) Np/m (S-029e, Steer eq. 26); er = 1 has no dielectric: 0
+#   dB = 20 log10(e) x Np
+#   quarter wave: L = c / (4 f sqrt(ee)); f = c / (4 L sqrt(ee)) (S-029c, derived from S-029a)
+# None of this verifies a ledger row. The envelope minimum and maximum are taken over the 2^k corners of the tolerance box and the
+# nominal point; each case is checked here to be monotone along every tolerated axis, so the corners hold the true extremes.
+# =====================================================================================================================
+import itertools
+
+RHO_CU = 1.0 / 58e6            # S-004 (IACS), the default conductor resistivity
+NP_TO_DB = 20.0 * math.log10(math.e)   # 8.685889638...
+
+
+def skin_depth_m(f, rho=RHO_CU):
+    return math.sqrt(rho / (math.pi * f * MU0))
+
+
+def surface_resistance_ohm(f, rho=RHO_CU):
+    return rho / skin_depth_m(f, rho)
+
+
+def alpha_d_np_per_m(f, er, ee, tand):
+    if er == 1.0:
+        return 0.0
+    return (2.0 * math.pi * f / C0) * tand * er * (ee - 1.0) / (2.0 * math.sqrt(ee) * (er - 1.0))
+
+
+def alpha_c_microstrip_np_per_m(f, z0, w_m, rho=RHO_CU):
+    return surface_resistance_ohm(f, rho) / (z0 * w_m)
+
+
+def alpha_c_coax_np_per_m(f, z0, D_m, d_m, rho=RHO_CU):
+    rp = surface_resistance_ohm(f, rho) / (2.0 * math.pi) * (1.0 / (d_m / 2.0) + 1.0 / (D_m / 2.0))
+    return rp / (2.0 * z0)
+
+
+def qw_length_m(ee, f):
+    return C0 / (4.0 * f * math.sqrt(ee))
+
+
+def qw_frequency_hz(ee, length_m):
+    return C0 / (4.0 * length_m * math.sqrt(ee))
+
+
+def _delay_ps_mm(ee):
+    return delay_ps_per_mm(ee)
+
+
+# ---- model closures: params in um (er dimensionless) -> dict of the outputs the calculators envelope ----
+def _m_microstrip(p):
+    u = p["w"] / p["h"]
+    return {"z0": ms_z0(u, p["er"]), "eeff": ms_ee(u, p["er"]), "delay": _delay_ps_mm(ms_ee(u, p["er"]))}
+
+
+def _m_microstrip_thickB(p):
+    z, e = ms_thick_B(p["w"] / p["h"], p["t"] / p["h"], p["er"])
+    return {"z0": z, "eeff": e, "delay": _delay_ps_mm(e)}
+
+
+def _m_stripline(p):
+    return {"z0": sl_z0(p["w"] / p["b"], p["er"]), "eeff": p["er"], "delay": _delay_ps_mm(p["er"])}
+
+
+def _m_stripline_cohn(p):
+    return {"z0": sl_cohn_wide(p["w"] / p["b"], p["t"] / p["b"], p["er"]), "eeff": p["er"], "delay": _delay_ps_mm(p["er"])}
+
+
+def _m_coax(p):
+    return {"z0": coax_z0(p["D"] / p["d"], p["er"]), "eeff": p["er"], "delay": _delay_ps_mm(p["er"])}
+
+
+def _m_diffms(p):
+    m = cm_modes(p["w"] / p["h"], p["s"] / p["h"], p["er"])
+    return {"zdiff": 2.0 * m["z0o"], "zodd": m["z0o"], "zeven": m["z0e"], "eeodd": m["ee_o"], "eeeven": m["ee_e"],
+            "delayodd": _delay_ps_mm(m["ee_o"]), "delayeven": _delay_ps_mm(m["ee_e"])}
+
+
+def _m_diffsl(p):
+    x, y = p["w"] / p["b"], p["s"] / p["b"]
+    zo, ze = sc_z0o(x, y, p["er"]), sc_z0e(x, y, p["er"])
+    return {"zdiff": 2.0 * zo, "zodd": zo, "zeven": ze, "eeff": p["er"], "delay": _delay_ps_mm(p["er"])}
+
+
+def _m_cpw(p):
+    m = cpw_model(p["w"], p["s"], p["h"], p["er"])
+    return {"z0": m["z0"], "eeff": m["ee"], "delay": _delay_ps_mm(m["ee"])}
+
+
+def _m_cpwg(p):
+    m = cpwg_model(p["w"], p["s"], p["h"], p["er"])
+    return {"z0": m["z0"], "eeff": m["ee"], "delay": _delay_ps_mm(m["ee"])}
+
+
+# (calc, tag, model, params, {input: (minus, plus)}); tolerances are fractions of the nominal
+ENV_CASES = [
+    ("microstrip", "A", _m_microstrip, {"w": 300, "h": 150, "er": 4.2}, {"w": (0.1, 0.1), "h": (0.05, 0.05), "er": (0.05, 0.05)}),
+    ("microstrip", "B", _m_microstrip, {"w": 600, "h": 635, "er": 4.1}, {"w": (0.2, 0.05), "er": (0.0, 0.1)}),
+    ("microstrip", "T", _m_microstrip_thickB, {"w": 3150, "h": 1575, "t": 35, "er": 4.5}, {"w": (0.1, 0.1), "t": (0.1, 0.1), "h": (0.05, 0.05)}),
+    ("stripline", "A", _m_stripline, {"w": 200, "b": 1000, "er": 4.0}, {"w": (0.1, 0.1), "b": (0.05, 0.05), "er": (0.05, 0.05)}),
+    ("stripline", "T", _m_stripline_cohn, {"w": 500, "b": 1000, "t": 20, "er": 4.0}, {"w": (0.1, 0.1), "t": (0.1, 0.2)}),
+    ("coax", "A", _m_coax, {"D": 3.5, "d": 1.0, "er": 2.1}, {"D": (0.02, 0.02), "d": (0.02, 0.02), "er": (0.03, 0.03)}),
+    ("diffmicrostrip", "A", _m_diffms, {"w": 150, "s": 100, "h": 200, "er": 4.5}, {"w": (0.1, 0.1), "s": (0.1, 0.1), "h": (0.05, 0.05), "er": (0.05, 0.05)}),
+    ("diffmicrostrip", "B", _m_diffms, {"w": 200, "s": 200, "h": 200, "er": 4.5}, {"w": (0.1, 0.0), "s": (0.2, 0.2)}),
+    ("diffstripline", "A", _m_diffsl, {"w": 300, "s": 200, "b": 1000, "er": 4.0}, {"w": (0.1, 0.1), "s": (0.1, 0.1), "b": (0.05, 0.05), "er": (0.05, 0.05)}),
+    ("cpw", "A", _m_cpw, {"w": 300, "s": 200, "h": 1600, "er": 4.5}, {"w": (0.1, 0.1), "s": (0.1, 0.1), "h": (0.05, 0.05), "er": (0.05, 0.05)}),
+    ("cpwg", "A", _m_cpwg, {"w": 300, "s": 200, "h": 200, "er": 4.2}, {"w": (0.1, 0.1), "s": (0.1, 0.1), "h": (0.05, 0.05), "er": (0.05, 0.05)}),
+]
+
+ENV_IDS = {
+    "microstrip": ("S-020", "S-013", "S-029", "S-029a"), "stripline": ("S-021", "S-013", "S-029", "S-029a"),
+    "coax": ("S-024", "S-013", "S-029", "S-029a"), "diffmicrostrip": DM_IDS, "diffstripline": DS_IDS,
+    "cpw": CPW_IDS, "cpwg": CPWG_IDS,
+}
+ENV_IDS_T = {"microstrip": ("S-020", "S-020a", "S-013", "S-029", "S-029a"), "stripline": ("S-021", "S-021a", "S-013", "S-029", "S-029a")}
+
+
+def env_tag(calc, tag):
+    return "%s_%s" % (calc, tag)
+
+
+def env_extremes(model, params, tols):
+    """(min, typ, max) per output over the nominal point and the 2^k corners of the tolerance box."""
+    keys = [k for k, (m, p) in tols.items() if m > 0 or p > 0]
+    nom = model(params)
+    lo, hi = dict(nom), dict(nom)
+    for signs in itertools.product((0, 1), repeat=len(keys)):
+        q = dict(params)
+        for k, sg in zip(keys, signs):
+            m, p = tols[k]
+            q[k] = params[k] * ((1.0 + p) if sg else (1.0 - m))
+        v = model(q)
+        for o in v:
+            lo[o], hi[o] = min(lo[o], v[o]), max(hi[o], v[o])
+    return lo, nom, hi
+
+
+def env_sensitivity(model, params, key, output, h=1e-6):
+    """d ln(output) / d ln(input), central difference in ln space, step 1e-6 (the app uses 1e-4; they agree to about 1e-8)."""
+    a, b = dict(params), dict(params)
+    a[key] = params[key] * (1.0 + h)
+    b[key] = params[key] * (1.0 - h)
+    return (math.log(model(a)[output]) - math.log(model(b)[output])) / (math.log(1.0 + h) - math.log(1.0 - h))
+
+
+ENV_NOTE = ("envelope min/typ/max over the corners of the tolerance box through the oracle's own model function (recorded formula, not the paper); "
+            "tolerances are TEST values; delay in ps/mm")
+SENS_NOTE = "S = d ln(out)/d ln(in), central difference in ln space, step 1e-6 in the oracle (the app uses 1e-4, relative agreement about 1e-8)"
+
+# loss cases: (calc, tag, params um (coax: mm), f Hz, tan delta, rho or None, length mm)
+LOSS_CASES = [
+    ("microstrip", "A", {"w": 600, "h": 635, "er": 4.1}, 1e9, 0.02, None, 100.0),
+    ("microstrip", "B", {"w": 300, "h": 150, "er": 4.2}, 5e9, 0.004, 1.9e-8, 250.0),
+    ("stripline", "A", {"w": 200, "b": 1000, "er": 4.0}, 2.5e9, 0.01, None, 50.0),
+    ("coax", "A", {"D": 3.5, "d": 1.0, "er": 2.1}, 1e8, 0.0003, None, 1000.0),
+    ("coax", "B", {"D": 4.6, "d": 1.5, "er": 2.25}, 2e9, 0.001, 2.0e-8, 300.0),
+    ("diffmicrostrip", "A", {"w": 150, "s": 100, "h": 200, "er": 4.5}, 3e9, 0.015, None, 100.0),
+    ("diffstripline", "A", {"w": 300, "s": 200, "b": 1000, "er": 4.0}, 1e9, 0.01, None, 100.0),
+    ("cpw", "A", {"w": 300, "s": 200, "h": 1600, "er": 4.5}, 2e9, 0.02, None, 80.0),
+    ("cpwg", "A", {"w": 300, "s": 200, "h": 200, "er": 4.2}, 4e9, 0.018, None, 60.0),
+]
+LOSS_IDS_BASE = ("S-029d", "S-029e", "S-029f", "S-013", "S-004")
+QW_EE_F = [(2.967, 5e9), (3.2, 1e9), (4.4, 250e6), (1.0, 2.4e9)]
+QW_EE_L = [(2.967, 8.0), (3.2, 30.0), (4.4, 150.0)]       # eps_eff, length mm
+SKIN_CASES = [(1e6, None), (1e9, None), (1e10, None), (1e9, 1.9e-8)]
+QW_IDS = ("S-029", "S-029a", "S-029c")
+SKIN_IDS = ("S-013", "S-004")
+
+
+def loss_values(calc, params, f, tand, rho):
+    """Returns the dB/m values of one loss case. Conductor loss only for microstrip and coax (S-029f)."""
+    r = RHO_CU if rho is None else rho
+    out = {}
+    if calc == "microstrip":
+        u = params["w"] / params["h"]
+        z0, ee, er = ms_z0(u, params["er"]), ms_ee(u, params["er"]), params["er"]
+        out["ad"] = alpha_d_np_per_m(f, er, ee, tand) * NP_TO_DB
+        out["ac"] = alpha_c_microstrip_np_per_m(f, z0, params["w"] * 1e-6, r) * NP_TO_DB
+    elif calc == "stripline":
+        er = params["er"]
+        out["ad"] = alpha_d_np_per_m(f, er, er, tand) * NP_TO_DB
+    elif calc == "coax":
+        er = params["er"]
+        z0 = coax_z0(params["D"] / params["d"], er)
+        out["ad"] = alpha_d_np_per_m(f, er, er, tand) * NP_TO_DB
+        out["ac"] = alpha_c_coax_np_per_m(f, z0, params["D"] * 1e-3, params["d"] * 1e-3, r) * NP_TO_DB
+    elif calc == "diffmicrostrip":
+        m = cm_modes(params["w"] / params["h"], params["s"] / params["h"], params["er"])
+        out["ad_odd"] = alpha_d_np_per_m(f, params["er"], m["ee_o"], tand) * NP_TO_DB
+        out["ad_even"] = alpha_d_np_per_m(f, params["er"], m["ee_e"], tand) * NP_TO_DB
+    elif calc == "diffstripline":
+        out["ad"] = alpha_d_np_per_m(f, params["er"], params["er"], tand) * NP_TO_DB
+    elif calc == "cpw":
+        m = cpw_model(params["w"], params["s"], params["h"], params["er"])
+        out["ad"] = alpha_d_np_per_m(f, params["er"], m["ee"], tand) * NP_TO_DB
+    elif calc == "cpwg":
+        m = cpwg_model(params["w"], params["s"], params["h"], params["er"])
+        out["ad"] = alpha_d_np_per_m(f, params["er"], m["ee"], tand) * NP_TO_DB
+    return out
+
+
+def _loss_tag(calc, tag, f, tand):
+    return "%s_%s_f%sHz_tand%s" % (calc, tag, _g(f), _g(tand))
+
+
+def part_d_vectors():
+    out = []
+    # ---- envelope and sensitivity ----
+    for calc, tag, model, params, tols in ENV_CASES:
+        ids = ENV_IDS_T[calc] if tag == "T" else ENV_IDS[calc]
+        lo, nom, hi = env_extremes(model, params, tols)
+        t = env_tag(calc, tag)
+        for o in nom:
+            out.append(("env_%s_%s_min" % (t, o), lo[o], RTOL, ids, ENV_NOTE))
+            out.append(("env_%s_%s_typ" % (t, o), nom[o], RTOL, ids, ENV_NOTE))
+            out.append(("env_%s_%s_max" % (t, o), hi[o], RTOL, ids, ENV_NOTE))
+        for k in tols:
+            for o in nom:
+                s = env_sensitivity(model, params, k, o)
+                out.append(("sens_%s_%s_to_%s" % (t, o, k), s, 1e-6, ids, SENS_NOTE))
+    # ---- skin depth and surface resistance ----
+    for f, rho in SKIN_CASES:
+        t = "f%sHz_rho%s" % (_g(f), "Cu" if rho is None else _g(rho))
+        out.append(("skin_depth_um_" + t, skin_depth_m(f, rho or RHO_CU) * 1e6, RTOL, SKIN_IDS, "delta = sqrt(rho/(pi f mu0)) (S-013); micrometres"))
+        out.append(("surface_resistance_mohm_" + t, surface_resistance_ohm(f, rho or RHO_CU) * 1e3, RTOL, SKIN_IDS, "Rs = rho/delta (S-029f); milliohm per square"))
+    # ---- loss ----
+    lnote = "approximate estimate, lower bound for rough copper, no roughness, no dispersion; dB per metre; formulas recorded in S-029d/e/f"
+    for calc, tag, params, f, tand, rho, length_mm in LOSS_CASES:
+        v = loss_values(calc, params, f, tand, rho)
+        t = _loss_tag(calc, tag, f, tand)
+        for k, x in v.items():
+            out.append(("loss_%s_%s_dBpm" % (t, k), x, RTOL, LOSS_IDS_BASE, lnote))
+        if "ad" in v and "ac" in v:
+            out.append(("loss_%s_total_dBpm" % t, v["ad"] + v["ac"], RTOL, LOSS_IDS_BASE, "alpha_d + alpha_c, dB per metre (S-029d)"))
+            out.append(("loss_%s_total_dB_len%smm" % (t, _g(length_mm)), (v["ad"] + v["ac"]) * length_mm * 1e-3, RTOL, LOSS_IDS_BASE, "total dB over the length"))
+        elif "ad" in v:
+            out.append(("loss_%s_ad_dB_len%smm" % (t, _g(length_mm)), v["ad"] * length_mm * 1e-3, RTOL, LOSS_IDS_BASE, "dielectric dB over the length"))
+    # ---- quarter wave ----
+    for ee, f in QW_EE_F:
+        t = "ee%s_f%sHz" % (_g(ee), _g(f))
+        out.append(("qw_length_mm_" + t, qw_length_m(ee, f) * 1e3, RTOL, QW_IDS, "L = c/(4 f sqrt(ee)) (S-029c derived from S-029a); millimetres"))
+    for f in sorted(set(f for _, f in QW_EE_F)):
+        out.append(("qw_freespace_length_mm_f%sHz" % _g(f), C0 / (4.0 * f) * 1e3, RTOL, QW_IDS, "free-space lambda0/4 = c/(4 f), for comparison only, NOT a stub or antenna length"))
+    for ee, length in QW_EE_L:
+        out.append(("qw_freq_GHz_ee%s_L%smm" % (_g(ee), _g(length)), qw_frequency_hz(ee, length * 1e-3) / 1e9, RTOL, QW_IDS, "f = c/(4 L sqrt(ee)) (S-029c); GHz"))
+    return out
+
+
+def part_d_self_checks():
+    """Oracle self-consistency for part D (raises AssertionError). Not a verification of any standard."""
+    # every envelope case is monotone along each tolerated axis (so the corners hold the extremes), 9 points per axis
+    for calc, tag, model, params, tols in ENV_CASES:
+        for k, (m, p) in tols.items():
+            if m == 0 and p == 0:
+                continue
+            xs = [params[k] * (1.0 - m + (m + p) * i / 8.0) for i in range(9)]
+            vals = []
+            for x in xs:
+                q = dict(params)
+                q[k] = x
+                vals.append(model(q))
+            for o in vals[0]:
+                seq = [v[o] for v in vals]
+                up = all(b >= a - 1e-12 * abs(a) for a, b in zip(seq, seq[1:]))
+                dn = all(b <= a + 1e-12 * abs(a) for a, b in zip(seq, seq[1:]))
+                assert up or dn, (calc, tag, k, o, seq)
+    # coax closed form: S = 1/ln(D/d) for D, -1/ln(D/d) for d, -1/2 for er
+    p = {"D": 3.5, "d": 1.0, "er": 2.1}
+    s = 1.0 / math.log(3.5)
+    assert abs(env_sensitivity(_m_coax, p, "D", "z0") - s) < 1e-9
+    assert abs(env_sensitivity(_m_coax, p, "d", "z0") + s) < 1e-9
+    assert abs(env_sensitivity(_m_coax, p, "er", "z0") + 0.5) < 1e-9
+    # copper at 1 GHz: delta 2.08981 um and Rs 8.2502 mohm (researcher figures in S-029f)
+    assert abs(skin_depth_m(1e9) * 1e6 - 2.08981) < 5e-5
+    assert abs(surface_resistance_ohm(1e9) * 1e3 - 8.2502) < 5e-4
+    # researcher example of S-029e: er 4.1, ee 2.9671, tan delta 0.02, 1 GHz -> 0.31655 Np/m = 2.7495 dB/m
+    a = alpha_d_np_per_m(1e9, 4.1, 2.9671, 0.02)
+    assert abs(a - 0.31655) < 5e-5 and abs(a * NP_TO_DB - 2.7495) < 5e-4
+    # homogeneous limit: alpha_d = pi f sqrt(er) tan delta / c
+    assert abs(alpha_d_np_per_m(1e9, 4.0, 4.0, 0.01) - math.pi * 1e9 * 2.0 * 0.01 / C0) < 1e-12
+    # quarter wave, free space at 1 GHz: 74.948 mm
+    assert abs(qw_length_m(1.0, 1e9) * 1e3 - 74.9481145) < 1e-6
+
+
 if __name__ == "__main__":
     self_checks()
     part_b_self_checks()
     part_c_self_checks()
+    part_d_self_checks()
     for name, got, tol, ids, note in vectors():
         print("%-70s %.17g" % (name, got))

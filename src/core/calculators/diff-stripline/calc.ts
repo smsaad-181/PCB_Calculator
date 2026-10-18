@@ -5,7 +5,13 @@ import { brent } from '../../solvers/rootfind';
 import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import { FINITE_THICKNESS_MESSAGE, SOLVE_CAUTION, num, suffixDelay } from '../diff-shared';
+import { impField, runEnvelope, solvedMessage, unusedMessage } from '../impedance-envelope';
+import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
+import type { LossInputs } from '../impedance-shared';
+import { lossBlock, mergeLoss } from '../loss-shared';
+import { hasTolerances } from '../tolerance-shared';
+import type { OutputPlan } from '../tolerance-shared';
 import { z0ZeroThickness } from '../stripline/calc';
 import { validate } from './guards';
 import { meta } from './meta';
@@ -15,7 +21,7 @@ import { meta } from './meta';
  * Analysis: width and edgeSpacing. Spacing solve: targetZdiff and width. Width solve: targetZdiff and edgeSpacing.
  * planeSpacing is b (plane to plane); edgeSpacing is the edge-to-edge gap s of the pair.
  */
-export interface Inputs {
+export interface Inputs extends LossInputs, EnvelopeInputs {
   width?: Quantity;
   edgeSpacing?: Quantity;
   targetZdiff?: Quantity;
@@ -59,7 +65,7 @@ function failure(code: CalcError['code'], field: string, message: string): CalcO
   return { ok: false, error: { code, field, message } };
 }
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -226,7 +232,9 @@ function build(raw: unknown): CalcOutcome {
     ...delay.assumptions,
     'The intra-pair skew uses the homogeneous eps_eff = er.',
   ];
-  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds];
+  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds, ...extraLedgerIds];
+  const loss = lossBlock({ common: inp.common, er, modes: [{ suffix: '', epsEff: er }], conductor: { kind: 'not-modelled', geometry: 'edge-coupled stripline pair' } });
+  const lossDefaults = mergeLoss(loss, { inputs, steps, results, validityChecks, warnings, outOfRange, assumptions, ledgerIds });
   return assemble({
     method: meta.method,
     standard: meta.reference.standard,
@@ -241,13 +249,39 @@ function build(raw: unknown): CalcOutcome {
     validityChecks,
     warnings,
     outOfRange,
+    defaultedExtra: lossDefaults,
   });
+}
+
+const ENVELOPE_OUTPUTS: readonly OutputPlan[] = [
+  { name: 'differential impedance Zdiff', sensitivity: true },
+  { name: 'odd-mode impedance Zodd', sensitivity: true },
+  { name: 'even-mode impedance Zeven', sensitivity: true },
+  { name: 'effective permittivity', sensitivity: true, onlyIfVaries: true },
+  { name: 'delay per length', sensitivity: true, onlyIfVaries: true },
+];
+
+/** Nominal result plus the tolerance envelope and sensitivities (core D). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const geo = inp.geometry;
+  const fields: ImpField[] = [
+    impField('width', 'width', 'width', geo.width !== undefined, solvedMessage('the width'), 'traceWidth'),
+    impField('edgeSpacing', 'edgeSpacing', 'edge spacing', geo.edgeSpacing !== undefined, solvedMessage('the edge spacing'), 'traceSpace'),
+    impField('planeSpacing', 'planeSpacing', 'plane spacing', true, ''),
+    impField('er', 'er', 'er', true, ''),
+    impField('thickness', 'thickness', 'thickness', false, inp.thickness === undefined ? 'thickness tolerance needs a thickness; none was given.' : unusedMessage('the thickness', 'the coupled model does not use it (finite thickness is not modelled).')),
+  ];
+  const results = { 'edge spacing for target Zdiff': 'edgeSpacing', 'strip width for target Zdiff': 'width' };
+  return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZdiff', results } });
 }
 
 /** Edge-coupled stripline Zdiff, Zodd, Zeven, Zcommon and delay, or the spacing / width for a target Zdiff. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

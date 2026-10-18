@@ -151,7 +151,7 @@ describe('invariants', () => {
     expect(r.inputs.find((i) => i.name === 'plating thickness tolerance (+)')?.value.si).toBe(0.1);
     expect(r.inputs.some((i) => i.source === 'fab-profile')).toBe(false);
     expect(r.assumptions.join('\n')).toMatch(/plating thickness: -20 % \/ \+10 %/);
-    expect(warningText(r)).toMatch(/worst-case corner range/);
+    expect(warningText(r)).toMatch(/tolerance-corner range/);
     expect(r.fabProfile).toBeUndefined();
   });
   it('a plating minus tolerance past the hole size is not special-cased; the corner is computed and a thick-plating corner can exceed d (warning kept)', () => {

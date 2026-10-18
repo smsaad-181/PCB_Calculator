@@ -2,12 +2,19 @@ import { Z_PREFACTOR_OHM } from '../../data/constants';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from '../../result';
 import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
+import type { OutOfRangeInput } from '../../confidence';
+import { impField, runEnvelope, solvedMessage } from '../impedance-envelope';
+import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless } from '../impedance-shared';
+import type { LossInputs } from '../impedance-shared';
+import { lossBlock, mergeLoss } from '../loss-shared';
+import { hasTolerances } from '../tolerance-shared';
+import type { OutputPlan } from '../tolerance-shared';
 import { validate } from './guards';
 import { meta } from './meta';
 
 /** Public input shape. Analysis: both diameters. Solve: targetZ0 and exactly one diameter. er is a dimensionless Quantity. */
-export interface Inputs {
+export interface Inputs extends LossInputs, EnvelopeInputs {
   outerDiameter?: Quantity;
   innerDiameter?: Quantity;
   targetZ0?: Quantity;
@@ -35,7 +42,7 @@ const TEM_MESSAGE =
 const num = (x: number): string => String(Number(x.toPrecision(5)));
 const failure = (code: CalcError['code'], field: string, message: string): CalcOutcome => ({ ok: false, error: { code, field, message } });
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -105,27 +112,52 @@ function build(raw: unknown): CalcOutcome {
     'Accuracy: the formula is exact for the ideal geometry (Steer: "Exact"); real cables differ through eccentricity, dielectric inhomogeneity and surface condition, none of which is modelled. er is the value you entered and has not been checked against the manufacturer.',
     ...delay.assumptions,
   ];
+  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds, ...extraLedgerIds];
+  const outOfRange: OutOfRangeInput[] = [];
+  const loss = lossBlock({ common: inp.common, er, modes: [{ suffix: '', epsEff: er }], conductor: { kind: 'coax', outer: D, inner: d, z0 } });
+  const lossDefaults = mergeLoss(loss, { inputs, steps, results, validityChecks, warnings, outOfRange, assumptions, ledgerIds });
   return assemble({
     method: meta.method,
     standard: meta.reference.standard,
     edition: meta.reference.edition,
     formula: meta.formula,
     accuracyClass: meta.accuracyClass,
-    ledgerIds: [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds],
+    ledgerIds,
     inputs,
     assumptions,
     steps,
     results,
     validityChecks,
     warnings,
-    outOfRange: [],
+    outOfRange,
+    defaultedExtra: lossDefaults,
   });
+}
+
+const ENVELOPE_OUTPUTS: readonly OutputPlan[] = [
+  { name: 'characteristic impedance Z0', sensitivity: true },
+  { name: 'effective permittivity', sensitivity: true, onlyIfVaries: true },
+  { name: 'delay per length', sensitivity: true, onlyIfVaries: true },
+];
+
+/** Nominal result plus the tolerance envelope and sensitivities (core D). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const fields: ImpField[] = [
+    impField('outerDiameter', 'outerDiameter', 'outer diameter', inp.outerDiameter !== undefined, solvedMessage('the outer diameter')),
+    impField('innerDiameter', 'innerDiameter', 'inner diameter', inp.innerDiameter !== undefined, solvedMessage('the inner diameter')),
+    impField('er', 'er', 'er', true, ''),
+  ];
+  const results = { 'outer diameter for target Z0': 'outerDiameter', 'inner diameter for target Z0': 'innerDiameter' };
+  return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZ0', results } });
 }
 
 /** Coax Z0, delay and guided wavelength, or a diameter for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

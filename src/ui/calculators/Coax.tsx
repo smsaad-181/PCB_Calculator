@@ -1,9 +1,11 @@
 import { useMemo } from 'preact/hooks';
 import { ErFields, ImpedanceResults, Q, SolveChoice, UnitsChoice } from '../components/ImpedanceCommon';
+import { ExtSections } from '../components/ImpedanceExt';
 import { NoticeBanner } from '../components/NoticeBanner';
 import { ResetButton } from '../components/ResetButton';
+import { useToday } from '../hooks';
 import { useCalcState } from '../useCalcState';
-import { CALCULATOR_ID, DEFAULT_STATE, FIELD, PAGE_INTRO, SOLVE_OPTIONS, computeView, fromHashState, liveSummary, toHashState, type CoaxState, type SolveFor } from './coax.vm';
+import { CALCULATOR_ID, DEFAULT_STATE, FIELD, PAGE_INTRO, SOLVE_OPTIONS, computeView, extForm, fromHashState, liveSummary, toHashState, type CoaxState, type SolveFor } from './coax.vm';
 
 export default function Coax() {
   const { state, applied, pending, notices, setNotices, patch, reset } = useCalcState<CoaxState>({
@@ -12,7 +14,8 @@ export default function Coax() {
     fromHash: fromHashState,
     toHash: toHashState,
   });
-  const view = useMemo(() => computeView(applied), [applied]);
+  const today = useToday();
+  const view = useMemo(() => computeView(applied, today), [applied, today]);
   const fe = 'fieldErrors' in view ? view.fieldErrors : {};
   const needsTarget = state.solveFor !== 'z0';
   const needsOuter = state.solveFor !== 'outer';
@@ -115,6 +118,7 @@ export default function Coax() {
             error={fe['mismatch']}
           />
           <UnitsChoice value={state.units} onChange={(units) => patch({ units })} />
+          <ExtSections form={extForm(state, today)} state={state} patch={patch} errors={fe} />
           <ResetButton onReset={reset} />
         </form>
         <section class="panel output" aria-labelledby="result-h" aria-busy={pending ? 'true' : undefined} data-pending={pending ? 'true' : undefined}>

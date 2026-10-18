@@ -19,11 +19,12 @@ export const meta = {
   formula:
     'Z0 = (η0/2π)·ln(D/d)/√εr, μr = 1; D = inner diameter of the outer conductor, d = outer diameter of the inner conductor (radii give the same ratio); ' +
     'η0 = μ0·c (exact SI constants, decision Q-1; textbooks round η0/2π to 60 Ω); εe = εr; delay = √εr/c; λg = λ0/√εr; inverse: D/d = exp(Z0·√εr/(η0/2π))',
-  ledgerIds: ['S-024', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-024', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** Domain, not an accuracy range: concentric round conductors need D > d and a passive dielectric needs er >= 1. */
     erMin: 1,
   },
   accuracyClass: 'analytical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['outerDiameter', 'innerDiameter', 'er'] as string[],
 } as const;

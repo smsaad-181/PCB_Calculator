@@ -148,7 +148,7 @@ describe('invariants', () => {
     expect(r.inputs.find((i) => i.name === 'ambient tolerance (+/-)')?.value.dim).toBe(DIM.TEMPERATURE_DIFFERENCE);
     expect(r.inputs.find((i) => i.name === 'length tolerance (+/-)')?.value.si).toBe(0.01);
     expect(r.assumptions.join('\n')).toMatch(/ambient: \+\/-5 K/);
-    expect(warningText(r)).toMatch(/worst-case corner range/);
+    expect(warningText(r)).toMatch(/tolerance-corner range/);
     expect(r.warnings.some((w) => w.code === 'VOLTAGE_DROP_SCOPE')).toBe(true);
   });
   it('a corner past the conductor temperature validity range is flagged as an extrapolation', () => {

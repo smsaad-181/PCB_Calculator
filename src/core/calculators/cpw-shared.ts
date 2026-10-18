@@ -6,8 +6,12 @@ import { brent } from '../solvers/rootfind';
 import { DIM, formatFor } from '../units';
 import type { Quantity } from '../units';
 import { guardQuantity } from './copper-converter/guards';
+import { impField } from './impedance-envelope';
+import type { EnvelopeInputs, ImpField, SolveSpec } from './impedance-envelope';
 import { commonInputEchoes, guardEr, isObject, validateCommon } from './impedance-shared';
-import type { CommonInputs } from './impedance-shared';
+import type { CommonInputs, LossInputs } from './impedance-shared';
+import { solvedMessage, unusedMessage } from './impedance-envelope';
+import type { OutputPlan } from './tolerance-shared';
 
 /**
  * Shared pieces of the two coplanar calculators (cpw, cpwg): the conformal-map models, the solve-mode decoding and bracketed
@@ -153,7 +157,7 @@ export interface CoplanarValid {
 }
 
 /** Public input shape of both coplanar calculators. Lengths are Quantities; er is a dimensionless Quantity. */
-export interface CoplanarInputs {
+export interface CoplanarInputs extends LossInputs, EnvelopeInputs {
   width?: Quantity;
   gap?: Quantity;
   targetZ0?: Quantity;
@@ -368,3 +372,26 @@ export function commonCoplanarWarnings(frequency: Quantity | undefined, thicknes
     { severity: 'caution', message: thicknessMessage(thickness), code: 'FINITE_THICKNESS_NOT_MODELLED' },
   ];
 }
+
+
+// ---- tolerance envelope (core D) -----------------------------------------------------------------------------------------------
+
+/** The tolerance fields of both coplanar calculators: width, gap, height, er; the thickness is not modelled so it is refused. */
+export function coplanarFields(inp: CoplanarValid): ImpField[] {
+  const geo = inp.geometry;
+  return [
+    impField('width', 'width', 'width', geo.width !== undefined, solvedMessage('the width'), 'traceWidth'),
+    impField('gap', 'gap', 'gap', geo.gap !== undefined, solvedMessage('the gap'), 'traceSpace'),
+    impField('height', 'height', 'height', true, ''),
+    impField('er', 'er', 'er', true, ''),
+    impField('thickness', 'thickness', 'thickness', false, inp.thickness === undefined ? 'thickness tolerance needs a thickness; none was given.' : unusedMessage('the thickness', 'the coplanar models do not use it (finite thickness is not modelled).')),
+  ];
+}
+
+export const COPLANAR_SOLVE: SolveSpec = { target: 'targetZ0', results: { 'gap for target Z0': 'gap', 'trace width for target Z0': 'width' } };
+
+export const COPLANAR_OUTPUTS: readonly OutputPlan[] = [
+  { name: 'characteristic impedance Z0', sensitivity: true },
+  { name: 'effective permittivity', sensitivity: true },
+  { name: 'delay per length', sensitivity: true },
+];

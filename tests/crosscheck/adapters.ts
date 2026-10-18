@@ -20,6 +20,22 @@
  *                          current voltage_drop_V, power_W. Nothing else is mapped: KiCad's via tab has capacitance,
  *                          inductance, ampacity and a different thermal model that do not correspond to our outputs.
  *
+ * Phase 2 impedance adapters (public compute() only; outputs are named like the record's toolOutputs, and only quantities a
+ * tool can display are mapped; delay is not mapped because the tools show an electrical angle at a frequency, not a delay):
+ *   'microstrip'       Inputs: width_mm|width_mil, height_mm|height_mil, er, optional thickness_mm|thickness_mil, optional
+ *                      thicknessModel ('none' default | 'hj-procedure-A' | 'hj-procedure-B'), optional frequency_Hz.
+ *                      The model is passed EXPLICITLY (never inferred from the presence of a thickness), so a record states
+ *                      whether it compares against a tool that ignores thickness or one that applies its own correction.
+ *                      Outputs: Z0_ohm, eps_eff.
+ *   'stripline'        Inputs: width, spacing (plane to plane, b), er, optional thickness, thicknessModel ('none' default |
+ *                      'cohn-wide'), frequency_Hz. Strip centred between the planes. Outputs: Z0_ohm, eps_eff (= er).
+ *   'coax'             Inputs: outerDiameter, innerDiameter, er, frequency_Hz. Outputs: Z0_ohm, eps_eff (= er).
+ *   'diff-microstrip'  Inputs: width, edgeSpacing (edge to edge), height, er, frequency_Hz. Outputs: Zdiff_ohm, Zodd_ohm,
+ *                      Zeven_ohm, eps_eff_odd, eps_eff_even. Our core applies no thickness correction here.
+ *   'diff-stripline'   Inputs: width, edgeSpacing, planeSpacing, er, frequency_Hz. Outputs: Zdiff_ohm, Zodd_ohm, Zeven_ohm, eps_eff.
+ *   'cpw', 'cpwg'      Inputs: width, gap (each side), height (substrate), er, frequency_Hz. Outputs: Z0_ohm, eps_eff.
+ *   Lengths are given as `<name>_mm` or `<name>_mil` (exactly one of the two); er is a plain number.
+ *
  * Unknown input keys throw (a typo must never be silently ignored). A case with real (non-null) tool data and no adapter
  * here FAILS the runner, by design.
  */
@@ -29,6 +45,13 @@ import type { CalcOutcome, CalcResult } from '../../src/core/result';
 import { compute as computeTraceWidth } from '../../src/core/calculators/trace-width/calc';
 import { compute as computeTraceResistance } from '../../src/core/calculators/trace-resistance/calc';
 import { compute as computeVia } from '../../src/core/calculators/via/calc';
+import { compute as computeMicrostrip } from '../../src/core/calculators/microstrip/calc';
+import { compute as computeStripline } from '../../src/core/calculators/stripline/calc';
+import { compute as computeCoax } from '../../src/core/calculators/coax/calc';
+import { compute as computeDiffMicrostrip } from '../../src/core/calculators/diff-microstrip/calc';
+import { compute as computeDiffStripline } from '../../src/core/calculators/diff-stripline/calc';
+import { compute as computeCpw } from '../../src/core/calculators/cpw/calc';
+import { compute as computeCpwg } from '../../src/core/calculators/cpwg/calc';
 
 export type CrosscheckInputs = Readonly<Record<string, unknown>>;
 export type CrosscheckAdapter = (inputs: CrosscheckInputs) => Record<string, number>;
@@ -165,8 +188,170 @@ const viaAdapter: CrosscheckAdapter = (inputs) => {
   return out;
 };
 
+// ---- Phase 2 impedance adapters ---------------------------------------------------------------------------------------------
+
+/** A length given as `<base>_mm` or `<base>_mil`; exactly one of the two must be present. */
+function lengthIn(id: string, inputs: CrosscheckInputs, base: string, required: true): Quantity;
+function lengthIn(id: string, inputs: CrosscheckInputs, base: string, required: false): Quantity | undefined;
+function lengthIn(id: string, inputs: CrosscheckInputs, base: string, required: boolean): Quantity | undefined {
+  const hasMm = inputs[`${base}_mm`] !== undefined;
+  const hasMil = inputs[`${base}_mil`] !== undefined;
+  if (hasMm && hasMil) throw new Error(`${id}: give exactly one of ${base}_mm or ${base}_mil, not both`);
+  if (!hasMm && !hasMil) {
+    if (required) throw new Error(`${id}: give exactly one of ${base}_mm or ${base}_mil (the ${base} is missing)`);
+    return undefined;
+  }
+  return hasMm ? fromUnit(num(id, inputs, `${base}_mm`), 'mm') : fromUnit(num(id, inputs, `${base}_mil`), 'mil');
+}
+
+const dimless = (v: number): Quantity => q(v, DIM.DIMENSIONLESS);
+const REC_SOURCE = 'cross-check record input (value as typed into the third-party tool)';
+
+/** Fields shared by all impedance adapters: er, optional frequency, and the provenance labels our UI asks for. */
+function commonImpedance(id: string, inputs: CrosscheckInputs): { er: Quantity; frequency?: Quantity; erSource: string; geometrySource: string } {
+  const f = optNum(id, inputs, 'frequency_Hz');
+  return {
+    er: dimless(num(id, inputs, 'er')),
+    ...(f !== undefined ? { frequency: fromUnit(f, 'Hz') } : {}),
+    erSource: REC_SOURCE,
+    geometrySource: REC_SOURCE,
+  };
+}
+
+/** The first entry of `allowed` is the default and is always 'none'. */
+function modelOf<T extends string>(id: string, inputs: CrosscheckInputs, allowed: readonly [T, ...T[]]): T {
+  const m = inputs['thicknessModel'];
+  if (m === undefined) return allowed[0];
+  const hit = allowed.find((a) => a === m);
+  if (hit === undefined) throw new Error(`${id}: thicknessModel must be one of ${allowed.join(', ')} (got ${JSON.stringify(m)})`);
+  return hit;
+}
+
+const ohm = (id: string, r: CalcResult, name: string): number => toUnit(result(id, r, name), 'ohm');
+const plain = (id: string, r: CalcResult, name: string): number => result(id, r, name).si;
+
+const MS_KEYS = ['width_mm', 'width_mil', 'height_mm', 'height_mil', 'thickness_mm', 'thickness_mil', 'er', 'thicknessModel', 'frequency_Hz'] as const;
+const microstripAdapter: CrosscheckAdapter = (inputs) => {
+  const id = 'microstrip';
+  checkKeys(id, inputs, MS_KEYS);
+  const model = modelOf(id, inputs, ['none', 'hj-procedure-A', 'hj-procedure-B']);
+  const t = lengthIn(id, inputs, 'thickness', false);
+  const r = value(
+    id,
+    computeMicrostrip({
+      width: lengthIn(id, inputs, 'width', true),
+      height: lengthIn(id, inputs, 'height', true),
+      ...(t !== undefined ? { thickness: t } : {}),
+      thicknessModel: model,
+      ...commonImpedance(id, inputs),
+    }),
+  );
+  return { Z0_ohm: ohm(id, r, 'characteristic impedance Z0'), eps_eff: plain(id, r, 'effective permittivity') };
+};
+
+const SL_KEYS = ['width_mm', 'width_mil', 'spacing_mm', 'spacing_mil', 'thickness_mm', 'thickness_mil', 'er', 'thicknessModel', 'frequency_Hz'] as const;
+const striplineAdapter: CrosscheckAdapter = (inputs) => {
+  const id = 'stripline';
+  checkKeys(id, inputs, SL_KEYS);
+  const model = modelOf(id, inputs, ['none', 'cohn-wide']);
+  const t = lengthIn(id, inputs, 'thickness', false);
+  const r = value(
+    id,
+    computeStripline({
+      width: lengthIn(id, inputs, 'width', true),
+      spacing: lengthIn(id, inputs, 'spacing', true),
+      ...(t !== undefined ? { thickness: t } : {}),
+      thicknessModel: model,
+      ...commonImpedance(id, inputs),
+    }),
+  );
+  return { Z0_ohm: ohm(id, r, 'characteristic impedance Z0'), eps_eff: plain(id, r, 'effective permittivity') };
+};
+
+const COAX_KEYS = ['outerDiameter_mm', 'outerDiameter_mil', 'innerDiameter_mm', 'innerDiameter_mil', 'er', 'frequency_Hz'] as const;
+const coaxAdapter: CrosscheckAdapter = (inputs) => {
+  const id = 'coax';
+  checkKeys(id, inputs, COAX_KEYS);
+  const r = value(
+    id,
+    computeCoax({
+      outerDiameter: lengthIn(id, inputs, 'outerDiameter', true),
+      innerDiameter: lengthIn(id, inputs, 'innerDiameter', true),
+      ...commonImpedance(id, inputs),
+    }),
+  );
+  return { Z0_ohm: ohm(id, r, 'characteristic impedance Z0'), eps_eff: plain(id, r, 'effective permittivity') };
+};
+
+const DM_KEYS = ['width_mm', 'width_mil', 'edgeSpacing_mm', 'edgeSpacing_mil', 'height_mm', 'height_mil', 'er', 'frequency_Hz'] as const;
+const diffMicrostripAdapter: CrosscheckAdapter = (inputs) => {
+  const id = 'diff-microstrip';
+  checkKeys(id, inputs, DM_KEYS);
+  const r = value(
+    id,
+    computeDiffMicrostrip({
+      width: lengthIn(id, inputs, 'width', true),
+      edgeSpacing: lengthIn(id, inputs, 'edgeSpacing', true),
+      height: lengthIn(id, inputs, 'height', true),
+      ...commonImpedance(id, inputs),
+    }),
+  );
+  return {
+    Zdiff_ohm: ohm(id, r, 'differential impedance Zdiff'),
+    Zodd_ohm: ohm(id, r, 'odd-mode impedance Zodd'),
+    Zeven_ohm: ohm(id, r, 'even-mode impedance Zeven'),
+    eps_eff_odd: plain(id, r, 'odd-mode effective permittivity'),
+    eps_eff_even: plain(id, r, 'even-mode effective permittivity'),
+  };
+};
+
+const DS_KEYS = ['width_mm', 'width_mil', 'edgeSpacing_mm', 'edgeSpacing_mil', 'planeSpacing_mm', 'planeSpacing_mil', 'er', 'frequency_Hz'] as const;
+const diffStriplineAdapter: CrosscheckAdapter = (inputs) => {
+  const id = 'diff-stripline';
+  checkKeys(id, inputs, DS_KEYS);
+  const r = value(
+    id,
+    computeDiffStripline({
+      width: lengthIn(id, inputs, 'width', true),
+      edgeSpacing: lengthIn(id, inputs, 'edgeSpacing', true),
+      planeSpacing: lengthIn(id, inputs, 'planeSpacing', true),
+      ...commonImpedance(id, inputs),
+    }),
+  );
+  return {
+    Zdiff_ohm: ohm(id, r, 'differential impedance Zdiff'),
+    Zodd_ohm: ohm(id, r, 'odd-mode impedance Zodd'),
+    Zeven_ohm: ohm(id, r, 'even-mode impedance Zeven'),
+    eps_eff: plain(id, r, 'effective permittivity'),
+  };
+};
+
+const CPW_KEYS = ['width_mm', 'width_mil', 'gap_mm', 'gap_mil', 'height_mm', 'height_mil', 'er', 'frequency_Hz'] as const;
+function coplanarAdapter(id: string, run: (i: Parameters<typeof computeCpw>[0]) => CalcOutcome): CrosscheckAdapter {
+  return (inputs) => {
+    checkKeys(id, inputs, CPW_KEYS);
+    const r = value(
+      id,
+      run({
+        width: lengthIn(id, inputs, 'width', true),
+        gap: lengthIn(id, inputs, 'gap', true),
+        height: lengthIn(id, inputs, 'height', true),
+        ...commonImpedance(id, inputs),
+      }),
+    );
+    return { Z0_ohm: ohm(id, r, 'characteristic impedance Z0'), eps_eff: plain(id, r, 'effective permittivity') };
+  };
+}
+
 export const CROSSCHECK_ADAPTERS: Record<string, CrosscheckAdapter> = {
   'trace-width-ipc2221': traceWidthIpc2221,
   'trace-resistance': traceResistance,
   via: viaAdapter,
+  microstrip: microstripAdapter,
+  stripline: striplineAdapter,
+  coax: coaxAdapter,
+  'diff-microstrip': diffMicrostripAdapter,
+  'diff-stripline': diffStriplineAdapter,
+  cpw: coplanarAdapter('cpw', computeCpw),
+  cpwg: coplanarAdapter('cpwg', computeCpwg),
 };

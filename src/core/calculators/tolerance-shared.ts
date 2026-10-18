@@ -408,7 +408,7 @@ export function applyEnvelope(a: ApplyArgs): CalcOutcome {
   warnings.push({
     severity: 'info',
     code: 'ENVELOPE_SCOPE',
-    message: `The envelope is a worst-case corner range over the tolerances listed (${activeLabels.length > 0 ? activeLabels.join(', ') : 'none non-zero'}); every other input stays at its stated value. It is arithmetic, not a statistical distribution, and it is only as complete as the tolerances you supply.`,
+    message: `The envelope is a tolerance-corner range over the tolerances listed (${activeLabels.length > 0 ? activeLabels.join(', ') : 'none non-zero'}); every other input stays at its stated value. It is arithmetic, not a statistical distribution, and it is only as complete as the tolerances you supply.`,
   });
 
   for (const p of a.plan.planned) {

@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'preact/hooks';
 import { MODEL_STATUS_HEADING, type CoplanarVm, type FieldName, type SolveMode } from '../calculators/coplanar.vm';
+import { useToday } from '../hooks';
 import { useCalcState } from '../useCalcState';
 import { ErFields, ImpedanceResults, Q, SolveChoice, UnitsChoice } from './ImpedanceCommon';
+import { ExtSections } from './ImpedanceExt';
 import { LedgerRowBadges } from './LedgerRowBadges';
 import { NoticeBanner } from './NoticeBanner';
 import { ResetButton } from './ResetButton';
@@ -26,7 +28,8 @@ export function CoplanarPage({ vm, stackupKey, formLabel, stackupNote }: Props) 
     fromHash: vm.fromHashState,
     toHash: vm.toHashState,
   });
-  const view = useMemo(() => vm.computeView(applied), [applied, vm]);
+  const today = useToday();
+  const view = useMemo(() => vm.computeView(applied, today), [applied, today, vm]);
   const [locked, setLocked] = useState(false);
   const fe = 'fieldErrors' in view ? view.fieldErrors : {};
   const active = vm.activeFields(state);
@@ -172,6 +175,7 @@ export function CoplanarPage({ vm, stackupKey, formLabel, stackupNote }: Props) 
             error={fe['mismatch']}
           />
           <UnitsChoice value={state.units} onChange={(units) => patch({ units })} />
+          <ExtSections form={vm.extForm(state, today)} state={state} patch={patch} errors={fe} />
           <p class="help" role="note">
             {stackupNote}
           </p>

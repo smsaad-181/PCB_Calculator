@@ -118,7 +118,7 @@ describe('hash state', () => {
     const back = fromHashState(parseHash(serializeHash(ROUTE, toHashState(s))).state);
     expect(back.notices).toEqual([]);
     expect(back.state).toEqual(s);
-    for (const k of WRITTEN_KEYS) expect([...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'u']).toContain(k);
+    for (const k of WRITTEN_KEYS) expect([...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'fp', 'u']).toContain(k);
     expect(fromHashState({ sf: 'zz', tm: 'hj-procedure-A' }).notices.length).toBe(2);
     expect(fromHashState(parseHash('#/calc/stripline?v=1&b=%E0%A4%A').state).state).toEqual(DEFAULT_STATE);
   });

@@ -24,6 +24,7 @@ import {
   type TextDef,
   type Units,
 } from './impedance.vm';
+import { EXT_DEFAULTS, extFormOf, type ExtForm, tolEr, tolHeight, tolSpacing, tolWidth, type ExtState } from './impedance-ext.vm';
 
 export { ER_HELP, ER_SOURCE_HELP };
 
@@ -35,7 +36,7 @@ export const THICKNESS_HELP = `Optional and not modelled: t does not change the 
 export type SolveMode = 'z0' | 'gap' | 'width';
 
 /** Everything the form holds. Strings are exactly what the user typed. Empty means "not entered". Nothing is pre-filled. */
-export type CoplanarState = {
+export type CoplanarState = ExtState & {
   readonly solveFor: SolveMode;
   readonly width: string;
   readonly gap: string;
@@ -92,7 +93,8 @@ export interface CoplanarVm {
   readonly WRITTEN_KEYS: readonly string[];
   readonly toHashState: (s: CoplanarState) => Record<string, string>;
   readonly fromHashState: (h: HashState) => Loaded<CoplanarState>;
-  readonly computeView: (s: CoplanarState) => CoplanarView;
+  readonly computeView: (s: CoplanarState, today?: string) => CoplanarView;
+  readonly extForm: (s: CoplanarState, today: string) => ExtForm;
   readonly liveSummary: (v: CoplanarView) => string;
   readonly activeFields: (s: CoplanarState) => readonly FieldName[];
   readonly modelStatusRows: () => LedgerRowBadge[];
@@ -100,6 +102,7 @@ export interface CoplanarVm {
 
 export function makeCoplanarVm(def: CoplanarKindDef): CoplanarVm {
   const DEFAULT_STATE: CoplanarState = Object.freeze({
+    ...EXT_DEFAULTS,
     solveFor: 'z0',
     width: '',
     gap: '',
@@ -216,6 +219,7 @@ export function makeCoplanarVm(def: CoplanarKindDef): CoplanarVm {
     pinCodes: ['OUT_OF_RANGE', def.modelWarningCode],
     informational: def.informational,
     netClassText,
+    ext: { tol: [tolWidth('Centre strip width W', 'width'), tolSpacing('gap', 'Gap s', 'gap'), tolHeight('height', def.height.label, 'height'), tolEr()] },
   };
 
   return {
@@ -231,7 +235,8 @@ export function makeCoplanarVm(def: CoplanarKindDef): CoplanarVm {
     WRITTEN_KEYS: writtenKeysOf(SPEC),
     toHashState: (s) => toHashStateOf(SPEC, s),
     fromHashState: (h) => fromHashStateOf(SPEC, h),
-    computeView: (s) => computeViewOf(SPEC, s),
+    computeView: (s, today) => computeViewOf(SPEC, s, today),
+    extForm: (s, today) => extFormOf(SPEC.ext, s, SPEC.active(s), today),
     liveSummary: liveSummaryOf,
     activeFields: (s) => SPEC.active(s) as readonly FieldName[],
     modelStatusRows: () => ledgerView(def.modelLedgerIds).entries.map((e) => ({ id: e.id, status: e.status, role: LEDGER_ROLE[e.id] ?? e.item })),

@@ -1,0 +1,307 @@
+{
+  "tool": "KiCad pcb_calculator, TransLine tab, Coupled microstrip line and (KiCad master only) coupled stripline",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "Human runs the stand-alone KiCad PCB Calculator, TransLine tab. Microstrip cases (kicad-dm-*): line type \"Coupled microstrip line\", substrate height as in the case, T = 0 (our coupled cores apply no thickness correction, so the tool is run at zero thickness). Stripline cases (kicad-ds-*): ONLY if the installed KiCad has a coupled stripline line type (research note: master/nightly only; if yours has none, leave all three kicad-ds-* cases null and write so in this field). The spacing S must be the EDGE-TO-EDGE gap between the two strips (check the tool's drawing; if it is centre-to-centre, STOP and leave the case null) and the stripline height field must be plane-to-plane spacing b. Outputs to copy: Zodd_ohm and Zeven_ohm = the odd and even mode impedances shown; Zdiff_ohm only if the tool prints a differential impedance (never compute 2 x Zodd by hand); eps_eff_odd and eps_eff_even only if the tool shows effective permittivity per mode (microstrip), eps_eff for the stripline only if shown; leave anything not shown null. The coupled-line models behind our cores (ledger S-022 and S-022a) are paywalled-primary based: this comparison cannot verify them. Record the exact KiCad version (Help > About), OS, displayed digits, the model names the tool states, and every non-default setting. Every toolOutputs value stays null until a human copies it from a real run of the tool (all displayed digits, no rounding, no conversion). Quasi-static comparison: frequency 1 MHz (1e6 Hz) in the tool; if it refuses, use the lowest accepted frequency and write it here. Dielectric loss tangent, conductor resistivity and roughness do not affect Z0 or eps_eff in the quasi-static model: leave them at the tool defaults and record the defaults here. Dispersion: check the tool's settings, turn dispersion off if it can be turned off, otherwise record that it is on. Soldermask or cover/top-dielectric correction: disable it (or leave the top height at its no-cover default) and record the setting. Thickness: the t0 cases need T = 0 in the tool (if refused, enter the smallest accepted value and record it); the t35um cases need T = 0.035 mm; one tool run with T = 0.035 mm feeds the three t35um cases of the same geometry (none, A, B): copy the same displayed numbers into all three. Record the tool's exact name for its thickness and dispersion models. Details, field entries per case and the digits check: docs/validation/crosscheck-impedance.md. Agreement never verifies a ledger row; no third-party source is copied.",
+  "cases": [
+    {
+      "id": "kicad-dm-er4.5-h0.2-w0.2-s0.2",
+      "calculator": "diff-microstrip",
+      "inputs": {
+        "width_mm": 0.2,
+        "edgeSpacing_mm": 0.2,
+        "height_mm": 0.2,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff_odd": null,
+        "eps_eff_even": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_odd",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_even",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-dm-er4.5-h0.2-w0.15-s0.1",
+      "calculator": "diff-microstrip",
+      "inputs": {
+        "width_mm": 0.15,
+        "edgeSpacing_mm": 0.1,
+        "height_mm": 0.2,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff_odd": null,
+        "eps_eff_even": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_odd",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_even",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-dm-er3.5-h0.2-w0.2-s0.4",
+      "calculator": "diff-microstrip",
+      "inputs": {
+        "width_mm": 0.2,
+        "edgeSpacing_mm": 0.4,
+        "height_mm": 0.2,
+        "er": 3.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff_odd": null,
+        "eps_eff_even": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_odd",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_even",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-dm-er4.5-h0.4-w0.2-s0.2",
+      "calculator": "diff-microstrip",
+      "inputs": {
+        "width_mm": 0.2,
+        "edgeSpacing_mm": 0.2,
+        "height_mm": 0.4,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff_odd": null,
+        "eps_eff_even": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Coupled microstrip impedance. NO ledger-derived bound exists: the primary papers behind S-022 are paywalled, and the difference between our Hammerstad-Jensen 1980 coupled model and the Kirschning-Jansen 1984 model that KiCad documents is not quantified anywhere in the ledger. The 3 % is an a-priori engineering screening allowance, not a derived value: 0.07 % prefactor + 0.5 % single-line model spread (as in the single microstrip) + the rest an unquantified coupled-model allowance. Its only purpose is to catch gross transcription errors. A pass says nothing about S-022 (PAYWALLED-USER-MUST-VERIFY); a miss is classified as a model difference or a bug by the validators. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_odd",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff_even",
+          "relTol": 0.02,
+          "why": "Coupled microstrip effective permittivity, even or odd mode (compare only if the tool shows it). No ledger-derived bound exists (S-022 paywalled, coupled-model difference unquantified): a-priori screening allowance 2 % = 0.4 % two single-line eps_e fits (S-020) + 1.6 % unquantified coupled-model allowance. Catches gross errors only; a pass says nothing about S-022. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ds-er4.5-b0.5-w0.15-s0.15",
+      "calculator": "diff-stripline",
+      "inputs": {
+        "width_mm": 0.15,
+        "edgeSpacing_mm": 0.15,
+        "planeSpacing_mm": 0.5,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for a coupled stripline: ours equals er (homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays it."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ds-er4.5-b0.5-w0.2-s0.3",
+      "calculator": "diff-stripline",
+      "inputs": {
+        "width_mm": 0.2,
+        "edgeSpacing_mm": 0.3,
+        "planeSpacing_mm": 0.5,
+        "er": 4.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for a coupled stripline: ours equals er (homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays it."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ds-er3.5-b0.8-w0.25-s0.4",
+      "calculator": "diff-stripline",
+      "inputs": {
+        "width_mm": 0.25,
+        "edgeSpacing_mm": 0.4,
+        "planeSpacing_mm": 0.8,
+        "er": 3.5,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Zdiff_ohm": null,
+        "Zodd_ohm": null,
+        "Zeven_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Zodd_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zeven_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "Zdiff_ohm",
+          "relTol": 0.03,
+          "why": "Edge-coupled stripline impedance, our Cohn (1955) approximate forms (ledger S-022a, PAYWALLED-USER-MUST-VERIFY, \"a good approximation\", no accuracy or range stated) against a coupled-stripline tool model whose origin is not established (KiCad master only; Qucs-S transcalc has none). NO ledger-derived bound exists; 3 % is an a-priori screening allowance (0.07 % prefactor + 0.5 % single stripline model spread, S-021a, + an unquantified remainder) that catches gross transcription errors only. A pass says nothing about S-022a. Zdiff is compared only if the tool prints it; do not compute it by hand. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for a coupled stripline: ours equals er (homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays it."
+        }
+      ]
+    }
+  ]
+}

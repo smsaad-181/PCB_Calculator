@@ -4,7 +4,11 @@ import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import { GROUND_WIDTH_MESSAGE, Z_CPWG_PREFACTOR_OHM, commonCoplanarWarnings, coplanarInputEchoes, cpwgModel, domainFailure, num, resolveGeometry, safeZ0 } from '../cpw-shared';
 import type { CoplanarInputs } from '../cpw-shared';
+import { COPLANAR_OUTPUTS, COPLANAR_SOLVE, coplanarFields } from '../cpw-shared';
+import { runEnvelope } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, delayOutputs, dimensionless } from '../impedance-shared';
+import { lossBlock, mergeLoss } from '../loss-shared';
+import { hasTolerances } from '../tolerance-shared';
 import { validate } from './guards';
 import { meta } from './meta';
 
@@ -16,7 +20,7 @@ const UNVERIFIED_MESSAGE =
 const STITCHING_MESSAGE =
   'Stitching vias are not modelled: the equations assume the coplanar top grounds are tied to the lower ground plane and extend far enough, and no via-fence or via-spacing effect is included. This result makes no statement about whether the grounding is adequate; unstitched or sparsely stitched top grounds float and change Z0 and eps_e by an amount this model does not give.';
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -111,7 +115,9 @@ function build(raw: unknown): CalcOutcome {
     ...delay.assumptions,
   ];
 
-  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds];
+  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds, ...extraLedgerIds];
+  const loss = lossBlock({ common: inp.common, er, modes: [{ suffix: '', epsEff: m.epsEff }], conductor: { kind: 'not-modelled', geometry: 'conductor-backed coplanar waveguide' } });
+  const lossDefaults = mergeLoss(loss, { inputs, steps, results, validityChecks, warnings, outOfRange, assumptions, ledgerIds });
   return assemble({
     method: meta.method,
     standard: meta.reference.standard,
@@ -126,13 +132,21 @@ function build(raw: unknown): CalcOutcome {
     validityChecks,
     warnings,
     outOfRange,
+    defaultedExtra: lossDefaults,
   });
+}
+
+/** Nominal result plus the tolerance envelope and sensitivities (core D). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields: coplanarFields(v.value), outputs: COPLANAR_OUTPUTS, solve: COPLANAR_SOLVE });
 }
 
 /** CPWG Z0, eps_e, delay and guided wavelength, or the gap / width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

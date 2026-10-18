@@ -39,7 +39,7 @@ export const meta = {
   thicknessFormula:
     'S-021a (CONFLICT), wide strips only (w/b ≥ 0.35), t̂ = t/b: Z0 = (η0/4)/√εr · (1 − t̂)/(w/b + Cf); ' +
     'Cf = (2/π)·ln[1/(1 − t̂) + 1] − (t̂/π)·ln[1/(1 − t̂)² − 1]. Narrow strips with finite thickness are not offered.',
-  ledgerIds: ['S-021', 'S-021a', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-021', 'S-021a', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** S-021a (Steer): accuracy better than 1 % for w/(b - t) > 0.05 and t/b < 0.025; the only stripline ranges recorded. */
     wOverBMin: 0.05,
@@ -48,5 +48,6 @@ export const meta = {
     wideMin: SL.wNarrow,
   },
   accuracyClass: 'empirical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['width', 'spacing', 'er', 'thickness'] as string[],
 } as const;

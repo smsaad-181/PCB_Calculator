@@ -4,14 +4,20 @@ import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from 
 import { brent } from '../../solvers/rootfind';
 import { DIM, formatFor, q } from '../../units';
 import type { Quantity } from '../../units';
+import { impField, runEnvelope, solvedMessage, unusedMessage } from '../impedance-envelope';
+import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
+import type { LossInputs } from '../impedance-shared';
+import { lossBlock, mergeLoss } from '../loss-shared';
+import { hasTolerances } from '../tolerance-shared';
+import type { OutputPlan } from '../tolerance-shared';
 import { validate } from './guards';
 import type { ValidInputs } from './guards';
 import { HJ, HJ_THICKNESS, meta } from './meta';
 import type { ThicknessModel } from './meta';
 
 /** Public input shape. All lengths are Quantities; er is a dimensionless Quantity. Exactly one of width and targetZ0. */
-export interface Inputs {
+export interface Inputs extends LossInputs, EnvelopeInputs {
   width?: Quantity;
   targetZ0?: Quantity;
   height: Quantity;
@@ -110,7 +116,7 @@ function variantLabel(model: ThicknessModel): string {
   return model === 'hj-procedure-A' ? 'procedure A' : 'procedure B';
 }
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp: ValidInputs = v.value;
@@ -250,6 +256,14 @@ function build(raw: unknown): CalcOutcome {
 
   const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds];
   if (model !== 'none') ledgerIds.push('S-020a');
+  ledgerIds.push(...extraLedgerIds);
+  const loss = lossBlock({
+    common: inp.common,
+    er,
+    modes: [{ suffix: '', epsEff: ev.epsEff }],
+    conductor: { kind: 'microstrip', width: widthQ, z0: ev.z0, ...(inp.thickness !== undefined ? { thickness: inp.thickness } : {}) },
+  });
+  const lossDefaults = mergeLoss(loss, { inputs, steps, results, validityChecks, warnings, outOfRange, assumptions, ledgerIds });
 
   const method = model === 'none' ? meta.method : `Hammerstad-Jensen quasi-static microstrip with the opt-in strip-thickness variant, ${variantLabel(model)} (ledger S-020a, CONFLICT); no dispersion, no soldermask`;
   const formula = model === 'none' ? meta.formula : `${meta.formula} ${meta.thicknessFormula}`;
@@ -267,13 +281,35 @@ function build(raw: unknown): CalcOutcome {
     validityChecks,
     warnings,
     outOfRange,
+    defaultedExtra: lossDefaults,
   });
+}
+
+const ENVELOPE_OUTPUTS: readonly OutputPlan[] = [
+  { name: 'characteristic impedance Z0', sensitivity: true },
+  { name: 'effective permittivity', sensitivity: true },
+  { name: 'delay per length', sensitivity: true },
+];
+
+/** Nominal result plus the tolerance envelope and sensitivities (core D). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const thicknessUsed = inp.thickness !== undefined && inp.thicknessModel !== 'none';
+  const fields: ImpField[] = [
+    impField('width', 'width', 'width', inp.width !== undefined, solvedMessage('the width'), 'traceWidth'),
+    impField('height', 'height', 'height', true, ''),
+    impField('er', 'er', 'er', true, ''),
+    impField('thickness', 'thickness', 'thickness', thicknessUsed, inp.thickness === undefined ? 'thickness tolerance needs a thickness; none was given.' : unusedMessage('the thickness', 'the zero-thickness model (thicknessModel none) does not use it.')),
+  ];
+  return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZ0', results: { 'trace width for target Z0': 'width' } } });
 }
 
 /** Microstrip Z0, eps_e, delay and guided wavelength, or the width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

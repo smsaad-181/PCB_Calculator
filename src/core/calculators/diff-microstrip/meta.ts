@@ -70,7 +70,7 @@ export const meta = {
     `p(g) = exp(−${n(CJ.p.a)}·g^${n(CJ.p.e)})/cosh(g^${n(CJ.p.h)}); fo1 = 1 − exp{−${n(CJ.fo1.a)}·g^${n(CJ.fo1.e)} − ${n(CJ.fo1.b)}·g^r/ln[e + (g/${n(CJ.fo1.g0)})^${n(CJ.fo1.ge)}]}; ` +
     `r(g,εr) = 1 + ${n(CJ.r.k)}·{1 − exp[1 − (εr−1)²/${n(CJ.r.d)}]/(1 + g^(${n(CJ.r.ge)}))}; q(g) = exp(−${n(CJ.q.a)} − g); ` +
     'Zdiff = 2·Z0o; Zcommon = Z0e/2 (S-022b); η0 = μ0·c (exact SI constants, decision Q-1); delay = √εe/c per mode; λg = λ0/√εe',
-  ledgerIds: ['S-022', 'S-022b', 'S-020', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-022', 'S-022b', 'S-020', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** S-022 (Steer): "accurate to better than 1% for 0.1 <= u <= 10 and g > 0.01"; er range inherited from S-020 (1 to 128). */
     uRange: [0.1, 10] as readonly [number, number],
@@ -82,5 +82,6 @@ export const meta = {
     gWeakCoupling: 3,
   },
   accuracyClass: 'empirical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['width', 'edgeSpacing', 'height', 'er'] as string[],
 } as const;

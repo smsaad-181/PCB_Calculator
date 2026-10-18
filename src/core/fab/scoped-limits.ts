@@ -55,8 +55,9 @@ export const SCOPED_KEYS = {
   smdPadToPad: CLEARANCE,
   copperToRoutedEdge: CLEARANCE,
   copperToVcutEdge: CLEARANCE,
-  traceWidth: { kinds: MIN_REC, minSi: 5e-6, maxSi: 5e-3 },
-  traceSpace: { kinds: MIN_REC, minSi: 5e-6, maxSi: 5e-3 },
+  /** Minimum and recommended width, and the published +/- tolerance on the drawn width (a length; a percentage is a `limits` entry). */
+  traceWidth: { kinds: ['min', 'recommended-min', 'tol-sym'], minSi: 5e-6, maxSi: 5e-3 },
+  traceSpace: { kinds: ['min', 'recommended-min', 'tol-sym'], minSi: 5e-6, maxSi: 5e-3 },
 } as const satisfies Record<string, KeySpec>;
 
 export type ScopedKey = keyof typeof SCOPED_KEYS;

@@ -25,7 +25,7 @@ export const meta = {
     'εe = 1 + ((εr − 1)/2)·[K(k1)/K(k1′)]·[K(k′)/K(k)]; Z0 = (η0/4)/√εe · K(k′)/K(k); ' +
     'K(k) = π/(2·M(1, k′)) by the arithmetic-geometric mean, K′(k) = K(k′); η0/4 = 30π of the sources, η0 = μ0·c (exact SI constants, decision Q-1); ' +
     'W = strip width, s = gap to each coplanar ground, h = substrate thickness; infinite substrate gives εe = (εr + 1)/2; delay = √εe/c; λg = λ0/√εe',
-  ledgerIds: ['S-023', 'S-023b', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-023', 'S-023b', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** Steer (S-023): substrate thickness two or three times both W and s. Below the lower figure the check fails; below the upper a caution. */
     hOverMaxMin: 2,
@@ -33,5 +33,6 @@ export const meta = {
   },
   /** Conformal mapping is an analytical quasi-static solution (not a curve fit); no accuracy figure is recorded for the finite-substrate eps_e. */
   accuracyClass: 'analytical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['width', 'gap', 'height', 'er'] as string[],
 } as const;

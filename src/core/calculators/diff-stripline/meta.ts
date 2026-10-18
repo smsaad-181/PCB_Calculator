@@ -35,7 +35,7 @@ export const meta = {
     'b = plane-to-plane spacing, w = strip width, s = edge-to-edge gap; εe = εr for both modes (homogeneous); ' +
     'weak-coupling limit s → ∞: Zinf = (η0/4)/√εr / (w/b + 2·ln2/π); Zdiff = 2·Z0o; Zcommon = Z0e/2 (S-022b); ' +
     'η0 = μ0·c (exact SI constants, decision Q-1; the source prints 94.15 for η0/4); delay = √εr/c; λg = λ0/√εr',
-  ledgerIds: ['S-022a', 'S-022b', 'S-021', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-022a', 'S-022b', 'S-021', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** No range is recorded for S-022a. Decision Q-5: apply the nearest recorded stripline range (S-021a, w/(b - t) > 0.05; t is not used here). */
     wOverBMin: 0.05,
@@ -45,5 +45,6 @@ export const meta = {
     sSolveRange: [0.001, 30] as readonly [number, number],
   },
   accuracyClass: 'empirical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['width', 'edgeSpacing', 'planeSpacing', 'er'] as string[],
 } as const;
