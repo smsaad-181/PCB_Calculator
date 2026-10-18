@@ -130,6 +130,14 @@ export interface ImpedanceSpec<S extends ImpedanceState> {
   readonly thicknessNames: Readonly<Record<string, 'thickness'>>;
   /** When true and the headline is a width, a plain-text starting value for a net class is offered. */
   readonly netClass: boolean;
+  /** Names of the result entries that are delay per length (their core note, ps/mm and ps/in, is the row text). Default: 'delay per length'. */
+  readonly delayNames?: readonly string[];
+  /** Warning codes shown before all others. Default: OUT_OF_RANGE and THICKNESS_VARIANT_CONFLICT. */
+  readonly pinCodes?: readonly string[];
+  /** Validity check names that are information, not a test. */
+  readonly informational?: readonly string[];
+  /** Replaces the default net-class text (for example to give width and spacing together); undefined means offer none. */
+  readonly netClassText?: (result: ResultView, s: Record<string, string>) => string | undefined;
 }
 
 export function toHashStateOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, s: S): Record<string, string> {
@@ -176,6 +184,9 @@ export const LEDGER_ROLE: Readonly<Record<string, string>> = {
   'S-021': 'Symmetric stripline Z0 at zero strip thickness (Pozar 3.179 form; secondary sources, the textbook was not read).',
   'S-021a': 'Finite-thickness stripline form for wide strips: the sources disagree, so it is an opt-in variant.',
   'S-024': 'Ideal coaxial line Z0 (two sources agree).',
+  'S-022': 'Edge-coupled microstrip even and odd mode (Hammerstad-Jensen coupled-line static model). One secondary source was read; the 1980 paper was not. Verify with your licensed copy / fab stackup.',
+  'S-022a': 'Edge-coupled stripline even and odd mode (Cohn approximate forms). One secondary source was read; the primary paper was not. Verify with your licensed copy / fab stackup.',
+  'S-022b': 'Definitions Zdiff = 2 Zodd and Zcommon = Zeven / 2 (two sources agree).',
   'S-013': 'Permeability of free space mu0, used with c to get the impedance of free space eta0 (exact SI constants).',
   'S-029': 'Speed of light c = 299 792 458 m/s (exact), used for delay and wavelength.',
   'S-029a': 'Delay = sqrt(eps_eff)/c and guided wavelength = lambda0/sqrt(eps_eff) (independent authors agree).',
@@ -208,7 +219,7 @@ export type ImpedanceView =
 
 const DELAY_NAME = 'delay per length';
 
-function startingValueText(label: string, headlineText: string): string {
+export function startingValueText(label: string, headlineText: string): string {
   return `${label}: ${headlineText}\nStarting value for a net class, not a design rule. ${IMPEDANCE_BANNER}`;
 }
 
@@ -274,8 +285,11 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
 
   const raw = out.value;
   const prefs = headlinePrefs(units);
-  const delay = raw.results.find((r) => r.name === DELAY_NAME);
-  const extraRows: ResultRowView[] = delay?.note === undefined ? [] : [{ label: 'Delay per length', text: delay.note }];
+  const delayNames = spec.delayNames ?? [DELAY_NAME];
+  const extraRows: ResultRowView[] = delayNames.flatMap((n): ResultRowView[] => {
+    const d = raw.results.find((r) => r.name === n);
+    return d?.note === undefined ? [] : [{ label: spec.labels[n] ?? n.charAt(0).toUpperCase() + n.slice(1), text: d.note }];
+  });
   const head = spec.headline(s);
   const result = buildResultView(raw, {
     headline: head,
@@ -284,11 +298,17 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     lengthRole: 'geometry',
     lengthRoleByName: spec.thicknessNames,
     labels: spec.labels,
-    skip: [DELAY_NAME],
+    skip: delayNames,
     extraRows,
-    pinWarningCodes: ['OUT_OF_RANGE', 'THICKNESS_VARIANT_CONFLICT'],
+    pinWarningCodes: spec.pinCodes ?? ['OUT_OF_RANGE', 'THICKNESS_VARIANT_CONFLICT'],
+    ...(spec.informational !== undefined ? { informationalChecks: spec.informational } : {}),
   });
-  const wantsStart = spec.netClass && /width/.test(head);
+  const netClass =
+    spec.netClassText !== undefined
+      ? spec.netClassText(result, s)
+      : spec.netClass && /width/.test(head)
+        ? startingValueText(result.headline.label, result.headline.text)
+        : undefined;
   return {
     status: 'ok',
     result,
@@ -297,7 +317,7 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     notes,
     ledgerRows: ledgerRowBadges(result),
     banner: BANNER,
-    ...(wantsStart ? { netClass: startingValueText(result.headline.label, result.headline.text) } : {}),
+    ...(netClass !== undefined ? { netClass } : {}),
   };
 }
 

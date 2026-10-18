@@ -91,6 +91,20 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/Coax'),
   },
   {
+    id: 'diff-microstrip',
+    title: 'Edge-coupled differential microstrip',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/DiffMicrostrip'),
+  },
+  {
+    id: 'diff-stripline',
+    title: 'Edge-coupled differential stripline',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/DiffStripline'),
+  },
+  {
     id: 'path-load',
     title: 'Path and load (weakest link)',
     category: 'load',

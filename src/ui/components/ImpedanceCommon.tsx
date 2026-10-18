@@ -1,3 +1,4 @@
+import type { ComponentChildren } from 'preact';
 import { DIM } from '../../core/units';
 import { ER_HELP, ER_SOURCE_HELP, dimOfKind, echoOf, parseNumberField, type ImpedanceView, type TextDef, type Units } from '../calculators/impedance.vm';
 import { Callout } from './Callout';
@@ -159,7 +160,7 @@ export function ThicknessChoice(p: ThicknessProps) {
 }
 
 /** Result area: the mandatory banner is an Important callout in every state (result, problems, or nothing to show yet). */
-export function ImpedanceResults({ view }: { readonly view: ImpedanceView }) {
+export function ImpedanceResults({ view, extra }: { readonly view: ImpedanceView; readonly extra?: ComponentChildren }) {
   if (view.status === 'ok') {
     return (
       <ResultsPanel
@@ -168,6 +169,7 @@ export function ImpedanceResults({ view }: { readonly view: ImpedanceView }) {
         callout={view.banner}
         afterHeadline={
           <>
+            {extra}
             {view.netClass !== undefined && (
               <section class="netclass" aria-labelledby="nc-h">
                 <h3 id="nc-h">Starting value for a net class (mm and mil)</h3>
