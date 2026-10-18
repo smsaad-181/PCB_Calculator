@@ -71,14 +71,16 @@ describe('registry', () => {
     expect(CATEGORIES.map((c) => c.id)).toEqual(['routing', 'trace', 'impedance', 'load', 'circuit']);
   });
   it('lists the impedance calculators under Impedance as lazy phase-2 entries that resolve to a component', async () => {
-    expect(calculatorsIn('impedance').map((x) => x.id)).toEqual(['microstrip', 'stripline', 'coax', 'diff-microstrip', 'diff-stripline']);
+    expect(calculatorsIn('impedance').map((x) => x.id)).toEqual(['microstrip', 'stripline', 'coax', 'diff-microstrip', 'diff-stripline', 'cpw', 'cpwg']);
+    expect(findCalculator('cpw')?.title).toBe('Coplanar waveguide (CPW) impedance');
+    expect(findCalculator('cpwg')?.title).toBe('Grounded coplanar waveguide (CPWG) impedance');
     const titles = Object.fromEntries(REGISTRY.map((x) => [x.id, x.title]));
     expect(titles['microstrip']).toBe('Microstrip impedance');
     expect(titles['diff-microstrip']).toBe('Edge-coupled differential microstrip');
     expect(titles['diff-stripline']).toBe('Edge-coupled differential stripline');
     expect(titles['stripline']).toBe('Symmetric stripline impedance');
     expect(titles['coax']).toBe('Coaxial line impedance');
-    for (const id of ['microstrip', 'stripline', 'coax', 'diff-microstrip', 'diff-stripline']) {
+    for (const id of ['microstrip', 'stripline', 'coax', 'diff-microstrip', 'diff-stripline', 'cpw', 'cpwg']) {
       const e = findCalculator(id);
       expect(e?.phase, id).toBe(2);
       expect(typeof (await e?.load())?.default, id).toBe('function');

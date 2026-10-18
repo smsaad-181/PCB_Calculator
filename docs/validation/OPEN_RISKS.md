@@ -326,3 +326,10 @@ Research: ledger rows S-020..S-025 (part A, `docs/research/impedance-models.md`)
 | P2-17 | Small-modulus asymptote branch (2/pi) ln(4/k) when k1 or k3' < 1e-8 (needed above gap/h ~ 475 or W/h ~ 350); tested against AGM to 1e-12 | calc-implementer | none | NOTED |
 | P2-18 | Notes arithmetic: docs/sources/notes/impedance-models.md gives K(5/9)=1.71897, K'=2.06275 (K/K'=0.83334); AGM gives K'=2.06282, K/K'=0.833315: rounding in the note, not a model issue | standards-researcher | Correct the note | MINOR |
 | P2-19 | Not modelled: finite ground width (assumed >= 3W, unchecked), thickness correction, coupled/differential CPW, stitching vias (CPWG), dispersion | calc-implementer | Later phases if wanted | DEFERRED |
+
+## Phase 2 UI C: CPW and CPWG pages (logged 2026-10-18)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-20 | The stackup editor has no coplanar layer type: it supplies h, t and er only (never W or s); for CPW the derived h is the distance to the nearest reference plane and the page tells the user to check it is the substrate thickness | calc-implementer + ui-engineer | Coplanar-aware derive in src/core/stackup | OPEN (minor) |
+| P2-21 | CPW golden geometry (h = max(W,s)) violates the core rule h >= 2 max(W,s), so the CPW page shows OUT_OF_RANGE then MODEL_CONFLICT and rates confidence score 5 (CPWG score 3); correct per the rule | orchestrator | none; use h >= 3 mm for in-range CPW examples | NOTED |

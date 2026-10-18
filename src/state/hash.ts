@@ -454,6 +454,35 @@ export const CALCULATOR_STATE_KEYS = {
     pr: 'Protocol preset id: "usb2-hs-90", "ethernet-mdi-100" or "lvds-100" (a design target, not a compliance statement). Absent means none: never pre-selected.',
     tl: 'Tolerance id of the chosen preset: "usb2-tol-15", "usb2-tol-10" or "ethernet-tol-10". Absent means none chosen: never defaulted (LVDS lists none).',
   },
+  // Coplanar waveguide pages (Phase 2). As above, the stackup layers are not in the link.
+  cpw: {
+    sf: 'Solve for: "z0" (impedance from the geometry), "gap" (gap for a target Z0) or "width" (strip width for a target Z0). Absent means z0.',
+    w: 'Entered centre strip width text, for example "500 um" (at most 40 characters; used when solving Z0 or the gap).',
+    s: 'Entered gap text between the strip and each coplanar ground, for example "200 um" (at most 40 characters; used when solving Z0 or the width).',
+    z: 'Entered target characteristic impedance text, for example "50 ohm" (at most 40 characters; used when solving the gap or the width).',
+    h: 'Entered substrate thickness text (no lower ground plane in this model), for example "500 um" (at most 40 characters).',
+    t: 'Entered copper thickness text, for example "35 um" (at most 40 characters). Optional: not modelled (echoed, with a warning).',
+    er: 'Entered relative permittivity as a plain number (at most 40 characters). Absent means not entered: there is no default and no result without it.',
+    es: 'Entered note on where er came from (free text, at most 200 characters). Absent means not entered: required, there is no result without it.',
+    gs: 'Optional note on where the geometry came from, for example the stackup name and signal layer (free text, at most 200 characters).',
+    f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
+    l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
+    dl: 'Entered length mismatch text between two lines, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+  },
+  cpwg: {
+    sf: 'Solve for: "z0" (impedance from the geometry), "gap" (gap for a target Z0) or "width" (strip width for a target Z0). Absent means z0.',
+    w: 'Entered centre strip width text, for example "500 um" (at most 40 characters; used when solving Z0 or the gap).',
+    s: 'Entered gap text between the strip and each coplanar ground, for example "200 um" (at most 40 characters; used when solving Z0 or the width).',
+    z: 'Entered target characteristic impedance text, for example "50 ohm" (at most 40 characters; used when solving the gap or the width).',
+    h: 'Entered dielectric height text from the strip to the lower ground plane, for example "500 um" (at most 40 characters).',
+    t: 'Entered copper thickness text, for example "35 um" (at most 40 characters). Optional: not modelled (echoed, with a warning).',
+    er: 'Entered relative permittivity as a plain number (at most 40 characters). Absent means not entered: there is no default and no result without it.',
+    es: 'Entered note on where er came from (free text, at most 200 characters). Absent means not entered: required, there is no result without it.',
+    gs: 'Optional note on where the geometry came from, for example the stackup name and signal layer (free text, at most 200 characters).',
+    f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
+    l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
+    dl: 'Entered length mismatch text between two lines, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+  },
 } as const satisfies Record<string, Record<string, string>>;
 
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {

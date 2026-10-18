@@ -105,6 +105,20 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     load: () => import('./calculators/DiffStripline'),
   },
   {
+    id: 'cpw',
+    title: 'Coplanar waveguide (CPW) impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Cpw'),
+  },
+  {
+    id: 'cpwg',
+    title: 'Grounded coplanar waveguide (CPWG) impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Cpwg'),
+  },
+  {
     id: 'path-load',
     title: 'Path and load (weakest link)',
     category: 'load',
