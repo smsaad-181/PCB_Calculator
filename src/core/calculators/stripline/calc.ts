@@ -4,13 +4,19 @@ import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from 
 import { brent } from '../../solvers/rootfind';
 import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
+import { impField, runEnvelope, solvedMessage, unusedMessage } from '../impedance-envelope';
+import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless } from '../impedance-shared';
+import type { LossInputs } from '../impedance-shared';
+import { lossBlock, mergeLoss } from '../loss-shared';
+import { hasTolerances } from '../tolerance-shared';
+import type { OutputPlan } from '../tolerance-shared';
 import { validate } from './guards';
 import { SL, meta } from './meta';
 import type { StriplineThicknessModel } from './meta';
 
 /** Public input shape: lengths are Quantities, er is a dimensionless Quantity; exactly one of width and targetZ0. spacing is b. */
-export interface Inputs {
+export interface Inputs extends LossInputs, EnvelopeInputs {
   width?: Quantity;
   targetZ0?: Quantity;
   spacing: Quantity;
@@ -54,7 +60,7 @@ function failure(code: CalcError['code'], field: string, message: string): CalcO
   return { ok: false, error: { code, field, message } };
 }
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -188,6 +194,9 @@ function build(raw: unknown): CalcOutcome {
   ];
   const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds];
   if (wide) ledgerIds.push('S-021a');
+  ledgerIds.push(...extraLedgerIds);
+  const loss = lossBlock({ common: inp.common, er, modes: [{ suffix: '', epsEff: er }], conductor: { kind: 'not-modelled', geometry: 'stripline' } });
+  const lossDefaults = mergeLoss(loss, { inputs, steps, results, validityChecks, warnings, outOfRange, assumptions, ledgerIds });
 
   return assemble({
     method: wide ? 'Symmetric stripline with the opt-in finite-thickness wide-strip form (ledger S-021a, CONFLICT); TEM, centred strip' : meta.method,
@@ -203,13 +212,35 @@ function build(raw: unknown): CalcOutcome {
     validityChecks,
     warnings,
     outOfRange,
+    defaultedExtra: lossDefaults,
   });
+}
+
+const ENVELOPE_OUTPUTS: readonly OutputPlan[] = [
+  { name: 'characteristic impedance Z0', sensitivity: true },
+  { name: 'effective permittivity', sensitivity: true, onlyIfVaries: true },
+  { name: 'delay per length', sensitivity: true, onlyIfVaries: true },
+];
+
+/** Nominal result plus the tolerance envelope and sensitivities (core D). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  const inp = v.value;
+  const thicknessUsed = inp.thickness !== undefined && inp.thicknessModel !== 'none';
+  const fields: ImpField[] = [
+    impField('width', 'width', 'width', inp.width !== undefined, solvedMessage('the width'), 'traceWidth'),
+    impField('spacing', 'spacing', 'spacing', true, ''),
+    impField('er', 'er', 'er', true, ''),
+    impField('thickness', 'thickness', 'thickness', thicknessUsed, inp.thickness === undefined ? 'thickness tolerance needs a thickness; none was given.' : unusedMessage('the thickness', 'the zero-thickness model (thicknessModel none) does not use it.')),
+  ];
+  return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZ0', results: { 'strip width for target Z0': 'width' } } });
 }
 
 /** Symmetric stripline Z0, eps_e (= er), delay and guided wavelength, or the width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

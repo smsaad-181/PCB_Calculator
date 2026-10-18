@@ -60,7 +60,7 @@ export const meta = {
     `S-020a (CONFLICT), H-J form, t/h = t̂: Δu1 = (t̂/π)·ln[1 + 4e/(t̂·coth²(√(${n(HJ_THICKNESS.k)}·u)))]; Δur = ½·[1 + 1/cosh(√(εr − 1))]·Δu1; u1 = u + Δu1; ur = u + Δur. ` +
     'Procedure A (Qucs 11.24-11.25): Z0 = Z01(ur)/√εe(ur) and εe(t) = εe(ur)·[Z01(u1)/Z01(ur)]². ' +
     'Procedure B (Janssen D.3): εe = εe(ur), Z0 = Z01(ur)/√εe(ur). The Wheeler form of Δu is not implemented.',
-  ledgerIds: ['S-020', 'S-020a', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-020', 'S-020a', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** S-020: eps_e accuracy range (Steer: better than 0.2 %). */
     uRange: [0.01, 100] as readonly [number, number],
@@ -69,5 +69,6 @@ export const meta = {
     uMaxZ01: 1000,
   },
   accuracyClass: 'empirical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['width', 'height', 'er', 'thickness'] as string[],
 } as const;

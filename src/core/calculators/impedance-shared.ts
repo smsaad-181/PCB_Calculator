@@ -4,10 +4,11 @@ import { C_LEDGER_ID, MU0_LEDGER_ID } from '../data/constants';
 import { dataStatusForLedgerIds } from '../data-status';
 import { assertCalcResult } from '../result';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning, Result } from '../result';
-import { DIM, mul, q } from '../units';
+import { DIM, mul, q, sameDim } from '../units';
 import type { Quantity } from '../units';
 import { guardQuantity } from './copper-converter/guards';
 import { DELAY_LEDGER_IDS, SKEW_LEDGER_ID, delayPerLength, formatDelayPerLength, guidedWavelength, skewFromMismatch } from './delay-shared';
+import { MAX_LOSS_TANGENT, RESISTIVITY_WINDOW } from './loss-shared';
 
 /**
  * Shared pieces of the Phase 2 impedance calculators (microstrip, stripline, coax): the mandatory banner, the common optional
@@ -58,6 +59,45 @@ export interface CommonInputs {
   readonly lengthMismatch?: Quantity;
   readonly erSource?: string;
   readonly geometrySource?: string;
+  /** Loss estimate (core D): tan(delta) as a number in [0, 1), its required source label, optional resistivity override. */
+  readonly lossTangent?: number;
+  readonly lossTangentSource?: string;
+  readonly resistivity?: Quantity;
+}
+
+/** The optional loss-estimate inputs every impedance calculator accepts (core D). Absent tan(delta) means no loss output. */
+export interface LossInputs {
+  /** Dimensionless Quantity in [0, 1). Setting it asks for the loss estimate, which then also needs frequency. */
+  lossTangent?: Quantity;
+  /** REQUIRED with lossTangent, never pre-filled: where the number comes from (product, revision, test frequency). */
+  lossTangentSource?: string;
+  /** Conductor resistivity override (ohm m); the default is copper at 20 degC (ledger S-004). */
+  resistivity?: Quantity;
+}
+
+const LOSS_REQUIRES = 'It is only used with a loss tangent (lossTangent); enter the loss tangent or remove it.';
+
+/** tan(delta): finite, not negative, below 1. Zero is allowed (a lossless dielectric). */
+function guardLossTangent(v: unknown): Result<number, CalcError> {
+  if (!isRecord(v) || typeof v['si'] !== 'number' || !isRecord(v['dim'])) {
+    return { ok: false, error: err('INVALID_INPUT', 'lossTangent', 'lossTangent must be a dimensionless quantity (tan delta, for example 0.02).') };
+  }
+  const qty = v as unknown as Quantity;
+  const same = ((): boolean => {
+    try {
+      return sameDim(qty, { si: 1, dim: DIM.DIMENSIONLESS } as Quantity);
+    } catch {
+      return false;
+    }
+  })();
+  if (!same) return { ok: false, error: err('DIMENSION', 'lossTangent', 'lossTangent must be a dimensionless number (tan delta).') };
+  const n = qty.si;
+  if (!Number.isFinite(n)) return { ok: false, error: err('INVALID_INPUT', 'lossTangent', `lossTangent is ${Number.isNaN(n) ? 'NaN (not a number)' : 'infinite'}; it must be a finite number of at least 0.`) };
+  if (n < 0) return { ok: false, error: err('INVALID_INPUT', 'lossTangent', 'lossTangent is negative; a passive dielectric has tan delta of at least 0.') };
+  if (n >= MAX_LOSS_TANGENT) {
+    return { ok: false, error: err('OUT_OF_DOMAIN', 'lossTangent', `lossTangent is ${String(n)}; tan delta of ${String(MAX_LOSS_TANGENT)} or more is not a laminate (typical values are 0.001 to 0.03). Check the unit: a percentage was probably entered as a fraction.`) };
+  }
+  return { ok: true, value: n };
 }
 
 /** Optional inputs every impedance calculator accepts. A zero or negative value is an error, never silently ignored. */
@@ -78,6 +118,31 @@ export function validateCommon(raw: Record<string, unknown>): Result<CommonInput
     const g = guardLabel(k, raw[k]);
     if (!g.ok) return g;
     if (g.value !== undefined) out[k] = g.value;
+  }
+  if (raw['lossTangent'] === undefined) {
+    for (const k of ['lossTangentSource', 'resistivity'] as const) {
+      if (raw[k] !== undefined) return { ok: false, error: err('INVALID_INPUT', k, `${k} was given without a loss tangent. ${LOSS_REQUIRES}`) };
+    }
+    return { ok: true, value: out };
+  }
+  const t = guardLossTangent(raw['lossTangent']);
+  if (!t.ok) return t;
+  out.lossTangent = t.value;
+  if (out.frequency === undefined) return { ok: false, error: err('INVALID_INPUT', 'frequency', 'The loss estimate needs the frequency (frequency, in Hz): loss depends on it and no frequency is assumed.') };
+  if (raw['lossTangentSource'] === undefined) {
+    return { ok: false, error: err('INVALID_INPUT', 'lossTangentSource', 'lossTangentSource is required with lossTangent: say where the loss tangent comes from (product, revision, test frequency). It is never pre-filled.') };
+  }
+  const src = guardLabel('lossTangentSource', raw['lossTangentSource']);
+  if (!src.ok) return src;
+  if (src.value !== undefined) out.lossTangentSource = src.value;
+  if (raw['resistivity'] !== undefined) {
+    const r = guardQuantity('resistivity', raw['resistivity'], DIM.RESISTIVITY, 'resistivity (ohm metres)');
+    if (!r.ok) return r;
+    const [lo, hi] = RESISTIVITY_WINDOW;
+    if (r.value.si < lo || r.value.si > hi) {
+      return { ok: false, error: err('OUT_OF_DOMAIN', 'resistivity', `resistivity ${String(r.value.si)} ohm m is outside the plausibility window ${String(lo)} to ${String(hi)} ohm m (a unit-slip guard, not a standard); copper is about 1.7e-8.`) };
+    }
+    out.resistivity = r.value;
   }
   return { ok: true, value: out };
 }
@@ -170,6 +235,8 @@ export interface AssembleArgs {
   readonly warnings: CalcWarning[];
   readonly outOfRange: OutOfRangeInput[];
   readonly recommendationExtra?: string;
+  /** Extra defaulted assumptions counted by the confidence rule (the default copper resistivity of the loss estimate). */
+  readonly defaultedExtra?: readonly string[];
 }
 
 /** Rates the confidence by the rule, builds the CalcResult, and runs the schema check. */
@@ -182,7 +249,7 @@ export function assemble(a: AssembleArgs): CalcOutcome {
   const skewUsed = ids.includes(SKEW_LEDGER_ID);
   const confidence = rateConfidence({
     outOfRangeInputs: a.outOfRange,
-    defaultedAssumptions: [STANDING_ASSUMPTION],
+    defaultedAssumptions: [STANDING_ASSUMPTION, ...(a.defaultedExtra ?? [])],
     accuracyClass: a.accuracyClass,
     dataStatus: skewUsed ? dataStatusForLedgerIds(ids.filter((id) => id !== SKEW_LEDGER_ID)) : dataStatus,
   });

@@ -25,12 +25,13 @@ export const meta = {
     'Z0 = (η0/2)/√εe · 1/( K(k)/K(k′) + K(k3)/K(k3′) ); ' +
     'K(k) = π/(2·M(1, k′)) by the arithmetic-geometric mean, K′(k) = K(k′); η0/2 = 60π of the sources, η0 = μ0·c (exact SI constants, decision Q-1); ' +
     'W = strip width, s = gap to each coplanar ground, h = substrate thickness (distance to the lower ground); delay = √εe/c; λg = λ0/√εe',
-  ledgerIds: ['S-023a', 'S-023b', 'S-013', 'S-029', 'S-029a', 'S-029b'],
+  ledgerIds: ['S-023a', 'S-023b', 'S-013', 'S-029', 'S-029a', 'S-029b', 'S-029d', 'S-029e', 'S-029f', 'S-004'],
   validity: {
     /** No numeric validity range is recorded for the Ghione-Naldi form (only the Qucs transcription was read), so none is enforced. */
     recordedRange: 'none',
   },
   /** Conformal mapping is an analytical quasi-static solution (not a curve fit); no accuracy figure is recorded for it. */
   accuracyClass: 'analytical' as AccuracyClass,
-  toleranceInputs: [] as string[],
+  /** Keys of the optional `tolerances` input (core D); none has a default value. */
+  toleranceInputs: ['width', 'gap', 'height', 'er'] as string[],
 } as const;

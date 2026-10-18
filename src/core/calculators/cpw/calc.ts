@@ -5,7 +5,11 @@ import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import { Z_CPW_PREFACTOR_OHM, commonCoplanarWarnings, coplanarInputEchoes, cpwModel, domainFailure, resolveGeometry, safeZ0, substrateCheck, GROUND_WIDTH_MESSAGE, num } from '../cpw-shared';
 import type { CoplanarInputs } from '../cpw-shared';
+import { COPLANAR_OUTPUTS, COPLANAR_SOLVE, coplanarFields } from '../cpw-shared';
+import { runEnvelope } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, delayOutputs, dimensionless } from '../impedance-shared';
+import { lossBlock, mergeLoss } from '../loss-shared';
+import { hasTolerances } from '../tolerance-shared';
 import { validate } from './guards';
 import { meta } from './meta';
 
@@ -15,7 +19,7 @@ export { cpwModel } from '../cpw-shared';
 const CONFLICT_MESSAGE =
   'The effective-permittivity model for CPW is in CONFLICT between the sources read (ledger S-023): this result uses the conformal-map finite-substrate form (decision Q-6); Steer gives a different, empirical eps_e fit (accurate to 1.5 % for h/s >= 1, log base not stated) that is NOT implemented, and the primary papers were not read. The two differ by about 0.7 % in eps_e (6.24 against 6.28) in the one case compared (Steer geometry W 500 um, s 200 um, h 500 um, er 12.85). Treat the numbers as an estimate.';
 
-function build(raw: unknown): CalcOutcome {
+function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcome {
   const v = validate(raw);
   if (!v.ok) return { ok: false, error: v.error };
   const inp = v.value;
@@ -113,7 +117,9 @@ function build(raw: unknown): CalcOutcome {
     ...delay.assumptions,
   ];
 
-  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds];
+  const ledgerIds = [...meta.reference.ledgerIds, ...CONSTANT_LEDGER_IDS, ...delay.ledgerIds, ...extraLedgerIds];
+  const loss = lossBlock({ common: inp.common, er, modes: [{ suffix: '', epsEff: m.epsEff }], conductor: { kind: 'not-modelled', geometry: 'coplanar waveguide' } });
+  const lossDefaults = mergeLoss(loss, { inputs, steps, results, validityChecks, warnings, outOfRange, assumptions, ledgerIds });
   return assemble({
     method: meta.method,
     standard: meta.reference.standard,
@@ -128,13 +134,21 @@ function build(raw: unknown): CalcOutcome {
     validityChecks,
     warnings,
     outOfRange,
+    defaultedExtra: lossDefaults,
   });
+}
+
+/** Nominal result plus the tolerance envelope and sensitivities (core D). */
+function buildWithEnvelope(raw: Inputs): CalcOutcome {
+  const v = validate(raw);
+  if (!v.ok) return { ok: false, error: v.error };
+  return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields: coplanarFields(v.value), outputs: COPLANAR_OUTPUTS, solve: COPLANAR_SOLVE });
 }
 
 /** CPW Z0, eps_e, delay and guided wavelength, or the gap / width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return build(inputs);
+    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };
