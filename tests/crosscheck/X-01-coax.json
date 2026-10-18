@@ -1,0 +1,114 @@
+{
+  "tool": "KiCad pcb_calculator, TransLine tab, Coaxial line",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "Human runs the stand-alone KiCad PCB Calculator, TransLine tab, line type \"Coaxial line\", Analyze direction. Outer diameter D = the inner diameter of the outer conductor and inner diameter d = the diameter of the centre conductor, in mm; CHECK that the tool's fields are DIAMETERS (the tool may use radii or other names: if so STOP and leave the case null, do not convert by hand) and write the field names you used in this field. Relative permeability of the dielectric and conductor = 1 (tool default; record it). Outputs to copy: Z0_ohm = characteristic impedance shown; eps_eff only if the tool shows an effective permittivity for coax (else leave null). Record the exact KiCad version (Help > About), OS, displayed digits and every non-default setting. Every toolOutputs value stays null until a human copies it from a real run of the tool (all displayed digits, no rounding, no conversion). Quasi-static comparison: frequency 1 MHz (1e6 Hz) in the tool; if it refuses, use the lowest accepted frequency and write it here. Dielectric loss tangent, conductor resistivity and roughness do not affect Z0 or eps_eff in the quasi-static model: leave them at the tool defaults and record the defaults here. Dispersion: check the tool's settings, turn dispersion off if it can be turned off, otherwise record that it is on. Soldermask or cover/top-dielectric correction: disable it (or leave the top height at its no-cover default) and record the setting. Thickness: the t0 cases need T = 0 in the tool (if refused, enter the smallest accepted value and record it); the t35um cases need T = 0.035 mm; one tool run with T = 0.035 mm feeds the three t35um cases of the same geometry (none, A, B): copy the same displayed numbers into all three. Record the tool's exact name for its thickness and dispersion models. Details, field entries per case and the digits check: docs/validation/crosscheck-impedance.md. Agreement never verifies a ledger row; no third-party source is copied.",
+  "cases": [
+    {
+      "id": "kicad-coax-er2.1-D4-d1",
+      "calculator": "coax",
+      "inputs": {
+        "outerDiameter_mm": 4,
+        "innerDiameter_mm": 1,
+        "er": 2.1,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.002,
+          "why": "Z0, coax (ledger S-024, ln(D/d) / sqrt(er), TEM). Derived before any run: 0.07 % prefactor (eta0/(2 pi) against the rounded 60 ohm) + 0.02 % display rounding, with 0.11 % margin for a tool that rounds its intermediate constant differently = 0.2 %. The formula is the textbook one in every tool, so a larger difference is a unit or field-definition error (diameter against radius) until shown otherwise. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for coax: ours equals er (TEM in a homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays an effective permittivity for coax."
+        }
+      ]
+    },
+    {
+      "id": "kicad-coax-er2.3-D3-d0.9",
+      "calculator": "coax",
+      "inputs": {
+        "outerDiameter_mm": 3,
+        "innerDiameter_mm": 0.9,
+        "er": 2.3,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.002,
+          "why": "Z0, coax (ledger S-024, ln(D/d) / sqrt(er), TEM). Derived before any run: 0.07 % prefactor (eta0/(2 pi) against the rounded 60 ohm) + 0.02 % display rounding, with 0.11 % margin for a tool that rounds its intermediate constant differently = 0.2 %. The formula is the textbook one in every tool, so a larger difference is a unit or field-definition error (diameter against radius) until shown otherwise. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for coax: ours equals er (TEM in a homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays an effective permittivity for coax."
+        }
+      ]
+    },
+    {
+      "id": "kicad-coax-er4-D7-d2",
+      "calculator": "coax",
+      "inputs": {
+        "outerDiameter_mm": 7,
+        "innerDiameter_mm": 2,
+        "er": 4,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.002,
+          "why": "Z0, coax (ledger S-024, ln(D/d) / sqrt(er), TEM). Derived before any run: 0.07 % prefactor (eta0/(2 pi) against the rounded 60 ohm) + 0.02 % display rounding, with 0.11 % margin for a tool that rounds its intermediate constant differently = 0.2 %. The formula is the textbook one in every tool, so a larger difference is a unit or field-definition error (diameter against radius) until shown otherwise. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for coax: ours equals er (TEM in a homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays an effective permittivity for coax."
+        }
+      ]
+    },
+    {
+      "id": "kicad-coax-er1-D10-d3",
+      "calculator": "coax",
+      "inputs": {
+        "outerDiameter_mm": 10,
+        "innerDiameter_mm": 3,
+        "er": 1,
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.002,
+          "why": "Z0, coax (ledger S-024, ln(D/d) / sqrt(er), TEM). Derived before any run: 0.07 % prefactor (eta0/(2 pi) against the rounded 60 ohm) + 0.02 % display rounding, with 0.11 % margin for a tool that rounds its intermediate constant differently = 0.2 %. The formula is the textbook one in every tool, so a larger difference is a unit or field-definition error (diameter against radius) until shown otherwise. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.001,
+          "why": "eps_eff for coax: ours equals er (TEM in a homogeneous dielectric). Display rounding only, 0.1 %. Compare only if the tool displays an effective permittivity for coax."
+        }
+      ]
+    }
+  ]
+}

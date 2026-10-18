@@ -195,8 +195,11 @@ describe('adapters: null optional current means absent', () => {
 // Structure of the shipped (pending) record files. No tool numbers are read or asserted here.
 const shipped = import.meta.glob('./crosscheck/X-0[13]-*.json', { eager: true, import: 'default' });
 describe('shipped Phase 1 record files', () => {
-  const files = Object.entries(shipped).map(([p, data]) => ({ name: p.slice(p.lastIndexOf('/') + 1), data }));
   const minCases: Record<string, number> = { 'X-01-trace-width.json': 6, 'X-01-track-resistance.json': 4, 'X-01-via.json': 2, 'X-03-twc-ipc2221.json': 6 };
+  // Phase 2 impedance records share the X-01 prefix; they are checked in tests/crosscheck-impedance-adapters.test.ts.
+  const files = Object.entries(shipped)
+    .map(([p, data]) => ({ name: p.slice(p.lastIndexOf('/') + 1), data }))
+    .filter((f) => f.name in minCases);
 
   it('contains the four expected files', () => {
     expect(files.map((f) => f.name).sort()).toEqual(Object.keys(minCases).sort());

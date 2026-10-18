@@ -1,0 +1,424 @@
+{
+  "tool": "KiCad pcb_calculator, TransLine tab, Microstrip line",
+  "toolId": "X-01",
+  "toolVersion": "TO BE FILLED BY HUMAN",
+  "retrieved": "TO BE FILLED BY HUMAN",
+  "obtainedBy": "human",
+  "method": "Human runs the stand-alone KiCad PCB Calculator, TransLine tab, line type \"Microstrip line\", Analyze direction (physical to electrical), substrate height 0.5 mm. Record in this field: the exact KiCad version string (Help > About), OS, the field names as the tool shows them, the displayed number of digits, the thickness and dispersion model names the tool states for microstrip, and every non-default setting. Outputs to copy: Z0_ohm = the characteristic impedance shown; eps_eff = the effective relative permittivity shown (the tool's own name for it). Every toolOutputs value stays null until a human copies it from a real run of the tool (all displayed digits, no rounding, no conversion). Quasi-static comparison: frequency 1 MHz (1e6 Hz) in the tool; if it refuses, use the lowest accepted frequency and write it here. Dielectric loss tangent, conductor resistivity and roughness do not affect Z0 or eps_eff in the quasi-static model: leave them at the tool defaults and record the defaults here. Dispersion: check the tool's settings, turn dispersion off if it can be turned off, otherwise record that it is on. Soldermask or cover/top-dielectric correction: disable it (or leave the top height at its no-cover default) and record the setting. Thickness: the t0 cases need T = 0 in the tool (if refused, enter the smallest accepted value and record it); the t35um cases need T = 0.035 mm; one tool run with T = 0.035 mm feeds the three t35um cases of the same geometry (none, A, B): copy the same displayed numbers into all three. Record the tool's exact name for its thickness and dispersion models. Details, field entries per case and the digits check: docs/validation/crosscheck-impedance.md. Agreement never verifies a ledger row; no third-party source is copied.",
+  "cases": [
+    {
+      "id": "kicad-ms-er3.5-wh0.5-t0",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.25,
+        "height_mm": 0.5,
+        "er": 3.5,
+        "thicknessModel": "none",
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, zero thickness. Derived before any run: 0.07 % prefactor (our eta0/(2 pi) against the 60 ohm some tools use, ledger S-020 and Q-1) + 0.30 % spread between Wheeler-type and Hammerstad-Jensen closed forms (ledger S-020d) + 0.10 % (half of the 0.2 % eps_e fit accuracy of S-020, since Z0 scales as 1/sqrt(eps_e)) + 0.02 % display rounding = 0.49 %, set to 0.5 %. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, zero thickness. Derived before any run: the Hammerstad-Jensen eps_e fit is quoted at better than 0.2 % (ledger S-020), so two different fits can differ by 0.4 %, plus 0.02 % display rounding = 0.42 %, set to 0.5 %. No prefactor term (eps_eff does not depend on it). Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er3.5-wh1-t0",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.5,
+        "height_mm": 0.5,
+        "er": 3.5,
+        "thicknessModel": "none",
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, zero thickness. Derived before any run: 0.07 % prefactor (our eta0/(2 pi) against the 60 ohm some tools use, ledger S-020 and Q-1) + 0.30 % spread between Wheeler-type and Hammerstad-Jensen closed forms (ledger S-020d) + 0.10 % (half of the 0.2 % eps_e fit accuracy of S-020, since Z0 scales as 1/sqrt(eps_e)) + 0.02 % display rounding = 0.49 %, set to 0.5 %. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, zero thickness. Derived before any run: the Hammerstad-Jensen eps_e fit is quoted at better than 0.2 % (ledger S-020), so two different fits can differ by 0.4 %, plus 0.02 % display rounding = 0.42 %, set to 0.5 %. No prefactor term (eps_eff does not depend on it). Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er3.5-wh2-t0",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 1,
+        "height_mm": 0.5,
+        "er": 3.5,
+        "thicknessModel": "none",
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, zero thickness. Derived before any run: 0.07 % prefactor (our eta0/(2 pi) against the 60 ohm some tools use, ledger S-020 and Q-1) + 0.30 % spread between Wheeler-type and Hammerstad-Jensen closed forms (ledger S-020d) + 0.10 % (half of the 0.2 % eps_e fit accuracy of S-020, since Z0 scales as 1/sqrt(eps_e)) + 0.02 % display rounding = 0.49 %, set to 0.5 %. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, zero thickness. Derived before any run: the Hammerstad-Jensen eps_e fit is quoted at better than 0.2 % (ledger S-020), so two different fits can differ by 0.4 %, plus 0.02 % display rounding = 0.42 %, set to 0.5 %. No prefactor term (eps_eff does not depend on it). Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh0.5-t0",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.25,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thicknessModel": "none",
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, zero thickness. Derived before any run: 0.07 % prefactor (our eta0/(2 pi) against the 60 ohm some tools use, ledger S-020 and Q-1) + 0.30 % spread between Wheeler-type and Hammerstad-Jensen closed forms (ledger S-020d) + 0.10 % (half of the 0.2 % eps_e fit accuracy of S-020, since Z0 scales as 1/sqrt(eps_e)) + 0.02 % display rounding = 0.49 %, set to 0.5 %. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, zero thickness. Derived before any run: the Hammerstad-Jensen eps_e fit is quoted at better than 0.2 % (ledger S-020), so two different fits can differ by 0.4 %, plus 0.02 % display rounding = 0.42 %, set to 0.5 %. No prefactor term (eps_eff does not depend on it). Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh1-t0",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.5,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thicknessModel": "none",
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, zero thickness. Derived before any run: 0.07 % prefactor (our eta0/(2 pi) against the 60 ohm some tools use, ledger S-020 and Q-1) + 0.30 % spread between Wheeler-type and Hammerstad-Jensen closed forms (ledger S-020d) + 0.10 % (half of the 0.2 % eps_e fit accuracy of S-020, since Z0 scales as 1/sqrt(eps_e)) + 0.02 % display rounding = 0.49 %, set to 0.5 %. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, zero thickness. Derived before any run: the Hammerstad-Jensen eps_e fit is quoted at better than 0.2 % (ledger S-020), so two different fits can differ by 0.4 %, plus 0.02 % display rounding = 0.42 %, set to 0.5 %. No prefactor term (eps_eff does not depend on it). Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh2-t0",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 1,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thicknessModel": "none",
+        "frequency_Hz": 1000000
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, zero thickness. Derived before any run: 0.07 % prefactor (our eta0/(2 pi) against the 60 ohm some tools use, ledger S-020 and Q-1) + 0.30 % spread between Wheeler-type and Hammerstad-Jensen closed forms (ledger S-020d) + 0.10 % (half of the 0.2 % eps_e fit accuracy of S-020, since Z0 scales as 1/sqrt(eps_e)) + 0.02 % display rounding = 0.49 %, set to 0.5 %. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, zero thickness. Derived before any run: the Hammerstad-Jensen eps_e fit is quoted at better than 0.2 % (ledger S-020), so two different fits can differ by 0.4 %, plus 0.02 % display rounding = 0.42 %, set to 0.5 %. No prefactor term (eps_eff does not depend on it). Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh0.5-t35um-none",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.25,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "none"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, control case: our zero-thickness model against a tool run WITH strip thickness 35 um. Same tolerance as the zero-thickness comparison (0.5 %, derivation in the zero-thickness cases). If the tool applies a thickness correction this case is EXPECTED to be outside tolerance: the size of the miss measures the tool's thickness effect and is classified as a thickness-model difference (E3, ledger S-020a), not as a bug. If the tool ignores T it should pass. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, control case: our zero-thickness model against a tool run WITH strip thickness 35 um. Same 0.5 % as the zero-thickness comparison; expected to fall outside it if the tool applies a thickness correction (classified as E3, ledger S-020a, not a bug); should pass if the tool ignores T. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh0.5-t35um-A",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.25,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "hj-procedure-A"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.01,
+          "why": "Z0, finite thickness 35 um, opt-in variant of ours compared with the tool's own thickness correction (ledger S-020a CONFLICT: procedure A against B differ by about 0.4 % in Z0; Wheeler against Hammerstad-Jensen width correction about 0.05 %). Derived before any run: 0.07 % prefactor + 0.40 % S-020a + 0.05 % width-correction form + 0.30 % closed-form spread (S-020d) + 0.10 % eps_e fit + 0.02 % rounding = 0.94 %, set to 1 %. Record which thickness model the tool names (worksheet section 3); a difference classified against S-020a is a CONFLICT item, not a bug. We do not choose between variants after seeing results: both are registered. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.015,
+          "why": "eps_eff, finite thickness 35 um, variant A or B against the tool's own correction. Derived before any run: 0.9 % (ledger S-020a: eps_e differs by about 0.9 % between procedures A and B) + 0.4 % (two eps_e fits, S-020) + 0.02 % rounding = 1.32 %, set to 1.5 %. A larger difference is classified against S-020a (CONFLICT), not as a bug, once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh0.5-t35um-B",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.25,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "hj-procedure-B"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.01,
+          "why": "Z0, finite thickness 35 um, opt-in variant of ours compared with the tool's own thickness correction (ledger S-020a CONFLICT: procedure A against B differ by about 0.4 % in Z0; Wheeler against Hammerstad-Jensen width correction about 0.05 %). Derived before any run: 0.07 % prefactor + 0.40 % S-020a + 0.05 % width-correction form + 0.30 % closed-form spread (S-020d) + 0.10 % eps_e fit + 0.02 % rounding = 0.94 %, set to 1 %. Record which thickness model the tool names (worksheet section 3); a difference classified against S-020a is a CONFLICT item, not a bug. We do not choose between variants after seeing results: both are registered. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.015,
+          "why": "eps_eff, finite thickness 35 um, variant A or B against the tool's own correction. Derived before any run: 0.9 % (ledger S-020a: eps_e differs by about 0.9 % between procedures A and B) + 0.4 % (two eps_e fits, S-020) + 0.02 % rounding = 1.32 %, set to 1.5 %. A larger difference is classified against S-020a (CONFLICT), not as a bug, once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh1-t35um-none",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.5,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "none"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, control case: our zero-thickness model against a tool run WITH strip thickness 35 um. Same tolerance as the zero-thickness comparison (0.5 %, derivation in the zero-thickness cases). If the tool applies a thickness correction this case is EXPECTED to be outside tolerance: the size of the miss measures the tool's thickness effect and is classified as a thickness-model difference (E3, ledger S-020a), not as a bug. If the tool ignores T it should pass. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, control case: our zero-thickness model against a tool run WITH strip thickness 35 um. Same 0.5 % as the zero-thickness comparison; expected to fall outside it if the tool applies a thickness correction (classified as E3, ledger S-020a, not a bug); should pass if the tool ignores T. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh1-t35um-A",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.5,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "hj-procedure-A"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.01,
+          "why": "Z0, finite thickness 35 um, opt-in variant of ours compared with the tool's own thickness correction (ledger S-020a CONFLICT: procedure A against B differ by about 0.4 % in Z0; Wheeler against Hammerstad-Jensen width correction about 0.05 %). Derived before any run: 0.07 % prefactor + 0.40 % S-020a + 0.05 % width-correction form + 0.30 % closed-form spread (S-020d) + 0.10 % eps_e fit + 0.02 % rounding = 0.94 %, set to 1 %. Record which thickness model the tool names (worksheet section 3); a difference classified against S-020a is a CONFLICT item, not a bug. We do not choose between variants after seeing results: both are registered. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.015,
+          "why": "eps_eff, finite thickness 35 um, variant A or B against the tool's own correction. Derived before any run: 0.9 % (ledger S-020a: eps_e differs by about 0.9 % between procedures A and B) + 0.4 % (two eps_e fits, S-020) + 0.02 % rounding = 1.32 %, set to 1.5 %. A larger difference is classified against S-020a (CONFLICT), not as a bug, once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh1-t35um-B",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 0.5,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "hj-procedure-B"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.01,
+          "why": "Z0, finite thickness 35 um, opt-in variant of ours compared with the tool's own thickness correction (ledger S-020a CONFLICT: procedure A against B differ by about 0.4 % in Z0; Wheeler against Hammerstad-Jensen width correction about 0.05 %). Derived before any run: 0.07 % prefactor + 0.40 % S-020a + 0.05 % width-correction form + 0.30 % closed-form spread (S-020d) + 0.10 % eps_e fit + 0.02 % rounding = 0.94 %, set to 1 %. Record which thickness model the tool names (worksheet section 3); a difference classified against S-020a is a CONFLICT item, not a bug. We do not choose between variants after seeing results: both are registered. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.015,
+          "why": "eps_eff, finite thickness 35 um, variant A or B against the tool's own correction. Derived before any run: 0.9 % (ledger S-020a: eps_e differs by about 0.9 % between procedures A and B) + 0.4 % (two eps_e fits, S-020) + 0.02 % rounding = 1.32 %, set to 1.5 %. A larger difference is classified against S-020a (CONFLICT), not as a bug, once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh2-t35um-none",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 1,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "none"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.005,
+          "why": "Z0, control case: our zero-thickness model against a tool run WITH strip thickness 35 um. Same tolerance as the zero-thickness comparison (0.5 %, derivation in the zero-thickness cases). If the tool applies a thickness correction this case is EXPECTED to be outside tolerance: the size of the miss measures the tool's thickness effect and is classified as a thickness-model difference (E3, ledger S-020a), not as a bug. If the tool ignores T it should pass. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.005,
+          "why": "eps_eff, control case: our zero-thickness model against a tool run WITH strip thickness 35 um. Same 0.5 % as the zero-thickness comparison; expected to fall outside it if the tool applies a thickness correction (classified as E3, ledger S-020a, not a bug); should pass if the tool ignores T. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh2-t35um-A",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 1,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "hj-procedure-A"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.01,
+          "why": "Z0, finite thickness 35 um, opt-in variant of ours compared with the tool's own thickness correction (ledger S-020a CONFLICT: procedure A against B differ by about 0.4 % in Z0; Wheeler against Hammerstad-Jensen width correction about 0.05 %). Derived before any run: 0.07 % prefactor + 0.40 % S-020a + 0.05 % width-correction form + 0.30 % closed-form spread (S-020d) + 0.10 % eps_e fit + 0.02 % rounding = 0.94 %, set to 1 %. Record which thickness model the tool names (worksheet section 3); a difference classified against S-020a is a CONFLICT item, not a bug. We do not choose between variants after seeing results: both are registered. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.015,
+          "why": "eps_eff, finite thickness 35 um, variant A or B against the tool's own correction. Derived before any run: 0.9 % (ledger S-020a: eps_e differs by about 0.9 % between procedures A and B) + 0.4 % (two eps_e fits, S-020) + 0.02 % rounding = 1.32 %, set to 1.5 %. A larger difference is classified against S-020a (CONFLICT), not as a bug, once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    },
+    {
+      "id": "kicad-ms-er4.5-wh2-t35um-B",
+      "calculator": "microstrip",
+      "inputs": {
+        "width_mm": 1,
+        "height_mm": 0.5,
+        "er": 4.5,
+        "thickness_mm": 0.035,
+        "frequency_Hz": 1000000,
+        "thicknessModel": "hj-procedure-B"
+      },
+      "toolOutputs": {
+        "Z0_ohm": null,
+        "eps_eff": null
+      },
+      "compare": [
+        {
+          "output": "Z0_ohm",
+          "relTol": 0.01,
+          "why": "Z0, finite thickness 35 um, opt-in variant of ours compared with the tool's own thickness correction (ledger S-020a CONFLICT: procedure A against B differ by about 0.4 % in Z0; Wheeler against Hammerstad-Jensen width correction about 0.05 %). Derived before any run: 0.07 % prefactor + 0.40 % S-020a + 0.05 % width-correction form + 0.30 % closed-form spread (S-020d) + 0.10 % eps_e fit + 0.02 % rounding = 0.94 %, set to 1 %. Record which thickness model the tool names (worksheet section 3); a difference classified against S-020a is a CONFLICT item, not a bug. We do not choose between variants after seeing results: both are registered. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        },
+        {
+          "output": "eps_eff",
+          "relTol": 0.015,
+          "why": "eps_eff, finite thickness 35 um, variant A or B against the tool's own correction. Derived before any run: 0.9 % (ledger S-020a: eps_e differs by about 0.9 % between procedures A and B) + 0.4 % (two eps_e fits, S-020) + 0.02 % rounding = 1.32 %, set to 1.5 %. A larger difference is classified against S-020a (CONFLICT), not as a bug, once the tool's model name is recorded. Display-rounding term assumes the tool shows at least 2 decimals for ohm values and at least 3 decimals for eps_eff; the worksheet (section 3) requires the human to check the shown digits and re-derive this tolerance BEFORE the first run if fewer are shown."
+        }
+      ]
+    }
+  ]
+}
