@@ -2,13 +2,16 @@ import type { OutOfRangeInput } from '../../confidence';
 import { Z_PREFACTOR_OHM } from '../../data/constants';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from '../../result';
 import { brent } from '../../solvers/rootfind';
+import { formatSignedPercent } from '../../format-result';
 import { DIM, formatFor, q } from '../../units';
 import type { Quantity } from '../../units';
 import { impField, runEnvelope, solvedMessage, unusedMessage } from '../impedance-envelope';
 import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
-import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
+import { CONSTANT_LEDGER_IDS, SOLDERMASK_MESSAGE, THICKNESS_NO_RANGE_RECORDED, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
 import type { LossInputs } from '../impedance-shared';
 import { lossBlock, mergeLoss } from '../loss-shared';
+import { withProfileMinimum } from '../profile-minimum';
+import type { MinimumSpec } from '../profile-minimum';
 import { hasTolerances } from '../tolerance-shared';
 import type { OutputPlan } from '../tolerance-shared';
 import { validate } from './guards';
@@ -94,10 +97,12 @@ export function evaluate(u: number, er: number, tn: number, model: ThicknessMode
 
 // ---- messages -------------------------------------------------------------------------------------------------------------
 
-const SOLDERMASK_MESSAGE =
-  'Soldermask and any coating over the trace are not modelled (no coating correction); a real board with mask over the trace has a somewhat lower Z0 and a higher eps_e than this bare-trace result.';
+/** Names of the labelled secondary results shown when t is entered but the zero-thickness model is the headline (PCB2-2). */
+export const VARIANT_A_Z0 = 'Z0 with thickness variant A (CONFLICT, S-020a)';
+export const VARIANT_A_EE = 'effective permittivity with thickness variant A (CONFLICT, S-020a)';
+export const VARIANT_A_DIFF = 'Z0 difference, thickness variant A vs zero-thickness headline (CONFLICT, S-020a)';
 const ZERO_THICKNESS_MESSAGE =
-  'Zero-thickness model: the entered trace thickness t is NOT used. Hammerstad-Jensen zero-thickness values are returned; a real trace of finite thickness has a lower Z0. The thickness correction (ledger S-020a, in CONFLICT between sources) is available only as an explicit opt-in variant.';
+  'Zero-thickness model: the entered trace thickness t is NOT used. Hammerstad-Jensen zero-thickness values are returned; a real trace of finite thickness has a lower Z0. The thickness correction (ledger S-020a, in CONFLICT between sources) is available as an explicit opt-in variant, and its value at this geometry is shown as a labelled secondary result (the headline and the confidence are unchanged).';
 const CONFLICT_MESSAGE =
   'Thickness variant enabled: the H-J width correction is in CONFLICT between the sources read (ledger S-020a): the full procedure (A) and the simplified procedure (B) give the same Z0 but eps_e differs by about 1 %, and the original paper was not read. Treat the result as a labelled variant, not as the verified base value.';
 
@@ -211,6 +216,22 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
   if (model === 'none') results.push({ name: 'air-line impedance Z01', value: ohms(z01(u)), role: 'secondary', bound: 'nominal' });
   results.push({ name: 'width over height w/h', value: dl(u), role: 'secondary', bound: 'nominal' });
   results.push(...delay.results);
+  const secondaryWarnings: CalcWarning[] = [];
+  if (inp.thickness !== undefined && model === 'none') {
+    if (tn < 1) {
+      const va = evaluate(u, er, tn, 'hj-procedure-A');
+      const diff = va.z0 / ev.z0 - 1;
+      const pct = formatSignedPercent(diff, { accuracyClass: meta.accuracyClass });
+      results.push(
+        { name: VARIANT_A_Z0, value: ohms(va.z0), role: 'secondary', bound: 'nominal', note: `Same geometry, thickness variant A (full H-J procedure; ${THICKNESS_NO_RANGE_RECORDED}); ledger S-020a is in CONFLICT between sources. Secondary value: the headline (zero-thickness) and the confidence are unchanged.` },
+        { name: VARIANT_A_EE, value: dl(va.epsEff), role: 'secondary', bound: 'nominal', note: 'Thickness variant A at the same geometry (ledger S-020a, CONFLICT). Secondary value.' },
+        { name: VARIANT_A_DIFF, value: dl(diff), role: 'secondary', bound: 'nominal', note: `${pct} of the zero-thickness Z0 (signed; negative means the finite-thickness variant is lower). Ledger S-020a, CONFLICT: a labelled side value, not a correction applied to the headline.` },
+      );
+      secondaryWarnings.push({ severity: 'info', code: 'THICKNESS_VARIANT_SECONDARY', message: `Because a thickness was entered, the thickness variant A value at this geometry is shown as a labelled secondary result: Z0 ${num(va.z0)} ohm (${pct} against the zero-thickness headline). Ledger S-020a is in CONFLICT; the headline and the confidence are unchanged.` });
+    } else {
+      secondaryWarnings.push({ severity: 'info', code: 'THICKNESS_VARIANT_NOT_SHOWN', message: `The thickness variant A value is not shown: t/h = ${num(tn)} is at or above 1, outside the thickness correction's domain (geometric guard, not a sourced range).` });
+    }
+  }
 
   // Validity checks: the recorded model ranges. A failed check also forces the confidence to low.
   const outOfRange: OutOfRangeInput[] = [];
@@ -231,7 +252,7 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
     validityChecks.push({
       name: 't/h reported',
       ok: true,
-      detail: `t/h = ${num(tn)}. No range for t/h is recorded in the ledger (S-020a is in CONFLICT), so this is informational, not a pass/fail limit.`,
+      detail: `t/h = ${num(tn)}; ${THICKNESS_NO_RANGE_RECORDED} (ledger S-020a is in CONFLICT), so this is informational, not a pass/fail limit. The only limit enforced is the geometric guard t < h (not a sourced range).`,
     });
   }
 
@@ -240,7 +261,7 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
     { severity: 'caution', message: dispersionMessage(inp.common.frequency), code: 'DISPERSION_NOT_MODELLED' },
     { severity: 'caution', message: SOLDERMASK_MESSAGE, code: 'SOLDERMASK_NOT_MODELLED' },
   );
-  if (inp.thickness !== undefined && model === 'none') warnings.push({ severity: 'caution', message: ZERO_THICKNESS_MESSAGE, code: 'ZERO_THICKNESS_MODEL' });
+  if (inp.thickness !== undefined && model === 'none') warnings.push({ severity: 'caution', message: ZERO_THICKNESS_MESSAGE, code: 'ZERO_THICKNESS_MODEL' }, ...secondaryWarnings);
   if (model !== 'none') warnings.push({ severity: 'warning', message: CONFLICT_MESSAGE, code: 'THICKNESS_VARIANT_CONFLICT' });
   warnings.push(...delay.warnings);
 
@@ -306,10 +327,13 @@ function buildWithEnvelope(raw: Inputs): CalcOutcome {
   return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZ0', results: { 'trace width for target Z0': 'width' } } });
 }
 
+/** Optional fab-profile minimum check (PCB2-4): the widths and spacings this calculator solves for or is given. */
+const MINIMUM_SPECS: readonly MinimumSpec[] = [{ key: 'traceWidth', label: 'trace width', input: 'width', solvedResult: 'trace width for target Z0' }];
+
 /** Microstrip Z0, eps_e, delay and guided wavelength, or the width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
+    return withProfileMinimum(hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs), inputs, MINIMUM_SPECS);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

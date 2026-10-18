@@ -21,7 +21,11 @@ import type { CommonInputs } from './impedance-shared';
  * loss for stripline, coupled or coplanar geometries (no form is recorded for them): those return a notice, never a formula.
  */
 
-export const LOSS_LABEL = 'approximate estimate, lower bound for rough copper, no roughness, no dispersion';
+/** The one loss label (shown once per block by the UI; never called a bound: roughness raises conductor loss, dispersion is not modelled). */
+export const LOSS_LABEL = 'approximate estimate; roughness not modelled raises conductor loss; dispersion not modelled';
+/** Direction of the microstrip conductor-loss form against the recorded refinements (F-1, Qucs eq. 11.82 K_i < 1, Steer eq. 22): an estimate, not a bound. */
+export const MICROSTRIP_CONDUCTOR_DIRECTION =
+  'overestimates for smooth copper per the recorded refinements, underestimates for rough copper (roughness not modelled); an approximate estimate, not a bound';
 /** dB per Np: 20 log10(e) (S-029d; arithmetic, no read source printed it). */
 export const NP_TO_DB = 20 * Math.log10(Math.E);
 /** Dimension of a loss per length (dB per metre is carried as a number with the dimension 1/length). */
@@ -51,7 +55,8 @@ export function surfaceResistance(resistivity: number, frequency: number): numbe
 
 /**
  * Dielectric loss in Np/m (S-029e): (omega/c) tan(delta) er (ee - 1) / (2 sqrt(ee) (er - 1)). With er = 1 there is no dielectric,
- * so the loss is 0 (the quotient (ee - 1)/(er - 1) is the filling factor, which has no meaning without a dielectric).
+ * so the function returns 0 (the quotient (ee - 1)/(er - 1) is the filling factor, which has no meaning without a dielectric). The
+ * calculators never reach this case with a loss request: validateCommon refuses er = 1 together with tan(delta) > 0 (F-2).
  */
 export function dielectricLossNpPerM(frequency: number, er: number, epsEff: number, tanDelta: number): number {
   if (!(er > 1) || tanDelta === 0) return 0;
@@ -112,7 +117,7 @@ const perInch = (dbPerM: number): string => num(dbPerM * INCH_M);
 
 const APPROX_WARNING =
   `Loss is an ${LOSS_LABEL}. It uses the low-loss form alpha ~ R'/(2 Z0) + G' Z0/2 (valid for R' << omega L' and G' << omega C', ledger S-029d), a dielectric term from the entered tan(delta) and eps_eff (S-029e) and, where recorded, a smooth-copper skin-effect term (S-029f). ` +
-  'tan(delta) and er must be the values at your analysis frequency (both vary with frequency, ledger S-027). Real foil and plating roughness add conductor loss that is not modelled, so a real conductor loss is higher than shown; dispersion and radiation are not modelled either.';
+  'tan(delta) and er must be the values at your analysis frequency (both vary with frequency, ledger S-027). Real foil and plating roughness is not modelled and raises conductor loss; dispersion and radiation are not modelled either, so treat the values as an estimate, not a bound.';
 
 /**
  * Builds the loss outputs for a calculator whose model has already given a valid Z0 and eps_eff. Returns undefined when no loss
@@ -168,7 +173,7 @@ export function lossBlock(a: LossArgs): LossBlock | undefined {
     warnings.push({
       severity: 'caution',
       code: 'CONDUCTOR_LOSS_NOT_MODELLED',
-      message: `conductor loss not modelled for this geometry (${a.conductor.geometry}): the ledger records a conductor-loss form only for a wide microstrip strip (S-029f) and for a coaxial line (S-029d, S-029f), so none is invented here. Only the dielectric loss is given; it is a lower bound of the total loss and no total is shown.`,
+      message: `conductor loss not modelled for this geometry (${a.conductor.geometry}): the ledger records a conductor-loss form only for a wide microstrip strip (S-029f) and for a coaxial line (S-029d, S-029f), so none is invented here. Only the dielectric loss is given; the conductor loss is missing from it, so it is not the total loss, and no total is shown.`,
     });
     if (rhoUser !== undefined) warnings.push({ severity: 'info', code: 'RESISTIVITY_UNUSED', message: 'The conductor resistivity you entered is not used: no conductor loss is modelled for this geometry.' });
   } else {
@@ -198,7 +203,7 @@ export function lossBlock(a: LossArgs): LossBlock | undefined {
       warnings.push({
         severity: 'caution',
         code: 'CONDUCTOR_LOSS_WIDE_STRIP',
-        message: 'The microstrip conductor loss Rs/(Z0 w) is the wide-strip, smooth-copper estimate (ledger S-029f): strip and ground plane each contribute about Rs/w, current crowding at the strip edges is not modelled, so it is optimistic for narrow traces and for rough foil.',
+        message: `The microstrip conductor loss Rs/(Z0 w) is the wide-strip, smooth-copper estimate (ledger S-029f): strip and ground plane each contribute about Rs/w and current crowding at the strip edges is not modelled. It ${MICROSTRIP_CONDUCTOR_DIRECTION}. The refinements are Qucs eq. 11.82 (K_i below 1) and Steer eq. 22 (ground term below Rs/w).`,
       });
       assumptions.push('Microstrip conductor loss alpha_c = Rs/(Z0 w) (strip plus ground each about Rs/w; Steer eqs. 21-23 structure, a low-frequency form, with the high-frequency Rs from the skin depth; ledger S-029f, UNVERIFIED).');
       if (a.conductor.thickness === undefined) {
@@ -211,7 +216,8 @@ export function lossBlock(a: LossArgs): LossBlock | undefined {
       assumptions.push("Coax conductor loss from R' = Rs/(2 pi) (1/a + 1/b) with a and b the inner and outer radii and alpha_c = R'/(2 Z0) (Ellingson via ledger S-029d and S-029f; smooth conductors, skin depth much smaller than the inner radius).");
     }
     const acDb = acNp * NP_TO_DB;
-    results.push({ name: 'conductor loss alpha_c', value: perLength(acDb), role: 'secondary', bound: 'prediction', note: `${condNote} ${num(acDb)} dB/m (${perInch(acDb)} dB/in).` });
+    const direction = a.conductor.kind === 'microstrip' ? ` This form ${MICROSTRIP_CONDUCTOR_DIRECTION}.` : '';
+    results.push({ name: 'conductor loss alpha_c', value: perLength(acDb), role: 'secondary', bound: 'prediction', note: `${condNote} ${num(acDb)} dB/m (${perInch(acDb)} dB/in).${direction}` });
     if (lenM !== undefined) results.push({ name: 'conductor loss over length', value: dB(acDb * lenM), role: 'secondary', bound: 'prediction', note: `${condNote} dB over the entered length.` });
     // total: only for a single line (one dielectric value)
     const ad = adByMode[0];

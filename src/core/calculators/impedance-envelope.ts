@@ -103,7 +103,7 @@ interface ProfileResolution {
   readonly today?: string;
 }
 
-function checkScope(raw: Record<string, unknown>): Result<{ scope: ScopeRequest; text: string }, CalcError> {
+export function checkScope(raw: Record<string, unknown>): Result<{ scope: ScopeRequest; text: string }, CalcError> {
   const s = raw['profileScope'];
   const need = 'profileScope {layerCount, layerSide, copperWeight?} is needed with a "profile" tolerance: the exact scope (layer count, layer side, copper weight) the fabricator publishes the tolerance for; nothing is defaulted.';
   if (!isRec(s)) return { ok: false, error: err('INVALID_INPUT', 'profileScope', need) };

@@ -181,7 +181,7 @@ describe('deriveView for stripline', () => {
     const d = updateLayer(STRIP, 3, { thickness: '150 um' });
     const v = deriveView(d, 'stripline');
     expect(v.status).toBe('derive-error');
-    if (v.status === 'derive-error') expect(v.message).toMatch(/offset stripline not offered/);
+    if (v.status === 'derive-error') expect(v.message).toMatch(/not centred between its two planes/);
   });
 });
 

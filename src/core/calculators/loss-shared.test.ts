@@ -72,7 +72,8 @@ describe('pure functions against the oracle', () => {
   });
   it('the loss per length has the dimension 1/length and the label is the required one', () => {
     expect(LOSS_PER_LENGTH).toEqual(div(dl(1), q(1, DIM.LENGTH)).dim);
-    expect(LOSS_LABEL).toBe('approximate estimate, lower bound for rough copper, no roughness, no dispersion');
+    expect(LOSS_LABEL).toBe('approximate estimate; roughness not modelled raises conductor loss; dispersion not modelled');
+    expect(LOSS_LABEL).not.toMatch(/lower bound/i);
   });
 });
 
@@ -148,7 +149,7 @@ describe('hand check from the recorded equations', () => {
   it('coax D/d = e, er 1, Cu, 1 GHz: Z0 = 59.958 ohm, R-prime = Rs/(2 pi)(1/a + 1/b), alpha_c = R-prime/(2 Z0)', () => {
     const d = 1e-3;
     const D = Math.E * d;
-    const r = okOf(coax, { outerDiameter: q(D, DIM.LENGTH), innerDiameter: q(d, DIM.LENGTH), er: dl(1), frequency: hz(1e9), lossTangent: dl(0.01), lossTangentSource: SRC, length: mm(1000) });
+    const r = okOf(coax, { outerDiameter: q(D, DIM.LENGTH), innerDiameter: q(d, DIM.LENGTH), er: dl(1), frequency: hz(1e9), lossTangent: dl(0), lossTangentSource: SRC, length: mm(1000) });
     const z0 = 59.9584916;
     expect(si(r, 'characteristic impedance Z0')).toBeCloseTo(z0, 6);
     const rs = 8.2502e-3;
@@ -157,7 +158,7 @@ describe('hand check from the recorded equations', () => {
     expect(aNp).toBeCloseTo(0.029956, 5);
     expect(si(r, AC) / NP_TO_DB).toBeCloseTo(aNp, 5);
     expect(si(r, AC)).toBeCloseTo(0.26021, 4);
-    // er = 1: no dielectric to lose in, whatever the loss tangent
+    // er = 1 with tan delta 0 (a loss request without dielectric loss): the conductor term alone; er = 1 with tan delta above 0 is refused (F-2)
     expect(si(r, AD)).toBe(0);
   });
   it('microstrip: alpha_c = Rs/(Z0 w) with Rs at 1 GHz', () => {

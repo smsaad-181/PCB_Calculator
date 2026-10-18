@@ -1,4 +1,5 @@
 import { copperBasisFromFoil } from '../data/constants';
+import { SOLDERMASK_WORDING } from '../data/impedance-wording';
 import type { CalcError, CopperBasis, Result } from '../result';
 import { DIM, q, toUnit } from '../units';
 import type { Quantity } from '../units';
@@ -105,7 +106,7 @@ function homogeneous(ds: readonly DielectricLayer[], where: string): Result<Homo
   const sources: string[] = [];
   for (const d of ds) {
     if (Math.abs(d.er - first.er) > SAME_ER_REL * first.er) {
-      return fail(`the dielectric layers ${where} have different er (${String(first.er)} and ${String(d.er)}); an inhomogeneous stack (effective er of mixed layers) is not offered. Enter one er for the whole path.`);
+      return fail(`The dielectric layers ${where} have different er (${String(first.er)} and ${String(d.er)}). This model uses one er for the whole path, so a core-plus-prepreg mix is not offered. Next step: ask your fabricator for a field-solver value, or enter one approximate er for the path yourself and label it as an approximation.`);
     }
     sum += d.thickness.si;
     if (!sources.includes(d.source)) sources.push(d.source);
@@ -163,7 +164,7 @@ export function deriveMicrostrip(s: Stackup, signalLayer: string | number, opts:
   if (!h.ok) return h;
   const notes: string[] = [`The reference plane is "${ref.reference.name}", the nearest copper layer; its copper roughness and thickness are not modelled.`];
   const soldermask = air.masks.length > 0;
-  if (soldermask) notes.push('Soldermask over the trace is not modelled (no coating correction); it lowers Z0 slightly in a real board.');
+  if (soldermask) notes.push(`${SOLDERMASK_WORDING}.`);
   return { ok: true, value: { ...common(layer, 'outer', h.value, notes), referenceLayer: ref.reference.name, h: h.value.thickness, soldermask } };
 }
 
@@ -194,14 +195,14 @@ export function deriveStripline(s: Stackup, signalLayer: string | number, opts: 
   const hb = homogeneous(below.dielectrics, `between "${layer.name}" and "${below.reference.name}"`);
   if (!hb.ok) return hb;
   if (Math.abs(ha.value.er - hb.value.er) > SAME_ER_REL * ha.value.er) {
-    return fail(`the dielectric above (er ${String(ha.value.er)}) and below (er ${String(hb.value.er)}) the strip have different er; an inhomogeneous stripline is not offered.`);
+    return fail(`The dielectric above and below the strip has different er (${String(ha.value.er)} above, ${String(hb.value.er)} below). The symmetric stripline model needs one er, so it does not apply. Next step: ask your fabricator for a field-solver value, or enter one approximate er and b yourself and label it as an approximation.`);
   }
   const a = ha.value.thickness.si;
   const b = hb.value.thickness.si;
   const offset = Math.abs(a - b) / Math.max(a, b);
   if (offset > tol) {
     return fail(
-      `offset stripline not offered: the dielectric above the strip is ${um(ha.value.thickness)} and below is ${um(hb.value.thickness)} (differ by ${String(Number((offset * 100).toPrecision(4)))} %, symmetry tolerance ${String(Number((tol * 100).toPrecision(4)))} %). Only a centred strip is modelled.`,
+      `This strip is not centred between its two planes (offset ${String(Number((offset * 100).toPrecision(4)))} %: ${um(ha.value.thickness)} of dielectric above, ${um(hb.value.thickness)} below). The symmetric stripline model does not apply. Next step: ask your fabricator for a field-solver value, or enter an approximate b yourself and label it as an approximation.`,
       'signalLayer',
     );
   }

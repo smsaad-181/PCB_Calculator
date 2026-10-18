@@ -10,6 +10,8 @@ import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
 import type { LossInputs } from '../impedance-shared';
 import { lossBlock, mergeLoss } from '../loss-shared';
+import { withProfileMinimum } from '../profile-minimum';
+import type { MinimumSpec } from '../profile-minimum';
 import { hasTolerances } from '../tolerance-shared';
 import type { OutputPlan } from '../tolerance-shared';
 import { z0ZeroThickness } from '../stripline/calc';
@@ -278,10 +280,16 @@ function buildWithEnvelope(raw: Inputs): CalcOutcome {
   return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZdiff', results } });
 }
 
+/** Optional fab-profile minimum check (PCB2-4): the widths and spacings this calculator solves for or is given. */
+const MINIMUM_SPECS: readonly MinimumSpec[] = [
+  { key: 'traceWidth', label: 'strip width', input: 'width', solvedResult: 'strip width for target Zdiff' },
+  { key: 'traceSpace', label: 'edge spacing', input: 'edgeSpacing', solvedResult: 'edge spacing for target Zdiff' },
+];
+
 /** Edge-coupled stripline Zdiff, Zodd, Zeven, Zcommon and delay, or the spacing / width for a target Zdiff. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
+    return withProfileMinimum(hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs), inputs, MINIMUM_SPECS);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

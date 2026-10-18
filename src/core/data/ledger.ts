@@ -45,7 +45,7 @@ const LEDGER_ROWS: readonly LedgerRow[] = [
   { id: 'S-011d', item: 'IPC-2152 fit: NinjaCalc', edition: E, status: 'UNVERIFIED' },
   { id: 'S-011e', item: 'IPC-2152 fit: Sierra Circuits (undisclosed)', edition: E, status: 'UNVERIFIED' },
   { id: 'S-012', item: 'Plated copper resistivity', edition: E, status: 'UNVERIFIED' },
-  { id: 'S-013', item: 'Skin depth', edition: E, status: 'VERIFIED' },
+  { id: 'S-013', item: 'Skin depth relation (the impedance calculators cite it for the mu0 value only: S-013 (mu0 value))', edition: E, status: 'VERIFIED' },
   { id: 'S-016', item: 'E-series preferred values (IEC 60063)', edition: E, status: 'PAYWALLED-USER-MUST-VERIFY' },
   { id: 'S-020', item: 'Microstrip, Hammerstad-Jensen quasi-static, zero thickness', edition: 'Steer, Microwave and RF Design II (LibreTexts) §3.5; Janssen et al. arXiv:2509.15043v2 App. D.3; H-J 1980 not read; retrieved 2026-10-18', status: 'VERIFIED' },
   { id: 'S-020a', item: 'Microstrip strip-thickness correction (H-J vs Wheeler; full vs simplified procedure)', edition: 'Janssen et al. arXiv:2509.15043v2; Qucs tech. doc. §11 (tier 4); retrieved 2026-10-18', status: 'CONFLICT' },
