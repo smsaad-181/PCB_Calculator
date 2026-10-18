@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
-import { EllipticDomainError, agm, ellipticK, ellipticKPrime, ellipticKRatio } from './elliptic';
+import { EllipticDomainError, agm, ellipticK, ellipticKPrime, ellipticKRatio, ellipticKRatioPair } from './elliptic';
 
 // Phase 2 task 2: complete elliptic integral of the first kind by the AGM (ledger S-023b, VERIFIED). TESTS FIRST.
 // Convention: K takes the MODULUS k, not the parameter m = k^2. Expected values come from
@@ -177,6 +177,30 @@ describe('domain guards: 0 < k < 1, finite', () => {
     expect(Number.isFinite(ellipticK(5e-324))).toBe(true);
     expect(Number.isFinite(ellipticKPrime(5e-324))).toBe(true);
     expect(ellipticKPrime(5e-324)).toBeGreaterThan(700);
+  });
+});
+
+describe("ellipticKRatioPair: K'/K from both moduli (no cancellation of 1 - k^2 near k = 1)", () => {
+  it('equals ellipticKRatio for a consistent pair, and is the plain ratio of the two AGM values', () => {
+    for (const k of [0.001, 0.1, 0.5, 5 / 9, 0.9, 0.99]) {
+      const kp = Math.sqrt((1 - k) * (1 + k));
+      expect(relErr(ellipticKRatioPair(k, kp), ellipticKRatio(k))).toBeLessThan(1e-14);
+      expect(relErr(ellipticKRatioPair(k, kp), ellipticKPrime(k) / ellipticK(k))).toBeLessThan(1e-13);
+    }
+  });
+  it('accepts a modulus that rounded to exactly 1 (the small complement carries the information): K(1 - tiny) follows the log law', () => {
+    const r = ellipticKRatioPair(1, 1e-9);
+    // K = ln(4/k') = ln(4e9) and K' = pi/2, so K'/K = (pi/2)/ln(4e9)
+    expect(relErr(r, Math.PI / 2 / Math.log(4e9))).toBeLessThan(1e-9);
+    expect(Number.isFinite(ellipticKRatioPair(1e-30, 1))).toBe(true);
+    expect(Number.isFinite(ellipticKRatioPair(1 - 2 ** -53, 1e-8))).toBe(true);
+  });
+  it('rejects a modulus or a complement outside (0, 1], and a pair that is both 1', () => {
+    expect(() => ellipticKRatioPair(0, 0.5)).toThrow(EllipticDomainError);
+    expect(() => ellipticKRatioPair(0.5, 0)).toThrow(EllipticDomainError);
+    expect(() => ellipticKRatioPair(1.5, 0.5)).toThrow(EllipticDomainError);
+    expect(() => ellipticKRatioPair(0.5, Number.NaN)).toThrow(/complementary modulus/);
+    expect(() => ellipticKRatioPair(1, 1)).toThrow(/both be 1/);
   });
 });
 

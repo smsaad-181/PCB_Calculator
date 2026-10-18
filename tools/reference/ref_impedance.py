@@ -551,8 +551,122 @@ PINNED_B = {
 PINNED.update(PINNED_B)
 
 
+# Part C pins (CPW and CPWG): full-precision literals recorded from this oracle (60-digit decimal K), regression pins only.
+PINNED_C = {
+    'cpw_z0_ohm_w500um_s200um_h500um_er1': 113.02151358540485,
+    'cpw_eeff_w500um_s200um_h500um_er1': 1.0,
+    'cpw_k_w500um_s200um_h500um_er1': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h500um_er1': 0.44916121659925634,
+    'cpw_z0_ohm_w500um_s200um_h500um_er12.85': 45.24582103634388,
+    'cpw_eeff_w500um_s200um_h500um_er12.85': 6.239722725757477,
+    'cpw_k_w500um_s200um_h500um_er12.85': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h500um_er12.85': 0.44916121659925634,
+    'cpw_z0_ohm_w300um_s200um_h1600um_er4.5': 79.16161633302383,
+    'cpw_eeff_w300um_s200um_h1600um_er4.5': 2.7359398404753934,
+    'cpw_k_w300um_s200um_h1600um_er4.5': 0.42857142857142855,
+    'cpw_k1_w300um_s200um_h1600um_er4.5': 0.42177325988690245,
+    'cpw_z0_ohm_w250um_s150um_h1000um_er4.2': 79.0745083132116,
+    'cpw_eeff_w250um_s150um_h1000um_er4.2': 2.5795276278433983,
+    'cpw_k_w250um_s150um_h1000um_er4.2': 0.45454545454545453,
+    'cpw_k1_w250um_s150um_h1000um_er4.2': 0.44354836393143976,
+    'cpw_z0_ohm_w100um_s100um_h200um_er3.66': 98.66396671918733,
+    'cpw_eeff_w100um_s100um_h200um_er3.66': 2.2272311432833867,
+    'cpw_k_w100um_s100um_h200um_er3.66': 0.3333333333333333,
+    'cpw_k1_w100um_s100um_h200um_er3.66': 0.27403129960564526,
+    'cpw_z0_ohm_w200um_s50um_h1600um_er4.5': 59.79356178025146,
+    'cpw_eeff_w200um_s50um_h1600um_er4.5': 2.74712704592507,
+    'cpw_k_w200um_s50um_h1600um_er4.5': 0.6666666666666666,
+    'cpw_k1_w200um_s50um_h1600um_er4.5': 0.6653307517534144,
+    'cpw_z0_ohm_w1000um_s100um_h1600um_er4.3': 48.420443104201226,
+    'cpw_eeff_w1000um_s100um_h1600um_er4.3': 2.6104390796220756,
+    'cpw_k_w1000um_s100um_h1600um_er4.3': 0.8333333333333334,
+    'cpw_k1_w1000um_s100um_h1600um_er4.3': 0.8190132933170973,
+    'cpw_z0_ohm_w150um_s500um_h800um_er4.2': 129.3693904744183,
+    'cpw_eeff_w150um_s500um_h800um_er4.2': 2.5107844113786637,
+    'cpw_k_w150um_s500um_h800um_er4.2': 0.13043478260869565,
+    'cpw_k1_w150um_s500um_h800um_er4.2': 0.10674048572265106,
+    'cpw_z0_ohm_w500um_s200um_h100000um_er4.5': 68.1546170509535,
+    'cpw_eeff_w500um_s200um_h100000um_er4.5': 2.7499935443971113,
+    'cpw_k_w500um_s200um_h100000um_er4.5': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h100000um_er4.5': 0.5555523570888262,
+    'cpw_z0_ohm_w500um_s200um_h20um_er4.5': 103.47744009194241,
+    'cpw_eeff_w500um_s200um_h20um_er4.5': 1.192973744565051,
+    'cpw_k_w500um_s200um_h20um_er4.5': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h20um_er4.5': 1.5070172753900646e-07,
+    'cpw_z0_ohm_w300um_s300um_h300um_er128': 20.796763873682504,
+    'cpw_eeff_w300um_s300um_h300um_er128': 50.12921605434623,
+    'cpw_k_w300um_s300um_h300um_er128': 0.3333333333333333,
+    'cpw_k1_w300um_s300um_h300um_er128': 0.16615830650994654,
+    'cpw_z0_ohm_w100um_s10um_h1600um_er4.5': 47.17963033654871,
+    'cpw_eeff_w100um_s10um_h1600um_er4.5': 2.749552482604889,
+    'cpw_k_w100um_s10um_h1600um_er4.5': 0.8333333333333334,
+    'cpw_k1_w100um_s10um_h1600um_er4.5': 0.8331861236025038,
+    'cpwg_z0_ohm_w500um_s200um_h500um_er1': 100.43800215362509,
+    'cpwg_eeff_w500um_s200um_h500um_er1': 1.0,
+    'cpwg_k3_w500um_s200um_h500um_er1': 0.7382735392946401,
+    'cpwg_q_w500um_s200um_h500um_er1': 0.5556686556063107,
+    'cpwg_z0_ohm_w500um_s200um_h500um_er12.85': 36.46948397460501,
+    'cpwg_eeff_w500um_s200um_h500um_er12.85': 7.584673568934782,
+    'cpwg_k3_w500um_s200um_h500um_er12.85': 0.7382735392946401,
+    'cpwg_q_w500um_s200um_h500um_er12.85': 0.5556686556063107,
+    'cpwg_z0_ohm_w300um_s200um_h200um_er4.2': 56.4952723135648,
+    'cpwg_eeff_w300um_s200um_h200um_er4.2': 3.00357976646107,
+    'cpwg_k3_w300um_s200um_h200um_er4.2': 0.8336518090713089,
+    'cpwg_q_w300um_s200um_h200um_er4.2': 0.6261186770190843,
+    'cpwg_z0_ohm_w250um_s150um_h1000um_er4.2': 77.46143355005367,
+    'cpwg_eeff_w250um_s150um_h1000um_er4.2': 2.6203005282860596,
+    'cpwg_k3_w250um_s150um_h1000um_er4.2': 0.47636606617529664,
+    'cpwg_q_w250um_s150um_h1000um_er4.2': 0.5063439150893937,
+    'cpwg_z0_ohm_w200um_s150um_h160um_er4.35': 60.807109847037516,
+    'cpwg_eeff_w200um_s150um_h160um_er4.35': 3.0394255269720087,
+    'cpwg_k3_w200um_s150um_h160um_er4.35': 0.7650333505149921,
+    'cpwg_q_w200um_s150um_h160um_er4.35': 0.6087837393946295,
+    'cpwg_z0_ohm_w150um_s100um_h100um_er3.66': 59.97141957948539,
+    'cpwg_eeff_w150um_s100um_h100um_er3.66': 2.665475680870764,
+    'cpwg_k3_w150um_s100um_h100um_er3.66': 0.8336518090713089,
+    'cpwg_q_w150um_s100um_h100um_er3.66': 0.6261186770190843,
+    'cpwg_z0_ohm_w400um_s300um_h1600um_er4.5': 80.02662493649,
+    'cpwg_eeff_w400um_s300um_h1600um_er4.5': 2.7773875850683067,
+    'cpwg_k3_w400um_s300um_h1600um_er4.5': 0.4261605070665631,
+    'cpwg_q_w400um_s300um_h1600um_er4.5': 0.5078250243052305,
+    'cpwg_z0_ohm_w500um_s200um_h100000um_er4.5': 68.15420564321526,
+    'cpwg_eeff_w500um_s200um_h100000um_er4.5': 2.7500064555921306,
+    'cpwg_k3_w500um_s200um_h100000um_er4.5': 0.5555619524606036,
+    'cpwg_q_w500um_s200um_h100000um_er4.5': 0.5000018444548945,
+    'cpwg_z0_ohm_w100um_s50um_h50um_er3.48': 52.09090838271699,
+    'cpwg_eeff_w100um_s50um_h50um_er3.48': 2.6133350498029726,
+    'cpwg_k3_w100um_s50um_h50um_er3.48': 0.9205842034099684,
+    'cpwg_q_w100um_s50um_h50um_er3.48': 0.6505383265334567,
+    'cpwg_z0_ohm_w1000um_s500um_h300um_er4.5': 34.55885209158871,
+    'cpwg_eeff_w1000um_s500um_h300um_er4.5': 3.553740440687788,
+    'cpwg_k3_w1000um_s500um_h300um_er4.5': 0.9894692474419606,
+    'cpwg_q_w1000um_s500um_h300um_er4.5': 0.7296401259107965,
+    'cpwg_z0_ohm_w300um_s300um_h300um_er128': 13.495578104354504,
+    'cpwg_eeff_w300um_s300um_h300um_er128': 76.94712537276797,
+    'cpwg_k3_w300um_s300um_h300um_er128': 0.667683386980107,
+    'cpwg_q_w300um_s300um_h300um_er128': 0.5980088612028974,
+    'cpw_solve_s_um_Z50ohm_w300um_h1600um_er4.5': 37.88147843267837,
+    'cpw_solve_s_um_Z60ohm_w250um_h1000um_er4.2': 56.811427688244265,
+    'cpw_solve_s_um_Z75ohm_w200um_h800um_er3.66': 82.90750766205666,
+    'cpw_solve_s_um_Z40ohm_w500um_h1600um_er4.5': 24.042475367675664,
+    'cpw_solve_w_um_Z50ohm_s200um_h1600um_er4.5': 1724.5522379893569,
+    'cpw_solve_w_um_Z60ohm_s150um_h1000um_er4.2': 687.7773307855166,
+    'cpw_solve_w_um_Z75ohm_s300um_h800um_er3.66': 804.7604049987445,
+    'cpw_solve_w_um_Z40ohm_s150um_h1600um_er4.5': 3986.6708488410286,
+    'cpwg_solve_s_um_Z50ohm_w300um_h200um_er4.2': 80.625486865237,
+    'cpwg_solve_s_um_Z60ohm_w250um_h1000um_er4.2': 58.96424516320917,
+    'cpwg_solve_s_um_Z75ohm_w200um_h800um_er3.66': 87.41915133936597,
+    'cpwg_solve_s_um_Z40ohm_w400um_h1600um_er4.5': 19.75339662714937,
+    'cpwg_solve_w_um_Z50ohm_s150um_h200um_er4.2': 353.8401505946634,
+    'cpwg_solve_w_um_Z60ohm_s150um_h1000um_er4.2': 561.2462819486717,
+    'cpwg_solve_w_um_Z75ohm_s300um_h800um_er3.66': 518.2894686575293,
+    'cpwg_solve_w_um_Z40ohm_s200um_h1600um_er4.5': 2289.2141807112903,
+}
+PINNED.update(PINNED_C)
+
+
 def pinned_vectors():
-    return [(n, got, PINNED[n], tol, ids, note) for n, got, tol, ids, note in vectors() + part_b_vectors()]
+    return [(n, got, PINNED[n], tol, ids, note) for n, got, tol, ids, note in vectors() + part_b_vectors() + part_c_vectors()]
 
 
 def self_checks():
@@ -809,8 +923,181 @@ def part_b_self_checks():
     assert abs(sc_z0o(0.5, 2.0 / math.pi, 4.0) - z / (0.5 + math.log(2.0) / math.pi + math.log(2.3130352854993313) / math.pi)) < 1e-12
 
 
+# =====================================================================================================================
+# Phase 2 part C: coplanar waveguide (CPW, S-023 conformal map with finite-substrate eps_e) and conductor-backed CPW (CPWG,
+# S-023a Ghione-Naldi as transcribed in Qucs 12.10-12.13), written from docs/sources/notes/impedance-models.md only.
+# Independent of src/. K by 60-digit decimal AGM; k, k1, k3 are also evaluated in 60-digit decimals, so the oracle is not limited
+# by double cancellation. Decision Q-1: 30 pi = eta0/4 and 60 pi = eta0/2 (eta0 = mu0 c). Decision Q-6: conformal-map eps_e is
+# the default CPW model (Steer's empirical eps_e fit, the other side of the S-023 CONFLICT, is NOT used).
+# No published worked example is internally consistent (Steer 3.8.1 uses w = 500 um while stating 200 um, and its eps_e is the
+# other model), so every vector is the recorded formula evaluated here. S-023 stays CONFLICT, S-023a PAYWALLED-USER-MUST-VERIFY.
+# =====================================================================================================================
+def _dexp(x):
+    return x.exp()
+
+
+def _dsinh(x):
+    return (_dexp(x) - _dexp(-x)) / 2
+
+
+def _dtanh(x):
+    e2 = _dexp(2 * x)
+    return (e2 - 1) / (e2 + 1)
+
+
+def _dratio(k):
+    """K'(k)/K(k) = M(1, k')/M(1, k) for a Decimal modulus 0 < k < 1 (S-023b)."""
+    kp = (1 - k * k).sqrt()
+    return _dagm(Decimal(1), kp) / _dagm(Decimal(1), k)
+
+
+def cpw_k(w, s):
+    return Decimal(w) / (Decimal(w) + 2 * Decimal(s))
+
+
+def cpw_k1(w, s, h):
+    a = _PI * Decimal(w) / (4 * Decimal(h))
+    b = _PI * (Decimal(w) + 2 * Decimal(s)) / (4 * Decimal(h))
+    return _dsinh(a) / _dsinh(b)
+
+
+def cpw_k3(w, s, h):
+    a = _PI * Decimal(w) / (4 * Decimal(h))
+    b = _PI * (Decimal(w) + 2 * Decimal(s)) / (4 * Decimal(h))
+    return _dtanh(a) / _dtanh(b)
+
+
+def cpw_model(w, s, h, er):
+    """S-023: returns dict(z0, ee, k, k1, rk, rk1). rk = K(k')/K(k), rk1 = K(k1')/K(k1)."""
+    k, k1 = cpw_k(w, s), cpw_k1(w, s, h)
+    rk, rk1 = _dratio(k), _dratio(k1)
+    ee = 1.0 + (er - 1.0) / 2.0 * float(rk / rk1)
+    return {"z0": (ETA0 / 4.0) / math.sqrt(ee) * float(rk), "ee": ee, "k": float(k), "k1": float(k1), "rk": float(rk), "rk1": float(rk1)}
+
+
+def cpwg_model(w, s, h, er):
+    """S-023a: returns dict(z0, ee, k, k3, a, b, q). a = K(k)/K(k'), b = K(k3)/K(k3')."""
+    k, k3 = cpw_k(w, s), cpw_k3(w, s, h)
+    a, b = 1 / _dratio(k), 1 / _dratio(k3)
+    q = float(b / (a + b))
+    ee = 1.0 + q * (er - 1.0)
+    return {"z0": (ETA0 / 2.0) / math.sqrt(ee) / float(a + b), "ee": ee, "k": float(k), "k3": float(k3), "a": float(a), "b": float(b), "q": q}
+
+
+def cpw_z0(w, s, h, er):
+    return cpw_model(w, s, h, er)["z0"]
+
+
+def cpwg_z0(w, s, h, er):
+    return cpwg_model(w, s, h, er)["z0"]
+
+
+# solves: plain bisection on ln of the unknown ratio. Gap solve over g = s/w in [0.01, 100]; width solve over x = w/s in [0.01, 100].
+def cpw_solve_s(z, w, h, er, model=cpw_z0):
+    return bisect_ln(lambda g: model(w, g * w, h, er) - z, 0.01, 100.0) * w
+
+
+def cpw_solve_w(z, s, h, er, model=cpw_z0):
+    return bisect_ln(lambda x: model(x * s, s, h, er) - z, 0.01, 100.0) * s
+
+
+# CPW analysis: (w um, s um, h um, er)
+CPW_CASES = [
+    (500, 200, 500, 1.0),        # hand-checkable: er = 1 gives eps_e = 1 exactly, Z0 = (eta0/4) K(k')/K(k), k = 5/9
+    (500, 200, 500, 12.85), (300, 200, 1600, 4.5), (250, 150, 1000, 4.2), (100, 100, 200, 3.66), (200, 50, 1600, 4.5),
+    (1000, 100, 1600, 4.3), (150, 500, 800, 4.2), (500, 200, 100000, 4.5), (500, 200, 20, 4.5), (300, 300, 300, 128.0),
+    (100, 10, 1600, 4.5),
+]
+# CPWG analysis: (w um, s um, h um, er)
+CPWG_CASES = [
+    (500, 200, 500, 1.0),        # er = 1: eps_e = 1 exactly, Z0 = (eta0/2) / (K(k)/K(k') + K(k3)/K(k3'))
+    (500, 200, 500, 12.85), (300, 200, 200, 4.2), (250, 150, 1000, 4.2), (200, 150, 160, 4.35), (150, 100, 100, 3.66),
+    (400, 300, 1600, 4.5), (500, 200, 100000, 4.5), (100, 50, 50, 3.48), (1000, 500, 300, 4.5), (300, 300, 300, 128.0),
+]
+# solves: (Z0 ohm, fixed um, h um, er)
+CPW_SOLVE_S_CASES = [(50, 300, 1600, 4.5), (60, 250, 1000, 4.2), (75, 200, 800, 3.66), (40, 500, 1600, 4.5)]
+CPW_SOLVE_W_CASES = [(50, 200, 1600, 4.5), (60, 150, 1000, 4.2), (75, 300, 800, 3.66), (40, 150, 1600, 4.5)]
+CPWG_SOLVE_S_CASES = [(50, 300, 200, 4.2), (60, 250, 1000, 4.2), (75, 200, 800, 3.66), (40, 400, 1600, 4.5)]
+CPWG_SOLVE_W_CASES = [(50, 150, 200, 4.2), (60, 150, 1000, 4.2), (75, 300, 800, 3.66), (40, 200, 1600, 4.5)]
+
+CPW_IDS = ("S-023", "S-023b", "S-013", "S-029", "S-029a")
+CPWG_IDS = ("S-023a", "S-023b", "S-013", "S-029", "S-029a")
+
+
+def _cp_tag(w, s, h, er):
+    return "w%sum_s%sum_h%sum_er%s" % (_g(w), _g(s), _g(h), _g(er))
+
+
+def part_c_vectors():
+    out = []
+    nc = ("CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); "
+          "eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper")
+    ng = ("CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width "
+          "argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation "
+          "against the recorded formula, not the paper")
+    for w, s, h, er in CPW_CASES:
+        t = _cp_tag(w, s, h, er)
+        m = cpw_model(w, s, h, er)
+        out.append(("cpw_z0_ohm_" + t, m["z0"], RTOL, CPW_IDS, nc))
+        out.append(("cpw_eeff_" + t, m["ee"], RTOL, CPW_IDS, nc))
+        out.append(("cpw_k_" + t, m["k"], RTOL, CPW_IDS, nc + "; k = W/(W + 2 s)"))
+        out.append(("cpw_k1_" + t, m["k1"], RTOL, CPW_IDS, nc + "; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"))
+    for w, s, h, er in CPWG_CASES:
+        t = _cp_tag(w, s, h, er)
+        m = cpwg_model(w, s, h, er)
+        out.append(("cpwg_z0_ohm_" + t, m["z0"], RTOL, CPWG_IDS, ng))
+        out.append(("cpwg_eeff_" + t, m["ee"], RTOL, CPWG_IDS, ng))
+        out.append(("cpwg_k3_" + t, m["k3"], RTOL, CPWG_IDS, ng + "; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"))
+        out.append(("cpwg_q_" + t, m["q"], RTOL, CPWG_IDS, ng + "; filling factor q"))
+    for z, w, h, er in CPW_SOLVE_S_CASES:
+        out.append(("cpw_solve_s_um_Z%sohm_w%sum_h%sum_er%s" % (_g(z), _g(w), _g(h), _g(er)), cpw_solve_s(z, w, h, er), 1e-9, CPW_IDS,
+                    "gap for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= s/w <= 100"))
+    for z, s, h, er in CPW_SOLVE_W_CASES:
+        out.append(("cpw_solve_w_um_Z%sohm_s%sum_h%sum_er%s" % (_g(z), _g(s), _g(h), _g(er)), cpw_solve_w(z, s, h, er), 1e-9, CPW_IDS,
+                    "width for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= w/s <= 100"))
+    for z, w, h, er in CPWG_SOLVE_S_CASES:
+        out.append(("cpwg_solve_s_um_Z%sohm_w%sum_h%sum_er%s" % (_g(z), _g(w), _g(h), _g(er)), cpw_solve_s(z, w, h, er, cpwg_z0), 1e-9, CPWG_IDS,
+                    "gap for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= s/w <= 100"))
+    for z, s, h, er in CPWG_SOLVE_W_CASES:
+        out.append(("cpwg_solve_w_um_Z%sohm_s%sum_h%sum_er%s" % (_g(z), _g(s), _g(h), _g(er)), cpw_solve_w(z, s, h, er, cpwg_z0), 1e-9, CPWG_IDS,
+                    "width for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= w/s <= 100"))
+    return out
+
+
+def part_c_self_checks():
+    """Oracle self-consistency for part C (raises AssertionError). Not a verification of any standard."""
+    # k = 5/9: the note's researcher check gives 0.83334 (hand arithmetic, +2e-5 vs the AGM 0.833315); also the pinned K vectors of part A
+    assert abs(float(1 / _dratio(Decimal(5) / Decimal(9))) - 0.83334) < 5e-5
+    # er = 1: eps_e = 1 exactly for both models, so Z0 is a pure elliptic ratio
+    m = cpw_model(500, 200, 500, 1.0)
+    assert m["ee"] == 1.0 and abs(m["z0"] - (ETA0 / 4.0) * m["rk"]) < 1e-12
+    g = cpwg_model(500, 200, 500, 1.0)
+    assert g["ee"] == 1.0 and abs(g["z0"] - (ETA0 / 2.0) / (g["a"] + g["b"])) < 1e-12
+    # h -> infinity: k1 -> k and k3 -> k, so CPWG -> CPW on an infinite substrate: eps_e = (er + 1)/2, same Z0
+    for er in (2.2, 4.5, 12.85):
+        c, d = cpw_model(500, 200, 1e7, er), cpwg_model(500, 200, 1e7, er)
+        assert abs(c["ee"] - (er + 1) / 2) < 1e-6 and abs(d["ee"] - (er + 1) / 2) < 1e-6
+        assert abs(c["z0"] - d["z0"]) / c["z0"] < 1e-6
+    # inequality from the formulas (k3 > k and k1 < k): CPWG Z0 is below CPW Z0 for the same geometry
+    for w, s, h, er in CPW_CASES + CPWG_CASES:
+        assert cpwg_z0(w, s, h, er) < cpw_z0(w, s, h, er), (w, s, h, er)
+    # monotone in w (down) and s (up) for both models
+    for model in (cpw_z0, cpwg_z0):
+        prev = None
+        for w in (50, 100, 200, 400, 800):
+            z = model(w, 150, 400, 4.5)
+            assert prev is None or z < prev
+            prev = z
+        prev = None
+        for s in (20, 50, 100, 200, 400, 800):
+            z = model(300, s, 400, 4.5)
+            assert prev is None or z > prev
+            prev = z
+
+
 if __name__ == "__main__":
     self_checks()
     part_b_self_checks()
+    part_c_self_checks()
     for name, got, tol, ids, note in vectors():
         print("%-70s %.17g" % (name, got))

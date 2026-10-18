@@ -59,6 +59,26 @@ export function ellipticKPrime(k: number): number {
   return Math.PI / (2 * agm(1, m));
 }
 
+/**
+ * K'(k)/K(k) = M(1, k')/M(1, k) from BOTH moduli, for callers that can evaluate the complementary modulus k' = sqrt(1 - k^2)
+ * directly without the cancellation of 1 - k^2 (k close to 1) or of k itself (k close to 0). The caller owns the relation
+ * k^2 + k'^2 = 1. Each modulus must be in (0, 1]; a value of exactly 1 is accepted because it is what a modulus within half an ulp
+ * of 1 rounds to, and the ratio is then still determined to double precision by the other, small modulus (M(1, 1) = 1 is the
+ * correct limit of M(1, k) for k -> 1). Both equal to 1 is inconsistent and refused.
+ */
+export function ellipticKRatioPair(k: number, kPrime: number): number {
+  for (const [x, label] of [
+    [k, 'ellipticKRatioPair'],
+    [kPrime, 'ellipticKRatioPair (complementary modulus)'],
+  ] as const) {
+    if (typeof x !== 'number' || !Number.isFinite(x) || !(x > 0) || !(x <= 1)) {
+      throw new EllipticDomainError(`${label}: the modulus k must be a finite number with 0 < k <= 1 (k is the modulus, not the parameter m = k^2); got ${String(x)}.`);
+    }
+  }
+  if (k === 1 && kPrime === 1) throw new EllipticDomainError('ellipticKRatioPair: the modulus and its complement cannot both be 1.');
+  return agm(1, kPrime) / agm(1, k);
+}
+
 /** K'(k)/K(k) = M(1, k')/M(1, k): the ratio the conformal-mapping line formulas use. */
 export function ellipticKRatio(k: number): number {
   const m = checkModulus(k, 'ellipticKRatio');
