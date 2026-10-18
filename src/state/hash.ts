@@ -381,6 +381,47 @@ export const CALCULATOR_STATE_KEYS = {
     f: 'Entered frequency text, for example "1 kHz" (at most 40 characters).',
     cv: 'Entered component value text: the inductance for inductive, the capacitance for capacitive, for example "1 mH" or "100 nF" (at most 40 characters).',
   },
+  // Impedance pages (Phase 2). The stackup editor's layers are NOT in the link (they would blow the 8192-character cap):
+  // the link carries only the scalar values derived from a stackup (h or b, t, er, the er source and the geometry source note).
+  microstrip: {
+    sf: 'Solve for: "z0" (impedance from the geometry) or "width" (trace width from a target Z0). Absent means z0.',
+    w: 'Entered trace width text, for example "600 um" (at most 40 characters; used when solving Z0).',
+    z: 'Entered target characteristic impedance text, for example "50 ohm" (at most 40 characters; used when solving the width).',
+    h: 'Entered dielectric height text from the trace to its reference plane, for example "635 um" (at most 40 characters).',
+    t: 'Entered trace copper thickness text, for example "35 um" (at most 40 characters). Optional: ignored by the zero-thickness model, required by a thickness variant.',
+    er: 'Entered relative permittivity as a plain number (at most 40 characters). Absent means not entered: there is no default and no result without it.',
+    es: 'Entered note on where er came from (free text, at most 200 characters). Absent means not entered: required, there is no result without it.',
+    gs: 'Optional note on where the geometry came from, for example the stackup name and signal layer (free text, at most 200 characters).',
+    tm: 'Thickness model: "hj-procedure-A" or "hj-procedure-B" (opt-in variants, ledger S-020a CONFLICT). Absent means zero thickness (the default).',
+    f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
+    l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
+    dl: 'Entered length mismatch text between two traces, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+  },
+  stripline: {
+    sf: 'Solve for: "z0" (impedance from the geometry) or "width" (strip width from a target Z0). Absent means z0.',
+    w: 'Entered strip width text, for example "0.2 mm" (at most 40 characters; used when solving Z0).',
+    z: 'Entered target characteristic impedance text, for example "50 ohm" (at most 40 characters; used when solving the width).',
+    b: 'Entered plane-to-plane spacing text (dielectric above and below plus the strip), for example "0.4 mm" (at most 40 characters).',
+    t: 'Entered strip copper thickness text, for example "17.5 um" (at most 40 characters). Optional: ignored by the zero-thickness model, required by the thickness variant.',
+    er: 'Entered relative permittivity as a plain number (at most 40 characters). Absent means not entered: there is no default and no result without it.',
+    es: 'Entered note on where er came from (free text, at most 200 characters). Absent means not entered: required, there is no result without it.',
+    gs: 'Optional note on where the geometry came from, for example the stackup name and signal layer (free text, at most 200 characters).',
+    tm: 'Thickness model: "cohn-wide" (opt-in variant for wide strips, ledger S-021a CONFLICT). Absent means zero thickness (the default).',
+    f: 'Entered frequency text, for example "5 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
+    l: 'Entered line length text, for example "50 mm" (at most 40 characters). Optional: adds the propagation delay.',
+    dl: 'Entered length mismatch text between two traces, for example "2 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+  },
+  coax: {
+    sf: 'Solve for: "z0" (impedance from both diameters), "outer" (outer diameter from a target Z0 and the inner diameter) or "inner". Absent means z0.',
+    od: 'Entered outer diameter text (inside of the shield), for example "4 mm" (at most 40 characters).',
+    id: 'Entered inner diameter text (centre conductor), for example "1 mm" (at most 40 characters).',
+    z: 'Entered target characteristic impedance text, for example "50 ohm" (at most 40 characters; used when solving a diameter).',
+    er: 'Entered relative permittivity as a plain number (at most 40 characters). Absent means not entered: there is no default and no result without it.',
+    es: 'Entered note on where er came from (free text, at most 200 characters). Absent means not entered: required, there is no result without it.',
+    f: 'Entered frequency text, for example "1 GHz" (at most 40 characters). Optional: adds the guided wavelength.',
+    l: 'Entered line length text, for example "1 m" (at most 40 characters). Optional: adds the propagation delay.',
+    dl: 'Entered length mismatch text between two cables, for example "5 mm" (at most 40 characters). Optional: adds the skew (ledger S-029b, UNVERIFIED).',
+  },
 } as const satisfies Record<string, Record<string, string>>;
 
 export function sanitizeReservedState(state: HashState): { state: Record<string, string>; notes: string[] } {

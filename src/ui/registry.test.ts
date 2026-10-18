@@ -67,8 +67,20 @@ describe('registry', () => {
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);
   });
-  it('has the four categories', () => {
-    expect(CATEGORIES.map((c) => c.id)).toEqual(['routing', 'trace', 'load', 'circuit']);
+  it('has the five categories', () => {
+    expect(CATEGORIES.map((c) => c.id)).toEqual(['routing', 'trace', 'impedance', 'load', 'circuit']);
+  });
+  it('lists the impedance calculators under Impedance as lazy phase-2 entries that resolve to a component', async () => {
+    expect(calculatorsIn('impedance').map((x) => x.id)).toEqual(['microstrip', 'stripline', 'coax']);
+    const titles = Object.fromEntries(REGISTRY.map((x) => [x.id, x.title]));
+    expect(titles['microstrip']).toBe('Microstrip impedance');
+    expect(titles['stripline']).toBe('Symmetric stripline impedance');
+    expect(titles['coax']).toBe('Coaxial line impedance');
+    for (const id of ['microstrip', 'stripline', 'coax']) {
+      const e = findCalculator(id);
+      expect(e?.phase, id).toBe(2);
+      expect(typeof (await e?.load())?.default, id).toBe('function');
+    }
   });
   it('looks up injected entries', () => {
     const e: CalculatorEntry = { id: 't', title: 'T', category: 'trace', phase: 1, load: () => Promise.reject(new Error('x')) };

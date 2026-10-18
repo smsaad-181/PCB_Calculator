@@ -206,3 +206,10 @@ td.num { font-variant-numeric: tabular-nums; }
 .tol-absent { margin: 0.5rem 0; }
 .rating-pointer { border: 2px dashed var(--muted); border-radius: 6px; padding: 0.1rem 0.75rem; margin: 0.75rem 0; font-size: 0.9375rem; }
 .rating-pointer p { margin: 0.4rem 0; }
+
+/* ---- Impedance pages and the stackup editor ---- */
+.stackup-editor h3 { font-size: 1rem; margin: 0.75rem 0 0.25rem; }
+.stackup-table th, .stackup-table td { padding: 0.25rem; }
+.stackup-table input[type="text"], .stackup-table select { min-width: 6rem; }
+.stackup-table td:nth-child(7) input[type="text"] { min-width: 12rem; }
+.stackup-table td:nth-child(4) select { margin-bottom: 0.25rem; }
