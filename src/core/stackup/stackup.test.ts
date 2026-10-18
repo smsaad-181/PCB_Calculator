@@ -352,13 +352,13 @@ describe('deriveStripline', () => {
     if (!r.ok) throw new Error(r.error.message);
     expect(toUnit(r.value.hAbove, 'um')).toBeCloseTo(200, 9);
   });
-  it('an off-centre strip is refused: "offset stripline not offered"', () => {
+  it('an off-centre strip is refused in plain language: "not centred between its two planes"', () => {
     const s = ok({ name: 'x', layers: [cu('P1'), diel('top', 150, 4.2, 's'), cu('S'), diel('bot', 250, 4.2, 's'), cu('P2')] });
     const r = deriveStripline(s, 'S');
     expect(r.ok).toBe(false);
     if (!r.ok) {
       expect(r.error.code).toBe('OUT_OF_DOMAIN');
-      expect(r.error.message).toMatch(/offset stripline not offered/);
+      expect(r.error.message).toMatch(/not centred between its two planes/);
       expect(r.error.message).toMatch(/150/);
     }
   });
@@ -390,6 +390,6 @@ describe('deriveStripline', () => {
   it('the four-layer example has no centred inner stripline: L2 sits between 200 and 1000 um dielectrics', () => {
     const r = deriveStripline(ok(FOUR()), 'L2');
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.error.message).toMatch(/different er|offset stripline not offered/);
+    if (!r.ok) expect(r.error.message).toMatch(/different er|not centred between its two planes/);
   });
 });

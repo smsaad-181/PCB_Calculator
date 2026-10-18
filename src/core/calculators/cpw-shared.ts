@@ -8,7 +8,7 @@ import type { Quantity } from '../units';
 import { guardQuantity } from './copper-converter/guards';
 import { impField } from './impedance-envelope';
 import type { EnvelopeInputs, ImpField, SolveSpec } from './impedance-envelope';
-import { commonInputEchoes, guardEr, isObject, validateCommon } from './impedance-shared';
+import { SOLDERMASK_MESSAGE, commonInputEchoes, guardEr, isObject, validateCommon } from './impedance-shared';
 import type { CommonInputs, LossInputs } from './impedance-shared';
 import { solvedMessage, unusedMessage } from './impedance-envelope';
 import type { OutputPlan } from './tolerance-shared';
@@ -345,8 +345,7 @@ export function substrateCheck(w: number, s: number, h: number, min: number, com
   };
 }
 
-export const SOLDERMASK_MESSAGE =
-  'Soldermask and any coating over the strip and the gaps are not modelled (no coating correction); a real board with mask over the gaps has a somewhat lower Z0 and a higher eps_e than this bare-conductor result.';
+export { SOLDERMASK_MESSAGE };
 
 export const GROUND_WIDTH_MESSAGE =
   'The coplanar grounds are assumed wide. Steer (ledger S-023) records that a finite ground width of w1 at least 3 W gives values very close to the ideal CPW; the ground width is not an input and is not checked, so a narrower ground changes Z0 and eps_e by an amount this model does not give.';

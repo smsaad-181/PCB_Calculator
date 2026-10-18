@@ -47,7 +47,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
     const t = guardQuantity('thickness', raw['thickness'], DIM.LENGTH, 'length');
     if (!t.ok) return t;
     if (t.value.si >= b.value.si) {
-      return { ok: false, error: err('OUT_OF_DOMAIN', 'thickness', 'thickness must be smaller than the plane-to-plane spacing b.') };
+      return { ok: false, error: err('OUT_OF_DOMAIN', 'thickness', `thickness must be smaller than the plane-to-plane spacing b: t/b = ${String(Number((t.value.si / b.value.si).toPrecision(5)))} is outside the thickness correction's domain (geometric guard, not a sourced range).`) };
     }
     thickness = t.value;
   }

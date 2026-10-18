@@ -478,7 +478,9 @@ describe('fab-profile tolerance (exact scope, never a default)', () => {
   it('there is no default: without tolerances a profile changes nothing', () => {
     const plain = okOf(microstrip, MSA);
     const withProfile = okOf(microstrip, { ...MSA, fabProfile: p, today: '2026-10-18', profileScope: scope });
-    expect(withProfile).toEqual(plain);
+    // the profile is only used for the optional minimum note (PCB2-4); no tolerance, envelope or number changes
+    const noMinimumNote = { ...withProfile, warnings: withProfile.warnings.filter((w) => !/PROFILE_MINIMUM/.test(w.code ?? '')), reference: plain.reference };
+    expect(noMinimumNote).toEqual(plain);
     expect(withProfile.envelope).toBeUndefined();
   });
 });

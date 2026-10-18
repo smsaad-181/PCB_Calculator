@@ -9,6 +9,8 @@ import { COPLANAR_OUTPUTS, COPLANAR_SOLVE, coplanarFields } from '../cpw-shared'
 import { runEnvelope } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, delayOutputs, dimensionless } from '../impedance-shared';
 import { lossBlock, mergeLoss } from '../loss-shared';
+import { withProfileMinimum } from '../profile-minimum';
+import type { MinimumSpec } from '../profile-minimum';
 import { hasTolerances } from '../tolerance-shared';
 import { validate } from './guards';
 import { meta } from './meta';
@@ -145,10 +147,16 @@ function buildWithEnvelope(raw: Inputs): CalcOutcome {
   return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields: coplanarFields(v.value), outputs: COPLANAR_OUTPUTS, solve: COPLANAR_SOLVE });
 }
 
+/** Optional fab-profile minimum check (PCB2-4): the widths and spacings this calculator solves for or is given. */
+const MINIMUM_SPECS: readonly MinimumSpec[] = [
+  { key: 'traceWidth', label: 'trace width', input: 'width', solvedResult: 'trace width for target Z0' },
+  { key: 'traceSpace', label: 'gap', input: 'gap', solvedResult: 'gap for target Z0' },
+];
+
 /** CPW Z0, eps_e, delay and guided wavelength, or the gap / width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
+    return withProfileMinimum(hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs), inputs, MINIMUM_SPECS);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

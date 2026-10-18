@@ -2,6 +2,7 @@ import type { OutOfRangeInput } from '../../confidence';
 import { Z_STRIPLINE_PREFACTOR_OHM } from '../../data/constants';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from '../../result';
 import { brent } from '../../solvers/rootfind';
+import { formatSignedPercent } from '../../format-result';
 import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import { impField, runEnvelope, solvedMessage, unusedMessage } from '../impedance-envelope';
@@ -9,6 +10,8 @@ import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
 import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless } from '../impedance-shared';
 import type { LossInputs } from '../impedance-shared';
 import { lossBlock, mergeLoss } from '../loss-shared';
+import { withProfileMinimum } from '../profile-minimum';
+import type { MinimumSpec } from '../profile-minimum';
 import { hasTolerances } from '../tolerance-shared';
 import type { OutputPlan } from '../tolerance-shared';
 import { validate } from './guards';
@@ -51,8 +54,12 @@ export function z0CohnWide(x: number, tn: number, er: number): number {
 const MAX_X = 1e6;
 const num = (x: number): string => String(Number(x.toPrecision(5)));
 
+/** Names of the labelled secondary results shown when t is entered but the zero-thickness model is the headline (PCB2-2). */
+export const COHN_WIDE_Z0 = 'Z0 with finite-thickness variant cohn-wide (CONFLICT, S-021a)';
+export const COHN_WIDE_DIFF = 'Z0 difference, finite-thickness variant cohn-wide vs zero-thickness headline (CONFLICT, S-021a)';
+
 const ZERO_THICKNESS_MESSAGE =
-  'Zero-thickness model: the entered strip thickness t is NOT used. A real strip of finite thickness has a lower Z0 for the same width. The finite-thickness form (ledger S-021a, in CONFLICT between sources) is available only as an explicit opt-in variant for wide strips.';
+  'Zero-thickness model: the entered strip thickness t is NOT used. A real strip of finite thickness has a lower Z0 for the same width. The finite-thickness form (ledger S-021a, in CONFLICT between sources) is available as an explicit opt-in variant for wide strips, and where its range allows its value at this geometry is shown as a labelled secondary result (the headline and the confidence are unchanged).';
 const CONFLICT_MESSAGE =
   'Finite-thickness variant enabled for a wide strip (ledger S-021a is in CONFLICT: the narrow-strip forms of the two sources differ by about 0.2 % and their prefactors by 0.1 %, and the original paper was not read). Treat the result as a labelled variant, not as the verified base value.';
 
@@ -144,6 +151,22 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
   results.push({ name: 'effective permittivity', value: dl(er), role: 'secondary', bound: 'nominal', note: 'homogeneous dielectric: eps_eff = er' });
   results.push({ name: 'width over spacing w/b', value: dl(x), role: 'secondary', bound: 'nominal' });
   results.push(...delay.results);
+  const secondaryWarnings: CalcWarning[] = [];
+  if (inp.thickness !== undefined && !wide) {
+    if (x >= meta.validity.wideMin && tn < 1) {
+      const zc = z0CohnWide(x, tn, er);
+      const diff = zc / z0 - 1;
+      const pct = formatSignedPercent(diff, { accuracyClass: meta.accuracyClass });
+      const range = tn < meta.validity.tOverBMax ? '' : ` t/b = ${num(tn)} is outside the recorded accuracy range t/b < ${String(meta.validity.tOverBMax)} (ledger S-021a).`;
+      results.push(
+        { name: COHN_WIDE_Z0, value: ohms(zc), role: 'secondary', bound: 'nominal', note: `Same geometry, wide-strip finite-thickness form (Steer eqs. 1-4); ledger S-021a is in CONFLICT between sources. Secondary value: the headline (zero-thickness) and the confidence are unchanged.${range}` },
+        { name: COHN_WIDE_DIFF, value: dl(diff), role: 'secondary', bound: 'nominal', note: `${pct} of the zero-thickness Z0 (signed; negative means the finite-thickness variant is lower). Ledger S-021a, CONFLICT: a labelled side value, not a correction applied to the headline.` },
+      );
+      secondaryWarnings.push({ severity: 'info', code: 'THICKNESS_VARIANT_SECONDARY', message: `Because a thickness was entered, the cohn-wide finite-thickness value at this geometry is shown as a labelled secondary result: Z0 ${num(zc)} ohm (${pct} against the zero-thickness headline). Ledger S-021a is in CONFLICT; the headline and the confidence are unchanged.${range}` });
+    } else {
+      secondaryWarnings.push({ severity: 'info', code: 'THICKNESS_VARIANT_NOT_SHOWN', message: `The cohn-wide finite-thickness value is not shown: that form is offered only for w/b of at least ${String(meta.validity.wideMin)} (this strip has w/b = ${num(x)}) and t below b; narrow strips with finite thickness are not offered (ledger S-021a, CONFLICT).` });
+    }
+  }
 
   // Validity: the only stripline ranges recorded are the S-021a accuracy ranges (Steer): w/(b - t) > 0.05 and t/b < 0.025.
   const outOfRange: OutOfRangeInput[] = [];
@@ -180,7 +203,7 @@ function build(raw: unknown, extraLedgerIds: readonly string[] = []): CalcOutcom
       code: 'OUT_OF_RANGE',
     });
   }
-  if (inp.thickness !== undefined && !wide) warnings.push({ severity: 'caution', message: ZERO_THICKNESS_MESSAGE, code: 'ZERO_THICKNESS_MODEL' });
+  if (inp.thickness !== undefined && !wide) warnings.push({ severity: 'caution', message: ZERO_THICKNESS_MESSAGE, code: 'ZERO_THICKNESS_MODEL' }, ...secondaryWarnings);
   if (wide) warnings.push({ severity: 'warning', message: CONFLICT_MESSAGE, code: 'THICKNESS_VARIANT_CONFLICT' });
   warnings.push(...delay.warnings);
 
@@ -237,10 +260,13 @@ function buildWithEnvelope(raw: Inputs): CalcOutcome {
   return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZ0', results: { 'strip width for target Z0': 'width' } } });
 }
 
+/** Optional fab-profile minimum check (PCB2-4): the widths and spacings this calculator solves for or is given. */
+const MINIMUM_SPECS: readonly MinimumSpec[] = [{ key: 'traceWidth', label: 'strip width', input: 'width', solvedResult: 'strip width for target Z0' }];
+
 /** Symmetric stripline Z0, eps_e (= er), delay and guided wavelength, or the width for a target Z0. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
+    return withProfileMinimum(hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs), inputs, MINIMUM_SPECS);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

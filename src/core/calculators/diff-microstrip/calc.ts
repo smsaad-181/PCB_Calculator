@@ -7,9 +7,11 @@ import type { Quantity } from '../../units';
 import { FINITE_THICKNESS_MESSAGE, SOLVE_CAUTION, dispersionMessageCoupled, evenModeDelay, num, suffixDelay } from '../diff-shared';
 import { impField, runEnvelope, solvedMessage, unusedMessage } from '../impedance-envelope';
 import type { EnvelopeInputs, ImpField } from '../impedance-envelope';
-import { CONSTANT_LEDGER_IDS, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
+import { CONSTANT_LEDGER_IDS, SOLDERMASK_MESSAGE, assemble, commonInputEchoes, delayOutputs, dimensionless, rangeCheck } from '../impedance-shared';
 import type { LossInputs } from '../impedance-shared';
 import { lossBlock, mergeLoss } from '../loss-shared';
+import { withProfileMinimum } from '../profile-minimum';
+import type { MinimumSpec } from '../profile-minimum';
 import { hasTolerances } from '../tolerance-shared';
 import type { OutputPlan } from '../tolerance-shared';
 import { epsEffZeroThickness, hjA, hjB, z01, z0ZeroThickness } from '../microstrip/calc';
@@ -101,8 +103,6 @@ function physical(m: CoupledModes): boolean {
   return [m.z0e, m.z0o, m.eeE, m.eeO].every(Number.isFinite) && m.z0e > 0 && m.z0o > 0 && m.eeE >= 1 && m.eeO >= 1;
 }
 
-const SOLDERMASK_MESSAGE =
-  'Soldermask and any coating over the traces are not modelled (no coating correction); with mask over the pair the real even- and odd-mode impedances are lower and eps_e higher than this bare-trace result, and the mask changes the two modes by different amounts.';
 const UNVERIFIED_MESSAGE =
   'The coupled-line model (ledger S-022) is PAYWALLED-USER-MUST-VERIFY: only one secondary source (Steer, section 5.6) was read, the 1980 paper was not, no published worked example exists, and the constants are transcriptions awaiting comparison with the paper. Treat the numbers as an estimate and confirm them with the fabricator.';
 
@@ -364,10 +364,16 @@ function buildWithEnvelope(raw: Inputs): CalcOutcome {
   return runEnvelope({ raw, build: (i: Inputs, extra) => build(i, extra), fields, outputs: ENVELOPE_OUTPUTS, solve: { target: 'targetZdiff', results } });
 }
 
+/** Optional fab-profile minimum check (PCB2-4): the widths and spacings this calculator solves for or is given. */
+const MINIMUM_SPECS: readonly MinimumSpec[] = [
+  { key: 'traceWidth', label: 'trace width', input: 'width', solvedResult: 'trace width for target Zdiff' },
+  { key: 'traceSpace', label: 'edge spacing', input: 'edgeSpacing', solvedResult: 'edge spacing for target Zdiff' },
+];
+
 /** Edge-coupled microstrip Zdiff, Zodd, Zeven, Zcommon, eps_e per mode and delay, or the spacing / width for a target Zdiff. Never throws; errors are values. */
 export function compute(inputs: Inputs): CalcOutcome {
   try {
-    return hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs);
+    return withProfileMinimum(hasTolerances(inputs) ? buildWithEnvelope(inputs) : build(inputs), inputs, MINIMUM_SPECS);
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: { code: 'OUT_OF_DOMAIN', message: `Calculation could not be completed: ${message}` } };

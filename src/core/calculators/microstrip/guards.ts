@@ -56,6 +56,13 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   if (thicknessModel !== 'none' && thickness === undefined) {
     return { ok: false, error: err('INVALID_INPUT', 'thickness', `thicknessModel ${thicknessModel} needs a thickness (t); enter the trace copper thickness.`) };
   }
+  // F-3: a defensive geometric guard, not a sourced range (none is recorded for the thickness correction, ledger S-020a).
+  if (thicknessModel !== 'none' && thickness !== undefined && thickness.si >= h.value.si) {
+    return {
+      ok: false,
+      error: err('OUT_OF_DOMAIN', 'thickness', `thickness is at or above the dielectric height h (t/h = ${String(Number((thickness.si / h.value.si).toPrecision(5)))}): outside the thickness correction's domain (geometric guard, not a sourced range). Use the zero-thickness model, or check the units of t and h.`),
+    };
+  }
   const c = validateCommon(raw);
   if (!c.ok) return c;
   return {

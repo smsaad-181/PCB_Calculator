@@ -276,7 +276,7 @@ describe.each(PAGES)('$name', (p) => {
       const v = ok(st(LOSS));
       expect(v.loss).toBeDefined();
       expect(v.loss?.caption).toBe(LOSS_LABEL);
-      expect(v.loss?.caption).toMatch(/approximate estimate, lower bound for rough copper, no roughness, no dispersion/);
+      expect(v.loss?.caption).toMatch(/approximate estimate; roughness not modelled raises conductor loss; dispersion not modelled/);
       expect(v.loss?.rows.length).toBeGreaterThan(0);
       for (const r of v.loss?.rows ?? []) if (r.label.startsWith('Dielectric') || r.label.startsWith('Conductor') || r.label.startsWith('Total')) expect(r.hint ?? '').toContain(LOSS_LABEL);
       expect(v.loss?.ledgerRows.map((x) => x.id)).toEqual(expect.arrayContaining(['S-029d', 'S-029e']));
@@ -288,8 +288,8 @@ describe.each(PAGES)('$name', (p) => {
     it('no loss row is repeated in the general rows, and the loss warnings are shown in their block only', () => {
       const v = ok(st(LOSS));
       expect(v.result.rows.map((r) => r.label).join('|')).not.toMatch(/loss|skin depth|surface resistance/i);
-      expect(v.result.warnings.some((w) => /approximate estimate, lower bound/.test(w.message))).toBe(false);
-      expect(v.loss?.notes.some((w) => /approximate estimate, lower bound/.test(w.message))).toBe(true);
+      expect(v.result.warnings.some((w) => /approximate estimate; roughness not modelled/.test(w.message))).toBe(false);
+      expect(v.loss?.notes.some((w) => /approximate estimate; roughness not modelled/.test(w.message))).toBe(true);
     });
     it('conductor loss and a total exist only for microstrip and coax; every other geometry shows the core notice and no total', () => {
       const v = ok(st(LOSS));

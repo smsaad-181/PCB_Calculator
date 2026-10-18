@@ -314,7 +314,7 @@ describe('validity ranges are enforced with a warning and a low confidence', () 
     const x = ok(analysis(600, 635, 4.1, { thickness: um(35) }));
     const c = x.validityChecks.find((v) => /t\/h/.test(v.name));
     expect(c?.ok).toBe(true);
-    expect(c?.detail).toMatch(/no range/i);
+    expect(c?.detail).toMatch(/no validity range recorded for the thickness correction/i);
   });
   it('w/h of 1000 or more is refused (Z01 is quoted for w/h < 1000)', () => {
     const e = fail(analysis(1000000, 1000, 4.2));

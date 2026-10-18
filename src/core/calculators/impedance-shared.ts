@@ -1,6 +1,7 @@
 import { rateConfidence } from '../confidence';
 import type { AccuracyClass, OutOfRangeInput } from '../confidence';
 import { C_LEDGER_ID, MU0_LEDGER_ID } from '../data/constants';
+import { SOLDERMASK_WORDING } from '../data/impedance-wording';
 import { dataStatusForLedgerIds } from '../data-status';
 import { assertCalcResult } from '../result';
 import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning, Result } from '../result';
@@ -26,6 +27,12 @@ export const IMPEDANCE_BANNER =
  * impedance result can never rate high (confidence capped at medium, skill impedance-models).
  */
 export const STANDING_ASSUMPTION = 'nominal user-entered stackup (er, h, t) not verified against the fabricator';
+
+/** The one soldermask / coating statement of every outer-layer model's core warning (Phase 2 closure, PCB2-2). */
+export const SOLDERMASK_MESSAGE = SOLDERMASK_WORDING;
+
+/** Shown beside every thickness variant: the ledger and notes record no validity range for the thickness correction (S-020a). */
+export const THICKNESS_NO_RANGE_RECORDED = 'no validity range recorded for the thickness correction';
 
 export const dimensionless = (x: number): Quantity => q(x, DIM.DIMENSIONLESS);
 
@@ -128,6 +135,12 @@ export function validateCommon(raw: Record<string, unknown>): Result<CommonInput
   const t = guardLossTangent(raw['lossTangent']);
   if (!t.ok) return t;
   out.lossTangent = t.value;
+  // F-2: er = 1 is vacuum, so a dielectric loss has nothing to act on (the filling-factor form divides by er - 1). Refused only
+  // when a loss is actually requested (tan delta above zero).
+  const erRaw = raw['er'];
+  if (t.value > 0 && isRecord(erRaw) && erRaw['si'] === 1) {
+    return { ok: false, error: err('INVALID_INPUT', 'er', 'A lossy dielectric needs er > 1: er = 1 is vacuum, so a loss tangent has no dielectric to act on. Enter the laminate er, or remove the loss tangent.') };
+  }
   if (out.frequency === undefined) return { ok: false, error: err('INVALID_INPUT', 'frequency', 'The loss estimate needs the frequency (frequency, in Hz): loss depends on it and no frequency is assumed.') };
   if (raw['lossTangentSource'] === undefined) {
     return { ok: false, error: err('INVALID_INPUT', 'lossTangentSource', 'lossTangentSource is required with lossTangent: say where the loss tangent comes from (product, revision, test frequency). It is never pre-filled.') };
