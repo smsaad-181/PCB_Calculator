@@ -304,3 +304,32 @@ Research: ledger rows S-020..S-025 (part A, `docs/research/impedance-models.md`)
 | P2-5 | Stripline prefactor: textbook 30 pi taken as eta0/4 = 94.18 ohm (0.07 % below 30 pi) under the Q-1 default; stated in every result's assumptions | orchestrator | User may overrule Q-1 | DEFAULT |
 | P2-6 | Every impedance result carries one standing defaulted assumption (nominal user-entered stackup not verified against the fabricator), so confidence can never be 'high'; skew (S-029b UNVERIFIED) is shown in dataStatus but excluded from the confidence score (like S-009 in trace-resistance) | calc-implementer | User may require skew to count | DEFAULT |
 | P2-7 | K(1/sqrt2) test cites NIST DLMF section 19.20 only (equation number not read) | standards-researcher | Read the equation number | MINOR |
+
+## Phase 2 part B core: differential pairs and presets (logged 2026-10-18)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-8 | Edge-coupled microstrip and stripline rate confidence LOW (score 4 = empirical 1 + standing unverified-stackup assumption 1 + PAYWALLED 2); by the rule they cannot reach medium until S-022/S-022a are verified | human | Read Hammerstad-Jensen 1980 coupled lines and Cohn 1955 and sign the ledger rows | OPEN (human) |
+| P2-9 | H-J coupled fit scanned (not sourced): monotone in s/h only up to ~6.7; Zodd < Z0 < Zeven held on the grid only up to s/h ~ 3; at s/h = 5 Zdiff overshoots 2 Z0 by up to 0.64 %. WEAK_COUPLING_FIT warns above s/h = 3; spacing solve bracket stops at s/h = 5 | calc-implementer | Compare with the primary when read | NOTED |
+| P2-10 | S-022a records no validity range: Q-5 applied the S-021a stripline range (w/b < 0.05 forces low confidence; w/b < 0.35 a caution that says the limit is an unsourced inference) | orchestrator | Replace with the primary's range | DEFAULT |
+| P2-11 | Stripline coupled prefactor: source prints 94.15, code uses eta0/4 = 94.1826 (Q-1), 0.034 % higher | orchestrator | User may overrule Q-1 | DEFAULT |
+| P2-12 | Whether Z01 inside Z01e/Z01o is the air-filled value (taken as the note records) and the H-J 1980 constants: unverified primaries | human | Read the primary | OPEN (human) |
+| P2-13 | No published coupled-line worked example exists: all 131 coupled golden vectors are the recorded formula only; they verify the implementation, nothing about S-022/S-022a | calc-validator | State in validator report | NOTED |
+
+## Phase 2 core C: CPW and CPWG (logged 2026-10-18)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-14 | CPW (S-023 CONFLICT) and CPWG (S-023a PAYWALLED) both rate confidence LOW, score 3 by the rule; they cannot rate higher until the rows change | human | Read Ghione-Naldi 1983 and settle the CPW conflict | OPEN (human) |
+| P2-15 | Q-1/Q-6/Q-7 applied: 30 pi = eta0/4 (CPW), 60 pi = eta0/2 (CPWG); conformal-map finite-substrate eps_e (Steer empirical fit not implemented, MODEL_CONFLICT warning names both); no dispersion threshold frequency | orchestrator | User may overrule | DEFAULT |
+| P2-16 | CPWG records no numeric validity range in the notes: none invented; the checks are informational and confidence reflects PAYWALLED. CPW enforces h >= 2 max(W,s) (Steer 'two or three times') as a confidence-lowering check | standards-researcher | Find the primary's range | OPEN |
+| P2-17 | Small-modulus asymptote branch (2/pi) ln(4/k) when k1 or k3' < 1e-8 (needed above gap/h ~ 475 or W/h ~ 350); tested against AGM to 1e-12 | calc-implementer | none | NOTED |
+| P2-18 | Notes arithmetic: docs/sources/notes/impedance-models.md gives K(5/9)=1.71897, K'=2.06275 (K/K'=0.83334); AGM gives K'=2.06282, K/K'=0.833315: rounding in the note, not a model issue | standards-researcher | Correct the note | MINOR |
+| P2-19 | Not modelled: finite ground width (assumed >= 3W, unchecked), thickness correction, coupled/differential CPW, stitching vias (CPWG), dispersion | calc-implementer | Later phases if wanted | DEFERRED |
+
+## Phase 2 UI C: CPW and CPWG pages (logged 2026-10-18)
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-20 | The stackup editor has no coplanar layer type: it supplies h, t and er only (never W or s); for CPW the derived h is the distance to the nearest reference plane and the page tells the user to check it is the substrate thickness | calc-implementer + ui-engineer | Coplanar-aware derive in src/core/stackup | OPEN (minor) |
+| P2-21 | CPW golden geometry (h = max(W,s)) violates the core rule h >= 2 max(W,s), so the CPW page shows OUT_OF_RANGE then MODEL_CONFLICT and rates confidence score 5 (CPWG score 3); correct per the rule | orchestrator | none; use h >= 3 mm for in-range CPW examples | NOTED |

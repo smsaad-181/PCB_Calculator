@@ -23304,6 +23304,5526 @@
       },
       "status": "UNVERIFIED",
       "note": "skew = dL sqrt(eps_eff)/c (S-029b, derived, UNVERIFIED)"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w200um_s200um_h200um_er4.5",
+      "oracle_value": 60.0370258688354,
+      "pinned_expected": 60.0370258688354,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w200um_s200um_h200um_er4.5",
+      "oracle_value": 79.93914530291562,
+      "pinned_expected": 79.93914530291562,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w200um_s200um_h200um_er4.5",
+      "oracle_value": 120.0740517376708,
+      "pinned_expected": 120.0740517376708,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w200um_s200um_h200um_er4.5",
+      "oracle_value": 39.96957265145781,
+      "pinned_expected": 39.96957265145781,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w200um_s200um_h200um_er4.5",
+      "oracle_value": 3.4562985444371335,
+      "pinned_expected": 3.4562985444371335,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w200um_s200um_h200um_er4.5",
+      "oracle_value": 2.9411821308418906,
+      "pinned_expected": 2.9411821308418906,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w150um_s100um_h200um_er4.5",
+      "oracle_value": 59.010804523794434,
+      "pinned_expected": 59.010804523794434,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w150um_s100um_h200um_er4.5",
+      "oracle_value": 99.15389505939397,
+      "pinned_expected": 99.15389505939397,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w150um_s100um_h200um_er4.5",
+      "oracle_value": 118.02160904758887,
+      "pinned_expected": 118.02160904758887,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w150um_s100um_h200um_er4.5",
+      "oracle_value": 49.57694752969699,
+      "pinned_expected": 49.57694752969699,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w150um_s100um_h200um_er4.5",
+      "oracle_value": 3.389989324730745,
+      "pinned_expected": 3.389989324730745,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w150um_s100um_h200um_er4.5",
+      "oracle_value": 2.843164005050705,
+      "pinned_expected": 2.843164005050705,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w100um_s50um_h100um_er3.66",
+      "oracle_value": 57.366733325660604,
+      "pinned_expected": 57.366733325660604,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w100um_s50um_h100um_er3.66",
+      "oracle_value": 94.04399578917435,
+      "pinned_expected": 94.04399578917435,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w100um_s50um_h100um_er3.66",
+      "oracle_value": 114.73346665132121,
+      "pinned_expected": 114.73346665132121,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w100um_s50um_h100um_er3.66",
+      "oracle_value": 47.02199789458717,
+      "pinned_expected": 47.02199789458717,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w100um_s50um_h100um_er3.66",
+      "oracle_value": 2.870774734513417,
+      "pinned_expected": 2.870774734513417,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w100um_s50um_h100um_er3.66",
+      "oracle_value": 2.428270179947411,
+      "pinned_expected": 2.428270179947411,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w300um_s200um_h150um_er4.2",
+      "oracle_value": 44.846895568891455,
+      "pinned_expected": 44.846895568891455,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w300um_s200um_h150um_er4.2",
+      "oracle_value": 54.03746739229859,
+      "pinned_expected": 54.03746739229859,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w300um_s200um_h150um_er4.2",
+      "oracle_value": 89.69379113778291,
+      "pinned_expected": 89.69379113778291,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w300um_s200um_h150um_er4.2",
+      "oracle_value": 27.018733696149294,
+      "pinned_expected": 27.018733696149294,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w300um_s200um_h150um_er4.2",
+      "oracle_value": 3.416387438184489,
+      "pinned_expected": 3.416387438184489,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w300um_s200um_h150um_er4.2",
+      "oracle_value": 2.954036067896932,
+      "pinned_expected": 2.954036067896932,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w50um_s50um_h500um_er4.2",
+      "oracle_value": 60.83585532558558,
+      "pinned_expected": 60.83585532558558,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w50um_s50um_h500um_er4.2",
+      "oracle_value": 235.57620819039585,
+      "pinned_expected": 235.57620819039585,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w50um_s50um_h500um_er4.2",
+      "oracle_value": 121.67171065117115,
+      "pinned_expected": 121.67171065117115,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w50um_s50um_h500um_er4.2",
+      "oracle_value": 117.78810409519792,
+      "pinned_expected": 117.78810409519792,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w50um_s50um_h500um_er4.2",
+      "oracle_value": 2.9222932798219388,
+      "pinned_expected": 2.9222932798219388,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w50um_s50um_h500um_er4.2",
+      "oracle_value": 2.605984194603142,
+      "pinned_expected": 2.605984194603142,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w3000um_s300um_h300um_er4.5",
+      "oracle_value": 13.259068832826658,
+      "pinned_expected": 13.259068832826658,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w3000um_s300um_h300um_er4.5",
+      "oracle_value": 15.232193372080141,
+      "pinned_expected": 15.232193372080141,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w3000um_s300um_h300um_er4.5",
+      "oracle_value": 26.518137665653317,
+      "pinned_expected": 26.518137665653317,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w3000um_s300um_h300um_er4.5",
+      "oracle_value": 7.616096686040071,
+      "pinned_expected": 7.616096686040071,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w3000um_s300um_h300um_er4.5",
+      "oracle_value": 4.144837133465025,
+      "pinned_expected": 4.144837133465025,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w3000um_s300um_h300um_er4.5",
+      "oracle_value": 3.716590702682813,
+      "pinned_expected": 3.716590702682813,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w100um_s800um_h200um_er4.5",
+      "oracle_value": 92.88717963471863,
+      "pinned_expected": 92.88717963471863,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w100um_s800um_h200um_er4.5",
+      "oracle_value": 96.38237561876811,
+      "pinned_expected": 96.38237561876811,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w100um_s800um_h200um_er4.5",
+      "oracle_value": 185.77435926943727,
+      "pinned_expected": 185.77435926943727,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w100um_s800um_h200um_er4.5",
+      "oracle_value": 48.191187809384054,
+      "pinned_expected": 48.191187809384054,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w100um_s800um_h200um_er4.5",
+      "oracle_value": 3.193109500770157,
+      "pinned_expected": 3.193109500770157,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w100um_s800um_h200um_er4.5",
+      "oracle_value": 3.0224084484421025,
+      "pinned_expected": 3.0224084484421025,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w200um_s3um_h200um_er4.2",
+      "oracle_value": 28.264817078527656,
+      "pinned_expected": 28.264817078527656,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w200um_s3um_h200um_er4.2",
+      "oracle_value": 98.93648425190774,
+      "pinned_expected": 98.93648425190774,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w200um_s3um_h200um_er4.2",
+      "oracle_value": 56.52963415705531,
+      "pinned_expected": 56.52963415705531,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w200um_s3um_h200um_er4.2",
+      "oracle_value": 49.46824212595387,
+      "pinned_expected": 49.46824212595387,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w200um_s3um_h200um_er4.2",
+      "oracle_value": 3.2130931325745173,
+      "pinned_expected": 3.2130931325745173,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w200um_s3um_h200um_er4.2",
+      "oracle_value": 2.641174685961226,
+      "pinned_expected": 2.641174685961226,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w150um_s150um_h150um_er1",
+      "oracle_value": 102.96274900174872,
+      "pinned_expected": 102.96274900174872,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w150um_s150um_h150um_er1",
+      "oracle_value": 148.61584829329297,
+      "pinned_expected": 148.61584829329297,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w150um_s150um_h150um_er1",
+      "oracle_value": 205.92549800349744,
+      "pinned_expected": 205.92549800349744,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w150um_s150um_h150um_er1",
+      "oracle_value": 74.30792414664649,
+      "pinned_expected": 74.30792414664649,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w150um_s150um_h150um_er1",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w150um_s150um_h150um_er1",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w150um_s100um_h150um_er128",
+      "oracle_value": 11.385257757300362,
+      "pinned_expected": 11.385257757300362,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w150um_s100um_h150um_er128",
+      "oracle_value": 16.40833974871391,
+      "pinned_expected": 16.40833974871391,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w150um_s100um_h150um_er128",
+      "oracle_value": 22.770515514600724,
+      "pinned_expected": 22.770515514600724,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w150um_s100um_h150um_er128",
+      "oracle_value": 8.204169874356955,
+      "pinned_expected": 8.204169874356955,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w150um_s100um_h150um_er128",
+      "oracle_value": 89.37215445754299,
+      "pinned_expected": 89.37215445754299,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w150um_s100um_h150um_er128",
+      "oracle_value": 69.68722758641272,
+      "pinned_expected": 69.68722758641272,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w635um_s300um_h635um_er9.8",
+      "oracle_value": 36.97039220908754,
+      "pinned_expected": 36.97039220908754,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w635um_s300um_h635um_er9.8",
+      "oracle_value": 59.911239963977565,
+      "pinned_expected": 59.911239963977565,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w635um_s300um_h635um_er9.8",
+      "oracle_value": 73.94078441817508,
+      "pinned_expected": 73.94078441817508,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w635um_s300um_h635um_er9.8",
+      "oracle_value": 29.955619981988782,
+      "pinned_expected": 29.955619981988782,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w635um_s300um_h635um_er9.8",
+      "oracle_value": 7.142707102634866,
+      "pinned_expected": 7.142707102634866,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w635um_s300um_h635um_er9.8",
+      "oracle_value": 5.7041893225266955,
+      "pinned_expected": 5.7041893225266955,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zodd_ohm_w120um_s150um_h100um_er3.48",
+      "oracle_value": 65.0404878229694,
+      "pinned_expected": 65.0404878229694,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zeven_ohm_w120um_s150um_h100um_er3.48",
+      "oracle_value": 78.37504727806672,
+      "pinned_expected": 78.37504727806672,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_zdiff_ohm_w120um_s150um_h100um_er3.48",
+      "oracle_value": 130.0809756459388,
+      "pinned_expected": 130.0809756459388,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_zcommon_ohm_w120um_s150um_h100um_er3.48",
+      "oracle_value": 39.18752363903336,
+      "pinned_expected": 39.18752363903336,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffmicrostrip_eeven_w120um_s150um_h100um_er3.48",
+      "oracle_value": 2.765391538445228,
+      "pinned_expected": 2.765391538445228,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_eodd_w120um_s150um_h100um_er3.48",
+      "oracle_value": 2.4342089663550874,
+      "pinned_expected": 2.4342089663550874,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffmicrostrip_solve_s_um_Zd100ohm_w150um_h100um_er4.2",
+      "oracle_value": 91.64802341290061,
+      "pinned_expected": 91.64802341290061,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection on the S-022 analysis function, bracket 0.01 <= s/h <= 5"
+    },
+    {
+      "name": "diffmicrostrip_solve_s_um_Zd90ohm_w200um_h150um_er4.5",
+      "oracle_value": 63.903500409608654,
+      "pinned_expected": 63.903500409608654,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection on the S-022 analysis function, bracket 0.01 <= s/h <= 5"
+    },
+    {
+      "name": "diffmicrostrip_solve_s_um_Zd110ohm_w120um_h100um_er3.66",
+      "oracle_value": 60.45679862400129,
+      "pinned_expected": 60.45679862400129,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection on the S-022 analysis function, bracket 0.01 <= s/h <= 5"
+    },
+    {
+      "name": "diffmicrostrip_solve_s_um_Zd85ohm_w250um_h200um_er4.2",
+      "oracle_value": 47.573313658711506,
+      "pinned_expected": 47.573313658711506,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection on the S-022 analysis function, bracket 0.01 <= s/h <= 5"
+    },
+    {
+      "name": "diffmicrostrip_solve_w_um_Zd100ohm_s150um_h100um_er4.2",
+      "oracle_value": 169.59511648336667,
+      "pinned_expected": 169.59511648336667,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection on the S-022 analysis function, bracket 0.1 <= w/h <= 10"
+    },
+    {
+      "name": "diffmicrostrip_solve_w_um_Zd90ohm_s200um_h150um_er4.5",
+      "oracle_value": 283.29234719713753,
+      "pinned_expected": 283.29234719713753,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection on the S-022 analysis function, bracket 0.1 <= w/h <= 10"
+    },
+    {
+      "name": "diffmicrostrip_solve_w_um_Zd110ohm_s120um_h100um_er3.66",
+      "oracle_value": 150.59583739188582,
+      "pinned_expected": 150.59583739188582,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection on the S-022 analysis function, bracket 0.1 <= w/h <= 10"
+    },
+    {
+      "name": "diffmicrostrip_solve_w_um_Zd85ohm_s200um_h200um_er4.2",
+      "oracle_value": 411.535501623153,
+      "pinned_expected": 411.535501623153,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022",
+        "S-022b",
+        "S-020",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-020": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection on the S-022 analysis function, bracket 0.1 <= w/h <= 10"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w500um_s636.62um_b1000um_er4",
+      "oracle_value": 47.68459321660051,
+      "pinned_expected": 47.68459321660051,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w500um_s636.62um_b1000um_er4",
+      "oracle_value": 52.273195937991126,
+      "pinned_expected": 52.273195937991126,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w500um_s636.62um_b1000um_er4",
+      "oracle_value": 95.36918643320102,
+      "pinned_expected": 95.36918643320102,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w500um_s636.62um_b1000um_er4",
+      "oracle_value": 26.136597968995563,
+      "pinned_expected": 26.136597968995563,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w500um_s636.62um_b1000um_er4",
+      "oracle_value": 50.02945927533656,
+      "pinned_expected": 50.02945927533656,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w300um_s200um_b1000um_er4",
+      "oracle_value": 47.858290547163,
+      "pinned_expected": 47.858290547163,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w300um_s200um_b1000um_er4",
+      "oracle_value": 77.81376508062841,
+      "pinned_expected": 77.81376508062841,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w300um_s200um_b1000um_er4",
+      "oracle_value": 95.716581094326,
+      "pinned_expected": 95.716581094326,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w300um_s200um_b1000um_er4",
+      "oracle_value": 38.90688254031421,
+      "pinned_expected": 38.90688254031421,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w300um_s200um_b1000um_er4",
+      "oracle_value": 63.527746880394254,
+      "pinned_expected": 63.527746880394254,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w200um_s200um_b500um_er4.2",
+      "oracle_value": 48.483257028652034,
+      "pinned_expected": 48.483257028652034,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w200um_s200um_b500um_er4.2",
+      "oracle_value": 60.3459464352407,
+      "pinned_expected": 60.3459464352407,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w200um_s200um_b500um_er4.2",
+      "oracle_value": 96.96651405730407,
+      "pinned_expected": 96.96651405730407,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w200um_s200um_b500um_er4.2",
+      "oracle_value": 30.17297321762035,
+      "pinned_expected": 30.17297321762035,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w200um_s200um_b500um_er4.2",
+      "oracle_value": 54.62732176256636,
+      "pinned_expected": 54.62732176256636,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w150um_s150um_b600um_er3.66",
+      "oracle_value": 55.62563679045058,
+      "pinned_expected": 55.62563679045058,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w150um_s150um_b600um_er3.66",
+      "oracle_value": 86.11194531708593,
+      "pinned_expected": 86.11194531708593,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w150um_s150um_b600um_er3.66",
+      "oracle_value": 111.25127358090116,
+      "pinned_expected": 111.25127358090116,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w150um_s150um_b600um_er3.66",
+      "oracle_value": 43.05597265854296,
+      "pinned_expected": 43.05597265854296,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w150um_s150um_b600um_er3.66",
+      "oracle_value": 71.21665465983244,
+      "pinned_expected": 71.21665465983244,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w500um_s400um_b1000um_er4.5",
+      "oracle_value": 42.36937511531565,
+      "pinned_expected": 42.36937511531565,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w500um_s400um_b1000um_er4.5",
+      "oracle_value": 51.532873293041725,
+      "pinned_expected": 51.532873293041725,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w500um_s400um_b1000um_er4.5",
+      "oracle_value": 84.7387502306313,
+      "pinned_expected": 84.7387502306313,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w500um_s400um_b1000um_er4.5",
+      "oracle_value": 25.766436646520862,
+      "pinned_expected": 25.766436646520862,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w500um_s400um_b1000um_er4.5",
+      "oracle_value": 47.168226550248946,
+      "pinned_expected": 47.168226550248946,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w100um_s100um_b400um_er4.2",
+      "oracle_value": 51.926720284995426,
+      "pinned_expected": 51.926720284995426,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w100um_s100um_b400um_er4.2",
+      "oracle_value": 80.38579251725133,
+      "pinned_expected": 80.38579251725133,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w100um_s100um_b400um_er4.2",
+      "oracle_value": 103.85344056999085,
+      "pinned_expected": 103.85344056999085,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w100um_s100um_b400um_er4.2",
+      "oracle_value": 40.192896258625666,
+      "pinned_expected": 40.192896258625666,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w100um_s100um_b400um_er4.2",
+      "oracle_value": 66.48098825520484,
+      "pinned_expected": 66.48098825520484,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w250um_s2000um_b800um_er4",
+      "oracle_value": 62.46400639266397,
+      "pinned_expected": 62.46400639266397,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w250um_s2000um_b800um_er4",
+      "oracle_value": 62.48448973125145,
+      "pinned_expected": 62.48448973125145,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w250um_s2000um_b800um_er4",
+      "oracle_value": 124.92801278532794,
+      "pinned_expected": 124.92801278532794,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w250um_s2000um_b800um_er4",
+      "oracle_value": 31.242244865625725,
+      "pinned_expected": 31.242244865625725,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w250um_s2000um_b800um_er4",
+      "oracle_value": 62.474248370921764,
+      "pinned_expected": 62.474248370921764,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w400um_s50um_b1000um_er4",
+      "oracle_value": 32.36211389171124,
+      "pinned_expected": 32.36211389171124,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w400um_s50um_b1000um_er4",
+      "oracle_value": 73.04883914886678,
+      "pinned_expected": 73.04883914886678,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w400um_s50um_b1000um_er4",
+      "oracle_value": 64.72422778342248,
+      "pinned_expected": 64.72422778342248,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w400um_s50um_b1000um_er4",
+      "oracle_value": 36.52441957443339,
+      "pinned_expected": 36.52441957443339,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w400um_s50um_b1000um_er4",
+      "oracle_value": 55.976347657725086,
+      "pinned_expected": 55.976347657725086,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_zodd_ohm_w150um_s1000um_b400um_er4.2",
+      "oracle_value": 56.291873650652235,
+      "pinned_expected": 56.291873650652235,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zeven_ohm_w150um_s1000um_b400um_er4.2",
+      "oracle_value": 56.30891940506602,
+      "pinned_expected": 56.30891940506602,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "diffstripline_zdiff_ohm_w150um_s1000um_b400um_er4.2",
+      "oracle_value": 112.58374730130447,
+      "pinned_expected": 112.58374730130447,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zdiff = 2 Zodd (S-022b)"
+    },
+    {
+      "name": "diffstripline_zcommon_ohm_w150um_s1000um_b400um_er4.2",
+      "oracle_value": 28.15445970253301,
+      "pinned_expected": 28.15445970253301,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; Zcommon = Zeven/2 (S-022b)"
+    },
+    {
+      "name": "diffstripline_zinf_ohm_w150um_s1000um_b400um_er4.2",
+      "oracle_value": 56.3003968919515,
+      "pinned_expected": 56.3003968919515,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); tests the implementation against the recorded formula, not the paper; weak-coupling limit s -> infinity"
+    },
+    {
+      "name": "diffstripline_solve_s_um_Zd100ohm_w200um_b1000um_er4",
+      "oracle_value": 156.80906968683132,
+      "pinned_expected": 156.80906968683132,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection, bracket 0.001 <= s/b <= 30"
+    },
+    {
+      "name": "diffstripline_solve_s_um_Zd90ohm_w150um_b600um_er4.2",
+      "oracle_value": 83.63994474672201,
+      "pinned_expected": 83.63994474672201,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection, bracket 0.001 <= s/b <= 30"
+    },
+    {
+      "name": "diffstripline_solve_s_um_Zd110ohm_w300um_b800um_er3.66",
+      "oracle_value": 386.3299022864807,
+      "pinned_expected": 386.3299022864807,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "edge spacing for a target Zdiff by bisection, bracket 0.001 <= s/b <= 30"
+    },
+    {
+      "name": "diffstripline_solve_w_um_Zd100ohm_s200um_b1000um_er4",
+      "oracle_value": 257.85229349572154,
+      "pinned_expected": 257.85229349572154,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection, bracket 0.05 <= w/b <= 1e6"
+    },
+    {
+      "name": "diffstripline_solve_w_um_Zd90ohm_s150um_b600um_er4.2",
+      "oracle_value": 231.7375138772208,
+      "pinned_expected": 231.7375138772208,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection, bracket 0.05 <= w/b <= 1e6"
+    },
+    {
+      "name": "diffstripline_solve_w_um_Zd110ohm_s300um_b800um_er3.66",
+      "oracle_value": 269.3525958047048,
+      "pinned_expected": 269.3525958047048,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-022a",
+        "S-022b",
+        "S-021",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-022a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-022b": "VERIFIED",
+        "S-021": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Zdiff by bisection, bracket 0.05 <= w/b <= 1e6"
+    },
+    {
+      "name": "cpw_z0_ohm_w500um_s200um_h500um_er1",
+      "oracle_value": 113.02151358540485,
+      "pinned_expected": 113.02151358540485,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w500um_s200um_h500um_er1",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w500um_s200um_h500um_er1",
+      "oracle_value": 0.5555555555555556,
+      "pinned_expected": 0.5555555555555556,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w500um_s200um_h500um_er1",
+      "oracle_value": 0.44916121659925634,
+      "pinned_expected": 0.44916121659925634,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w500um_s200um_h500um_er12.85",
+      "oracle_value": 45.24582103634388,
+      "pinned_expected": 45.24582103634388,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w500um_s200um_h500um_er12.85",
+      "oracle_value": 6.239722725757477,
+      "pinned_expected": 6.239722725757477,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w500um_s200um_h500um_er12.85",
+      "oracle_value": 0.5555555555555556,
+      "pinned_expected": 0.5555555555555556,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w500um_s200um_h500um_er12.85",
+      "oracle_value": 0.44916121659925634,
+      "pinned_expected": 0.44916121659925634,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w300um_s200um_h1600um_er4.5",
+      "oracle_value": 79.16161633302383,
+      "pinned_expected": 79.16161633302383,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w300um_s200um_h1600um_er4.5",
+      "oracle_value": 2.7359398404753934,
+      "pinned_expected": 2.7359398404753934,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w300um_s200um_h1600um_er4.5",
+      "oracle_value": 0.42857142857142855,
+      "pinned_expected": 0.42857142857142855,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w300um_s200um_h1600um_er4.5",
+      "oracle_value": 0.42177325988690245,
+      "pinned_expected": 0.42177325988690245,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 79.0745083132116,
+      "pinned_expected": 79.0745083132116,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 2.5795276278433983,
+      "pinned_expected": 2.5795276278433983,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 0.45454545454545453,
+      "pinned_expected": 0.45454545454545453,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 0.44354836393143976,
+      "pinned_expected": 0.44354836393143976,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w100um_s100um_h200um_er3.66",
+      "oracle_value": 98.66396671918733,
+      "pinned_expected": 98.66396671918733,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w100um_s100um_h200um_er3.66",
+      "oracle_value": 2.2272311432833867,
+      "pinned_expected": 2.2272311432833867,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w100um_s100um_h200um_er3.66",
+      "oracle_value": 0.3333333333333333,
+      "pinned_expected": 0.3333333333333333,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w100um_s100um_h200um_er3.66",
+      "oracle_value": 0.27403129960564526,
+      "pinned_expected": 0.27403129960564526,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w200um_s50um_h1600um_er4.5",
+      "oracle_value": 59.79356178025146,
+      "pinned_expected": 59.79356178025146,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w200um_s50um_h1600um_er4.5",
+      "oracle_value": 2.74712704592507,
+      "pinned_expected": 2.74712704592507,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w200um_s50um_h1600um_er4.5",
+      "oracle_value": 0.6666666666666666,
+      "pinned_expected": 0.6666666666666666,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w200um_s50um_h1600um_er4.5",
+      "oracle_value": 0.6653307517534144,
+      "pinned_expected": 0.6653307517534144,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w1000um_s100um_h1600um_er4.3",
+      "oracle_value": 48.420443104201226,
+      "pinned_expected": 48.420443104201226,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w1000um_s100um_h1600um_er4.3",
+      "oracle_value": 2.6104390796220756,
+      "pinned_expected": 2.6104390796220756,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w1000um_s100um_h1600um_er4.3",
+      "oracle_value": 0.8333333333333334,
+      "pinned_expected": 0.8333333333333334,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w1000um_s100um_h1600um_er4.3",
+      "oracle_value": 0.8190132933170973,
+      "pinned_expected": 0.8190132933170973,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w150um_s500um_h800um_er4.2",
+      "oracle_value": 129.3693904744183,
+      "pinned_expected": 129.3693904744183,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w150um_s500um_h800um_er4.2",
+      "oracle_value": 2.5107844113786637,
+      "pinned_expected": 2.5107844113786637,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w150um_s500um_h800um_er4.2",
+      "oracle_value": 0.13043478260869565,
+      "pinned_expected": 0.13043478260869565,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w150um_s500um_h800um_er4.2",
+      "oracle_value": 0.10674048572265106,
+      "pinned_expected": 0.10674048572265106,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 68.1546170509535,
+      "pinned_expected": 68.1546170509535,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 2.7499935443971113,
+      "pinned_expected": 2.7499935443971113,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 0.5555555555555556,
+      "pinned_expected": 0.5555555555555556,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 0.5555523570888262,
+      "pinned_expected": 0.5555523570888262,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w500um_s200um_h20um_er4.5",
+      "oracle_value": 103.47744009194241,
+      "pinned_expected": 103.47744009194241,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w500um_s200um_h20um_er4.5",
+      "oracle_value": 1.192973744565051,
+      "pinned_expected": 1.192973744565051,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w500um_s200um_h20um_er4.5",
+      "oracle_value": 0.5555555555555556,
+      "pinned_expected": 0.5555555555555556,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w500um_s200um_h20um_er4.5",
+      "oracle_value": 1.5070172753900646e-07,
+      "pinned_expected": 1.5070172753900646e-07,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w300um_s300um_h300um_er128",
+      "oracle_value": 20.796763873682504,
+      "pinned_expected": 20.796763873682504,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w300um_s300um_h300um_er128",
+      "oracle_value": 50.12921605434623,
+      "pinned_expected": 50.12921605434623,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w300um_s300um_h300um_er128",
+      "oracle_value": 0.3333333333333333,
+      "pinned_expected": 0.3333333333333333,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w300um_s300um_h300um_er128",
+      "oracle_value": 0.16615830650994654,
+      "pinned_expected": 0.16615830650994654,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpw_z0_ohm_w100um_s10um_h1600um_er4.5",
+      "oracle_value": 47.17963033654871,
+      "pinned_expected": 47.17963033654871,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_eeff_w100um_s10um_h1600um_er4.5",
+      "oracle_value": 2.749552482604889,
+      "pinned_expected": 2.749552482604889,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpw_k_w100um_s10um_h1600um_er4.5",
+      "oracle_value": 0.8333333333333334,
+      "pinned_expected": 0.8333333333333334,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k = W/(W + 2 s)"
+    },
+    {
+      "name": "cpw_k1_w100um_s10um_h1600um_er4.5",
+      "oracle_value": 0.8331861236025038,
+      "pinned_expected": 0.8331861236025038,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_z0_ohm_w500um_s200um_h500um_er1",
+      "oracle_value": 100.43800215362509,
+      "pinned_expected": 100.43800215362509,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w500um_s200um_h500um_er1",
+      "oracle_value": 1.0,
+      "pinned_expected": 1.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w500um_s200um_h500um_er1",
+      "oracle_value": 0.7382735392946401,
+      "pinned_expected": 0.7382735392946401,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w500um_s200um_h500um_er1",
+      "oracle_value": 0.5556686556063107,
+      "pinned_expected": 0.5556686556063107,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w500um_s200um_h500um_er12.85",
+      "oracle_value": 36.46948397460501,
+      "pinned_expected": 36.46948397460501,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w500um_s200um_h500um_er12.85",
+      "oracle_value": 7.584673568934782,
+      "pinned_expected": 7.584673568934782,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w500um_s200um_h500um_er12.85",
+      "oracle_value": 0.7382735392946401,
+      "pinned_expected": 0.7382735392946401,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w500um_s200um_h500um_er12.85",
+      "oracle_value": 0.5556686556063107,
+      "pinned_expected": 0.5556686556063107,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w300um_s200um_h200um_er4.2",
+      "oracle_value": 56.4952723135648,
+      "pinned_expected": 56.4952723135648,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w300um_s200um_h200um_er4.2",
+      "oracle_value": 3.00357976646107,
+      "pinned_expected": 3.00357976646107,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w300um_s200um_h200um_er4.2",
+      "oracle_value": 0.8336518090713089,
+      "pinned_expected": 0.8336518090713089,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w300um_s200um_h200um_er4.2",
+      "oracle_value": 0.6261186770190843,
+      "pinned_expected": 0.6261186770190843,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 77.46143355005367,
+      "pinned_expected": 77.46143355005367,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 2.6203005282860596,
+      "pinned_expected": 2.6203005282860596,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 0.47636606617529664,
+      "pinned_expected": 0.47636606617529664,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w250um_s150um_h1000um_er4.2",
+      "oracle_value": 0.5063439150893937,
+      "pinned_expected": 0.5063439150893937,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w200um_s150um_h160um_er4.35",
+      "oracle_value": 60.807109847037516,
+      "pinned_expected": 60.807109847037516,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w200um_s150um_h160um_er4.35",
+      "oracle_value": 3.0394255269720087,
+      "pinned_expected": 3.0394255269720087,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w200um_s150um_h160um_er4.35",
+      "oracle_value": 0.7650333505149921,
+      "pinned_expected": 0.7650333505149921,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w200um_s150um_h160um_er4.35",
+      "oracle_value": 0.6087837393946295,
+      "pinned_expected": 0.6087837393946295,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w150um_s100um_h100um_er3.66",
+      "oracle_value": 59.97141957948539,
+      "pinned_expected": 59.97141957948539,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w150um_s100um_h100um_er3.66",
+      "oracle_value": 2.665475680870764,
+      "pinned_expected": 2.665475680870764,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w150um_s100um_h100um_er3.66",
+      "oracle_value": 0.8336518090713089,
+      "pinned_expected": 0.8336518090713089,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w150um_s100um_h100um_er3.66",
+      "oracle_value": 0.6261186770190843,
+      "pinned_expected": 0.6261186770190843,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w400um_s300um_h1600um_er4.5",
+      "oracle_value": 80.02662493649,
+      "pinned_expected": 80.02662493649,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w400um_s300um_h1600um_er4.5",
+      "oracle_value": 2.7773875850683067,
+      "pinned_expected": 2.7773875850683067,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w400um_s300um_h1600um_er4.5",
+      "oracle_value": 0.4261605070665631,
+      "pinned_expected": 0.4261605070665631,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w400um_s300um_h1600um_er4.5",
+      "oracle_value": 0.5078250243052305,
+      "pinned_expected": 0.5078250243052305,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 68.15420564321526,
+      "pinned_expected": 68.15420564321526,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 2.7500064555921306,
+      "pinned_expected": 2.7500064555921306,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 0.5555619524606036,
+      "pinned_expected": 0.5555619524606036,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w500um_s200um_h100000um_er4.5",
+      "oracle_value": 0.5000018444548945,
+      "pinned_expected": 0.5000018444548945,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w100um_s50um_h50um_er3.48",
+      "oracle_value": 52.09090838271699,
+      "pinned_expected": 52.09090838271699,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w100um_s50um_h50um_er3.48",
+      "oracle_value": 2.6133350498029726,
+      "pinned_expected": 2.6133350498029726,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w100um_s50um_h50um_er3.48",
+      "oracle_value": 0.9205842034099684,
+      "pinned_expected": 0.9205842034099684,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w100um_s50um_h50um_er3.48",
+      "oracle_value": 0.6505383265334567,
+      "pinned_expected": 0.6505383265334567,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w1000um_s500um_h300um_er4.5",
+      "oracle_value": 34.55885209158871,
+      "pinned_expected": 34.55885209158871,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w1000um_s500um_h300um_er4.5",
+      "oracle_value": 3.553740440687788,
+      "pinned_expected": 3.553740440687788,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w1000um_s500um_h300um_er4.5",
+      "oracle_value": 0.9894692474419606,
+      "pinned_expected": 0.9894692474419606,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w1000um_s500um_h300um_er4.5",
+      "oracle_value": 0.7296401259107965,
+      "pinned_expected": 0.7296401259107965,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpwg_z0_ohm_w300um_s300um_h300um_er128",
+      "oracle_value": 13.495578104354504,
+      "pinned_expected": 13.495578104354504,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_eeff_w300um_s300um_h300um_er128",
+      "oracle_value": 76.94712537276797,
+      "pinned_expected": 76.94712537276797,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper"
+    },
+    {
+      "name": "cpwg_k3_w300um_s300um_h300um_er128",
+      "oracle_value": 0.667683386980107,
+      "pinned_expected": 0.667683386980107,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"
+    },
+    {
+      "name": "cpwg_q_w300um_s300um_h300um_er128",
+      "oracle_value": 0.5980088612028974,
+      "pinned_expected": 0.5980088612028974,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper; filling factor q"
+    },
+    {
+      "name": "cpw_solve_s_um_Z50ohm_w300um_h1600um_er4.5",
+      "oracle_value": 37.88147843267837,
+      "pinned_expected": 37.88147843267837,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "gap for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpw_solve_s_um_Z60ohm_w250um_h1000um_er4.2",
+      "oracle_value": 56.811427688244265,
+      "pinned_expected": 56.811427688244265,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "gap for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpw_solve_s_um_Z75ohm_w200um_h800um_er3.66",
+      "oracle_value": 82.90750766205666,
+      "pinned_expected": 82.90750766205666,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "gap for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpw_solve_s_um_Z40ohm_w500um_h1600um_er4.5",
+      "oracle_value": 24.042475367675664,
+      "pinned_expected": 24.042475367675664,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "gap for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpw_solve_w_um_Z50ohm_s200um_h1600um_er4.5",
+      "oracle_value": 1724.5522379893569,
+      "pinned_expected": 1724.5522379893569,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpw_solve_w_um_Z60ohm_s150um_h1000um_er4.2",
+      "oracle_value": 687.7773307855166,
+      "pinned_expected": 687.7773307855166,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpw_solve_w_um_Z75ohm_s300um_h800um_er3.66",
+      "oracle_value": 804.7604049987445,
+      "pinned_expected": 804.7604049987445,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpw_solve_w_um_Z40ohm_s150um_h1600um_er4.5",
+      "oracle_value": 3986.6708488410286,
+      "pinned_expected": 3986.6708488410286,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023": "CONFLICT",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "width for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpwg_solve_s_um_Z50ohm_w300um_h200um_er4.2",
+      "oracle_value": 80.625486865237,
+      "pinned_expected": 80.625486865237,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "gap for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpwg_solve_s_um_Z60ohm_w250um_h1000um_er4.2",
+      "oracle_value": 58.96424516320917,
+      "pinned_expected": 58.96424516320917,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "gap for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpwg_solve_s_um_Z75ohm_w200um_h800um_er3.66",
+      "oracle_value": 87.41915133936597,
+      "pinned_expected": 87.41915133936597,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "gap for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpwg_solve_s_um_Z40ohm_w400um_h1600um_er4.5",
+      "oracle_value": 19.75339662714937,
+      "pinned_expected": 19.75339662714937,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "gap for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= s/w <= 100"
+    },
+    {
+      "name": "cpwg_solve_w_um_Z50ohm_s150um_h200um_er4.2",
+      "oracle_value": 353.8401505946634,
+      "pinned_expected": 353.8401505946634,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpwg_solve_w_um_Z60ohm_s150um_h1000um_er4.2",
+      "oracle_value": 561.2462819486717,
+      "pinned_expected": 561.2462819486717,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpwg_solve_w_um_Z75ohm_s300um_h800um_er3.66",
+      "oracle_value": 518.2894686575293,
+      "pinned_expected": 518.2894686575293,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= w/s <= 100"
+    },
+    {
+      "name": "cpwg_solve_w_um_Z40ohm_s200um_h1600um_er4.5",
+      "oracle_value": 2289.2141807112903,
+      "pinned_expected": 2289.2141807112903,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-023a",
+        "S-023b",
+        "S-013",
+        "S-029",
+        "S-029a"
+      ],
+      "ledger_status": {
+        "S-023a": "PAYWALLED-USER-MUST-VERIFY",
+        "S-023b": "VERIFIED",
+        "S-013": "VERIFIED",
+        "S-029": "VERIFIED",
+        "S-029a": "VERIFIED"
+      },
+      "status": "PAYWALLED-USER-MUST-VERIFY",
+      "note": "width for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= w/s <= 100"
     }
   ]
 }

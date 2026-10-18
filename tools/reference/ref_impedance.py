@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-INDEPENDENT ORACLE for Phase 2 part A (impedance models). Written from the equations recorded in
+INDEPENDENT ORACLE for Phase 2 parts A and B (impedance models; part B = edge-coupled differential models S-022, S-022a, S-022b). Written from the equations recorded in
 docs/sources/notes/impedance-models.md (S-020, S-020a, S-021, S-021a wide-strip form, S-023b, S-024) and
 docs/sources/notes/impedance-presets-and-data.md (S-029, S-029a, S-029b). It never imports or reads src/.
 Imported by ref_calcs.py, which appends these vectors to GOLDEN (and so to docs/golden-vectors.json).
@@ -414,8 +414,259 @@ PINNED = {
 }
 
 
+# Part B pins (coupled differential models): full-precision literals recorded from this oracle, regression pins only.
+PINNED_B = {
+    'diffmicrostrip_zodd_ohm_w200um_s200um_h200um_er4.5': 60.0370258688354,
+    'diffmicrostrip_zeven_ohm_w200um_s200um_h200um_er4.5': 79.93914530291562,
+    'diffmicrostrip_zdiff_ohm_w200um_s200um_h200um_er4.5': 120.0740517376708,
+    'diffmicrostrip_zcommon_ohm_w200um_s200um_h200um_er4.5': 39.96957265145781,
+    'diffmicrostrip_eeven_w200um_s200um_h200um_er4.5': 3.4562985444371335,
+    'diffmicrostrip_eodd_w200um_s200um_h200um_er4.5': 2.9411821308418906,
+    'diffmicrostrip_zodd_ohm_w150um_s100um_h200um_er4.5': 59.010804523794434,
+    'diffmicrostrip_zeven_ohm_w150um_s100um_h200um_er4.5': 99.15389505939397,
+    'diffmicrostrip_zdiff_ohm_w150um_s100um_h200um_er4.5': 118.02160904758887,
+    'diffmicrostrip_zcommon_ohm_w150um_s100um_h200um_er4.5': 49.57694752969699,
+    'diffmicrostrip_eeven_w150um_s100um_h200um_er4.5': 3.389989324730745,
+    'diffmicrostrip_eodd_w150um_s100um_h200um_er4.5': 2.843164005050705,
+    'diffmicrostrip_zodd_ohm_w100um_s50um_h100um_er3.66': 57.366733325660604,
+    'diffmicrostrip_zeven_ohm_w100um_s50um_h100um_er3.66': 94.04399578917435,
+    'diffmicrostrip_zdiff_ohm_w100um_s50um_h100um_er3.66': 114.73346665132121,
+    'diffmicrostrip_zcommon_ohm_w100um_s50um_h100um_er3.66': 47.02199789458717,
+    'diffmicrostrip_eeven_w100um_s50um_h100um_er3.66': 2.870774734513417,
+    'diffmicrostrip_eodd_w100um_s50um_h100um_er3.66': 2.428270179947411,
+    'diffmicrostrip_zodd_ohm_w300um_s200um_h150um_er4.2': 44.846895568891455,
+    'diffmicrostrip_zeven_ohm_w300um_s200um_h150um_er4.2': 54.03746739229859,
+    'diffmicrostrip_zdiff_ohm_w300um_s200um_h150um_er4.2': 89.69379113778291,
+    'diffmicrostrip_zcommon_ohm_w300um_s200um_h150um_er4.2': 27.018733696149294,
+    'diffmicrostrip_eeven_w300um_s200um_h150um_er4.2': 3.416387438184489,
+    'diffmicrostrip_eodd_w300um_s200um_h150um_er4.2': 2.954036067896932,
+    'diffmicrostrip_zodd_ohm_w50um_s50um_h500um_er4.2': 60.83585532558558,
+    'diffmicrostrip_zeven_ohm_w50um_s50um_h500um_er4.2': 235.57620819039585,
+    'diffmicrostrip_zdiff_ohm_w50um_s50um_h500um_er4.2': 121.67171065117115,
+    'diffmicrostrip_zcommon_ohm_w50um_s50um_h500um_er4.2': 117.78810409519792,
+    'diffmicrostrip_eeven_w50um_s50um_h500um_er4.2': 2.9222932798219388,
+    'diffmicrostrip_eodd_w50um_s50um_h500um_er4.2': 2.605984194603142,
+    'diffmicrostrip_zodd_ohm_w3000um_s300um_h300um_er4.5': 13.259068832826658,
+    'diffmicrostrip_zeven_ohm_w3000um_s300um_h300um_er4.5': 15.232193372080141,
+    'diffmicrostrip_zdiff_ohm_w3000um_s300um_h300um_er4.5': 26.518137665653317,
+    'diffmicrostrip_zcommon_ohm_w3000um_s300um_h300um_er4.5': 7.616096686040071,
+    'diffmicrostrip_eeven_w3000um_s300um_h300um_er4.5': 4.144837133465025,
+    'diffmicrostrip_eodd_w3000um_s300um_h300um_er4.5': 3.716590702682813,
+    'diffmicrostrip_zodd_ohm_w100um_s800um_h200um_er4.5': 92.88717963471863,
+    'diffmicrostrip_zeven_ohm_w100um_s800um_h200um_er4.5': 96.38237561876811,
+    'diffmicrostrip_zdiff_ohm_w100um_s800um_h200um_er4.5': 185.77435926943727,
+    'diffmicrostrip_zcommon_ohm_w100um_s800um_h200um_er4.5': 48.191187809384054,
+    'diffmicrostrip_eeven_w100um_s800um_h200um_er4.5': 3.193109500770157,
+    'diffmicrostrip_eodd_w100um_s800um_h200um_er4.5': 3.0224084484421025,
+    'diffmicrostrip_zodd_ohm_w200um_s3um_h200um_er4.2': 28.264817078527656,
+    'diffmicrostrip_zeven_ohm_w200um_s3um_h200um_er4.2': 98.93648425190774,
+    'diffmicrostrip_zdiff_ohm_w200um_s3um_h200um_er4.2': 56.52963415705531,
+    'diffmicrostrip_zcommon_ohm_w200um_s3um_h200um_er4.2': 49.46824212595387,
+    'diffmicrostrip_eeven_w200um_s3um_h200um_er4.2': 3.2130931325745173,
+    'diffmicrostrip_eodd_w200um_s3um_h200um_er4.2': 2.641174685961226,
+    'diffmicrostrip_zodd_ohm_w150um_s150um_h150um_er1': 102.96274900174872,
+    'diffmicrostrip_zeven_ohm_w150um_s150um_h150um_er1': 148.61584829329297,
+    'diffmicrostrip_zdiff_ohm_w150um_s150um_h150um_er1': 205.92549800349744,
+    'diffmicrostrip_zcommon_ohm_w150um_s150um_h150um_er1': 74.30792414664649,
+    'diffmicrostrip_eeven_w150um_s150um_h150um_er1': 1.0,
+    'diffmicrostrip_eodd_w150um_s150um_h150um_er1': 1.0,
+    'diffmicrostrip_zodd_ohm_w150um_s100um_h150um_er128': 11.385257757300362,
+    'diffmicrostrip_zeven_ohm_w150um_s100um_h150um_er128': 16.40833974871391,
+    'diffmicrostrip_zdiff_ohm_w150um_s100um_h150um_er128': 22.770515514600724,
+    'diffmicrostrip_zcommon_ohm_w150um_s100um_h150um_er128': 8.204169874356955,
+    'diffmicrostrip_eeven_w150um_s100um_h150um_er128': 89.37215445754299,
+    'diffmicrostrip_eodd_w150um_s100um_h150um_er128': 69.68722758641272,
+    'diffmicrostrip_zodd_ohm_w635um_s300um_h635um_er9.8': 36.97039220908754,
+    'diffmicrostrip_zeven_ohm_w635um_s300um_h635um_er9.8': 59.911239963977565,
+    'diffmicrostrip_zdiff_ohm_w635um_s300um_h635um_er9.8': 73.94078441817508,
+    'diffmicrostrip_zcommon_ohm_w635um_s300um_h635um_er9.8': 29.955619981988782,
+    'diffmicrostrip_eeven_w635um_s300um_h635um_er9.8': 7.142707102634866,
+    'diffmicrostrip_eodd_w635um_s300um_h635um_er9.8': 5.7041893225266955,
+    'diffmicrostrip_zodd_ohm_w120um_s150um_h100um_er3.48': 65.0404878229694,
+    'diffmicrostrip_zeven_ohm_w120um_s150um_h100um_er3.48': 78.37504727806672,
+    'diffmicrostrip_zdiff_ohm_w120um_s150um_h100um_er3.48': 130.0809756459388,
+    'diffmicrostrip_zcommon_ohm_w120um_s150um_h100um_er3.48': 39.18752363903336,
+    'diffmicrostrip_eeven_w120um_s150um_h100um_er3.48': 2.765391538445228,
+    'diffmicrostrip_eodd_w120um_s150um_h100um_er3.48': 2.4342089663550874,
+    'diffmicrostrip_solve_s_um_Zd100ohm_w150um_h100um_er4.2': 91.64802341290061,
+    'diffmicrostrip_solve_s_um_Zd90ohm_w200um_h150um_er4.5': 63.903500409608654,
+    'diffmicrostrip_solve_s_um_Zd110ohm_w120um_h100um_er3.66': 60.45679862400129,
+    'diffmicrostrip_solve_s_um_Zd85ohm_w250um_h200um_er4.2': 47.573313658711506,
+    'diffmicrostrip_solve_w_um_Zd100ohm_s150um_h100um_er4.2': 169.59511648336667,
+    'diffmicrostrip_solve_w_um_Zd90ohm_s200um_h150um_er4.5': 283.29234719713753,
+    'diffmicrostrip_solve_w_um_Zd110ohm_s120um_h100um_er3.66': 150.59583739188582,
+    'diffmicrostrip_solve_w_um_Zd85ohm_s200um_h200um_er4.2': 411.535501623153,
+    'diffstripline_zodd_ohm_w500um_s636.62um_b1000um_er4': 47.68459321660051,
+    'diffstripline_zeven_ohm_w500um_s636.62um_b1000um_er4': 52.273195937991126,
+    'diffstripline_zdiff_ohm_w500um_s636.62um_b1000um_er4': 95.36918643320102,
+    'diffstripline_zcommon_ohm_w500um_s636.62um_b1000um_er4': 26.136597968995563,
+    'diffstripline_zinf_ohm_w500um_s636.62um_b1000um_er4': 50.02945927533656,
+    'diffstripline_zodd_ohm_w300um_s200um_b1000um_er4': 47.858290547163,
+    'diffstripline_zeven_ohm_w300um_s200um_b1000um_er4': 77.81376508062841,
+    'diffstripline_zdiff_ohm_w300um_s200um_b1000um_er4': 95.716581094326,
+    'diffstripline_zcommon_ohm_w300um_s200um_b1000um_er4': 38.90688254031421,
+    'diffstripline_zinf_ohm_w300um_s200um_b1000um_er4': 63.527746880394254,
+    'diffstripline_zodd_ohm_w200um_s200um_b500um_er4.2': 48.483257028652034,
+    'diffstripline_zeven_ohm_w200um_s200um_b500um_er4.2': 60.3459464352407,
+    'diffstripline_zdiff_ohm_w200um_s200um_b500um_er4.2': 96.96651405730407,
+    'diffstripline_zcommon_ohm_w200um_s200um_b500um_er4.2': 30.17297321762035,
+    'diffstripline_zinf_ohm_w200um_s200um_b500um_er4.2': 54.62732176256636,
+    'diffstripline_zodd_ohm_w150um_s150um_b600um_er3.66': 55.62563679045058,
+    'diffstripline_zeven_ohm_w150um_s150um_b600um_er3.66': 86.11194531708593,
+    'diffstripline_zdiff_ohm_w150um_s150um_b600um_er3.66': 111.25127358090116,
+    'diffstripline_zcommon_ohm_w150um_s150um_b600um_er3.66': 43.05597265854296,
+    'diffstripline_zinf_ohm_w150um_s150um_b600um_er3.66': 71.21665465983244,
+    'diffstripline_zodd_ohm_w500um_s400um_b1000um_er4.5': 42.36937511531565,
+    'diffstripline_zeven_ohm_w500um_s400um_b1000um_er4.5': 51.532873293041725,
+    'diffstripline_zdiff_ohm_w500um_s400um_b1000um_er4.5': 84.7387502306313,
+    'diffstripline_zcommon_ohm_w500um_s400um_b1000um_er4.5': 25.766436646520862,
+    'diffstripline_zinf_ohm_w500um_s400um_b1000um_er4.5': 47.168226550248946,
+    'diffstripline_zodd_ohm_w100um_s100um_b400um_er4.2': 51.926720284995426,
+    'diffstripline_zeven_ohm_w100um_s100um_b400um_er4.2': 80.38579251725133,
+    'diffstripline_zdiff_ohm_w100um_s100um_b400um_er4.2': 103.85344056999085,
+    'diffstripline_zcommon_ohm_w100um_s100um_b400um_er4.2': 40.192896258625666,
+    'diffstripline_zinf_ohm_w100um_s100um_b400um_er4.2': 66.48098825520484,
+    'diffstripline_zodd_ohm_w250um_s2000um_b800um_er4': 62.46400639266397,
+    'diffstripline_zeven_ohm_w250um_s2000um_b800um_er4': 62.48448973125145,
+    'diffstripline_zdiff_ohm_w250um_s2000um_b800um_er4': 124.92801278532794,
+    'diffstripline_zcommon_ohm_w250um_s2000um_b800um_er4': 31.242244865625725,
+    'diffstripline_zinf_ohm_w250um_s2000um_b800um_er4': 62.474248370921764,
+    'diffstripline_zodd_ohm_w400um_s50um_b1000um_er4': 32.36211389171124,
+    'diffstripline_zeven_ohm_w400um_s50um_b1000um_er4': 73.04883914886678,
+    'diffstripline_zdiff_ohm_w400um_s50um_b1000um_er4': 64.72422778342248,
+    'diffstripline_zcommon_ohm_w400um_s50um_b1000um_er4': 36.52441957443339,
+    'diffstripline_zinf_ohm_w400um_s50um_b1000um_er4': 55.976347657725086,
+    'diffstripline_zodd_ohm_w150um_s1000um_b400um_er4.2': 56.291873650652235,
+    'diffstripline_zeven_ohm_w150um_s1000um_b400um_er4.2': 56.30891940506602,
+    'diffstripline_zdiff_ohm_w150um_s1000um_b400um_er4.2': 112.58374730130447,
+    'diffstripline_zcommon_ohm_w150um_s1000um_b400um_er4.2': 28.15445970253301,
+    'diffstripline_zinf_ohm_w150um_s1000um_b400um_er4.2': 56.3003968919515,
+    'diffstripline_solve_s_um_Zd100ohm_w200um_b1000um_er4': 156.80906968683132,
+    'diffstripline_solve_s_um_Zd90ohm_w150um_b600um_er4.2': 83.63994474672201,
+    'diffstripline_solve_s_um_Zd110ohm_w300um_b800um_er3.66': 386.3299022864807,
+    'diffstripline_solve_w_um_Zd100ohm_s200um_b1000um_er4': 257.85229349572154,
+    'diffstripline_solve_w_um_Zd90ohm_s150um_b600um_er4.2': 231.7375138772208,
+    'diffstripline_solve_w_um_Zd110ohm_s300um_b800um_er3.66': 269.3525958047048,
+}
+PINNED.update(PINNED_B)
+
+
+# Part C pins (CPW and CPWG): full-precision literals recorded from this oracle (60-digit decimal K), regression pins only.
+PINNED_C = {
+    'cpw_z0_ohm_w500um_s200um_h500um_er1': 113.02151358540485,
+    'cpw_eeff_w500um_s200um_h500um_er1': 1.0,
+    'cpw_k_w500um_s200um_h500um_er1': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h500um_er1': 0.44916121659925634,
+    'cpw_z0_ohm_w500um_s200um_h500um_er12.85': 45.24582103634388,
+    'cpw_eeff_w500um_s200um_h500um_er12.85': 6.239722725757477,
+    'cpw_k_w500um_s200um_h500um_er12.85': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h500um_er12.85': 0.44916121659925634,
+    'cpw_z0_ohm_w300um_s200um_h1600um_er4.5': 79.16161633302383,
+    'cpw_eeff_w300um_s200um_h1600um_er4.5': 2.7359398404753934,
+    'cpw_k_w300um_s200um_h1600um_er4.5': 0.42857142857142855,
+    'cpw_k1_w300um_s200um_h1600um_er4.5': 0.42177325988690245,
+    'cpw_z0_ohm_w250um_s150um_h1000um_er4.2': 79.0745083132116,
+    'cpw_eeff_w250um_s150um_h1000um_er4.2': 2.5795276278433983,
+    'cpw_k_w250um_s150um_h1000um_er4.2': 0.45454545454545453,
+    'cpw_k1_w250um_s150um_h1000um_er4.2': 0.44354836393143976,
+    'cpw_z0_ohm_w100um_s100um_h200um_er3.66': 98.66396671918733,
+    'cpw_eeff_w100um_s100um_h200um_er3.66': 2.2272311432833867,
+    'cpw_k_w100um_s100um_h200um_er3.66': 0.3333333333333333,
+    'cpw_k1_w100um_s100um_h200um_er3.66': 0.27403129960564526,
+    'cpw_z0_ohm_w200um_s50um_h1600um_er4.5': 59.79356178025146,
+    'cpw_eeff_w200um_s50um_h1600um_er4.5': 2.74712704592507,
+    'cpw_k_w200um_s50um_h1600um_er4.5': 0.6666666666666666,
+    'cpw_k1_w200um_s50um_h1600um_er4.5': 0.6653307517534144,
+    'cpw_z0_ohm_w1000um_s100um_h1600um_er4.3': 48.420443104201226,
+    'cpw_eeff_w1000um_s100um_h1600um_er4.3': 2.6104390796220756,
+    'cpw_k_w1000um_s100um_h1600um_er4.3': 0.8333333333333334,
+    'cpw_k1_w1000um_s100um_h1600um_er4.3': 0.8190132933170973,
+    'cpw_z0_ohm_w150um_s500um_h800um_er4.2': 129.3693904744183,
+    'cpw_eeff_w150um_s500um_h800um_er4.2': 2.5107844113786637,
+    'cpw_k_w150um_s500um_h800um_er4.2': 0.13043478260869565,
+    'cpw_k1_w150um_s500um_h800um_er4.2': 0.10674048572265106,
+    'cpw_z0_ohm_w500um_s200um_h100000um_er4.5': 68.1546170509535,
+    'cpw_eeff_w500um_s200um_h100000um_er4.5': 2.7499935443971113,
+    'cpw_k_w500um_s200um_h100000um_er4.5': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h100000um_er4.5': 0.5555523570888262,
+    'cpw_z0_ohm_w500um_s200um_h20um_er4.5': 103.47744009194241,
+    'cpw_eeff_w500um_s200um_h20um_er4.5': 1.192973744565051,
+    'cpw_k_w500um_s200um_h20um_er4.5': 0.5555555555555556,
+    'cpw_k1_w500um_s200um_h20um_er4.5': 1.5070172753900646e-07,
+    'cpw_z0_ohm_w300um_s300um_h300um_er128': 20.796763873682504,
+    'cpw_eeff_w300um_s300um_h300um_er128': 50.12921605434623,
+    'cpw_k_w300um_s300um_h300um_er128': 0.3333333333333333,
+    'cpw_k1_w300um_s300um_h300um_er128': 0.16615830650994654,
+    'cpw_z0_ohm_w100um_s10um_h1600um_er4.5': 47.17963033654871,
+    'cpw_eeff_w100um_s10um_h1600um_er4.5': 2.749552482604889,
+    'cpw_k_w100um_s10um_h1600um_er4.5': 0.8333333333333334,
+    'cpw_k1_w100um_s10um_h1600um_er4.5': 0.8331861236025038,
+    'cpwg_z0_ohm_w500um_s200um_h500um_er1': 100.43800215362509,
+    'cpwg_eeff_w500um_s200um_h500um_er1': 1.0,
+    'cpwg_k3_w500um_s200um_h500um_er1': 0.7382735392946401,
+    'cpwg_q_w500um_s200um_h500um_er1': 0.5556686556063107,
+    'cpwg_z0_ohm_w500um_s200um_h500um_er12.85': 36.46948397460501,
+    'cpwg_eeff_w500um_s200um_h500um_er12.85': 7.584673568934782,
+    'cpwg_k3_w500um_s200um_h500um_er12.85': 0.7382735392946401,
+    'cpwg_q_w500um_s200um_h500um_er12.85': 0.5556686556063107,
+    'cpwg_z0_ohm_w300um_s200um_h200um_er4.2': 56.4952723135648,
+    'cpwg_eeff_w300um_s200um_h200um_er4.2': 3.00357976646107,
+    'cpwg_k3_w300um_s200um_h200um_er4.2': 0.8336518090713089,
+    'cpwg_q_w300um_s200um_h200um_er4.2': 0.6261186770190843,
+    'cpwg_z0_ohm_w250um_s150um_h1000um_er4.2': 77.46143355005367,
+    'cpwg_eeff_w250um_s150um_h1000um_er4.2': 2.6203005282860596,
+    'cpwg_k3_w250um_s150um_h1000um_er4.2': 0.47636606617529664,
+    'cpwg_q_w250um_s150um_h1000um_er4.2': 0.5063439150893937,
+    'cpwg_z0_ohm_w200um_s150um_h160um_er4.35': 60.807109847037516,
+    'cpwg_eeff_w200um_s150um_h160um_er4.35': 3.0394255269720087,
+    'cpwg_k3_w200um_s150um_h160um_er4.35': 0.7650333505149921,
+    'cpwg_q_w200um_s150um_h160um_er4.35': 0.6087837393946295,
+    'cpwg_z0_ohm_w150um_s100um_h100um_er3.66': 59.97141957948539,
+    'cpwg_eeff_w150um_s100um_h100um_er3.66': 2.665475680870764,
+    'cpwg_k3_w150um_s100um_h100um_er3.66': 0.8336518090713089,
+    'cpwg_q_w150um_s100um_h100um_er3.66': 0.6261186770190843,
+    'cpwg_z0_ohm_w400um_s300um_h1600um_er4.5': 80.02662493649,
+    'cpwg_eeff_w400um_s300um_h1600um_er4.5': 2.7773875850683067,
+    'cpwg_k3_w400um_s300um_h1600um_er4.5': 0.4261605070665631,
+    'cpwg_q_w400um_s300um_h1600um_er4.5': 0.5078250243052305,
+    'cpwg_z0_ohm_w500um_s200um_h100000um_er4.5': 68.15420564321526,
+    'cpwg_eeff_w500um_s200um_h100000um_er4.5': 2.7500064555921306,
+    'cpwg_k3_w500um_s200um_h100000um_er4.5': 0.5555619524606036,
+    'cpwg_q_w500um_s200um_h100000um_er4.5': 0.5000018444548945,
+    'cpwg_z0_ohm_w100um_s50um_h50um_er3.48': 52.09090838271699,
+    'cpwg_eeff_w100um_s50um_h50um_er3.48': 2.6133350498029726,
+    'cpwg_k3_w100um_s50um_h50um_er3.48': 0.9205842034099684,
+    'cpwg_q_w100um_s50um_h50um_er3.48': 0.6505383265334567,
+    'cpwg_z0_ohm_w1000um_s500um_h300um_er4.5': 34.55885209158871,
+    'cpwg_eeff_w1000um_s500um_h300um_er4.5': 3.553740440687788,
+    'cpwg_k3_w1000um_s500um_h300um_er4.5': 0.9894692474419606,
+    'cpwg_q_w1000um_s500um_h300um_er4.5': 0.7296401259107965,
+    'cpwg_z0_ohm_w300um_s300um_h300um_er128': 13.495578104354504,
+    'cpwg_eeff_w300um_s300um_h300um_er128': 76.94712537276797,
+    'cpwg_k3_w300um_s300um_h300um_er128': 0.667683386980107,
+    'cpwg_q_w300um_s300um_h300um_er128': 0.5980088612028974,
+    'cpw_solve_s_um_Z50ohm_w300um_h1600um_er4.5': 37.88147843267837,
+    'cpw_solve_s_um_Z60ohm_w250um_h1000um_er4.2': 56.811427688244265,
+    'cpw_solve_s_um_Z75ohm_w200um_h800um_er3.66': 82.90750766205666,
+    'cpw_solve_s_um_Z40ohm_w500um_h1600um_er4.5': 24.042475367675664,
+    'cpw_solve_w_um_Z50ohm_s200um_h1600um_er4.5': 1724.5522379893569,
+    'cpw_solve_w_um_Z60ohm_s150um_h1000um_er4.2': 687.7773307855166,
+    'cpw_solve_w_um_Z75ohm_s300um_h800um_er3.66': 804.7604049987445,
+    'cpw_solve_w_um_Z40ohm_s150um_h1600um_er4.5': 3986.6708488410286,
+    'cpwg_solve_s_um_Z50ohm_w300um_h200um_er4.2': 80.625486865237,
+    'cpwg_solve_s_um_Z60ohm_w250um_h1000um_er4.2': 58.96424516320917,
+    'cpwg_solve_s_um_Z75ohm_w200um_h800um_er3.66': 87.41915133936597,
+    'cpwg_solve_s_um_Z40ohm_w400um_h1600um_er4.5': 19.75339662714937,
+    'cpwg_solve_w_um_Z50ohm_s150um_h200um_er4.2': 353.8401505946634,
+    'cpwg_solve_w_um_Z60ohm_s150um_h1000um_er4.2': 561.2462819486717,
+    'cpwg_solve_w_um_Z75ohm_s300um_h800um_er3.66': 518.2894686575293,
+    'cpwg_solve_w_um_Z40ohm_s200um_h1600um_er4.5': 2289.2141807112903,
+}
+PINNED.update(PINNED_C)
+
+
 def pinned_vectors():
-    return [(n, got, PINNED[n], tol, ids, note) for n, got, tol, ids, note in vectors()]
+    return [(n, got, PINNED[n], tol, ids, note) for n, got, tol, ids, note in vectors() + part_b_vectors() + part_c_vectors()]
 
 
 def self_checks():
@@ -439,7 +690,414 @@ def self_checks():
     assert abs(sl_cohn_wide(0.5, 1e-9, 4.0) - sl_z0(0.5, 4.0)) / sl_z0(0.5, 4.0) < 1e-3  # 0.441 vs 2 ln2/pi
 
 
+# =====================================================================================================================
+# Phase 2 part B: edge-coupled differential models. Written from docs/sources/notes/impedance-models.md (S-022 Hammerstad-
+# Jensen coupled microstrip as given in Steer sec. 5.6; S-022a Cohn approximate edge-coupled stripline, Caspers eq. 3.3;
+# S-022b Zdiff = 2 Zodd, Zcommon = Zeven/2). Independent of src/. No published worked example exists for any of them, so every
+# vector below is the recorded formula evaluated here; none of this verifies the models (S-022, S-022a stay
+# PAYWALLED-USER-MUST-VERIFY).
+# Interpretation recorded in the note: Z0 in Z01e = Z0/(1 - Z0 phi_e/eta0) is the AIR-FILLED single-line impedance Z01(u).
+# Decision Q-1 applied: eta0 = mu0 c exact; the stripline 94.15 (as printed by Caspers) is taken as eta0/4 = 94.1826.
+# =====================================================================================================================
+# ---- S-022 coupled microstrip, u = w/h, g = s/h ----
+def cm_psi(g):
+    return 1.0 + g / 1.45 + g ** 2.09 / 3.95
+
+
+def cm_alpha(g):
+    return 0.5 * math.exp(-g)
+
+
+def cm_m(g):
+    return 0.2175 + (4.113 + (20.36 / g) ** 6) ** (-0.251) + (1.0 / 323.0) * math.log(g ** 10 / (1.0 + (g / 13.8) ** 10))
+
+
+def cm_mu(u, g):
+    return g * math.exp(-g) + u * (20.0 + g * g) / (10.0 + g * g)
+
+
+def cm_phi(u):
+    return 0.8645 * u ** 0.172
+
+
+def cm_phie(u, g):
+    return cm_phi(u) / (cm_psi(g) * (cm_alpha(g) * u ** cm_m(g) + (1.0 - cm_alpha(g)) * u ** (-cm_m(g))))
+
+
+def cm_theta(g):
+    return 1.729 + 1.175 * math.log(1.0 + 0.627 / (g + 0.327 * g ** 2.17))
+
+
+def cm_beta(g):
+    return (0.2306 + (1.0 / 301.8) * math.log(g ** 10 / (1.0 + (g / 3.73) ** 10))
+            + (1.0 / 5.3) * math.log(1.0 + 0.646 * g ** 1.175))
+
+
+def cm_n(g):
+    return ((1.0 / 17.7 + math.exp(-6.424 - 0.76 * math.log(g) - (g / 0.23) ** 5))
+            * math.log((10.0 + 68.3 * g * g) / (1.0 + 32.5 * g ** 3.093)))
+
+
+def cm_phio(u, g):
+    return cm_phie(u, g) - (cm_theta(g) / cm_psi(g)) * math.exp(cm_beta(g) * u ** cm_n(g) * math.log(u))
+
+
+def cm_p(g):
+    return math.exp(-0.745 * g ** 0.295) / math.cosh(g ** 0.68)
+
+
+def cm_r(g, er):
+    return 1.0 + 0.15 * (1.0 - math.exp(1.0 - (er - 1.0) ** 2 / 8.2) / (1.0 + g ** (-6)))
+
+
+def cm_fo1(g, er):
+    return 1.0 - math.exp(-0.179 * g ** 0.15 - 0.328 * g ** cm_r(g, er) / math.log(math.e + (g / 7.0) ** 2.8))
+
+
+def cm_q(g):
+    return math.exp(-1.366 - g)
+
+
+def cm_fo(u, g, er):
+    return cm_fo1(g, er) * math.exp(cm_p(g) * math.log(u) + cm_q(g) * math.sin(math.pi * math.log(u) / math.log(10.0)))
+
+
+def cm_modes(u, g, er):
+    """Returns dict with z0e, z0o, ee_e, ee_o (S-022) for u = w/h, g = s/h."""
+    z01 = ms_z01(u)
+    ab = ms_a(u) * ms_b(er)
+    ee = (er + 1.0) / 2.0 + (er - 1.0) / 2.0 * (1.0 + 10.0 / cm_mu(u, g)) ** (-ab)
+    eo = (er + 1.0) / 2.0 + (er - 1.0) / 2.0 * cm_fo(u, g, er) * (1.0 + 10.0 / u) ** (-ab)
+    z01e = z01 / (1.0 - z01 * cm_phie(u, g) / ETA0)
+    z01o = z01 / (1.0 - z01 * cm_phio(u, g) / ETA0)
+    return {"z0e": z01e / math.sqrt(ee), "z0o": z01o / math.sqrt(eo), "ee_e": ee, "ee_o": eo}
+
+
+def cm_zdiff(u, g, er):
+    return 2.0 * cm_modes(u, g, er)["z0o"]          # S-022b
+
+
+def cm_zcommon(u, g, er):
+    return cm_modes(u, g, er)["z0e"] / 2.0          # S-022b
+
+
+# ---- S-022a coupled stripline (Cohn approximate forms), x = w/b, y = s/b; eps_e = er (homogeneous) ----
+SC_P = ETA0 / 4.0
+
+
+def sc_z0e(x, y, er):
+    return SC_P / math.sqrt(er) / (x + math.log(2.0) / math.pi + math.log(1.0 + math.tanh(math.pi * y / 2.0)) / math.pi)
+
+
+def sc_z0o(x, y, er):
+    return SC_P / math.sqrt(er) / (x + math.log(2.0) / math.pi + math.log(1.0 + 1.0 / math.tanh(math.pi * y / 2.0)) / math.pi)
+
+
+def sc_zinf(x, er):
+    """Weak-coupling limit s -> infinity of the same forms: denominator x + 2 ln2/pi."""
+    return SC_P / math.sqrt(er) / (x + 2.0 * math.log(2.0) / math.pi)
+
+
+# ---- solves (plain bisection on ln of the unknown, independent of the app's Brent) ----
+def cm_solve_s(zd, u, er):
+    """Spacing over h for a target Zdiff, bracket 0.01 <= g <= 5 (Zdiff increases with g there)."""
+    return bisect_ln(lambda g: cm_zdiff(u, g, er) - zd, 0.01, 5.0)
+
+
+def cm_solve_w(zd, g, er):
+    """Width over h for a target Zdiff, bracket 0.1 <= u <= 10 (Zdiff decreases with u)."""
+    return bisect_ln(lambda u: cm_zdiff(u, g, er) - zd, 0.1, 10.0)
+
+
+def sc_solve_s(zd, x, er):
+    return bisect_ln(lambda y: 2.0 * sc_z0o(x, y, er) - zd, 0.001, 30.0)
+
+
+def sc_solve_w(zd, y, er):
+    return bisect_ln(lambda x: 2.0 * sc_z0o(x, y, er) - zd, 0.05, 1e6)
+
+
+# ---- case tables (mirrored by name in src/core/calculators/diff-*/calc.test.ts) ----
+# coupled microstrip: (w um, s um, h um, er)
+DM_CASES = [
+    (200, 200, 200, 4.5),     # u = 1, g = 1: the hand-checkable case (ln u = 0 removes the messy terms)
+    (150, 100, 200, 4.5), (100, 50, 100, 3.66), (300, 200, 150, 4.2), (50, 50, 500, 4.2),
+    (3000, 300, 300, 4.5), (100, 800, 200, 4.5), (200, 3, 200, 4.2), (150, 150, 150, 1.0),
+    (150, 100, 150, 128.0), (635, 300, 635, 9.8), (120, 150, 100, 3.48),
+]
+# spacing solve: (Zdiff ohm, w um, h um, er); width solve: (Zdiff ohm, s um, h um, er)
+DM_SOLVE_S_CASES = [(100, 150, 100, 4.2), (90, 200, 150, 4.5), (110, 120, 100, 3.66), (85, 250, 200, 4.2)]
+DM_SOLVE_W_CASES = [(100, 150, 100, 4.2), (90, 200, 150, 4.5), (110, 120, 100, 3.66), (85, 200, 200, 4.2)]
+# coupled stripline: (w um, s um, b um, er)
+DS_CASES = [
+    (500, 636.6197723675814, 1000, 4.0),   # pi s / 2b = 1: the hand-checkable case
+    (300, 200, 1000, 4.0), (200, 200, 500, 4.2), (150, 150, 600, 3.66), (500, 400, 1000, 4.5),
+    (100, 100, 400, 4.2), (250, 2000, 800, 4.0), (400, 50, 1000, 4.0), (150, 1000, 400, 4.2),
+]
+DS_SOLVE_S_CASES = [(100, 200, 1000, 4.0), (90, 150, 600, 4.2), (110, 300, 800, 3.66)]
+DS_SOLVE_W_CASES = [(100, 200, 1000, 4.0), (90, 150, 600, 4.2), (110, 300, 800, 3.66)]
+
+DM_IDS = ("S-022", "S-022b", "S-020", "S-013", "S-029", "S-029a")
+DS_IDS = ("S-022a", "S-022b", "S-021", "S-013", "S-029", "S-029a")
+
+
+def _dm_tag(w, s, h, er):
+    return "w%sum_s%sum_h%sum_er%s" % (_g(w), _g(s), _g(h), _g(er))
+
+
+def _ds_tag(w, s, b, er):
+    return "w%sum_s%sum_b%sum_er%s" % (_g(w), _g(s), _g(b), _g(er))
+
+
+def part_b_vectors():
+    out = []
+    nm = ("H-J coupled-line static model as recorded for S-022 (Steer sec. 5.6; Z0 in Z01e/Z01o = air-filled Z01); Q-1 prefactor; "
+          "tests the implementation against the recorded formula, not the paper")
+    for w, s, h, er in DM_CASES:
+        u, g = w / h, s / h
+        t = _dm_tag(w, s, h, er)
+        m = cm_modes(u, g, er)
+        out.append(("diffmicrostrip_zodd_ohm_" + t, m["z0o"], RTOL, DM_IDS, nm))
+        out.append(("diffmicrostrip_zeven_ohm_" + t, m["z0e"], RTOL, DM_IDS, nm))
+        out.append(("diffmicrostrip_zdiff_ohm_" + t, 2.0 * m["z0o"], RTOL, DM_IDS, nm + "; Zdiff = 2 Zodd (S-022b)"))
+        out.append(("diffmicrostrip_zcommon_ohm_" + t, m["z0e"] / 2.0, RTOL, DM_IDS, nm + "; Zcommon = Zeven/2 (S-022b)"))
+        out.append(("diffmicrostrip_eeven_" + t, m["ee_e"], RTOL, DM_IDS, nm))
+        out.append(("diffmicrostrip_eodd_" + t, m["ee_o"], RTOL, DM_IDS, nm))
+    for zd, w, h, er in DM_SOLVE_S_CASES:
+        g = cm_solve_s(zd, w / h, er)
+        out.append(("diffmicrostrip_solve_s_um_Zd%sohm_w%sum_h%sum_er%s" % (_g(zd), _g(w), _g(h), _g(er)), g * h, 1e-9, DM_IDS,
+                    "edge spacing for a target Zdiff by bisection on the S-022 analysis function, bracket 0.01 <= s/h <= 5"))
+    for zd, s, h, er in DM_SOLVE_W_CASES:
+        u = cm_solve_w(zd, s / h, er)
+        out.append(("diffmicrostrip_solve_w_um_Zd%sohm_s%sum_h%sum_er%s" % (_g(zd), _g(s), _g(h), _g(er)), u * h, 1e-9, DM_IDS,
+                    "width for a target Zdiff by bisection on the S-022 analysis function, bracket 0.1 <= w/h <= 10"))
+    nc = ("Cohn approximate edge-coupled stripline as recorded for S-022a (Caspers eq. 3.3), 94.15 taken as eta0/4 (Q-1); "
+          "tests the implementation against the recorded formula, not the paper")
+    for w, s, b, er in DS_CASES:
+        x, y = w / b, s / b
+        t = _ds_tag(w, s, b, er)
+        zo, ze = sc_z0o(x, y, er), sc_z0e(x, y, er)
+        out.append(("diffstripline_zodd_ohm_" + t, zo, RTOL, DS_IDS, nc))
+        out.append(("diffstripline_zeven_ohm_" + t, ze, RTOL, DS_IDS, nc))
+        out.append(("diffstripline_zdiff_ohm_" + t, 2.0 * zo, RTOL, DS_IDS, nc + "; Zdiff = 2 Zodd (S-022b)"))
+        out.append(("diffstripline_zcommon_ohm_" + t, ze / 2.0, RTOL, DS_IDS, nc + "; Zcommon = Zeven/2 (S-022b)"))
+        out.append(("diffstripline_zinf_ohm_" + t, sc_zinf(x, er), RTOL, DS_IDS, nc + "; weak-coupling limit s -> infinity"))
+    for zd, w, b, er in DS_SOLVE_S_CASES:
+        y = sc_solve_s(zd, w / b, er)
+        out.append(("diffstripline_solve_s_um_Zd%sohm_w%sum_b%sum_er%s" % (_g(zd), _g(w), _g(b), _g(er)), y * b, 1e-9, DS_IDS,
+                    "edge spacing for a target Zdiff by bisection, bracket 0.001 <= s/b <= 30"))
+    for zd, s, b, er in DS_SOLVE_W_CASES:
+        x = sc_solve_w(zd, s / b, er)
+        out.append(("diffstripline_solve_w_um_Zd%sohm_s%sum_b%sum_er%s" % (_g(zd), _g(s), _g(b), _g(er)), x * b, 1e-9, DS_IDS,
+                    "width for a target Zdiff by bisection, bracket 0.05 <= w/b <= 1e6"))
+    return out
+
+
+def part_b_self_checks():
+    """Oracle self-consistency for part B (raises AssertionError). Not a verification of any standard."""
+    # u = 1, g = 1: ln u = 0, so phi_o = phi_e - theta/psi and f_o = f_o1 (hand-checkable closed pieces)
+    assert abs(cm_psi(1.0) - (1.0 + 1.0 / 1.45 + 1.0 / 3.95)) < 1e-15
+    assert abs(cm_phie(1.0, 1.0) - 0.8645 / cm_psi(1.0)) < 1e-15
+    assert abs(cm_phio(1.0, 1.0) - (0.8645 - cm_theta(1.0)) / cm_psi(1.0)) < 1e-15
+    assert abs(cm_fo(1.0, 1.0, 4.5) - cm_fo1(1.0, 4.5)) < 1e-15
+    # weak coupling: Zeven and Zodd approach Z0 as g grows (inside the range where the fit is monotone and ordered)
+    for er in (1.0, 2.2, 4.5, 9.8, 128.0):
+        for u in (0.1, 0.5, 1.0, 3.0, 10.0):
+            z0 = ms_z0(u, er)
+            prev = None
+            for g in (0.01, 0.03, 0.1, 0.3, 1.0, 2.0, 3.0):
+                mm = cm_modes(u, g, er)
+                assert mm["z0o"] < z0 < mm["z0e"], (er, u, g)
+                assert prev is None or mm["z0o"] > prev, (er, u, g)
+                prev = mm["z0o"]
+            assert abs(cm_zdiff(u, 5.0, er) - 2.0 * z0) / (2.0 * z0) < 0.03, (er, u)
+    # stripline: ordering and the exact limits
+    for x in (0.05, 0.35, 0.5, 2.0):
+        for y in (0.01, 0.3, 1.0, 5.0):
+            assert sc_z0o(x, y, 4.0) < sc_zinf(x, 4.0) < sc_z0e(x, y, 4.0), (x, y)
+        assert abs(sc_z0o(x, 40.0, 4.0) - sc_zinf(x, 4.0)) <= 1e-12 * sc_zinf(x, 4.0)
+        assert abs(sc_z0e(x, 40.0, 4.0) - sc_zinf(x, 4.0)) <= 1e-12 * sc_zinf(x, 4.0)
+    # pi s/(2b) = 1 closed forms (tanh 1 = 0.7615941559557649, coth 1 = 1.3130352854993313)
+    z = SC_P / 2.0
+    assert abs(sc_z0e(0.5, 2.0 / math.pi, 4.0) - z / (0.5 + math.log(2.0) / math.pi + math.log(1.7615941559557649) / math.pi)) < 1e-12
+    assert abs(sc_z0o(0.5, 2.0 / math.pi, 4.0) - z / (0.5 + math.log(2.0) / math.pi + math.log(2.3130352854993313) / math.pi)) < 1e-12
+
+
+# =====================================================================================================================
+# Phase 2 part C: coplanar waveguide (CPW, S-023 conformal map with finite-substrate eps_e) and conductor-backed CPW (CPWG,
+# S-023a Ghione-Naldi as transcribed in Qucs 12.10-12.13), written from docs/sources/notes/impedance-models.md only.
+# Independent of src/. K by 60-digit decimal AGM; k, k1, k3 are also evaluated in 60-digit decimals, so the oracle is not limited
+# by double cancellation. Decision Q-1: 30 pi = eta0/4 and 60 pi = eta0/2 (eta0 = mu0 c). Decision Q-6: conformal-map eps_e is
+# the default CPW model (Steer's empirical eps_e fit, the other side of the S-023 CONFLICT, is NOT used).
+# No published worked example is internally consistent (Steer 3.8.1 uses w = 500 um while stating 200 um, and its eps_e is the
+# other model), so every vector is the recorded formula evaluated here. S-023 stays CONFLICT, S-023a PAYWALLED-USER-MUST-VERIFY.
+# =====================================================================================================================
+def _dexp(x):
+    return x.exp()
+
+
+def _dsinh(x):
+    return (_dexp(x) - _dexp(-x)) / 2
+
+
+def _dtanh(x):
+    e2 = _dexp(2 * x)
+    return (e2 - 1) / (e2 + 1)
+
+
+def _dratio(k):
+    """K'(k)/K(k) = M(1, k')/M(1, k) for a Decimal modulus 0 < k < 1 (S-023b)."""
+    kp = (1 - k * k).sqrt()
+    return _dagm(Decimal(1), kp) / _dagm(Decimal(1), k)
+
+
+def cpw_k(w, s):
+    return Decimal(w) / (Decimal(w) + 2 * Decimal(s))
+
+
+def cpw_k1(w, s, h):
+    a = _PI * Decimal(w) / (4 * Decimal(h))
+    b = _PI * (Decimal(w) + 2 * Decimal(s)) / (4 * Decimal(h))
+    return _dsinh(a) / _dsinh(b)
+
+
+def cpw_k3(w, s, h):
+    a = _PI * Decimal(w) / (4 * Decimal(h))
+    b = _PI * (Decimal(w) + 2 * Decimal(s)) / (4 * Decimal(h))
+    return _dtanh(a) / _dtanh(b)
+
+
+def cpw_model(w, s, h, er):
+    """S-023: returns dict(z0, ee, k, k1, rk, rk1). rk = K(k')/K(k), rk1 = K(k1')/K(k1)."""
+    k, k1 = cpw_k(w, s), cpw_k1(w, s, h)
+    rk, rk1 = _dratio(k), _dratio(k1)
+    ee = 1.0 + (er - 1.0) / 2.0 * float(rk / rk1)
+    return {"z0": (ETA0 / 4.0) / math.sqrt(ee) * float(rk), "ee": ee, "k": float(k), "k1": float(k1), "rk": float(rk), "rk1": float(rk1)}
+
+
+def cpwg_model(w, s, h, er):
+    """S-023a: returns dict(z0, ee, k, k3, a, b, q). a = K(k)/K(k'), b = K(k3)/K(k3')."""
+    k, k3 = cpw_k(w, s), cpw_k3(w, s, h)
+    a, b = 1 / _dratio(k), 1 / _dratio(k3)
+    q = float(b / (a + b))
+    ee = 1.0 + q * (er - 1.0)
+    return {"z0": (ETA0 / 2.0) / math.sqrt(ee) / float(a + b), "ee": ee, "k": float(k), "k3": float(k3), "a": float(a), "b": float(b), "q": q}
+
+
+def cpw_z0(w, s, h, er):
+    return cpw_model(w, s, h, er)["z0"]
+
+
+def cpwg_z0(w, s, h, er):
+    return cpwg_model(w, s, h, er)["z0"]
+
+
+# solves: plain bisection on ln of the unknown ratio. Gap solve over g = s/w in [0.01, 100]; width solve over x = w/s in [0.01, 100].
+def cpw_solve_s(z, w, h, er, model=cpw_z0):
+    return bisect_ln(lambda g: model(w, g * w, h, er) - z, 0.01, 100.0) * w
+
+
+def cpw_solve_w(z, s, h, er, model=cpw_z0):
+    return bisect_ln(lambda x: model(x * s, s, h, er) - z, 0.01, 100.0) * s
+
+
+# CPW analysis: (w um, s um, h um, er)
+CPW_CASES = [
+    (500, 200, 500, 1.0),        # hand-checkable: er = 1 gives eps_e = 1 exactly, Z0 = (eta0/4) K(k')/K(k), k = 5/9
+    (500, 200, 500, 12.85), (300, 200, 1600, 4.5), (250, 150, 1000, 4.2), (100, 100, 200, 3.66), (200, 50, 1600, 4.5),
+    (1000, 100, 1600, 4.3), (150, 500, 800, 4.2), (500, 200, 100000, 4.5), (500, 200, 20, 4.5), (300, 300, 300, 128.0),
+    (100, 10, 1600, 4.5),
+]
+# CPWG analysis: (w um, s um, h um, er)
+CPWG_CASES = [
+    (500, 200, 500, 1.0),        # er = 1: eps_e = 1 exactly, Z0 = (eta0/2) / (K(k)/K(k') + K(k3)/K(k3'))
+    (500, 200, 500, 12.85), (300, 200, 200, 4.2), (250, 150, 1000, 4.2), (200, 150, 160, 4.35), (150, 100, 100, 3.66),
+    (400, 300, 1600, 4.5), (500, 200, 100000, 4.5), (100, 50, 50, 3.48), (1000, 500, 300, 4.5), (300, 300, 300, 128.0),
+]
+# solves: (Z0 ohm, fixed um, h um, er)
+CPW_SOLVE_S_CASES = [(50, 300, 1600, 4.5), (60, 250, 1000, 4.2), (75, 200, 800, 3.66), (40, 500, 1600, 4.5)]
+CPW_SOLVE_W_CASES = [(50, 200, 1600, 4.5), (60, 150, 1000, 4.2), (75, 300, 800, 3.66), (40, 150, 1600, 4.5)]
+CPWG_SOLVE_S_CASES = [(50, 300, 200, 4.2), (60, 250, 1000, 4.2), (75, 200, 800, 3.66), (40, 400, 1600, 4.5)]
+CPWG_SOLVE_W_CASES = [(50, 150, 200, 4.2), (60, 150, 1000, 4.2), (75, 300, 800, 3.66), (40, 200, 1600, 4.5)]
+
+CPW_IDS = ("S-023", "S-023b", "S-013", "S-029", "S-029a")
+CPWG_IDS = ("S-023a", "S-023b", "S-013", "S-029", "S-029a")
+
+
+def _cp_tag(w, s, h, er):
+    return "w%sum_s%sum_h%sum_er%s" % (_g(w), _g(s), _g(h), _g(er))
+
+
+def part_c_vectors():
+    out = []
+    nc = ("CPW conformal map, finite-substrate eps_e (S-023, CONFLICT: Steer's empirical eps_e is the other model, not used); "
+          "eta0/4 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation against the recorded formula, not the paper")
+    ng = ("CPWG Ghione-Naldi as transcribed in Qucs 12.10-12.13 (S-023a, PAYWALLED-USER-MUST-VERIFY), k3 with the quarter-width "
+          "argument pi W/(4h) (NextPCB form NOT used); eta0/2 prefactor (Q-1); K by 60-digit AGM (S-023b); tests the implementation "
+          "against the recorded formula, not the paper")
+    for w, s, h, er in CPW_CASES:
+        t = _cp_tag(w, s, h, er)
+        m = cpw_model(w, s, h, er)
+        out.append(("cpw_z0_ohm_" + t, m["z0"], RTOL, CPW_IDS, nc))
+        out.append(("cpw_eeff_" + t, m["ee"], RTOL, CPW_IDS, nc))
+        out.append(("cpw_k_" + t, m["k"], RTOL, CPW_IDS, nc + "; k = W/(W + 2 s)"))
+        out.append(("cpw_k1_" + t, m["k1"], RTOL, CPW_IDS, nc + "; k1 = sinh(pi W/4h)/sinh(pi (W + 2 s)/4h)"))
+    for w, s, h, er in CPWG_CASES:
+        t = _cp_tag(w, s, h, er)
+        m = cpwg_model(w, s, h, er)
+        out.append(("cpwg_z0_ohm_" + t, m["z0"], RTOL, CPWG_IDS, ng))
+        out.append(("cpwg_eeff_" + t, m["ee"], RTOL, CPWG_IDS, ng))
+        out.append(("cpwg_k3_" + t, m["k3"], RTOL, CPWG_IDS, ng + "; k3 = tanh(pi W/4h)/tanh(pi (W + 2 s)/4h)"))
+        out.append(("cpwg_q_" + t, m["q"], RTOL, CPWG_IDS, ng + "; filling factor q"))
+    for z, w, h, er in CPW_SOLVE_S_CASES:
+        out.append(("cpw_solve_s_um_Z%sohm_w%sum_h%sum_er%s" % (_g(z), _g(w), _g(h), _g(er)), cpw_solve_s(z, w, h, er), 1e-9, CPW_IDS,
+                    "gap for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= s/w <= 100"))
+    for z, s, h, er in CPW_SOLVE_W_CASES:
+        out.append(("cpw_solve_w_um_Z%sohm_s%sum_h%sum_er%s" % (_g(z), _g(s), _g(h), _g(er)), cpw_solve_w(z, s, h, er), 1e-9, CPW_IDS,
+                    "width for a target Z0 by bisection on the S-023 analysis function, bracket 0.01 <= w/s <= 100"))
+    for z, w, h, er in CPWG_SOLVE_S_CASES:
+        out.append(("cpwg_solve_s_um_Z%sohm_w%sum_h%sum_er%s" % (_g(z), _g(w), _g(h), _g(er)), cpw_solve_s(z, w, h, er, cpwg_z0), 1e-9, CPWG_IDS,
+                    "gap for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= s/w <= 100"))
+    for z, s, h, er in CPWG_SOLVE_W_CASES:
+        out.append(("cpwg_solve_w_um_Z%sohm_s%sum_h%sum_er%s" % (_g(z), _g(s), _g(h), _g(er)), cpw_solve_w(z, s, h, er, cpwg_z0), 1e-9, CPWG_IDS,
+                    "width for a target Z0 by bisection on the S-023a analysis function, bracket 0.01 <= w/s <= 100"))
+    return out
+
+
+def part_c_self_checks():
+    """Oracle self-consistency for part C (raises AssertionError). Not a verification of any standard."""
+    # k = 5/9: the note's researcher check gives 0.83334 (hand arithmetic, +2e-5 vs the AGM 0.833315); also the pinned K vectors of part A
+    assert abs(float(1 / _dratio(Decimal(5) / Decimal(9))) - 0.83334) < 5e-5
+    # er = 1: eps_e = 1 exactly for both models, so Z0 is a pure elliptic ratio
+    m = cpw_model(500, 200, 500, 1.0)
+    assert m["ee"] == 1.0 and abs(m["z0"] - (ETA0 / 4.0) * m["rk"]) < 1e-12
+    g = cpwg_model(500, 200, 500, 1.0)
+    assert g["ee"] == 1.0 and abs(g["z0"] - (ETA0 / 2.0) / (g["a"] + g["b"])) < 1e-12
+    # h -> infinity: k1 -> k and k3 -> k, so CPWG -> CPW on an infinite substrate: eps_e = (er + 1)/2, same Z0
+    for er in (2.2, 4.5, 12.85):
+        c, d = cpw_model(500, 200, 1e7, er), cpwg_model(500, 200, 1e7, er)
+        assert abs(c["ee"] - (er + 1) / 2) < 1e-6 and abs(d["ee"] - (er + 1) / 2) < 1e-6
+        assert abs(c["z0"] - d["z0"]) / c["z0"] < 1e-6
+    # inequality from the formulas (k3 > k and k1 < k): CPWG Z0 is below CPW Z0 for the same geometry
+    for w, s, h, er in CPW_CASES + CPWG_CASES:
+        assert cpwg_z0(w, s, h, er) < cpw_z0(w, s, h, er), (w, s, h, er)
+    # monotone in w (down) and s (up) for both models
+    for model in (cpw_z0, cpwg_z0):
+        prev = None
+        for w in (50, 100, 200, 400, 800):
+            z = model(w, 150, 400, 4.5)
+            assert prev is None or z < prev
+            prev = z
+        prev = None
+        for s in (20, 50, 100, 200, 400, 800):
+            z = model(300, s, 400, 4.5)
+            assert prev is None or z > prev
+            prev = z
+
+
 if __name__ == "__main__":
     self_checks()
+    part_b_self_checks()
+    part_c_self_checks()
     for name, got, tol, ids, note in vectors():
         print("%-70s %.17g" % (name, got))

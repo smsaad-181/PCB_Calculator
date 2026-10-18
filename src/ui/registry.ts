@@ -1,6 +1,6 @@
 import type { ComponentType } from 'preact';
 
-export type Category = 'routing' | 'trace' | 'load' | 'circuit';
+export type Category = 'routing' | 'trace' | 'impedance' | 'load' | 'circuit';
 
 export interface CalculatorEntry {
   readonly id: string;
@@ -13,6 +13,7 @@ export interface CalculatorEntry {
 export const CATEGORIES: readonly { id: Category; title: string; phase: number }[] = [
   { id: 'routing', title: 'Routing', phase: 2 },
   { id: 'trace', title: 'Trace', phase: 1 },
+  { id: 'impedance', title: 'Impedance and delay', phase: 2 },
   { id: 'load', title: 'Load / path', phase: 1 },
   { id: 'circuit', title: 'Circuit values', phase: 1 },
 ];
@@ -67,6 +68,55 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     category: 'trace',
     phase: 1,
     load: () => import('./calculators/AnnularRing'),
+  },
+  {
+    id: 'microstrip',
+    title: 'Microstrip impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Microstrip'),
+  },
+  {
+    id: 'stripline',
+    title: 'Symmetric stripline impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Stripline'),
+  },
+  {
+    id: 'coax',
+    title: 'Coaxial line impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Coax'),
+  },
+  {
+    id: 'diff-microstrip',
+    title: 'Edge-coupled differential microstrip',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/DiffMicrostrip'),
+  },
+  {
+    id: 'diff-stripline',
+    title: 'Edge-coupled differential stripline',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/DiffStripline'),
+  },
+  {
+    id: 'cpw',
+    title: 'Coplanar waveguide (CPW) impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Cpw'),
+  },
+  {
+    id: 'cpwg',
+    title: 'Grounded coplanar waveguide (CPWG) impedance',
+    category: 'impedance',
+    phase: 2,
+    load: () => import('./calculators/Cpwg'),
   },
   {
     id: 'path-load',
