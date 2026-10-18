@@ -258,3 +258,40 @@ Final validator verdicts: calc `phase-1-calc-final.md` PASS-WITH-CONDITIONS; pha
 | CF-15 | PF-9 / PV-5: lockfile header stale; R-24 Dependabot; setup-node 7.1.0; R-16 (.mcp.json pins); R-19 (DOM test deps); R-25 (formatter); no in-app profile editor | human + devops-engineer | See each row | OPEN |
 | CF-16 | PF-5 / R-26: all Phase 1 code merged to main before validators finished; once Pages is enabled every merge to main deploys | human | Policy: validate before merge for Phase 2 (user to decide); enable Pages | OPEN (human) |
 | CF-17 | Browser verification of the UI was done by orchestrator and validators via snapshots and headless dumps only; no visual/contrast/keyboard pass beyond source scans and the contrast test | ui-engineer | A manual visual/keyboard pass by the human or a Playwright run | OPEN |
+
+## Phase 2 research decisions (logged 2026-10-18, branch phase-2)
+
+Research: ledger rows S-020..S-025 (part A, `docs/research/impedance-models.md`) and S-026..S-029 (part B, `docs/research/impedance-presets-and-data.md`). Statuses as recorded in the ledger; nothing was run from third-party tools.
+
+**Human decisions (user, 2026-10-18):** (1) scope: build the VERIFIED models normally AND the edge-coupled and CPW/CPWG models with a visible UNVERIFIED/PAYWALLED badge, confidence capped at medium and the mandatory fab-stackup/TDR banner; embedded microstrip, offset stripline and broadside-coupled are NOT offered (no source found). (2) Open modelling choices Q-1..Q-9: orchestrator picks conservative defaults and logs them (below). (3) An open textbook (Steer, LibreTexts) counts as a source for a VERIFIED row only together with a second independent source (met for S-020, S-021, S-024).
+
+**Defaults chosen by the orchestrator (overrulable; extended to Q-10..Q-20 by the same instruction, applied conservatively):**
+
+| Q | Choice | Numeric effect / reason | Status |
+|---|---|---|---|
+| Q-1 | Prefactor eta0/(2 pi) with eta0 from exact SI constants (c, mu0 per S-013/S-029) rather than 60 | 0.07 % in Z0 | DEFAULT, overrulable |
+| Q-2 | Zero-thickness Hammerstad-Jensen (S-020) as base; thickness correction opt-in, labelled variant (S-020a CONFLICT shown) | variants differ ~0.4 % Z0, ~0.9 % eps_e at w/h = 2 | DEFAULT |
+| Q-3 | Dispersion OFF by default; visible 'dispersion not modelled' warning; Kirschning-Jansen (paywalled) and Kobayashi (one open source) not offered as numbers until verified | S-020b PAYWALLED, S-020c UNVERIFIED | DEFAULT |
+| Q-4 | Embedded microstrip, offset stripline, broadside-coupled: not offered | no source found | DECIDED (user scope choice) |
+| Q-5 | Narrow strips with finite thickness in stripline: not offered; edge-coupled stripline (Cohn) offered only inside the source's stated range, badged, none stated so enforce the stripline w/b range of S-021a and flag | S-021a CONFLICT | DEFAULT |
+| Q-6 | CPW effective permittivity by conformal map (finite substrate), K by AGM (S-023b VERIFIED); CPWG Ghione-Naldi badged | Steer fit vs conformal differ; S-023 CONFLICT shown | DEFAULT |
+| Q-7 | 'Dispersion not modelled' warning always shown for microstrip/CPW results, with the frequency stated by the user; no invented threshold frequency in code | no verified threshold | DEFAULT |
+| Q-8 | Soldermask flagged 'not modelled' (no coating correction) | not researched | DEFAULT |
+| Q-9 | Steer textbook accepted with a second source | user decision | DECIDED |
+| Q-10 | USB 2.0: preset 90 ohm differential offered with the tolerance left for the user to choose among the sources' stated values (+/-15 % NXP/Prolific, +/-10 % TI); no default tolerance | S-026 VERIFIED value, S-026a CONFLICT tolerance | DEFAULT |
+| Q-11 | USB 3.x: not offered as a preset (sources conflict: 90 +/-7 % vs 95 +/-5 %); user types a target | S-026b CONFLICT | DEFAULT |
+| Q-12 | RS-485 120 ohm: shown as an informational termination/cable note with UNVERIFIED badge | S-026e UNVERIFIED | DEFAULT |
+| Q-13 | CAN and RS-485: informational notes (cable/termination), not controlled-impedance PCB presets; a termination helper is deferred | not tight PCB impedance | DEFAULT |
+| Q-14 | Single-source device-specific presets (PCIe, HDMI, SATA, SGMII, MIPI CSI, eUSB2): not offered | one source each, device-specific | DEFAULT |
+| Q-15 | No laminate preset pre-filled; user enters er/Df; a picker of source-labelled entries (product, revision, test frequency, date) may be added later | S-027 UNVERIFIED | DEFAULT |
+| Q-16 | Exact c = 299792458 m/s everywhere (S-029 VERIFIED), not the 85 ps/in app-note figure | exact | DEFAULT |
+| Q-17 | Loss estimate without surface-roughness factors (tier-4 sources); labelled approximate and optimistic for rough copper | S-029e/f UNVERIFIED | DEFAULT |
+| Q-18 | Quarter-wave helper for transmission-line stubs only; antenna warning; no antenna length computed | S-029c UNVERIFIED | DEFAULT |
+| Q-19 | Cross-check tools: NO approval given to install rf-tool (pip) or rftools-mcp (npx) (rule 15 stays); human may run KiCad transcalc and Qucs-S transcalc via GUI | rule 15 | OPEN (human) |
+| Q-20 | Golden vectors only from published examples that are internally consistent; National AN-1035 (50 ohm printed vs 53.05 from its formula), EnOcean AN102 and Steer stripline Example 1 are excluded | listed by the researcher | DEFAULT |
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| P2-1 | Paywalled primaries to check: Hammerstad-Jensen 1980, Kirschning-Jansen 1982, Cohn 1954, White, Ghione-Naldi 1983, IPC-2141A, IEC/IPC protocol texts | human | Read and sign ledger rows | OPEN (human) |
+| P2-2 | Both research agents had no shell: sync/audit checks were run by the orchestrator; audit LEDGER_ID_RE read 'RS-485' as ledger id 'S-485' (false positive): fixed with a lookbehind and a test | orchestrator | n/a | FIXED |
+| P2-3 | Steer stripline Example 1 prints 42.77 ohm but its formula gives 42.32 ohm; National AN-1035 prints 50 ohm vs formula 53.05 ohm | human | Read the pages | OPEN (excluded from golden vectors) |

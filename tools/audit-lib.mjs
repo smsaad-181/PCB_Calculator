@@ -136,7 +136,8 @@ export function auditDataTables(root, dirs = DATA_DIRS) {
 }
 
 /** Ledger IDs: S-001, or sub-rows like S-011a. */
-const LEDGER_ID_RE = /S-\d{3}[a-z]?/g;
+// Not preceded by a letter or digit, so protocol names such as RS-485 are not read as ledger id S-485.
+const LEDGER_ID_RE = /(?<![A-Za-z0-9])S-\d{3}[a-z]?/g;
 const idNum = (id) => Number(id.slice(2, 5));
 
 /**

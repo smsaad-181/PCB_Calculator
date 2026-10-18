@@ -181,6 +181,10 @@ describe('ledger audit', () => {
   it('flags an invalid status', () => {
     expect(parseLedger('| S-001 | a | b | c | MAYBE |').errors.join()).toContain('MAYBE');
   });
+  it('does not read a protocol name such as RS-485 as ledger id S-485, but still checks a real id', () => {
+    const r = runAudit(fx('ledger-ref-embedded'), { ledgerText: text });
+    expect(r.errors).toEqual([]);
+  });
   it('flags a src reference to an unknown ID but not a ranged one', () => {
     const r = runAudit(fx('ledger-ref-bad'), { ledgerText: text });
     expect(r.errors).toHaveLength(1);
