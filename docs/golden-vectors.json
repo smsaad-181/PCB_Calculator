@@ -36562,6 +36562,266 @@
       },
       "status": "CONFLICT",
       "note": "D c / (rho20 alpha20)"
+    },
+    {
+      "name": "thermalvia_E_drill0.35_t25_L1.6_N1_k401_barrel_area_mm2",
+      "oracle_value": 0.025525440310417067,
+      "pinned_expected": 0.025525440310417067,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "drill basis: pi t (D - t), pure geometry"
+    },
+    {
+      "name": "thermalvia_E_drill0.35_t25_L1.6_N1_k401_theta_array_KperW",
+      "oracle_value": 156.31561646470445,
+      "pinned_expected": 156.31561646470445,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-041",
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-041": "VERIFIED",
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "L / (k pi t (D - t)), N = 1 (S-041 drill form)"
+    },
+    {
+      "name": "thermalvia_F_drill0.3_t20_L1.0_N9_k391_fill1.0_P1.5W_finished_d_mm",
+      "oracle_value": 0.25999999999999995,
+      "pinned_expected": 0.26,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "finished hole = drill - 2 t"
+    },
+    {
+      "name": "thermalvia_F_drill0.3_t20_L1.0_N9_k391_fill1.0_P1.5W_theta_barrel_KperW",
+      "oracle_value": 145.37353223592925,
+      "pinned_expected": 145.37353223592925,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-041",
+        "S-041a",
+        "S-041b",
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-041": "VERIFIED",
+        "S-041a": "UNVERIFIED",
+        "S-041b": "VERIFIED",
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "drill form barrel"
+    },
+    {
+      "name": "thermalvia_F_drill0.3_t20_L1.0_N9_k391_fill1.0_P1.5W_theta_core_KperW",
+      "oracle_value": 18834.90450791661,
+      "pinned_expected": 18834.90450791661,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-041",
+        "S-041a",
+        "S-041b",
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-041": "VERIFIED",
+        "S-041a": "UNVERIFIED",
+        "S-041b": "VERIFIED",
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "core uses the finished diameter D - 2 t"
+    },
+    {
+      "name": "thermalvia_F_drill0.3_t20_L1.0_N9_k391_fill1.0_P1.5W_theta_array_KperW",
+      "oracle_value": 16.02889876797294,
+      "pinned_expected": 16.02889876797294,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-041",
+        "S-041a",
+        "S-041b",
+        "S-007"
+      ],
+      "ledger_status": {
+        "S-041": "VERIFIED",
+        "S-041a": "UNVERIFIED",
+        "S-041b": "VERIFIED",
+        "S-007": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "theta_via / N"
+    },
+    {
+      "name": "thermalvia_F_drill0.3_t20_L1.0_N9_k391_fill1.0_P1.5W_dT_K",
+      "oracle_value": 24.04334815195941,
+      "pinned_expected": 24.04334815195941,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-041",
+        "S-041a",
+        "S-041b",
+        "S-007",
+        "S-019d"
+      ],
+      "ledger_status": {
+        "S-041": "VERIFIED",
+        "S-041a": "UNVERIFIED",
+        "S-041b": "VERIFIED",
+        "S-007": "CONFLICT",
+        "S-019d": "VERIFIED"
+      },
+      "status": "CONFLICT",
+      "note": "dT = theta_array x P"
+    },
+    {
+      "name": "fusing_trace0.254mmx35um_Ta20_c385_Te300_i2t_A2s",
+      "oracle_value": 2.962648701691042,
+      "pinned_expected": 2.9626487016910414,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003d",
+        "S-004",
+        "S-042a",
+        "S-042c",
+        "S-042d"
+      ],
+      "ledger_status": {
+        "S-003d": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-042a": "UNVERIFIED",
+        "S-042c": "VERIFIED",
+        "S-042d": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "S-042a with Te = 300 degC (user end temperature) in place of Tm"
+    },
+    {
+      "name": "fusing_trace0.254mmx35um_Ta20_c385_Te300_I10A_time_s",
+      "oracle_value": 0.029626487016910417,
+      "pinned_expected": 0.029626487016910414,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003d",
+        "S-004",
+        "S-042a",
+        "S-042c",
+        "S-042d"
+      ],
+      "ledger_status": {
+        "S-003d": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-042a": "UNVERIFIED",
+        "S-042c": "VERIFIED",
+        "S-042d": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "t = I^2 t(Te) / I^2"
+    },
+    {
+      "name": "fusing_trace1mmx35um_Ta25_c383.48_Te260_t0.5s_current_A",
+      "oracle_value": 8.91582089431916,
+      "pinned_expected": 8.91582089431916,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003d",
+        "S-004",
+        "S-042a",
+        "S-042c",
+        "S-042d"
+      ],
+      "ledger_status": {
+        "S-003d": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-042a": "UNVERIFIED",
+        "S-042c": "VERIFIED",
+        "S-042d": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "I = sqrt(I^2 t(Te) / t)"
+    },
+    {
+      "name": "fusing_trace0.5mmx70um_Ta40_c385_Te300_i2t50_ratio",
+      "oracle_value": 1.2124374780626024,
+      "pinned_expected": 1.2124374780626024,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003d",
+        "S-004",
+        "S-042a",
+        "S-042c",
+        "S-042d"
+      ],
+      "ledger_status": {
+        "S-003d": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-042a": "UNVERIFIED",
+        "S-042c": "VERIFIED",
+        "S-042d": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "user I^2 t / I^2 t to reach Te"
+    },
+    {
+      "name": "fusing_via0.3mmx25um_Ta25_c385_area_mm2",
+      "oracle_value": 0.025525440310417067,
+      "pinned_expected": 0.025525440310417067,
+      "rel_tol": 1e-09,
+      "ledger_ids": [],
+      "ledger_status": {},
+      "status": "NOT-APPLICABLE",
+      "note": "via barrel annulus pi t (d + t), d finished"
+    },
+    {
+      "name": "fusing_via0.3mmx25um_Ta25_c385_i2t_melt_A2s",
+      "oracle_value": 53.51728999108987,
+      "pinned_expected": 53.51728999108987,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003d",
+        "S-004",
+        "S-042a",
+        "S-042c",
+        "S-042d"
+      ],
+      "ledger_status": {
+        "S-003d": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-042a": "UNVERIFIED",
+        "S-042c": "VERIFIED",
+        "S-042d": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "S-042a on the barrel cross-section"
+    },
+    {
+      "name": "fusing_via0.3mmx25um_Ta25_c385_I20A_time_s",
+      "oracle_value": 0.13379322497772467,
+      "pinned_expected": 0.13379322497772467,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-003d",
+        "S-004",
+        "S-042a",
+        "S-042c",
+        "S-042d"
+      ],
+      "ledger_status": {
+        "S-003d": "VERIFIED",
+        "S-004": "VERIFIED",
+        "S-042a": "UNVERIFIED",
+        "S-042c": "VERIFIED",
+        "S-042d": "CONFLICT"
+      },
+      "status": "CONFLICT",
+      "note": "t = I^2 t / I^2"
     }
   ]
 }

@@ -7,6 +7,7 @@ import { RadioGroup } from '../components/RadioGroup';
 import { ResetButton } from '../components/ResetButton';
 import { ResultStatus } from '../components/ResultStatus';
 import { ResultsPanel } from '../components/ResultsPanel';
+import { WarningList } from '../components/WarningList';
 import { SelectField } from '../components/SelectField';
 import { echoPrefs } from '../components/prefs';
 import { useCalcState } from '../useCalcState';
@@ -27,6 +28,9 @@ import {
   SELF_HEATING_HREF,
   SELF_HEATING_LINK_TEXT,
   SEPARATION_NOTE,
+  TE_HELP,
+  VIA_HOLE_HELP,
+  VIA_PLATING_HELP,
   STATUS_LINES,
   TEMP_HELP,
   THICKNESS_HELP,
@@ -62,8 +66,18 @@ function Results({ view }: { view: FusingView }) {
         <ResultsPanel
           view={view.result}
           failedCheckHint={RANGE_HINT}
+          underHeadline={<WarningList warnings={view.headlineWarnings} />}
           callouts={view.callouts}
-          afterHeadline={<LedgerRowBadges heading="Data behind this result (one status per ledger row)" rows={view.ledgerRows} />}
+          afterHeadline={
+            <>
+              {view.suppressedHeadline !== undefined && (
+                <p class="muted">
+                  <strong>{view.suppressedHeadline.label}.</strong> {view.suppressedHeadline.text}
+                </p>
+              )}
+              <LedgerRowBadges heading="Data behind this result (one status per ledger row)" rows={view.ledgerRows} />
+            </>
+          }
         />
         {view.notCheckedCount > 0 && <p class="muted">{NOT_CHECKED_HINT}</p>}
         {view.preece !== undefined && (
@@ -125,13 +139,13 @@ export default function Fusing() {
             legend="Conductor geometry (choose one)"
             value={state.geometry}
             options={GEOMETRY_OPTIONS}
-            onChange={(v) => patch({ geometry: (v === 'area' || v === 'wire' || v === 'trace' ? v : '') as Geometry })}
+            onChange={(v) => patch({ geometry: (v === 'area' || v === 'wire' || v === 'trace' || v === 'via' ? v : '') as Geometry })}
           />
           {state.geometry === 'area' && (
             <QuantityField
               id="area"
               label="Cross-section area"
-              unitHint="mm2, mil2 or cmil"
+              unitHint="mm2 or mil2 (not cmil)"
               text={state.area}
               onText={(area) => patch({ area })}
               expectedDim={fieldDim('area')}
@@ -155,6 +169,34 @@ export default function Fusing() {
               required
               externalError={fe.wire}
             />
+          )}
+          {state.geometry === 'via' && (
+            <>
+              <QuantityField
+                id="via-hole"
+                label="Via finished hole diameter (not the drill)"
+                unitHint="mm or mil"
+                text={state.viaHole}
+                onText={(viaHole) => patch({ viaHole })}
+                expectedDim={fieldDim('viaHole')}
+                echoPrefs={widthPrefs}
+                help={VIA_HOLE_HELP}
+                required
+                externalError={fe.viaHole}
+              />
+              <QuantityField
+                id="via-plating"
+                label="Via barrel plating thickness"
+                unitHint="µm or mil"
+                text={state.viaPlating}
+                onText={(viaPlating) => patch({ viaPlating })}
+                expectedDim={fieldDim('viaPlating')}
+                echoPrefs={echoPrefs(state.units, 'thickness')}
+                help={VIA_PLATING_HELP}
+                required
+                externalError={fe.viaPlating}
+              />
+            </>
           )}
           {state.geometry === 'trace' && (
             <>
@@ -240,6 +282,17 @@ export default function Fusing() {
             placeholder="25 °C"
             required
             externalError={fe.initialTemp}
+          />
+          <QuantityField
+            id="end-temp"
+            label="End temperature (optional)"
+            unitHint="°C, K or °F"
+            text={state.endTemp}
+            onText={(endTemp) => patch({ endTemp })}
+            expectedDim={fieldDim('endTemp')}
+            echoPrefs={otherPrefs}
+            help={TE_HELP}
+            externalError={fe.endTemp}
           />
           <RadioGroup
             name="mode"

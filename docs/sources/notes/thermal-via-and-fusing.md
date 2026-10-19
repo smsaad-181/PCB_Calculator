@@ -1,6 +1,6 @@
 # Thermal via and fusing: source notes (Phase 4)
 
-Researcher: standards-researcher. Retrieved: 2026-10-19. Ledger rows: S-040, S-041, S-041a-d, S-042, S-042a-f (and S-014 now points here).
+Researcher: standards-researcher. Retrieved: 2026-10-19. Ledger rows: S-040, S-041, S-041a-d, S-042, S-042a-f, S-045 (added in the validator follow-up pass, below) (and S-014 now points here).
 Scope by user decision (2026-10-19): (1) thermal via array estimate, (2) fusing (Onderdonk / Preece), kept apart from steady-state heating. Out of scope: θJA/θJC, exposed-pad spreading, RF/antenna, twisted pair/coax (placeholder S-043…S-044 kept).
 
 ## Read method and limits
@@ -72,6 +72,57 @@ Short quotes:
 - Preece 1888 (Proc. R. Soc. Lond. 44; DOI 10.1098/rspl.1888.0006 unconfirmed) and Stauffacher 1928 (GE Review 31(6)) if primary confirmation is wanted. Both are old enough to be freely available in some libraries.
 - Fill-material conductivity from the fill-material datasheet the fab uses (S-041a).
 - Decisions Q-50…Q-60 in `docs/research/phase-4-thermal-via-and-fusing.md`.
+
+## Validator follow-up pass (2026-10-19)
+Inputs: `docs/validation/reports/phase-4-calc.md` (C4-5), `phase-4-phase.md` (m-4, m-5), `phase-4-pcb.md` (M-3, m-6, fusing end temperature), OPEN_RISKS "Phase 4 core fixes" (CF-4, CF-7). Same limits: no shell, no PDF readable (SLMA002H and SLOA122 returned compressed binary), HTML via summarizing fetcher.
+
+### 1. Brooks & Adam 2015 constants do not reproduce their own 0.0213 (S-042 notes; calc C4-5)
+- Re-fetched 2026-10-19 from PCD&F 10179: "ρ20 = 1.75×10-8", "ρ = 8900 kg/m³", "cp = 385 J/kgK", "α20 = 0.00393 1/K", "c = 0.0213 in circular mils".
+- Researcher arithmetic (Ta 20 °C, Tm 1083 °C, β20 234.45, ln(1317.45/254.45) = 1.64434, (5.06707e-10 m²/cmil)²):
+  - their printed constants: 8900·385/(1.75e-8·0.00393) = 4.9822e16, giving 0.02103 A²·s/cmil²;
+  - our S-004/S-003d constants (1/58e6, 8890): 5.0512e16, giving 0.02133, which matches their stated 0.0213.
+- Conclusion: an internal inconsistency in the article (probably typesetting or rounding). Do NOT move our ρ20 to 1.75e-8 or D to 8900 to "match Brooks".
+
+### 2. Pure-copper density reference (S-003d notes; phase m-4, CF-7)
+- PPPL "Pure copper" Table 1: density "8933" kg/m³ at 293 K; the same page's general properties give "8.96 g/cm3" at 20 °C (Goodfellow catalogue). LANL: 8.935 g/cm³ at STP (S-003e, 2026-10-06).
+- This is a reference value only. The code keeps the IACS 8890 kg/m³ (S-003d, VERIFIED), consistent with ρ20 = 1/58e6. 8933/8890 = 1.0048. Fusing time scales with D, so 8890 gives a time about 0.5 % shorter (the conservative direction for "will the trace survive").
+- Pure-copper density itself stays CONFLICT (S-003e: 8.96 vs 8.935; PPPL adds 8.933).
+- The calc-implementer may now cite "S-003d notes / S-003e" in the CF-7 assumption text. The 8933 figure has a ledger home but is still not a code constant.
+
+### 3. Thermal relief vs solid connection (new row S-045; PCB M-3, CF-4)
+- VERIFIED, qualitative only. Sources:
+  - TI THS3091/THS3095 datasheet SLOS423K §9.4.1.1.1: "do not use the typical web or spoke via connection methodology"; "Web connections have a high thermal resistance"; "complete connection around the entire circumference".
+  - JLCPCB blog (2026-08): exposed pads "stay solid because moving heat is their whole purpose"; set exposed pads to direct connect.
+- Snippet-only cross-checks (not counted): TI SLOA120, Active-Semi AN-104. Altium "Polygon Connect Style" documents the relief/direct setting in the CAD tool.
+- Not usable (unsourced, single source): "spokes can halve the heat path" (JLCPCB), "3–5×" (Atlas PCB blog), mΩ per relief. No number goes into code or UI.
+- JLCPCB attributes the direct-connect rule to IPC-7093 (paywalled, not read).
+- Code follow-up (not done here; calc-implementer): add S-045 to the thermal-via meta reference list next to `THERMAL_RELIEF_NOT_MODELLED`.
+
+### 4. Via-in-pad solder wicking: vendor guidance CONFLICTS (DFM caution, PCB m-6)
+- Recorded as a conflict, not resolved. No ledger constant; the via diameters and pitches below are vendor examples, NOT defaults.
+- **TI (THS3091/THS3095 datasheet, HTML, read via fetcher):**
+  - keep the holes small so solder does not wick through them during reflow;
+  - recommended hole "0.01 inch (0.254 mm)";
+  - leave the top-side mask open over the holes and cover them on the bottom side.
+- **TI SLOA122 QFN layout guideline** (PDF not readable): the PCB reviewer reports vias of 0.3 mm or less at about 1 mm pitch, not covered by solder mask. A search snippet says the via figure marks the solid via "recommended" and web/spoke vias not recommended. NOT confirmed by this researcher.
+- **MACOM S2083:**
+  - The PCB reviewer reports that V18 recommends solder mask over the via areas to stop wicking. NOT confirmed: the V18 PDF was not readable.
+  - The readable V10 (HTML mirror https://pdf.jiepei.com/s2083-17398778.html) recommends thermal vias, "a via diameter of 0.3 mm in a 1.0 mm pitch array", and SMOBC. It says nothing on tenting or wicking.
+  - The MACOM side of the conflict therefore stays secondhand until a human reads S2083 V18.
+- **Other vendors (search snippets only, not read):**
+  - Qorvo AN-105: vias may be plugged, or tented with solder mask from the top or bottom, to prevent wicking.
+  - Cirrus Logic WAN0236: leave vias bare/untented to limit voids and outgassing.
+- **JLCPCB blog (read):** tent, plug or fill the vias; an open via "drains paste downward and leaves a void above it".
+- Takeaway for the UI caution: guidance ranges from open vias (small holes), through one-side tenting and plugging, to filled-and-capped via-in-pad. The fab and assembler must agree on the choice. The app must not recommend one option as a standard.
+- Human: read TI SLOA122, TI SLMA002H, MACOM S2083 (latest rev.) and the device datasheet for the actual part.
+
+### 5. Fusing end temperature: laminate Tg/Td is a user input, not a ledger value
+- S-042a holds for any end temperature Tf below melting.
+- A board-damage end temperature (laminate Tg or Td, solder reflow) must be taken by the user from the laminate or solder datasheet in use, together with the datasheet's test method.
+- No laminate value is recorded in LEDGER.md and none may be put in code. The laminate number in `phase-4-pcb.md` illustrates one product only.
+
+### 6. Ledger shape (phase m-5)
+- The S-043…S-044 placeholder now sits in a 9-column table, with its status in the Status column. Id and status are unchanged.
 
 ## Not used (leads only)
 - ICEA/IEEE-242 short-circuit form with 0.0297 (Mike Holt documents: 403; search snippet only).

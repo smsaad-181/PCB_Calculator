@@ -164,9 +164,12 @@ Conditional (thresholds are PRODUCT CHOICES based on S-042e, not sourced limits;
 6. Via barrel area forms mixed up in the wild: π·d·t (+8.3 % θ), drill form with a finished hole (+18 % θ). (S-041)
 7. Plated copper k: 401.6 (Pulsonix, unsourced) vs about 385 (Brooks & Adam) vs S-007; TI prints 4 (typo). (S-041d)
 8. Onderdonk mis-transcriptions: the 33 dropped, 234 − Ta, 33·t outside the root. (S-042)
+9. (2026-10-19 follow-up) Brooks & Adam 2015's printed constants (ρ20 1.75e-8, D 8900) give 0.0210, not their stated 0.0213. Their 0.0213 matches our 1/58e6 and 8890. Do not tune toward theirs. (S-042)
+10. (2026-10-19 follow-up) Via-in-pad solder wicking: TI (small open holes, top mask open and bottom covered; SLOA122 reportedly unmasked) vs MACOM S2083 (mask over vias, reported by the PCB reviewer, not confirmed) vs Qorvo/JLCPCB (tent, plug or fill) vs Cirrus (leave bare). This is a DFM caution, not a constant. See notes §4.
 
 ## Part E: status summary
-- VERIFIED: S-040 (caveat text only), S-041 (barrel formula), S-041b (ideal θ/N), S-042b (Preece form and constant), S-042c (melting point).
+- VERIFIED: S-040 (caveat text only), S-041 (barrel formula), S-041b (ideal θ/N), S-042b (Preece form and constant), S-042c (melting point), S-045 (thermal-relief caveat text only, no number; added 2026-10-19).
+- Reference only, not used in code: pure-copper density 8933 kg/m³ at 293 K (PPPL), recorded in the S-003d notes. The code keeps 8890 (IACS). Laminate Tg/Td end temperatures are user inputs from the laminate datasheet; the ledger holds no value.
 - UNVERIFIED: S-041a (filled via, derived), S-041d (plated k, not found), S-042 (Onderdonk form), S-042a (adiabatic, derived), S-042e (PCB validity, one author group), S-043…S-044 (out of scope placeholder).
 - CONFLICT: S-041c (1-D limits and via usefulness), S-042d (specific heat).
 - PAYWALLED-USER-MUST-VERIFY: S-042f (IPC scope for fusing).

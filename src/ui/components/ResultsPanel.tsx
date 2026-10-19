@@ -21,6 +21,8 @@ interface Props {
   readonly callout?: CalloutView;
   /** More prominent notices, shown after `callout` (each one is an Important block). */
   readonly callouts?: readonly CalloutView[];
+  /** Shown directly under the headline, before every callout (for example a time warning that changes how the headline reads). */
+  readonly underHeadline?: ComponentChildren;
   /** Extra content directly under the headline and its callout (for example a min/typ/max row). */
   readonly afterHeadline?: ComponentChildren;
 }
@@ -28,7 +30,7 @@ interface Props {
 const DEFAULT_FAILED_HINT = 'This input or result is outside the stated range, so the result is less reliable. See the confidence reasons.';
 
 /** Quick answer first (headline, status, confidence with reasons, warnings); details are in an expandable section. */
-export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, callouts, afterHeadline }: Props) {
+export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, callouts, afterHeadline, underHeadline }: Props) {
   const v = view;
   return (
     <div class="results">
@@ -36,6 +38,7 @@ export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, ca
       <p class="answer">{v.headline.text}</p>
       <p class="muted">{v.headline.meaning}</p>
       {v.headline.note !== undefined && <p class="muted"><strong>Note:</strong> {v.headline.note}</p>}
+      {underHeadline}
       {callout !== undefined && <Callout heading={callout.heading} text={callout.text} />}
       {(callouts ?? []).map((c) => (
         <Callout key={c.heading} heading={c.heading} text={c.text} />

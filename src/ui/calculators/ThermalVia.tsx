@@ -15,6 +15,8 @@ import {
   CALCULATOR_ID,
   COUNT_HELP,
   DEFAULT_STATE,
+  DIAMETER_BASIS_HELP,
+  DIAMETER_BASIS_OPTIONS,
   DIAMETER_HELP,
   FILL_HELP,
   FILL_K_HELP,
@@ -30,12 +32,14 @@ import {
   RANGE_HINT,
   STATUS_LINES,
   computeView,
+  diameterPlaceholder,
   fieldDim,
   fromHashState,
   kOptions,
   liveSummary,
   parseCountField,
   toHashState,
+  type DiameterBasis,
   type FieldErrors,
   type FillChoice,
   type KChoice,
@@ -88,16 +92,24 @@ export default function ThermalVia() {
       <div class="calc-grid">
         <form class="panel inputs" onSubmit={(e) => e.preventDefault()} aria-label="Thermal via inputs" noValidate>
           <h2>Inputs</h2>
+          <RadioGroup
+            name="diameter-basis"
+            legend="Diameter basis (required, no default)"
+            value={state.diameterBasis}
+            options={DIAMETER_BASIS_OPTIONS}
+            onChange={(v) => patch({ diameterBasis: (v === 'finished' || v === 'drill' ? v : '') as DiameterBasis })}
+          />
+          <p class="help">{DIAMETER_BASIS_HELP}</p>
           <QuantityField
             id="diameter"
-            label="Finished hole diameter (not the drill)"
+            label="Hole diameter (on the basis chosen above)"
             unitHint="mm, mil, in or µm"
             text={state.diameter}
             onText={(diameter) => patch({ diameter })}
             expectedDim={fieldDim('diameter')}
             echoPrefs={widthPrefs}
             help={DIAMETER_HELP}
-            placeholder="0.3 mm"
+            placeholder={diameterPlaceholder(state.diameterBasis)}
             required
             externalError={fe.diameter}
           />

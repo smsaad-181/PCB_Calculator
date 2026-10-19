@@ -61,9 +61,11 @@ const TH_CORE = 'fill core thermal resistance (one via)';
 const TH_VIA = 'thermal resistance of one via';
 const TH_ARRAY = 'thermal resistance of the via array (1-D conduction estimate, ideal parallel)';
 const DT = 'temperature difference across the array for the given power';
+const D_USED = 'finished hole diameter used in the calculation';
 
 const base = (d: number, t: number, L: number, N: number, extra: Partial<Inputs> = {}): Inputs => ({
   finishedHoleDiameter: mm(d),
+  diameterBasis: 'finished',
   platingThickness: um(t),
   barrelLength: mm(L),
   count: N,
@@ -124,7 +126,7 @@ describe('golden vectors (oracle): area, barrel, core, one via, array, rise', ()
 describe('result set, roles, bounds, dimensions', () => {
   it('names without fill and power, one primary (the array)', () => {
     const r = ok(base(0.3, 25, 1.6, 2));
-    expect(r.results.map((x) => x.name).sort()).toEqual([AREA, TH_BARREL, TH_VIA, TH_ARRAY].sort());
+    expect(r.results.map((x) => x.name).sort()).toEqual([AREA, D_USED, TH_BARREL, TH_VIA, TH_ARRAY].sort());
     expect(r.results.filter((x) => x.role === 'primary').map((x) => x.name)).toEqual([TH_ARRAY]);
     expect(r.designValues).toEqual([]);
   });
@@ -242,6 +244,104 @@ describe('confidence and data status (rule based)', () => {
       expect(r.confidence.reasons.length).toBeGreaterThan(0);
       expect(r.reference.ledgerIds).toEqual(expect.arrayContaining(['S-041', 'S-041b', 'S-041c', 'S-007', 'S-040']));
     }
+  });
+});
+
+describe('diameter basis (PCB M-4): finished or drill, required, no default', () => {
+  const drill = (D: number, t: number, L: number, N: number, extra: Partial<Inputs> = {}): Inputs => base(D, t, L, N, { diameterBasis: 'drill', ...extra });
+  it('golden E: drill 0.35 mm, t 25 um, L 1.6 mm: area pi t (D - t) and theta match the oracle', () => {
+    const tag = 'E_drill0.35_t25_L1.6_N1_k401';
+    const r = ok(drill(0.35, 25, 1.6, 1));
+    expect(relErr(res(r, AREA).value.si * 1e6, vec(`thermalvia_${tag}_barrel_area_mm2`).pinned_expected)).toBeLessThanOrEqual(TOL);
+    expect(relErr(res(r, TH_ARRAY).value.si, vec(`thermalvia_${tag}_theta_array_KperW`).pinned_expected)).toBeLessThanOrEqual(TOL);
+  });
+  it('golden F: drill 0.3 mm, t 20 um, filled k 1.0, N 9, 1.5 W: the core uses the finished diameter D - 2t', () => {
+    const tag = 'F_drill0.3_t20_L1.0_N9_k391_fill1.0_P1.5W';
+    const r = ok(drill(0.3, 20, 1.0, 9, { kMaterial: 'c11000-391', fill: 'filled', fillConductivity: kcond(1.0), power: watt(1.5) }));
+    expect(relErr(res(r, D_USED).value.si * 1e3, vec(`thermalvia_${tag}_finished_d_mm`).pinned_expected)).toBeLessThanOrEqual(TOL);
+    expect(relErr(res(r, TH_BARREL).value.si, vec(`thermalvia_${tag}_theta_barrel_KperW`).pinned_expected)).toBeLessThanOrEqual(TOL);
+    expect(relErr(res(r, TH_CORE).value.si, vec(`thermalvia_${tag}_theta_core_KperW`).pinned_expected)).toBeLessThanOrEqual(TOL);
+    expect(relErr(res(r, TH_ARRAY).value.si, vec(`thermalvia_${tag}_theta_array_KperW`).pinned_expected)).toBeLessThanOrEqual(TOL);
+    expect(relErr(res(r, DT).value.si, vec(`thermalvia_${tag}_dT_K`).pinned_expected)).toBeLessThanOrEqual(TOL);
+  });
+  it('a drill D equals a finished hole of D - 2t (same theta), and the drill as finished is about 18 % optimistic', () => {
+    const a = res(ok(drill(0.35, 25, 1.6, 1)), TH_ARRAY).value.si;
+    const b = res(ok(base(0.3, 25, 1.6, 1)), TH_ARRAY).value.si;
+    expect(relErr(a, b)).toBeLessThan(1e-12);
+    const wrong = res(ok(base(0.3, 25, 1.6, 1)), TH_ARRAY).value.si;
+    const right = res(ok(drill(0.3, 25, 1.6, 1)), TH_ARRAY).value.si;
+    expect(wrong).toBeLessThan(right);
+  });
+  it('results, inputs and assumptions state which basis was used', () => {
+    const d = ok(drill(0.35, 25, 1.6, 1));
+    expect(d.inputs.find((i) => i.name === 'hole diameter as entered')?.sourceDetail).toMatch(/drill/i);
+    expect(d.assumptions.join(' ')).toMatch(/drill diameter/i);
+    expect(d.assumptions.join(' ')).toMatch(/D - 2t/);
+    expect(res(d, D_USED).value.si).toBeCloseTo(0.3e-3, 12);
+    const f = ok(base(0.3, 25, 1.6, 1));
+    expect(f.inputs.find((i) => i.name === 'hole diameter as entered')?.sourceDetail).toMatch(/finished/i);
+    expect(res(f, D_USED).value.si).toBeCloseTo(0.3e-3, 12);
+    expect(f.steps.some((s) => /drill/i.test(s.expr))).toBe(false);
+    expect(d.steps.some((s) => /drill/i.test(s.expr))).toBe(true);
+  });
+  it('diameterBasis is required with no default and must be finished or drill', () => {
+    for (const bad of [undefined, 'Finished', 'inside', '', 3, null]) {
+      const out = compute({ ...base(0.3, 25, 1.6, 1), diameterBasis: bad } as unknown as Inputs);
+      expect(out.ok).toBe(false);
+      if (!out.ok) {
+        expect(out.error.code).toBe('INVALID_INPUT');
+        expect(out.error.field).toBe('diameterBasis');
+        expect(out.error.message).toMatch(/no default/i);
+      }
+    }
+    expect(validate({ ...base(0.3, 25, 1.6, 1), diameterBasis: 'toString' }).ok).toBe(false);
+  });
+  it('a drill with plating of half the drill or more has no hole left: OUT_OF_DOMAIN', () => {
+    for (const t of [150, 200]) {
+      const out = compute(drill(0.3, t, 1.6, 1));
+      expect(out.ok).toBe(false);
+      if (!out.ok) {
+        expect(out.error.code).toBe('OUT_OF_DOMAIN');
+        expect(out.error.field).toBe('platingThickness');
+      }
+    }
+  });
+});
+
+describe('thermal-relief and plane connection (PCB M-3, always shown)', () => {
+  it('always warns that relief spokes or a non-solid plane connection are not modelled', () => {
+    for (const inp of [base(0.3, 25, 1.6, 1), base(0.3, 25, 1.6, 9, { fill: 'filled', fillConductivity: kcond(3), power: watt(1) }), base(0.35, 25, 1.6, 1, { diameterBasis: 'drill' })]) {
+      const w = ok(inp).warnings.find((x) => x.code === 'THERMAL_RELIEF_NOT_MODELLED');
+      expect(w).toBeDefined();
+      expect(w?.severity).toBe('warning');
+      expect(w?.message).toMatch(/thermal-relief/i);
+      expect(w?.message).toMatch(/not modelled/i);
+      expect(w?.message).toMatch(/solid/i);
+    }
+  });
+  it('the lower-bound statement is conditional and names both directions (C4-1)', () => {
+    const r = ok(base(0.3, 25, 1.6, 1));
+    const one = r.warnings.find((x) => x.code === 'ONE_D_ESTIMATE')?.message ?? '';
+    expect(one).toMatch(/usually a lower bound/i);
+    expect(one).toMatch(/not assured/i);
+    expect(one).toMatch(/dielectric/i);
+    expect(one).toMatch(/overstate/i);
+    expect(one).toMatch(/UNDERESTIMATES/);
+    expect(r.recommendation).toMatch(/usually a lower bound/i);
+    expect(r.warnings.find((x) => x.code === 'IDEAL_PARALLEL')?.message).toMatch(/dielectric/i);
+  });
+});
+
+describe('ledger ids cited in the text are listed (phase validator m-3)', () => {
+  it('S-015 for a user plating value and S-019m for a fab average, each only with its text', () => {
+    const u = ok(base(0.3, 25, 1.6, 1)).reference.ledgerIds;
+    const f = ok(base(0.3, 18, 1.6, 1, { platingSource: 'fab-profile-average' })).reference.ledgerIds;
+    expect(u).toContain('S-015');
+    expect(u).not.toContain('S-019m');
+    expect(f).toContain('S-019m');
+    expect(f).not.toContain('S-015');
+    expect(meta.ledgerIds).toEqual(expect.arrayContaining(['S-015', 'S-019m']));
+    expect(meta.reference.ledgerIds).toEqual(expect.arrayContaining(['S-015', 'S-019m']));
   });
 });
 

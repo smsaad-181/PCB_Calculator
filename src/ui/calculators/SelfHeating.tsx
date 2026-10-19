@@ -17,6 +17,9 @@ import {
   CALCULATOR_ID,
   DEFAULT_STATE,
   DEFAULT_TEXT,
+  FUSING_HREF,
+  FUSING_LINK_TEXT,
+  FUSING_NOTE,
   LAW_HELP,
   LAW_LABEL,
   METHOD_TEXT,
@@ -153,6 +156,9 @@ export default function SelfHeating() {
       <p class="muted">
         Steady-state temperature rise of a copper trace carrying a current, with the copper resistance rising as the trace warms (the heating and the
         resistance are solved together). The thermal law and the copper layer have no default: choose them.
+      </p>
+      <p class="muted">
+        {FUSING_NOTE} <a href={FUSING_HREF}>{FUSING_LINK_TEXT}</a>
       </p>
       {notices.length > 0 && (
         <div class="banner" role="status">

@@ -98,6 +98,10 @@ export const DEFAULT_TEXT = {
   ambient: `${String(meta.defaults.ambientC)} °C (engineering default, not from a standard)`,
 } as const;
 
+export const FUSING_HREF = '#/calc/fusing';
+export const FUSING_LINK_TEXT = 'Open fusing (short pulse to the melting point)';
+export const FUSING_NOTE = 'For a short, large current pulse that heats a conductor toward melting, use the fusing page: it answers a different question and is not steady-state heating.';
+
 export const RANGE_HINT =
   'Outside the stated plausibility range (an engineering range, not a standard), or no steady state was found, so the result is less reliable. See the confidence reasons.';
 

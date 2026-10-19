@@ -12,8 +12,13 @@ import type { ValidInputs } from './guards';
 import { meta } from './meta';
 
 export interface Inputs {
-  /** FINISHED (inside) hole diameter after plating, not the drill diameter. */
+  /**
+   * The hole diameter as entered; what it means is set by `diameterBasis`. (The key keeps its original name for compatibility:
+   * with basis 'drill' it holds the DRILL diameter.)
+   */
   finishedHoleDiameter: Quantity;
+  /** 'finished' (inside the plating) or 'drill': required at run time, never defaulted (optional in the type only so older callers still compile; they get an error). */
+  diameterBasis?: 'finished' | 'drill' | undefined;
   /** Barrel plating thickness: required, never pre-filled. */
   platingThickness: Quantity;
   /** Barrel length: board thickness for a through via, or the span for a blind or buried via. */
@@ -33,15 +38,15 @@ export interface Inputs {
 }
 
 const RECOMMENDATION =
-  'This is a one-dimensional conduction estimate for the barrel (and fill) only. It is not a design constant and not a package metric: treat it as a lower bound on the real thermal resistance, and confirm with the thermal path of your own board (receiving copper, planes, package, airflow) or with measurement or simulation.';
+  'This is a one-dimensional conduction estimate for the barrel (and fill) only. It is not a design constant and not a package metric: treat it as usually a lower bound on the real thermal resistance (not assured: see the 1-D warning), and confirm with the thermal path of your own board (receiving copper, planes, package, airflow) or with measurement or simulation.';
 const ONE_D_TEXT =
-  'One-dimensional estimate. It covers conduction along the barrels (and fill) only. It excludes spreading in the pads and planes, the package, solder, interface and convection. Published FEA found the 1-D model UNDERESTIMATES the thermal resistance (by up to 27 % in one case, ledger S-041c), so the real resistance is higher: this value is a lower bound.';
+  'One-dimensional estimate. It covers conduction along the barrels (and fill) only. It excludes spreading in the pads and planes, the package, solder, interface and convection. Published FEA found the 1-D model UNDERESTIMATES the thermal resistance (by up to 27 % in one case, ledger S-041c), so the real resistance is usually higher and this value is usually a lower bound. This is not assured: the dielectric between the vias is also ignored, which OVERSTATES theta for sparse arrays under a large pad or on a high-conductivity laminate.';
 const RECEIVING_TEXT =
   'The heat needs somewhere to go. A via array without a receiving copper area or plane has little effect (Brooks and Adam 2024), while application notes recommend thermal vias. The sources disagree on how useful thermal vias are (ledger S-041c, CONFLICT); this calculator takes no side.';
 const BULK_K_TEXT =
   'The thermal conductivity of plated barrel copper was not found (ledger S-041d); the value used is the bulk copper value you selected (S-007, CONFLICT). A higher k gives a lower theta, which is the non-conservative side.';
 const IDEAL_TEXT =
-  'theta/N assumes every via sees the same top and bottom temperature and identical geometry. This is the ideal parallel combination (S-041b); dielectric between the vias is ignored.';
+  'theta/N assumes every via sees the same top and bottom temperature and identical geometry. This is the ideal parallel combination (S-041b); dielectric between the vias is ignored (this overstates theta, the opposite direction to the spreading effect).';
 const SHARING_TEXT =
   'More vias give diminishing returns: the array rarely reaches theta/N because heat spreads into the pads and planes unevenly (S-041b, S-041c). Treat theta/N as the ideal, not the expected value.';
 const JA_TEXT =
@@ -55,6 +60,9 @@ const PLATING_TEXT =
 const RISE_TEXT =
   'The temperature difference is theta x P for the power you entered, assuming all of that power flows through the vias between two isothermal copper areas. It is a lower bound on the real rise across the heat path, not a junction or board temperature.';
 
+const RELIEF_TEXT =
+  'Not modelled: thermal-relief spokes or any non-solid connection of the vias to the pad and the receiving plane usually dominate the real behaviour. Check the plane connect style in your CAD rules; this result assumes a solid connection.';
+
 const num = (x: number): string => String(Number(x.toPrecision(4)));
 
 /** Thrown for a value outside the representable or modelled range; mapped to OUT_OF_DOMAIN by compute. */
@@ -66,9 +74,11 @@ function positive(n: number, what: string): number {
 }
 
 const ALL = [...meta.reference.ledgerIds];
-const idsFor = (filled: boolean, power: boolean): string[] => ALL.filter((id) => (filled || id !== 'S-041a') && (power || id !== 'S-019d'));
+/** S-041a only when filled, S-019d only with a power, S-019m only for a fab average and S-015 only for a user plating value (each is cited only then). */
+const idsFor = (filled: boolean, power: boolean, fabAvg: boolean): string[] =>
+  ALL.filter((id) => (filled || id !== 'S-041a') && (power || id !== 'S-019d') && (fabAvg || id !== 'S-019m') && (!fabAvg || id !== 'S-015'));
 const STATUS: Record<string, ReturnType<typeof dataStatusForLedgerIds>> = {};
-for (const f of [false, true]) for (const p of [false, true]) STATUS[`${String(f)}${String(p)}`] = dataStatusForLedgerIds(idsFor(f, p));
+for (const f of [false, true]) for (const p of [false, true]) for (const a of [false, true]) STATUS[`${String(f)}${String(p)}${String(a)}`] = dataStatusForLedgerIds(idsFor(f, p, a));
 
 function build(raw: unknown): CalcOutcome {
   const v = validate(raw);
@@ -76,6 +86,7 @@ function build(raw: unknown): CalcOutcome {
   const inp: ValidInputs = v.value;
   const N = inp.count;
   const d = inp.finishedHoleDiameter.si;
+  const drill = inp.diameterBasis === 'drill';
   const t = inp.platingThickness.si;
   const L = inp.barrelLength.si;
   const filled = inp.fill === 'filled';
@@ -97,7 +108,12 @@ function build(raw: unknown): CalcOutcome {
 
   const fabAvg = inp.platingSource === 'fab-profile-average';
   const inputs: CalcInput[] = [
-    { name: 'finished hole diameter', value: inp.finishedHoleDiameter, source: 'user' },
+    {
+      name: 'hole diameter as entered',
+      value: inp.enteredDiameter,
+      source: 'user',
+      sourceDetail: drill ? 'diameter basis: DRILL (finished hole = D - 2t)' : 'diameter basis: FINISHED (inside the plating)',
+    },
     fabAvg
       ? { name: 'plating thickness', value: inp.platingThickness, source: 'fab-profile', sourceDetail: 'fab profile holePlatingAverage: a fabricator AVERAGE, not a minimum (S-019m)' }
       : { name: 'plating thickness', value: inp.platingThickness, source: 'user' },
@@ -108,6 +124,7 @@ function build(raw: unknown): CalcOutcome {
   if (inp.power !== undefined) inputs.push({ name: 'power through the vias', value: inp.power, source: 'user' });
 
   const steps: CalcResult['steps'] = [
+    ...(drill ? [{ label: 'Finished hole diameter from the drill', expr: 'd = D - 2t, D = drill diameter as entered (S-041 drill form A = pi t (D - t))', value: inp.finishedHoleDiameter }] : []),
     { label: 'Barrel copper area (one via)', expr: 'A = pi x t x (d + t), d = finished hole diameter', value: q(areaOne, DIM.AREA), bound: 'nominal' },
     { label: 'Barrel thermal resistance (one via)', expr: 'theta_barrel = L / (k x A)', value: q(thetaBarrel, DIM.THERMAL_RESISTANCE), bound: 'prediction' },
   ];
@@ -125,6 +142,13 @@ function build(raw: unknown): CalcOutcome {
     { name: 'thermal resistance of one via', value: q(thetaOne, DIM.THERMAL_RESISTANCE), role: 'secondary', bound: 'prediction' },
     { name: 'barrel thermal resistance (one via)', value: q(thetaBarrel, DIM.THERMAL_RESISTANCE), role: 'secondary', bound: 'prediction' },
     { name: 'barrel copper area (one via)', value: q(areaOne, DIM.AREA), role: 'secondary', bound: 'nominal' },
+    {
+      name: 'finished hole diameter used in the calculation',
+      value: inp.finishedHoleDiameter,
+      role: 'secondary',
+      bound: 'nominal',
+      note: drill ? 'derived from the entered DRILL diameter as D - 2t' : 'as entered (finished basis)',
+    },
   ];
   if (thetaCore !== undefined) results.push({ name: 'fill core thermal resistance (one via)', value: q(thetaCore, DIM.THERMAL_RESISTANCE), role: 'secondary', bound: 'prediction' });
   if (dT !== undefined) results.push({ name: 'temperature difference across the array for the given power', value: dT, role: 'secondary', bound: 'prediction' });
@@ -147,6 +171,7 @@ function build(raw: unknown): CalcOutcome {
     { severity: 'caution', message: BULK_K_TEXT, code: 'BULK_COPPER_K' },
     { severity: 'info', message: IDEAL_TEXT, code: 'IDEAL_PARALLEL' },
     { severity: 'info', message: JA_TEXT, code: 'NOT_THETA_JA' },
+    { severity: 'warning', message: RELIEF_TEXT, code: 'THERMAL_RELIEF_NOT_MODELLED' },
   ];
   if (N > 1) warnings.push({ severity: 'caution', message: SHARING_TEXT, code: 'EQUAL_SHARING' });
   if (fabAvg) warnings.push({ severity: 'caution', message: FAB_AVG_TEXT, code: 'FAB_AVERAGE_PLATING' });
@@ -156,7 +181,9 @@ function build(raw: unknown): CalcOutcome {
 
   const assumptions: string[] = [
     'This is a 1-D conduction estimate: it ignores spreading in the pads and planes, the package, solder, interface and convection, and it is not a design constant.',
-    'd is the FINISHED (inside) hole diameter after plating, not the drill diameter; the barrel is a copper annulus of inside diameter d and wall t.',
+    drill
+      ? 'The entered diameter is the DRILL diameter D; the finished (inside) hole is d = D - 2t and the barrel is a copper annulus of inside diameter d and wall t, area pi t (D - t) (S-041 drill form). The fill core uses d.'
+      : 'd is the FINISHED (inside) hole diameter after plating, not the drill diameter; the barrel is a copper annulus of inside diameter d and wall t.',
     fabAvg
       ? 'Plating thickness comes from a fabricator AVERAGE (ledger S-019m); it is never pre-filled and it is not a minimum.'
       : 'Plating thickness is a required user input and is never pre-filled; published fabricator and class values differ (ledger S-015, PAYWALLED-USER-MUST-VERIFY).',
@@ -168,12 +195,12 @@ function build(raw: unknown): CalcOutcome {
     ...(dT !== undefined ? ['The temperature difference assumes all of the power you entered flows through the vias; it is not a junction or board temperature.'] : []),
   ];
 
-  const status = STATUS[`${String(filled)}${String(inp.power !== undefined)}`] as CalcResult['dataStatus'];
+  const status = STATUS[`${String(filled)}${String(inp.power !== undefined)}${String(fabAvg)}`] as CalcResult['dataStatus'];
   const confidence = rateConfidence(confidenceFactorsFromInputs({ inputs, outOfRange, accuracyClass: meta.accuracyClass, dataStatus: status }));
 
   const result: CalcResult = {
     method: meta.method,
-    reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds: idsFor(filled, inp.power !== undefined) },
+    reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds: idsFor(filled, inp.power !== undefined, fabAvg) },
     formula: meta.formula,
     inputs,
     assumptions,

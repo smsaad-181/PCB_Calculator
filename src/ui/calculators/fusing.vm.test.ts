@@ -8,6 +8,11 @@ import {
   DEFAULT_STATE,
   SELF_HEATING_HREF,
   SEPARATION_NOTE,
+  NOT_MEANINGFUL_TEXT,
+  AREA_HELP,
+  I2T_HELP,
+  THICKNESS_HELP,
+  TE_HELP,
   STATUS_LINES,
   WRITTEN_KEYS,
   computeView,
@@ -73,7 +78,7 @@ describe('inputs are mutually exclusive in the UI', () => {
     expect(computeView(st({ ...AREA, time: 'garbage', wire: '-1 mm' })).status).toBe('ok');
   });
   it('each mode gives its own headline', () => {
-    expect(ok(st(AREA)).result.headline.label).toMatch(/time/i);
+    expect(ok(st({ ...AREA, current: '300 A' })).result.headline.label).toMatch(/time/i);
     const t = ok(st({ ...AREA, mode: 'time', time: '0.5 s', current: '' }));
     expect(t.result.headline.label).toMatch(/current/i);
     expect(t.result.headline.text).toMatch(/A$/);
@@ -155,7 +160,7 @@ describe('always-visible statements and warnings', () => {
     expect(pageSrc).toContain('SELF_HEATING_HREF');
   });
   it('the result carries the adiabatic PCB caveat and the not-a-rating notice as callouts, and the answer is the time to REACH melting', () => {
-    const v = ok(st(AREA));
+    const v = ok(st({ ...AREA, current: '300 A' }));
     const t = v.callouts.map((c) => c.text).join(' ');
     expect(t).toMatch(/not a fuse rating/i);
     expect(t).toMatch(/adiabatic/i);
@@ -175,6 +180,10 @@ describe('always-visible statements and warnings', () => {
     expect(texts.length).toBe(2);
     for (const w of texts) expect(w.message).toMatch(/product choices, not sourced limits/);
     expect(over10.result.warnings[0]?.severity).toBe('critical');
+  });
+  it('the IPC scope item is read from the core notChecked flag, not matched by name', () => {
+    expect(vmSrc).not.toMatch(/IPC_CHECK|IPC scope for fusing|\/\^IPC/);
+    expect(vmSrc).toMatch(/notChecked === true/);
   });
   it('the IPC scope check is shown as not checked, not as a failure', () => {
     const v = ok(st({ ...AREA, current: '300 A' }));
@@ -221,6 +230,133 @@ describe('always-visible statements and warnings', () => {
   });
 });
 
+describe('headline suppression where the model has no meaning (PCB M-5)', () => {
+  it('over 10 s the headline is replaced by a plain statement, and the number stays below, labelled', () => {
+    const v = ok(st({ ...AREA, current: '50 A' }));
+    expect(v.result.headline.text).toBe(NOT_MEANINGFUL_TEXT);
+    expect(v.result.headline.text).toBe('Not meaningful for this model: the conductor would not fuse in a short pulse; use the self-heating calculator');
+    expect(v.result.headline.text).not.toMatch(/\d/);
+    expect(v.suppressedHeadline?.text).toMatch(/\d/);
+    expect(v.suppressedHeadline?.label).toMatch(/not meaningful/i);
+    expect(liveSummary(v)).toMatch(/Not meaningful/);
+    expect(codes(v)).toContain('OVER_10S');
+    expect(v.headlineWarnings).toEqual([]);
+  });
+  it('the same holds in time mode when the pulse time is over 10 s', () => {
+    const v = ok(st({ ...AREA, mode: 'time', time: '30 s', current: '' }));
+    expect(v.result.headline.text).toBe(NOT_MEANINGFUL_TEXT);
+    expect(v.suppressedHeadline).toBeDefined();
+  });
+  it('between 1 s and 10 s the over-1-s warning sits directly under the headline, not in the list', () => {
+    const v = ok(st({ ...AREA, current: '200 A' }));
+    expect(v.result.headline.text).not.toBe(NOT_MEANINGFUL_TEXT);
+    expect(v.suppressedHeadline).toBeUndefined();
+    expect(v.headlineWarnings.length).toBe(1);
+    expect(v.headlineWarnings[0]?.message).toMatch(/beyond 1 s/);
+    expect(v.result.warnings.some((w) => /beyond 1 s/.test(w.message))).toBe(false);
+  });
+  it('under 1 s nothing is suppressed or moved', () => {
+    const v = ok(st({ ...AREA, current: '300 A' }));
+    expect(v.suppressedHeadline).toBeUndefined();
+    expect(v.headlineWarnings).toEqual([]);
+  });
+  it('the page puts the under-headline warnings before the callouts', () => {
+    expect(pageSrc).toMatch(/underHeadline=/);
+    expect(pageSrc).toMatch(/suppressedHeadline/);
+  });
+});
+
+describe('end temperature (optional, no default)', () => {
+  it('is blank by default and not needed', () => {
+    expect(DEFAULT_STATE.endTemp).toBe('');
+    expect(ok(st(AREA)).raw.inputs.some((i) => /end temperature/.test(i.name))).toBe(false);
+    expect(TE_HELP).toMatch(/laminate datasheet \(e\.g\. glass transition\/decomposition\), no default/i);
+    expect(TE_HELP).not.toMatch(/\d/);
+  });
+  it('shows the time to reach it as a labelled secondary row, with the board-damage warning always shown', () => {
+    const base = ok(st(AREA));
+    expect(codes(base)).toContain('BOARD_DAMAGE_BELOW_MELTING');
+    const v = ok(st({ ...AREA, endTemp: '200 °C' }));
+    const row = v.result.rows.find((r) => /end temperature/i.test(r.label));
+    expect(row?.label).toMatch(/your end temperature/i);
+    expect(row?.text).toMatch(/s$/);
+    expect(v.result.warnings.some((w) => /Board damage/.test(w.message))).toBe(true);
+    expect(v.result.details.inputs.some((i) => /end temperature/i.test(i.label))).toBe(true);
+  });
+  it('in time mode it gives a current; in I2t mode a fraction labelled not a safety margin', () => {
+    const t = ok(st({ ...AREA, mode: 'time', time: '0.5 s', current: '', endTemp: '200 °C' }));
+    expect(t.result.rows.some((r) => /current that reaches your end temperature/i.test(r.label) && /A$/.test(r.text))).toBe(true);
+    const f = ok(st({ ...AREA, mode: 'i2t', i2t: '40 A2s', current: '', endTemp: '200 °C' }));
+    expect(f.result.headline.label).toMatch(/not a safety margin/i);
+    expect(f.result.headline.note).toMatch(/not a safety margin/i);
+    expect(f.result.rows.some((r) => /end temperature/i.test(r.label))).toBe(true);
+  });
+  it('an end temperature at or below the initial temperature, or above melting, is an error on its field', () => {
+    for (const te of ['20 °C', '1100 °C', '5 A']) {
+      const v = computeView(st({ ...AREA, endTemp: te }));
+      expect(v.status).toBe('error');
+      if (v.status === 'error') expect(v.fieldErrors.endTemp).toBeDefined();
+    }
+  });
+});
+
+describe('via barrel geometry (weakest link)', () => {
+  const VIA: Partial<FusingState> = { geometry: 'via', viaHole: '0.3 mm', viaPlating: '20 um', initialTemp: '25 °C', mode: 'current', current: '10 A' };
+  it('needs the finished hole and the plating, with no default for either', () => {
+    const v = computeView(st({ geometry: 'via', initialTemp: '25 °C', mode: 'current', current: '10 A' }));
+    expect(v.status).toBe('needs-input');
+    if (v.status === 'needs-input') {
+      expect(v.needs.join(' ')).toMatch(/finished.*hole/i);
+      expect(v.needs.join(' ')).toMatch(/plating thickness.*never filled in/i);
+    }
+  });
+  it('gives a result with the via, weakest-link and plating-average warnings shown', () => {
+    const v = ok(st(VIA));
+    expect(codes(v)).toEqual(expect.arrayContaining(['VIA_BARREL_PLATING', 'WEAKEST_LINK']));
+    expect(v.result.warnings.some((w) => /smallest cross-section/.test(w.message))).toBe(true);
+    expect(v.result.warnings.some((w) => /averages, not minimums/.test(w.message))).toBe(true);
+    expect(v.raw.inputs.map((i) => i.name)).toEqual(expect.arrayContaining(['via finished hole diameter', 'via barrel plating thickness']));
+    const plating = v.result.details.inputs.find((i) => /plating thickness/i.test(i.label));
+    expect(plating?.value).toMatch(/µm|um/);
+  });
+  it('no thickness basis is asked for a via, and a plating at or above the hole is flagged', () => {
+    const bad = computeView(st({ ...VIA, viaPlating: '0.4 mm' }));
+    if (bad.status === 'ok') expect(bad.result.details.validity.some((c) => !c.ok && !c.notChecked)).toBe(true);
+    else expect(bad.status).toBe('error');
+  });
+  it('a sub-millisecond pulse shows its warning', () => {
+    const v = ok(st({ ...AREA, mode: 'time', time: '100 us', current: '' }));
+    expect(codes(v)).toContain('SUB_MS_PULSE');
+    expect(v.result.warnings.some((w) => /under 1 ms/.test(w.message))).toBe(true);
+  });
+  it('the weakest-link warning is shown for every geometry', () => {
+    expect(codes(ok(st(AREA)))).toContain('WEAKEST_LINK');
+  });
+});
+
+describe('field help and result digits', () => {
+  it('the area hint says a circular mil is not a square mil and cmil is not accepted; cmil really is refused', () => {
+    expect(AREA_HELP).toMatch(/circular mil.*not a square mil/i);
+    expect(AREA_HELP).toMatch(/cmil.*not accepted/i);
+    expect(pageSrc).not.toMatch(/unitHint="mm2, mil2 or cmil"/);
+    expect(computeView(st({ ...AREA, area: '100 cmil' })).status).toBe('error');
+    expect(computeView(st({ ...AREA, area: '100 mil2' })).status).toBe('ok');
+  });
+  it('the Onderdonk to adiabatic ratio carries enough digits to show it is not exactly 1', () => {
+    const v = ok(st(AREA));
+    const rows = v.result.rows.filter((r) => /ratio/i.test(r.label));
+    expect(rows.length).toBe(1);
+    expect(rows[0]?.text).toMatch(/^1\.\d{3}$/);
+  });
+  it('the I2t help points to the fuse total clearing I2t at the fault current', () => {
+    expect(I2T_HELP).toMatch(/total clearing I2t at (the|your) fault current/i);
+  });
+  it('the nominal-thickness help names both directions', () => {
+    expect(THICKNESS_HELP).toMatch(/thinner/i);
+    expect(THICKNESS_HELP).toMatch(/outer.*thicker/i);
+  });
+});
+
 describe('invalid input never gives a number', () => {
   it.each([
     [{ current: '-5 A' }],
@@ -254,6 +390,7 @@ describe('hash state', () => {
   const full = st({
     geometry: 'trace',
     width: '2 mm',
+    endTemp: '200 °C',
     thickness: '1 oz/ft2',
     basis: 'nominal',
     convention: 'mass-density',
@@ -266,6 +403,10 @@ describe('hash state', () => {
   it('round-trips through the URL hash', () => {
     const p = parseHash(serializeHash(ROUTE, toHashState(full)));
     expect(fromHashState(p.state).state).toEqual(full);
+    const via = st({ geometry: 'via', viaHole: '0.3 mm', viaPlating: '20 um', initialTemp: '25 °C', mode: 'current', current: '5 A' });
+    expect(fromHashState(parseHash(serializeHash(ROUTE, toHashState(via))).state).state).toEqual(via);
+    expect(Object.keys(toHashState(via))).toEqual(expect.arrayContaining(['gm', 'vd', 'vp']));
+    expect(toHashState(full)['te']).toBe('200 °C');
   });
   it('the default state writes nothing, and no choice is ever invented', () => {
     expect(serializeHash(ROUTE, toHashState(DEFAULT_STATE))).toBe('#/calc/fusing');

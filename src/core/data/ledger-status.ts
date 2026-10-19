@@ -109,6 +109,7 @@ const STATUS_ROWS: readonly LedgerStatusRow[] = [
   { id: 'S-042d', status: 'CONFLICT' },
   { id: 'S-042e', status: 'UNVERIFIED' },
   { id: 'S-042f', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-045', status: 'VERIFIED' },
   { id: 'S-043…S-044', status: 'UNVERIFIED' },
   { id: 'S-050', status: 'VERIFIED' },
   { id: 'S-051', status: 'VERIFIED' },

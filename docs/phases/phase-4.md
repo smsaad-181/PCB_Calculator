@@ -17,3 +17,7 @@ S-040 JEDEC JESD51 series scope and θJA caveats · S-041 thermal via array mode
 - [ ] θJA never presented as a design constant
 - [ ] Fusing and heating clearly separated
 - [ ] Final validator reports PASS and RUNBOOK/README complete
+
+## Scope decision (human, 2026-10-19)
+Confirmed scope for the thermal part: **thermal via array estimate** only. **Fusing (Onderdonk/Preece)** built as a separate calculator. **Final hardening (task 5)** stays required by the exit criteria.
+Deferred (not built, logged in OPEN_RISKS): theta-JA/theta-JC estimate, exposed-pad / copper-area spreading, RF/antenna helper (task 2), twisted pair and coax references (task 3). Trace heating reuse is the existing self-heating calculator (no new math). Ledger placeholder S-043…S-044 covers the deferred RF/twisted-pair/coax rows.

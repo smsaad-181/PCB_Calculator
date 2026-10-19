@@ -9,12 +9,23 @@ import { DIM, FOIL_CONVENTIONS, foilThickness, type Dim, type DisplayPrefs, type
 import { RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
 import { stateKeyNames } from '../../state/state-keys';
 import { echoPrefs, headlinePrefs, type Units } from '../components/prefs';
-import { buildResultView, MAX_FIELD_CHARS, parseField, type FieldView, type LedgerEntryView, type ProvenanceRow, type ResultView } from '../components/view';
+import {
+  buildResultView,
+  MAX_FIELD_CHARS,
+  orderWarnings,
+  parseField,
+  type FieldView,
+  type LedgerEntryView,
+  type ProvenanceRow,
+  type ResultRowView,
+  type ResultView,
+  type WarningView,
+} from '../components/view';
 
 export const CALCULATOR_ID = 'fusing';
 export type { Units };
 
-export type Geometry = '' | 'area' | 'wire' | 'trace';
+export type Geometry = '' | 'area' | 'wire' | 'trace' | 'via';
 export type Mode = '' | 'current' | 'time' | 'i2t';
 export type Basis = '' | 'finished' | 'measured' | 'nominal';
 export type CpChoice = '' | CopperSpecificHeatSource;
@@ -30,7 +41,13 @@ export interface FusingState {
   readonly basis: Basis;
   /** Only used when the thickness is a foil weight. '' means the foil default, shown as a default. */
   readonly convention: FoilConvention | '';
+  /** Via barrel: the FINISHED hole diameter (inside the plating, not the drill). */
+  readonly viaHole: string;
+  /** Via barrel plating thickness: required, never pre-filled. */
+  readonly viaPlating: string;
   readonly initialTemp: string;
+  /** Optional end temperature from the user's laminate datasheet. Blank means none: there is no default. */
+  readonly endTemp: string;
   readonly mode: Mode;
   readonly current: string;
   readonly time: string;
@@ -48,7 +65,10 @@ export const DEFAULT_STATE: FusingState = Object.freeze({
   thickness: '',
   basis: '',
   convention: '',
+  viaHole: '',
+  viaPlating: '',
   initialTemp: '',
+  endTemp: '',
   mode: '',
   current: '',
   time: '',
@@ -75,9 +95,10 @@ export const SELF_HEATING_LINK_TEXT = 'Open trace self-heating (steady-state, a 
 
 export const RANGE_HINT = 'Outside the stated plausibility range (an engineering range, not a standard): less reliable. See the confidence reasons.';
 
-export const GEOMETRY_OPTIONS: readonly { value: 'area' | 'wire' | 'trace'; label: string }[] = [
+export const GEOMETRY_OPTIONS: readonly { value: 'area' | 'wire' | 'trace' | 'via'; label: string }[] = [
   { value: 'trace', label: 'A PCB trace (width and copper thickness)' },
   { value: 'wire', label: 'A round wire (diameter)' },
+  { value: 'via', label: 'A via barrel (finished hole and plating thickness)' },
   { value: 'area', label: 'A cross-section area I give directly' },
 ];
 export const MODE_OPTIONS: readonly { value: 'current' | 'time' | 'i2t'; label: string }[] = [
@@ -91,15 +112,23 @@ export const BASIS_OPTIONS: readonly { value: 'finished' | 'measured' | 'nominal
   { value: 'nominal', label: 'Nominal (an assumed foil weight, not finished copper)' },
 ];
 
-export const AREA_HELP = 'The conductor cross-section. Example: 0.07 mm2 or 100 mil2.';
+export const AREA_HELP =
+  'The conductor cross-section in a square length unit (mm2 or mil2). A circular mil is not a square mil, and cmil is not accepted: convert it first. Example: 0.07 mm2.';
+export const VIA_HOLE_HELP = 'The FINISHED hole (inside the plating), not the drill. Write the unit (mm or mil).';
+export const VIA_PLATING_HELP =
+  'Required, never filled in for you. A fabricator figure is an average, not a minimum, and the thinnest spot of the barrel fuses first. Write the unit (um or mil).';
 export const WIRE_HELP = 'Diameter of a solid round conductor. Example: 0.5 mm.';
 export const WIDTH_HELP = 'Trace width. Example: 2 mm or 80 mil.';
 export const THICKNESS_HELP =
-  'The FINISHED copper thickness (a length such as 35 um or 1.4 mil), then choose its basis. Or write a foil weight such as 1 oz/ft2: it is converted to a nominal length with the foil convention below and treated as nominal, which can be thicker than finished copper, so the time shown may be too long.';
+  'The FINISHED copper thickness (a length such as 35 um or 1.4 mil), then choose its basis. Or write a foil weight such as 1 oz/ft2: it is converted to a nominal length with the foil convention below and treated as nominal. Finished copper can be thinner than nominal (inner layers, where the trace fuses sooner and the time shown is too long) or thicker (outer plated layers are usually thicker than nominal, where the time shown is too short).';
 export const TEMP_HELP = 'The conductor temperature at the START of the pulse (not room ambient if the trace already carries load). Required, no default. Example: 25 °C.';
 export const CURRENT_HELP = 'Constant current of a rectangular pulse. Example: 10 A.';
 export const TIME_HELP = 'Duration of a rectangular pulse. Example: 0.5 s or 20 ms.';
-export const I2T_HELP = 'The integral of i squared over time for your pulse (not I rms times an arbitrary time). Example: 40 A2s. With no duration, the 1 s and 10 s warnings cannot be checked.';
+export const I2T_HELP =
+  'The integral of i squared over time for your pulse (not I rms times an arbitrary time). For a protective fuse use its total clearing I2t at your fault current (from its datasheet), not its melting I2t. Example: 40 A2s. With no duration, the 1 s and 10 s warnings cannot be checked.';
+export const TE_HELP =
+  'Optional. From your laminate datasheet (e.g. glass transition/decomposition), no default. Board damage occurs far below the copper melting point. It must be above the initial temperature and below the melting point.';
+export const NOT_MEANINGFUL_TEXT = 'Not meaningful for this model: the conductor would not fuse in a short pulse; use the self-heating calculator';
 export const CONVENTION_HELP = 'How a foil weight becomes a thickness. Conventions differ by a few percent (ledger S-003, CONFLICT).';
 export const CP_HELP = 'The sourced values disagree by under 1 percent and time scales linearly with it. They are not averaged. The default is a product choice that needs your confirmation.';
 
@@ -135,9 +164,9 @@ export function conventionOptions(): readonly { value: FoilConvention | ''; labe
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-type TextKey = 'area' | 'wire' | 'width' | 'thickness' | 'initialTemp' | 'current' | 'time' | 'i2t';
+type TextKey = 'area' | 'wire' | 'width' | 'thickness' | 'viaHole' | 'viaPlating' | 'initialTemp' | 'endTemp' | 'current' | 'time' | 'i2t';
 
-const TEXT_HASH_KEY: Readonly<Record<TextKey, string>> = { area: 'a', wire: 'dw', width: 'w', thickness: 'th', initialTemp: 'ta', current: 'i', time: 'tp', i2t: 'it' };
+const TEXT_HASH_KEY: Readonly<Record<TextKey, string>> = { area: 'a', wire: 'dw', width: 'w', thickness: 'th', viaHole: 'vd', viaPlating: 'vp', initialTemp: 'ta', endTemp: 'te', current: 'i', time: 'tp', i2t: 'it' };
 const TEXT_KEYS = Object.keys(TEXT_HASH_KEY) as TextKey[];
 const LOCAL_KEYS = stateKeyNames(CALCULATOR_ID);
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (and `u`, which is reserved). */
@@ -148,7 +177,10 @@ const FIELD_LABEL: Readonly<Record<TextKey, string>> = {
   wire: 'Wire diameter',
   width: 'Trace width',
   thickness: 'Copper thickness',
+  viaHole: 'Via finished hole diameter',
+  viaPlating: 'Via plating thickness',
   initialTemp: 'Initial temperature',
+  endTemp: 'End temperature',
   current: 'Current',
   time: 'Pulse time',
   i2t: 'Action integral I²t',
@@ -158,7 +190,10 @@ const FIELD_DIM: Readonly<Record<Exclude<TextKey, 'thickness'>, Dim>> = {
   area: DIM.AREA,
   wire: DIM.LENGTH,
   width: DIM.LENGTH,
+  viaHole: DIM.LENGTH,
+  viaPlating: DIM.LENGTH,
   initialTemp: DIM.ABS_TEMPERATURE,
+  endTemp: DIM.ABS_TEMPERATURE,
   current: DIM.CURRENT,
   time: DIM.TIME,
   i2t: DIM.ACTION_INTEGRAL,
@@ -202,7 +237,7 @@ export function fromHashState(h: HashState): LoadedState {
   };
   const gm = get('gm');
   if (gm !== undefined) {
-    if (gm === 'area' || gm === 'wire' || gm === 'trace') s = { ...s, geometry: gm };
+    if (gm === 'area' || gm === 'wire' || gm === 'trace' || gm === 'via') s = { ...s, geometry: gm };
     else notices.push('The conductor geometry was not recognised: none is chosen. Choose one.');
   }
   const tb = get('tb');
@@ -230,7 +265,7 @@ export function fromHashState(h: HashState): LoadedState {
   if (u === 'metric' || u === 'imperial') {
     if (RESERVED_STATE_KEYS.u.isValid(u)) s = { ...s, units: u };
   }
-  s = { ...s, area: text('area'), wire: text('wire'), width: text('width'), thickness: text('thickness'), initialTemp: text('initialTemp'), current: text('current'), time: text('time'), i2t: text('i2t') };
+  s = { ...s, area: text('area'), wire: text('wire'), width: text('width'), thickness: text('thickness'), viaHole: text('viaHole'), viaPlating: text('viaPlating'), initialTemp: text('initialTemp'), endTemp: text('endTemp'), current: text('current'), time: text('time'), i2t: text('i2t') };
   return { state: s, notices };
 }
 
@@ -241,7 +276,7 @@ export type FieldKey = TextKey | 'geometry' | 'basis' | 'mode' | 'specificHeat';
 export type FieldErrors = Partial<Record<FieldKey, string>>;
 
 export function echoFor(s: FusingState, k: Exclude<TextKey, 'thickness'>): DisplayPrefs {
-  return echoPrefs(s.units, k === 'wire' || k === 'width' ? 'width' : 'other');
+  return echoPrefs(s.units, k === 'wire' || k === 'width' || k === 'viaHole' ? 'width' : k === 'viaPlating' ? 'thickness' : 'other');
 }
 
 /** Which quantity fields the page shows and reads. Hidden fields are never read, so they cannot conflict. */
@@ -250,6 +285,7 @@ export function activeFields(s: Pick<FusingState, 'geometry' | 'mode'>): readonl
   if (s.geometry === 'area') out.push('area');
   if (s.geometry === 'wire') out.push('wire');
   if (s.geometry === 'trace') out.push('width', 'thickness');
+  if (s.geometry === 'via') out.push('viaHole', 'viaPlating');
   out.push('initialTemp');
   if (s.mode === 'current') out.push('current');
   if (s.mode === 'time') out.push('time');
@@ -289,6 +325,9 @@ const CORE_FIELD: Readonly<Record<string, FieldKey>> = {
   wireDiameter: 'wire',
   traceWidth: 'width',
   traceThickness: 'thickness',
+  viaHoleDiameter: 'viaHole',
+  viaPlatingThickness: 'viaPlating',
+  endTemperature: 'endTemp',
   thicknessBasis: 'basis',
   initialTemperature: 'initialTemp',
   current: 'current',
@@ -336,28 +375,41 @@ const LEDGER_ROLE: Readonly<Record<string, string>> = {
 const HEADLINE_BY_MODE: Readonly<Record<'current' | 'time' | 'i2t', string>> = {
   current: 'adiabatic time to reach the melting point',
   time: 'adiabatic current to reach the melting point in the pulse time',
-  i2t: 'your I²t as a fraction of the I²t to reach the melting point',
+  i2t: 'your I²t as a fraction of the I²t to reach the melting point (not a safety margin)',
 };
 const RESULT_LABELS: Readonly<Record<string, string>> = {
   'adiabatic time to reach the melting point': 'Adiabatic time to reach the copper melting point (estimate, not a fuse rating)',
   'adiabatic current to reach the melting point in the pulse time': 'Adiabatic current that reaches the copper melting point in your pulse time (estimate, not a fuse rating)',
-  'your I²t as a fraction of the I²t to reach the melting point': 'Your I²t as a fraction of the I²t that reaches the melting point (estimate)',
+  'your I²t as a fraction of the I²t to reach the melting point (not a safety margin)': 'Your I²t as a fraction of the I²t that reaches the melting point (estimate, not a safety margin)',
+  'adiabatic time to reach your end temperature': 'Adiabatic time to reach your end temperature (your value, not checked)',
+  'adiabatic current to reach your end temperature in the pulse time': 'Adiabatic current that reaches your end temperature in your pulse time (your value, not checked)',
+  'adiabatic action integral I²t to reach your end temperature': 'Adiabatic I²t to reach your end temperature (your value, not checked)',
+  'your I²t as a fraction of the I²t to reach your end temperature': 'Your I²t as a fraction of the I²t that reaches your end temperature (your value, not checked)',
   'adiabatic action integral I²t to reach the melting point': 'Adiabatic I²t to reach the melting point',
   'Onderdonk time to reach the melting point (secondary check)': 'Onderdonk time to reach the melting point (secondary check)',
   'Onderdonk current to reach the melting point in the pulse time (secondary check)': 'Onderdonk current to reach the melting point (secondary check)',
   'Onderdonk action integral I²t (secondary check)': 'Onderdonk I²t (secondary check)',
-  'Onderdonk to adiabatic ratio': 'Onderdonk to adiabatic ratio (same physics, not an independent confirmation)',
   'conductor cross-section': 'Conductor cross-section used',
 };
-const THICKNESS_NAMES: Readonly<Record<string, 'thickness'>> = { 'trace copper thickness': 'thickness', 'Trace copper thickness': 'thickness' };
+const THICKNESS_NAMES: Readonly<Record<string, 'thickness'>> = {
+  'trace copper thickness': 'thickness',
+  'Trace copper thickness': 'thickness',
+  'via barrel plating thickness': 'thickness',
+  'Via barrel plating thickness': 'thickness',
+};
+const RATIO_NAME = 'Onderdonk to adiabatic ratio';
+const RATIO_LABEL = 'Onderdonk to adiabatic ratio (same physics, not an independent confirmation)';
 
 const NEEDS = {
   geometry: 'Choose the conductor geometry (trace, round wire or a cross-section area). It is not assumed.',
-  area: 'Enter the cross-section area, for example 0.07 mm2.',
+  area: 'Enter the cross-section area in mm2 or mil2, for example 0.07 mm2.',
+  viaHole: 'Enter the FINISHED via hole diameter (inside the plating, not the drill), with its unit.',
+  viaPlating: 'Enter the via barrel plating thickness (required, never filled in for you; a fabricator figure is an average, not a minimum).',
   wire: 'Enter the wire diameter, for example 0.5 mm.',
   width: 'Enter the trace width, for example 2 mm.',
   thickness: 'Enter the copper thickness (a finished length such as 35 um, or a foil weight such as 1 oz/ft2). It is never filled in for you.',
   basis: 'Choose the thickness basis (finished, measured or nominal). There is no default: thinner finished copper fuses sooner.',
+  endTemp: 'Enter the end temperature from your laminate datasheet, or leave it blank (optional).',
   initialTemp: 'Enter the initial conductor temperature at the start of the pulse, for example 25 °C. There is no default.',
   mode: 'Choose what you know: the current, the pulse time, or the action integral I²t.',
   current: 'Enter the pulse current, for example 10 A.',
@@ -386,13 +438,16 @@ export type FusingView =
       readonly preece?: PreeceView;
       /** How a foil weight was converted (only when the thickness was typed as a weight). */
       readonly thicknessNote?: string;
+      /** Set when the time to melt is over the 10 s threshold: the headline is replaced and the number is kept here, labelled. */
+      readonly suppressedHeadline?: { readonly label: string; readonly text: string };
+      /** Warnings shown directly under the headline (the 1 s warning, between 1 s and 10 s), removed from the list. */
+      readonly headlineWarnings: readonly WarningView[];
       /** Validity checks that failed, and checks that could not be made (a paywalled standard): never the same count. */
       readonly failedChecks: number;
       readonly notCheckedCount: number;
     };
 
 const K_STEP = /^K = /;
-const IPC_CHECK = /^IPC scope for fusing/;
 const PREECE = /^Preece/;
 
 /**
@@ -414,6 +469,11 @@ export function computeView(s: FusingState): FusingView {
       problems.push(`${FIELD_LABEL[k]}: ${v.message}`);
       fieldErrors[k] = v.message;
     }
+  }
+  const endText = s.endTemp.trim() === '' ? undefined : parseField(s.endTemp, fieldDim('endTemp'), echoFor(s, 'endTemp'));
+  if (endText?.status === 'error') {
+    problems.push(`${FIELD_LABEL.endTemp}: ${endText.message}`);
+    fieldErrors.endTemp = endText.message;
   }
   const thk: Thickness = s.geometry === 'trace' ? parseThickness(s) : { kind: 'empty' };
   if (thk.kind === 'error') {
@@ -446,6 +506,8 @@ export function computeView(s: FusingState): FusingView {
     ...(s.geometry === 'area' ? { area: qty('area') } : {}),
     ...(s.geometry === 'wire' ? { wireDiameter: qty('wire') } : {}),
     ...(s.geometry === 'trace' ? { traceWidth: qty('width'), traceThickness, thicknessBasis: basis } : {}),
+    ...(s.geometry === 'via' ? { viaHoleDiameter: qty('viaHole'), viaPlatingThickness: qty('viaPlating') } : {}),
+    ...(endText?.status === 'ok' ? { endTemperature: endText.value } : {}),
     ...(s.mode === 'current' ? { current: qty('current') } : {}),
     ...(s.mode === 'time' ? { pulseTime: qty('time') } : {}),
     ...(s.mode === 'i2t' ? { actionIntegral: qty('i2t') } : {}),
@@ -468,15 +530,22 @@ export function computeView(s: FusingState): FusingView {
   // The K step has a local dimension (A²·s/m⁴) with no display unit: it is printed from its SI value and the local unit (P4-7).
   const kIdx = raw.steps.findIndex((x) => K_STEP.test(x.label));
   const kStep = kIdx >= 0 ? raw.steps[kIdx] : undefined;
+  // Over 10 s the headline means nothing (PCB M-5); between 1 s and 10 s the 1 s warning goes directly under the headline.
+  const over10 = raw.warnings.some((w) => w.code === 'OVER_10S');
+  const over1Only = !over10 && raw.warnings.some((w) => w.code === 'OVER_1S');
+  const headlineWarnings: WarningView[] = over1Only ? orderWarnings(raw.warnings.filter((w) => w.code === 'OVER_1S')) : [];
   const forView: CalcResult = {
     ...raw,
     steps: raw.steps.filter((x) => !K_STEP.test(x.label)),
     // The pinned warnings keep the order given here: the critical 10 s warning comes before the 1 s one.
     warnings: [...raw.warnings.filter((w) => w.code === 'OVER_10S'), ...raw.warnings.filter((w) => w.code !== 'OVER_10S')].filter(
-      (w) => w.code === undefined || !(CALLOUT_CODES as readonly string[]).includes(w.code),
+      (w) => (w.code === undefined || !(CALLOUT_CODES as readonly string[]).includes(w.code)) && !(over1Only && w.code === 'OVER_1S'),
     ),
-    results: raw.results.filter((r) => !PREECE.test(r.name)),
+    results: raw.results.filter((r) => !PREECE.test(r.name) && r.name !== RATIO_NAME),
   };
+  // The ratio compares two formulas (it is not a prediction), so it prints with the analytical class (4 figures) to show 1.016, not 1.
+  const ratio = raw.results.find((r) => r.name === RATIO_NAME);
+  const ratioRows: ResultRowView[] = ratio === undefined ? [] : [{ label: RATIO_LABEL, text: formatResult(ratio, { accuracyClass: 'analytical' }) }];
   const prefs = headlinePrefs(s.units);
   const cp = copperSpecificHeat(s.specificHeat === '' ? DEFAULT_COPPER_SPECIFIC_HEAT : s.specificHeat);
   const extra: ProvenanceRow[] = [
@@ -503,14 +572,19 @@ export function computeView(s: FusingState): FusingView {
     lengthRoleByName: THICKNESS_NAMES,
     labels: RESULT_LABELS,
     extraProvenance: extra,
-    pinWarningCodes: ['OVER_10S', 'OVER_1S', 'THICKNESS_NOMINAL', 'NO_DURATION'],
-    notCheckedChecks: raw.validityChecks.filter((c) => IPC_CHECK.test(c.name)).map((c) => c.name),
+    pinWarningCodes: ['OVER_10S', 'OVER_1S', 'THICKNESS_NOMINAL', 'SUB_MS_PULSE', 'BOARD_DAMAGE_BELOW_MELTING', 'NO_DURATION'],
+    extraRows: ratioRows,
+    notCheckedChecks: raw.validityChecks.filter((c) => c.notChecked === true).map((c) => c.name),
   });
   const steps = [...result.details.steps];
   if (kStep !== undefined) {
     steps.splice(kIdx, 0, { label: kStep.label, expr: kStep.expr, text: `${kStep.value.si.toExponential(4)} A²·s/m⁴` });
   }
-  const withK: ResultView = { ...result, details: { ...result.details, steps } };
+  const withSteps: ResultView = { ...result, details: { ...result.details, steps } };
+  const suppressed = over10 ? { label: 'Numeric detail, not meaningful for this model (the time or pulse is over 10 s)', text: `${result.headline.label}: ${result.headline.text}` } : undefined;
+  const withK: ResultView = over10
+    ? { ...withSteps, headline: { label: 'Result', text: NOT_MEANINGFUL_TEXT, meaning: 'No number is offered as the answer. The numeric detail is kept below, labelled.' } }
+    : withSteps;
 
   const preeceRes = raw.results.find((r) => PREECE.test(r.name));
   const preeceWarn = raw.warnings.find((w) => w.code === 'PREECE_HISTORICAL');
@@ -535,6 +609,8 @@ export function computeView(s: FusingState): FusingView {
     ledgerRows,
     failedChecks: failed,
     notCheckedCount: notChecked,
+    headlineWarnings,
+    ...(suppressed !== undefined ? { suppressedHeadline: suppressed } : {}),
     ...(preece !== undefined ? { preece } : {}),
     ...(thk.kind === 'weight' ? { thicknessNote: thk.note } : {}),
   };
@@ -544,6 +620,7 @@ export function computeView(s: FusingState): FusingView {
 export function liveSummary(v: FusingView): string {
   switch (v.status) {
     case 'ok':
+      if (v.suppressedHeadline !== undefined) return `No meaningful result. ${NOT_MEANINGFUL_TEXT}. This is an estimate, not a fuse rating.`;
       return `Result: ${v.result.headline.label} ${v.result.headline.text}. This is an estimate, not a fuse rating. Confidence ${v.result.confidence.level}.`;
     case 'error':
       return `No result. ${v.problems.join(' ')}`;

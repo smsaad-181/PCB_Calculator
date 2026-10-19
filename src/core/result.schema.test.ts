@@ -506,6 +506,39 @@ describe('assertCalcResult A1: a failed validity check forces confidence low', (
   });
 });
 
+describe('assertCalcResult A1b: a notChecked item is not a failure', () => {
+  const nc = { name: 'IPC scope (paywalled)', ok: false, detail: 'not read', notChecked: true };
+  it('a notChecked item alone does not force confidence low', () => {
+    const r = withConf({ level: 'medium', reasons: ['r'], score: 1 }, (x) => {
+      x.validityChecks = [nc];
+    });
+    expect(assertCalcResult(r).ok).toBe(true);
+    const h = withConf({ level: 'high', reasons: [], score: 0 }, (x) => {
+      x.validityChecks = [nc];
+    });
+    expect(assertCalcResult(h).ok).toBe(true);
+  });
+  it('the level must still match the score when only a notChecked item is present', () => {
+    const r = withConf({ level: 'high', reasons: ['r'], score: 4 }, (x) => {
+      x.validityChecks = [nc];
+    });
+    expect(joined(errorsOf(r))).toContain('does not match score');
+  });
+  it('a real failure next to a notChecked item still forces low', () => {
+    const r = withConf({ level: 'medium', reasons: ['r'], score: 1 }, (x) => {
+      x.validityChecks = [nc, { name: 'b', ok: false, detail: 'bad' }];
+    });
+    expect(joined(errorsOf(r))).toContain('validity check');
+    expect(joined(errorsOf(r))).not.toContain('IPC scope');
+  });
+  it('notChecked: false is an ordinary failed check', () => {
+    const r = withConf({ level: 'medium', reasons: ['r'], score: 1 }, (x) => {
+      x.validityChecks = [{ name: 'b', ok: false, detail: 'bad', notChecked: false }];
+    });
+    expect(joined(errorsOf(r))).toContain('validity check');
+  });
+});
+
 describe('assertCalcResult A2: level must match the score', () => {
   it.each([
     [0, 'high', []],

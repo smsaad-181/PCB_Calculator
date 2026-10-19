@@ -21,7 +21,7 @@ import type { ThicknessBasis } from './guards';
 import { meta } from './meta';
 
 export interface Inputs {
-  /** Conductor cross-section. Give exactly one of area, a trace (traceWidth + traceThickness + thicknessBasis) or wireDiameter. */
+  /** Conductor cross-section. Give exactly one of area, a trace (traceWidth + traceThickness + thicknessBasis), wireDiameter, or a via barrel (viaHoleDiameter + viaPlatingThickness). */
   area?: Quantity | undefined;
   traceWidth?: Quantity | undefined;
   /** FINISHED copper thickness of the trace (not an assumed foil weight). */
@@ -29,6 +29,12 @@ export interface Inputs {
   /** Where the thickness came from; required with a trace, no default. 'nominal' means converted from a foil weight. */
   thicknessBasis?: ThicknessBasis | undefined;
   wireDiameter?: Quantity | undefined;
+  /** Via barrel: FINISHED hole diameter (inside the plating, not the drill); area = pi t (d + t). */
+  viaHoleDiameter?: Quantity | undefined;
+  /** Via barrel plating thickness: required with a via barrel, never pre-filled (a fabricator average is not a minimum). */
+  viaPlatingThickness?: Quantity | undefined;
+  /** Optional user END temperature (absolute), above the initial temperature and at most the melting point. No default; no laminate value is held here. */
+  endTemperature?: Quantity | undefined;
   /** Conductor temperature at the START of the pulse (absolute): required, no default. */
   initialTemperature: Quantity;
   /** Give exactly one of current (solves time), pulseTime (solves current), actionIntegral (I²t of a non-rectangular pulse). */
@@ -63,7 +69,18 @@ const PREECE_TEXT =
 const NO_DURATION_TEXT =
   'No pulse duration was given (action integral mode), so the 1 s and 10 s time warnings cannot be checked. The adiabatic model is only meaningful for short pulses; check the duration of your pulse.';
 const NOMINAL_TEXT =
-  'The copper thickness is nominal (converted from a foil weight), not finished copper. Finished copper differs from nominal (secondhand IPC-6012 minimums, ledger S-009, and the foil weight convention, ledger S-003, CONFLICT); thinner finished copper fuses sooner, so the time shown may be too long.';
+  'The copper thickness is nominal (converted from a foil weight), not finished copper. Finished copper differs from nominal (secondhand IPC-6012 minimums, ledger S-009, and the foil weight convention, ledger S-003, CONFLICT); finished copper can be thinner (inner layers) or thicker (outer layers after plating) than nominal; where it is thinner the trace fuses sooner, so the time shown may be too long.';
+const WEAKEST_TEXT =
+  'The smallest cross-section in the current path usually fuses first: via barrels, neck-downs, pad entries and connector or pour necks in series. Check each one; this result covers only the one cross-section you entered.';
+const BOARD_DAMAGE_TEXT =
+  'Board damage (laminate decomposition, pad lift) occurs far below the copper melting point, so the time to melt is not a time to board damage. Enter an end temperature from your laminate datasheet to see the time, current and I²t to reach it; no laminate value is built in.';
+const BOARD_DAMAGE_USER_TEXT =
+  'Board damage (laminate decomposition, pad lift) occurs far below the copper melting point. Your end temperature is your own value, not checked or verified here: take it from your laminate datasheet.';
+const NOT_MARGIN_TEXT = 'Not a safety margin: board damage occurs far below the copper melting point.';
+const SUB_MS_TEXT =
+  'The pulse is under 1 ms: the adiabatic assumption, uniform current density (skin effect) and negligible inductance are unreliable, and magnetic forces and vaporisation are not modelled. The 1 ms threshold is a product choice, not a sourced limit.';
+const VIA_TEXT =
+  'The plating thickness is your value: fabricator figures are averages, not minimums (ledger S-015, S-019m), so the thinnest spot of the barrel fuses first.';
 const OVER_1S_TEXT =
   'The time is beyond 1 s, past the 1.0 to 1.5 s range where the authors report Onderdonk applies to boards (ledger S-042e). The 1 s threshold is one of the product choices, not sourced limits, behind these warnings.';
 const OVER_10S_TEXT =
@@ -71,6 +88,8 @@ const OVER_10S_TEXT =
 
 const REL_TOL = 1e-9;
 const STATUS = dataStatusForLedgerIds([...meta.ledgerIds]);
+/** S-009 only for a nominal thickness basis; S-015 and S-019m only for a via barrel (each is cited only then). */
+const idsFor = (nominal: boolean, via: boolean): string[] => meta.ledgerIds.filter((id) => (nominal || id !== 'S-009') && (via || (id !== 'S-015' && id !== 'S-019m')));
 
 /** Thrown for a value outside the representable or modelled range; mapped to OUT_OF_DOMAIN by compute. */
 class RangeFailure extends Error {}
@@ -99,6 +118,9 @@ function build(raw: unknown): CalcOutcome {
   const kk = positive((COPPER_DENSITY_KG_M3 * c.valueJPerKgK) / (COPPER_RESISTIVITY_20C * COPPER_ALPHA_20C), 'Constant K');
   const lnTerm = positive(Math.log((tmC + beta20) / (taC + beta20)), 'Logarithm term');
   const i2t = positive(A * A * kk * lnTerm, 'Action integral to the melting point');
+  // Optional user end temperature: the same equation with Te in place of Tm (S-042a).
+  const teC = inp.endTemperature !== undefined ? toUnit(inp.endTemperature, 'degC') : undefined;
+  const i2tE = teC !== undefined ? positive(A * A * kk * Math.log((teC + beta20) / (taC + beta20)), 'Action integral to the end temperature') : undefined;
 
   // Onderdonk (S-042), in circular mils; log10 and 234 + Ta as printed.
   const aCmil = positive(A / CIRCULAR_MIL_M2, 'Area in circular mils');
@@ -115,28 +137,37 @@ function build(raw: unknown): CalcOutcome {
   let timeO: number | undefined;
   let curO: number | undefined;
   let fraction: number | undefined;
+  let timeE: number | undefined;
+  let curE: number | undefined;
+  let fractionE: number | undefined;
   let pulseSeconds: number | undefined;
   if (inp.current !== undefined) {
     const i2 = inp.current.si * inp.current.si;
     timeS = positive(i2t / i2, 'Time to the melting point');
     timeO = positive(i2tO / i2, 'Onderdonk time');
     pulseSeconds = timeS;
+    if (i2tE !== undefined) timeE = positive(i2tE / i2, 'Time to the end temperature');
   } else if (inp.pulseTime !== undefined) {
     curA = positive(Math.sqrt(i2t / inp.pulseTime.si), 'Current to the melting point');
     curO = positive(Math.sqrt(i2tO / inp.pulseTime.si), 'Onderdonk current');
     pulseSeconds = inp.pulseTime.si;
+    if (i2tE !== undefined) curE = positive(Math.sqrt(i2tE / inp.pulseTime.si), 'Current to the end temperature');
   } else if (inp.actionIntegral !== undefined) {
     fraction = positive(inp.actionIntegral.si / i2t, 'Fraction of the melting action integral');
+    if (i2tE !== undefined) fractionE = positive(inp.actionIntegral.si / i2tE, 'Fraction of the end-temperature action integral');
   }
 
   const inputs: CalcInput[] = [];
   if (inp.area !== undefined) inputs.push({ name: 'conductor cross-section (given)', value: inp.area, source: 'user' });
   if (inp.wireDiameter !== undefined) inputs.push({ name: 'wire diameter', value: inp.wireDiameter, source: 'user' });
+  if (inp.viaHoleDiameter !== undefined) inputs.push({ name: 'via finished hole diameter', value: inp.viaHoleDiameter, source: 'user' });
+  if (inp.viaPlatingThickness !== undefined) inputs.push({ name: 'via barrel plating thickness', value: inp.viaPlatingThickness, source: 'user' });
   if (inp.traceWidth !== undefined) inputs.push({ name: 'trace width', value: inp.traceWidth, source: 'user' });
   if (inp.traceThickness !== undefined) {
     inputs.push({ name: 'trace copper thickness', value: inp.traceThickness, source: 'user', sourceDetail: `thickness basis: ${inp.thicknessBasis ?? ''}` });
   }
   inputs.push({ name: 'initial conductor temperature', value: inp.initialTemperature, source: 'user' });
+  if (inp.endTemperature !== undefined) inputs.push({ name: 'end temperature (your value, not checked)', value: inp.endTemperature, source: 'user' });
   if (inp.current !== undefined) inputs.push({ name: 'current', value: inp.current, source: 'user' });
   if (inp.pulseTime !== undefined) inputs.push({ name: 'pulse time', value: inp.pulseTime, source: 'user' });
   if (inp.actionIntegral !== undefined) inputs.push({ name: 'action integral I²t', value: inp.actionIntegral, source: 'user' });
@@ -144,7 +175,7 @@ function build(raw: unknown): CalcOutcome {
   const area = q(A, DIM.AREA);
   const tmK = fromUnit(tmC, 'degC');
   const steps: CalcResult['steps'] = [
-    { label: 'Conductor cross-section', expr: inp.geometry === 'trace' ? 'A = width x finished thickness' : inp.geometry === 'wire' ? 'A = pi x d^2 / 4' : 'A as given', value: area, bound: 'nominal' },
+    { label: 'Conductor cross-section', expr: inp.geometry === 'trace' ? 'A = width x finished thickness' : inp.geometry === 'wire' ? 'A = pi x d^2 / 4' : inp.geometry === 'via' ? 'A = pi x t x (d + t), d = finished hole, t = barrel plating' : 'A as given', value: area, bound: 'nominal' },
     { label: 'Initial conductor temperature Ta', expr: 'user value', value: inp.initialTemperature },
     { label: 'Melting point Tm', expr: 'copper freezing point, ITS-90 (S-042c), no override', value: tmK },
     { label: 'beta20 = 1/alpha20 - 20 °C', expr: 'beta20 = 1 / alpha20 - 20 °C (S-004, S-042a)', value: q(beta20, DIM.TEMPERATURE_DIFFERENCE) },
@@ -152,6 +183,7 @@ function build(raw: unknown): CalcOutcome {
     { label: 'Logarithm term', expr: 'ln[(Tm + beta20) / (Ta + beta20)]', value: q(lnTerm, DIM.DIMENSIONLESS) },
     { label: 'Adiabatic action integral to the melting point', expr: 'I2t = A^2 x K x ln[(Tm + beta20) / (Ta + beta20)]', value: q(i2t, DIM.ACTION_INTEGRAL), bound: 'nominal' },
   ];
+  if (i2tE !== undefined) steps.push({ label: 'Adiabatic action integral to your end temperature', expr: 'I2t = A^2 x K x ln[(Te + beta20) / (Ta + beta20)], Te = your end temperature (S-042a)', value: q(i2tE, DIM.ACTION_INTEGRAL), bound: 'nominal' });
   if (timeS !== undefined) steps.push({ label: 'Adiabatic time to the melting point', expr: 't = I2t / I^2', value: q(timeS, DIM.TIME), bound: 'nominal' });
   if (curA !== undefined) steps.push({ label: 'Adiabatic current to the melting point', expr: 'I = sqrt(I2t / t)', value: q(curA, DIM.CURRENT), bound: 'nominal' });
   steps.push({ label: 'Area in circular mils', expr: 'A_cmil = A / ((pi/4) x (25.4e-6 m)^2) (S-006 arithmetic)', value: q(aCmil, DIM.DIMENSIONLESS) });
@@ -166,7 +198,13 @@ function build(raw: unknown): CalcOutcome {
   if (timeS !== undefined) add('adiabatic time to reach the melting point', q(timeS, DIM.TIME), 'primary');
   if (curA !== undefined) add('adiabatic current to reach the melting point in the pulse time', q(curA, DIM.CURRENT), 'primary');
   add('adiabatic action integral I²t to reach the melting point', q(i2t, DIM.ACTION_INTEGRAL), fraction !== undefined ? 'primary' : 'secondary');
-  if (fraction !== undefined) add('your I²t as a fraction of the I²t to reach the melting point', q(fraction, DIM.DIMENSIONLESS), 'secondary');
+  if (fraction !== undefined) {
+    results.push({ name: 'your I²t as a fraction of the I²t to reach the melting point (not a safety margin)', value: q(fraction, DIM.DIMENSIONLESS), role: 'secondary', bound: 'nominal', note: NOT_MARGIN_TEXT });
+  }
+  if (timeE !== undefined) add('adiabatic time to reach your end temperature', q(timeE, DIM.TIME), 'secondary');
+  if (curE !== undefined) add('adiabatic current to reach your end temperature in the pulse time', q(curE, DIM.CURRENT), 'secondary');
+  if (i2tE !== undefined) add('adiabatic action integral I²t to reach your end temperature', q(i2tE, DIM.ACTION_INTEGRAL), 'secondary');
+  if (fractionE !== undefined) add('your I²t as a fraction of the I²t to reach your end temperature', q(fractionE, DIM.DIMENSIONLESS), 'secondary');
   if (timeO !== undefined) add('Onderdonk time to reach the melting point (secondary check)', q(timeO, DIM.TIME), 'secondary');
   if (curO !== undefined) add('Onderdonk current to reach the melting point in the pulse time (secondary check)', q(curO, DIM.CURRENT), 'secondary');
   add('Onderdonk action integral I²t (secondary check)', q(i2tO, DIM.ACTION_INTEGRAL), 'secondary');
@@ -198,6 +236,17 @@ function build(raw: unknown): CalcOutcome {
     });
     if (!thOk) outOfRange.push({ name: 'copper thickness', value: `${num(th * 1e6)} um`, bound: `${String(lo * 1e6)} to ${String(hi * 1e6)} um` });
   }
+  if (inp.viaHoleDiameter !== undefined && inp.viaPlatingThickness !== undefined) {
+    const dv = inp.viaHoleDiameter.si;
+    const tv = inp.viaPlatingThickness.si;
+    const okV = tv < dv;
+    validityChecks.push({
+      name: 'via plating thickness below the finished hole diameter',
+      ok: okV,
+      detail: `Plausibility check, not a standard. Plating ${num(tv * 1e6)} um, finished hole ${num(dv * 1e6)} um; check the units and that the hole is the finished diameter.`,
+    });
+    if (!okV) outOfRange.push({ name: 'via plating thickness', value: `${num(tv * 1e6)} um`, bound: `below the finished hole diameter ${num(dv * 1e6)} um` });
+  }
   if (pulseSeconds !== undefined) {
     validityChecks.push({
       name: `pulse time at most ${String(meta.timeWarnings.overSeconds)} s (product choice)`,
@@ -208,12 +257,15 @@ function build(raw: unknown): CalcOutcome {
   validityChecks.push({
     name: 'IPC scope for fusing (PAYWALLED, not checked)',
     ok: false,
+    notChecked: true,
     detail: 'The IPC documents were not read for any statement on fusing or short-time currents (ledger S-042f, PAYWALLED-USER-MUST-VERIFY). Not checked, so not passed.',
   });
 
   const warnings: CalcWarning[] = [
     { severity: 'warning', message: NOT_RATING_TEXT, code: 'NOT_A_RATING' },
     { severity: 'warning', message: PCB_TEXT, code: 'PCB_ADIABATIC_CAVEAT' },
+    { severity: 'warning', message: inp.endTemperature !== undefined ? BOARD_DAMAGE_USER_TEXT : BOARD_DAMAGE_TEXT, code: 'BOARD_DAMAGE_BELOW_MELTING' },
+    { severity: 'caution', message: WEAKEST_TEXT, code: 'WEAKEST_LINK' },
     { severity: 'caution', message: REACH_TEXT, code: 'REACH_NOT_OPEN' },
     { severity: 'caution', message: CP_CONFLICT_TEXT, code: 'SPECIFIC_HEAT_CONFLICT' },
     { severity: 'info', message: ERRS_SHORT_TEXT, code: 'SPECIFIC_HEAT_ERRS_SHORT' },
@@ -223,20 +275,27 @@ function build(raw: unknown): CalcOutcome {
     { severity: 'info', message: PREECE_TEXT, code: 'PREECE_HISTORICAL' },
   ];
   if (inp.thicknessBasis === 'nominal') warnings.push({ severity: 'warning', message: NOMINAL_TEXT, code: 'THICKNESS_NOMINAL' });
+  if (inp.geometry === 'via') warnings.push({ severity: 'caution', message: VIA_TEXT, code: 'VIA_BARREL_PLATING' });
+  if (pulseSeconds !== undefined && pulseSeconds < meta.timeWarnings.subMsSeconds) warnings.push({ severity: 'warning', message: SUB_MS_TEXT, code: 'SUB_MS_PULSE' });
   if (pulseSeconds === undefined) warnings.push({ severity: 'caution', message: NO_DURATION_TEXT, code: 'NO_DURATION' });
   if (pulseSeconds !== undefined && pulseSeconds > meta.timeWarnings.overSeconds) warnings.push({ severity: 'warning', message: OVER_1S_TEXT, code: 'OVER_1S' });
   if (pulseSeconds !== undefined && pulseSeconds > meta.timeWarnings.strongSeconds) warnings.push({ severity: 'critical', message: OVER_10S_TEXT, code: 'OVER_10S' });
 
   const assumptions: string[] = [
     'Adiabatic: all the Joule heat stays in the conductor; no loss to the board, air or connected copper (S-042a, derived). The result is the time to REACH the melting point, heat of fusion excluded.',
-    `Copper constants: density ${String(COPPER_DENSITY_KG_M3)} kg/m3 (S-003d), resistivity 1/58e6 ohm m and temperature coefficient 0.00393 per K (S-004), melting point ${String(tmC)} °C (S-042c, pure copper; no override, plated or alloyed copper may differ).`,
+    `Copper constants: density ${String(COPPER_DENSITY_KG_M3)} kg/m3 (S-003d, the IACS wire-table convention; a pure-copper density reference is about 0.5 % different, higher, and is not used: the time scales with the density), resistivity 1/58e6 ohm m and temperature coefficient 0.00393 per K (S-004), melting point ${String(tmC)} °C (S-042c, pure copper; no override, plated or alloyed copper may differ).`,
     `Specific heat ${String(c.valueJPerKgK)} J/(kg·K) (${c.label}; ledger S-042d, status ${c.status})${inp.specificHeatDefaulted ? ': a product DEFAULT, not chosen by the user; the sourced values disagree and are not averaged' : ': chosen by the user from the sourced values'}. Specific heat and density are taken as constant.`,
     'The initial temperature has no default and is the conductor temperature at the start of the pulse.',
     inp.geometry === 'trace'
       ? `The trace area is width x finished copper thickness; thickness basis: ${inp.thicknessBasis ?? ''}.`
       : inp.geometry === 'wire'
         ? 'The wire area is pi d^2/4 of the solid round conductor.'
-        : 'The cross-section is the area as given.',
+        : inp.geometry === 'via'
+          ? 'The via barrel area is pi t (d + t): plating annulus around the FINISHED hole d, with your plating thickness t (an average, not a minimum). The hole is empty (no fill or cap).'
+          : 'The cross-section is the area as given.',
+    inp.endTemperature !== undefined
+      ? 'The end temperature is your value (not checked); the same adiabatic equation is used with it in place of the melting point.'
+      : 'No end temperature was entered (there is no default); only the melting point is used.',
     'Rectangular pulse of constant current for the time or current modes; for any other pulse give its action integral I²t = the integral of i² dt (not I_rms times an arbitrary time).',
     'Onderdonk (S-042, UNVERIFIED, origin unknown) uses 33 and 234 as printed with log10; it is a secondary check on the same physics, not an independent confirmation. Preece (S-042b) is a historical reference with no time term.',
   ];
@@ -251,7 +310,7 @@ function build(raw: unknown): CalcOutcome {
 
   const result: CalcResult = {
     method: meta.method,
-    reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds: [...meta.reference.ledgerIds] },
+    reference: { standard: meta.reference.standard, edition: meta.reference.edition, ledgerIds: idsFor(inp.thicknessBasis === 'nominal', inp.geometry === 'via') },
     formula: meta.formula,
     inputs,
     assumptions,
