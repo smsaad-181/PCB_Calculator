@@ -1,6 +1,6 @@
 // View-model for the microstrip impedance page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/microstrip compute().
-import { compute, type Inputs } from '../../core/calculators/microstrip/calc';
+import { VARIANT_A_DIFF, VARIANT_A_EE, VARIANT_A_Z0, compute, type Inputs } from '../../core/calculators/microstrip/calc';
 import { THICKNESS_MODELS, meta, type ThicknessModel } from '../../core/calculators/microstrip/meta';
 import type { HashState } from '../../state/hash';
 import { EXT_DEFAULTS, extFormOf, type ExtForm, tolEr, tolHeight, tolThickness, tolWidth, type ExtState } from './impedance-ext.vm';
@@ -164,6 +164,9 @@ const SPEC: ImpedanceSpec<MicrostripState> = {
   accuracyClass: meta.accuracyClass,
   thicknessNames: { height: 'thickness', thickness: 'thickness' },
   netClass: true,
+  sizeInput: { name: 'height', label: 'h' },
+  epsHandoff: true,
+  conflict: { names: [VARIANT_A_Z0, VARIANT_A_EE, VARIANT_A_DIFF], diff: [VARIANT_A_DIFF] },
   ext: {
     tol: [tolWidth('Trace width w', 'width'), tolHeight('height', 'Dielectric height h', 'height'), tolEr(), tolThickness('Trace copper thickness t', 'thickness')],
     thicknessUsed: (s) => s['thicknessModel'] !== 'none',

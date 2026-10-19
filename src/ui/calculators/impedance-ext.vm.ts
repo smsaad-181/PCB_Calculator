@@ -2,6 +2,7 @@
 // Pure: no DOM, no engineering math. It parses what the user typed, builds the extra core inputs (tolerances, fab profile and
 // scope, loss tangent and its source, resistivity) and turns the core result into display strings. The envelope, the
 // sensitivities and the loss numbers all come from the core result (impedance-envelope.ts, loss-shared.ts through the calculators).
+import { LOSS_LABEL } from '../../core/calculators/loss-shared';
 import { DIM, q, type Quantity } from '../../core/units';
 import { echoPrefs } from '../components/prefs';
 import { MAX_FIELD_CHARS, parseField, type FieldView } from '../components/view';
@@ -223,7 +224,7 @@ export const LOSS_TANGENT_HELP =
 export const LOSS_SOURCE_HELP = 'Required with the loss tangent. Say where it came from (product, revision, test frequency). It is echoed in the result inputs and is not checked.';
 export const RESISTIVITY_HELP = 'Optional. Leave empty for copper at 20 °C (ledger S-004, shown as a default in the result); enter your own, for example from a plating datasheet, to change it. Only used with a loss tangent.';
 export const LOSS_INTRO =
-  'Optional. A rough attenuation estimate (dielectric, and conductor loss where a form is recorded): approximate estimate, lower bound for rough copper, no roughness, no dispersion. It uses the Frequency (required for loss) and the Line length fields above.';
+  `Optional. A rough attenuation estimate (dielectric, and conductor loss where a form is recorded): ${LOSS_LABEL}. It uses the Frequency (required for loss) and the Line length fields above.`;
 
 /** A plain number (tan delta, dimensionless). Input validation only; the core refuses negative values and values of 1 or more. */
 export function parseLossTangent(text: string): FieldView {
@@ -307,14 +308,18 @@ export function collectExt(ext: ExtSpec, s: Record<string, string>, active: read
   problems.push(...tolProblems(col.errors, fields));
   if (col.tolerances !== undefined) inputs['tolerances'] = col.tolerances;
 
-  // fab profile scope, only when a width or gap tolerance is taken from the profile
+  // fab profile: needed for a width or gap tolerance taken from it (then the scope is required) and, when a profile is chosen, for the
+  // minimum width/spacing note (then an incomplete scope is not an error: the core says the minimum was not checked)
   const profileWanted = col.tolerances !== undefined && Object.values(col.tolerances).some((v) => v === 'profile');
-  if (profileWanted) {
+  const profileChosen = canTakeProfile(ext) && s['profile'] === 'bundled';
+  if (profileWanted || profileChosen) {
     const scope: Record<string, unknown> = {};
-    if (!LAYER_COUNT_VALUES.includes(s['layerCount'] ?? '')) needs.push('Choose the layer count for the fab-profile tolerance lookup (the profile entry is used only for the exact scope).');
-    else scope['layerCount'] = s['layerCount'];
-    if (!LAYER_SIDE_VALUES.includes(s['layerSide'] ?? '')) needs.push('Choose the layer side (inner or outer) for the fab-profile tolerance lookup.');
-    else scope['layerSide'] = s['layerSide'];
+    if (!LAYER_COUNT_VALUES.includes(s['layerCount'] ?? '')) {
+      if (profileWanted) needs.push('Choose the layer count for the fab-profile tolerance lookup (the profile entry is used only for the exact scope).');
+    } else scope['layerCount'] = s['layerCount'];
+    if (!LAYER_SIDE_VALUES.includes(s['layerSide'] ?? '')) {
+      if (profileWanted) needs.push('Choose the layer side (inner or outer) for the fab-profile tolerance lookup.');
+    } else scope['layerSide'] = s['layerSide'];
     if (entered(s, 'copperWeight')) {
       const w = parseCopperWeight(s['copperWeight'] ?? '');
       if (w.status === 'error') {
@@ -323,9 +328,11 @@ export function collectExt(ext: ExtSpec, s: Record<string, string>, active: read
       } else if (w.status === 'ok') scope['copperWeight'] = w.value;
     }
     const p = bundledProfile();
-    if (p === null) problems.push('The bundled fab profile could not be read: no profile tolerance can be applied.');
-    else if (o.today === undefined || o.today === '') problems.push("Today's date is not available, so the fab profile age cannot be checked: no profile tolerance can be applied.");
-    else {
+    if (p === null) {
+      if (profileWanted) problems.push('The bundled fab profile could not be read: no profile tolerance can be applied.');
+    } else if (o.today === undefined || o.today === '') {
+      if (profileWanted) problems.push("Today's date is not available, so the fab profile age cannot be checked: no profile tolerance can be applied.");
+    } else {
       inputs['fabProfile'] = p;
       inputs['today'] = o.today;
       inputs['profileScope'] = scope;
@@ -400,15 +407,17 @@ export interface ExtForm {
   readonly profile: ProfileChoice;
   readonly banner: ProfileBanner | undefined;
   readonly flags: readonly ProfileFlag[];
-  /** True when the section holds anything (the page opens it then). */
+  /** True when the tolerance section holds anything (the page opens it then). */
   readonly hasTolerance: boolean;
+  /** True when a fab profile is chosen or none (the fab profile section opens then). */
+  readonly hasProfile: boolean;
   readonly hasLoss: boolean;
 }
 
 export const PROFILE_LOCK_REASON = 'Taken from the fab profile for the scope below, if it publishes it.';
-export const PROFILE_QUESTION = 'Fab profile for a width or gap tolerance (optional)';
+export const PROFILE_QUESTION = 'Fab profile (optional)';
 export const PROFILE_HELP =
-  'Nothing is chosen for you. A profile supplies a tolerance only for the exact layer count, layer side and copper weight you give; if it publishes none, the result says so and nothing is assumed. None means only your own values are used.';
+  'Nothing is chosen for you. A profile is used for two things: a note comparing the width and the spacing or gap with its published minimum, and (if you ask for it below) a width or gap tolerance. Both apply only to the exact layer count, layer side and copper weight you give; if the profile publishes nothing for that scope, the result says so and nothing is assumed. None means no fab minimum is checked and only your own values are used.';
 
 export function extFormOf(ext: ExtSpec, s: Record<string, string>, active: readonly string[], today: string): ExtForm {
   const fields = tolFieldDefs(ext, s, active);
@@ -422,17 +431,18 @@ export function extFormOf(ext: ExtSpec, s: Record<string, string>, active: reado
   const profile: ProfileChoice = isProfileChoice(s['profile'] ?? '') ? (s['profile'] as ProfileChoice) : '';
   const lockedReason: Record<string, string> = {};
   for (const d of offeredProfileDefs) if (flagOf(s, d)) lockedReason[d.core] = PROFILE_LOCK_REASON;
-  const banner = profile === 'bundled' && offeredProfileDefs.length > 0 ? profileBanner(profile, today) : undefined;
+  const banner = profile === 'bundled' ? profileBanner(profile, today) : undefined;
   return {
     fields,
     tol,
     stateKeyOf,
     lockedReason,
-    offerProfile: offeredProfileDefs.length > 0,
+    offerProfile: canTakeProfile(ext),
     profile,
     banner,
     flags: profile === 'bundled' ? offeredProfileDefs.map((d) => ({ state: d.profile as 'profWidth' | 'profSpacing', core: d.core, label: d.label, checked: flagOf(s, d) })) : [],
-    hasTolerance: ext.tol.some((d) => !isTolEmpty(tolOf(s, d.state))) || (s['profile'] ?? '') !== '',
+    hasTolerance: ext.tol.some((d) => !isTolEmpty(tolOf(s, d.state))),
+    hasProfile: (s['profile'] ?? '') !== '',
     hasLoss: ['lossTangent', 'lossSource', 'resistivity'].some((k) => entered(s, k)),
   };
 }

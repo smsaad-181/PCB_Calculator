@@ -1,7 +1,6 @@
 // Shared view-model for the two coplanar waveguide pages (CPW, CPWG). Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculations are src/core/calculators/{cpw,cpwg} compute(); the per-calculator files
 // (cpw.vm.ts, cpwg.vm.ts) supply only what differs: ids, labels, the core compute and the ledger row of the model.
-import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
 import { thicknessMessage } from '../../core/calculators/cpw-shared';
 import type { AccuracyClass } from '../../core/confidence';
 import type { CalcOutcome } from '../../core/result';
@@ -150,20 +149,18 @@ export function makeCoplanarVm(def: CoplanarKindDef): CoplanarVm {
   const ACTIVE_TAIL: readonly FieldName[] = ['height', 'thickness', 'er', 'erSource', 'geometrySource', 'frequency', 'length', 'mismatch'];
 
   const modelRow = (r: ResultView, label: string): string => r.details.inputs.find((i) => i.label === label)?.value ?? '';
-  const netClassText = (r: ResultView, s: Record<string, string>): string | undefined => {
+  const netClassText = (r: ResultView, s: Record<string, string>): readonly string[] | undefined => {
     const mode = s['solveFor'];
     if (mode !== 'gap' && mode !== 'width') return undefined;
     const width = mode === 'width' ? r.headline.text : modelRow(r, 'Width');
     const gap = mode === 'gap' ? r.headline.text : modelRow(r, 'Gap');
-    const status = r.ledger.entries.filter((e) => e.status !== 'VERIFIED').map((e) => `${e.id} ${e.status}`);
     return [
       'Coplanar waveguide (starting value for a net class)',
       `Strip width: ${width}`,
       `Gap to each coplanar ground (clearance): ${gap}`,
       `Target Z0: ${modelRow(r, 'Target Z0')}`,
-      `Starting value for a net class, not a design rule. ${IMPEDANCE_BANNER}`,
-      `Model status: ${status.join('; ')}. ${VERIFY_LINE}`,
-    ].join('\n');
+      VERIFY_LINE,
+    ];
   };
 
   const SPEC: ImpedanceSpec<CoplanarState> = {
@@ -219,6 +216,8 @@ export function makeCoplanarVm(def: CoplanarKindDef): CoplanarVm {
     pinCodes: ['OUT_OF_RANGE', def.modelWarningCode],
     informational: def.informational,
     netClassText,
+    sizeInput: { name: 'height', label: 'h' },
+    epsHandoff: true,
     ext: { tol: [tolWidth('Centre strip width W', 'width'), tolSpacing('gap', 'Gap s', 'gap'), tolHeight('height', def.height.label, 'height'), tolEr()] },
   };
 

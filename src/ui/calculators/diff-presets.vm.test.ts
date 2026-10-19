@@ -94,9 +94,9 @@ describe('USB 2.0: tolerance is never defaulted', () => {
   });
   it('with a chosen tolerance the band is stated as a text tag', () => {
     const inside = buildPresetView({ ...base, preset: 'usb2-hs-90', tolerance: 'usb2-tol-10', zdiff: z(96) });
-    expect(inside.comparison?.bandTag).toMatch(/^within the stated \+\/-10 % band/);
+    expect(inside.comparison?.bandTag).toMatch(/^nominal model value is within the stated \+\/-10 % band/);
     const outside = buildPresetView({ ...base, preset: 'usb2-hs-90', tolerance: 'usb2-tol-10', zdiff: z(110) });
-    expect(outside.comparison?.bandTag).toMatch(/^outside the stated \+\/-10 % band/);
+    expect(outside.comparison?.bandTag).toMatch(/^nominal model value is outside the stated \+\/-10 % band/);
     expect(outside.comparison?.status).toBe('UNVERIFIED');
   });
   it('a tolerance that does not belong to the preset is ignored with a note, never used', () => {

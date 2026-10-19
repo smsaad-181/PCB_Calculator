@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import {
   KIND_LABEL,
   LAYER_KINDS,
+  MAX_IMPORT_CHARS,
+  NEXT_STEP,
   NOT_IN_LINK,
   STACKUP_INTRO,
   addLayer,
@@ -246,6 +248,7 @@ export function StackupEditor({ kind, storageKey, onUse }: Props) {
             <p>
               <strong>This stackup cannot be used for a {kind} here:</strong> {view.message}
             </p>
+            <p>{NEXT_STEP}</p>
           </div>
         )}
         {view.status === 'ok' && (
@@ -301,7 +304,7 @@ export function StackupEditor({ kind, storageKey, onUse }: Props) {
         <h3 id="stk-import-h">Import</h3>
         <div class="field">
           <label for="stk-import">Paste stackup JSON</label>
-          <textarea id="stk-import" class="netclass-text" rows={6} value={importText} spellcheck={false} onInput={(e) => setImportText((e.currentTarget as HTMLTextAreaElement).value)} aria-describedby="stk-import-help" />
+          <textarea id="stk-import" class="netclass-text" rows={6} maxLength={MAX_IMPORT_CHARS} value={importText} spellcheck={false} onInput={(e) => setImportText((e.currentTarget as HTMLTextAreaElement).value)} aria-describedby="stk-import-help" />
           <p id="stk-import-help" class="help">
             Replaces the layers above. The text is checked by the same rules as typing: unknown fields, missing er or source, and unit slips are refused with the field named.
           </p>

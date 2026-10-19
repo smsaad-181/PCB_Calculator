@@ -1,3 +1,4 @@
+import { shownMessages } from '../test-helpers';
 import { describe, expect, it } from 'vitest';
 import genericSrc from './coplanar.vm.ts?raw';
 import cpwVmSrc from './cpw.vm.ts?raw';
@@ -124,7 +125,7 @@ describe.each(KINDS)('$name', (k) => {
     it('shows every core warning as written, and the model warning first', () => {
       // h = 2 mm keeps the CPW substrate rule satisfied, so the model warning is the only pinned one.
       const v = ok(st({ thickness: '35 um', frequency: '1 GHz', height: '2 mm' }));
-      for (const w of v.raw.warnings) expect(v.result.warnings.some((x) => x.message === w.message), w.code).toBe(true);
+      for (const w of v.raw.warnings) expect(shownMessages(v).includes(w.message), w.code).toBe(true);
       const m = v.raw.warnings.find((w) => w.code === k.code);
       expect(m).toBeDefined();
       expect(v.result.warnings[0]?.message).toBe(m?.message);
@@ -170,7 +171,7 @@ describe.each(KINDS)('$name', (k) => {
       const v = ok(st({ thickness: '35 um' }));
       const w = v.raw.warnings.find((x) => x.code === 'FINITE_THICKNESS_NOT_MODELLED');
       expect(w?.message).toMatch(/NOT used/);
-      expect(v.result.warnings.some((x) => x.message === w?.message)).toBe(true);
+      expect(shownMessages(v).includes(w?.message ?? '')).toBe(true);
       expect(val(v, 'characteristic impedance Z0')).toBeCloseTo(k.z0Er1, 3);
     });
   });
@@ -313,7 +314,7 @@ describe('cpwg specifics', () => {
   it('shows the paywalled wording and the stitching caution', () => {
     const v = cpwg.computeView(st({}));
     if (v.status !== 'ok') throw new Error('expected ok');
-    expect(cpwg.modelStatusRows().find((r) => r.id === 'S-023a')?.role).toMatch(/verify with your licensed copy \/ fab stackup/i);
+    expect(cpwg.modelStatusRows().find((r) => r.id === 'S-023a')?.role).toMatch(/paywalled paper.*not read by this project/i);
     expect(v.raw.warnings.some((w) => w.code === 'STITCHING_VIAS_NOT_MODELLED')).toBe(true);
   });
   it('accepts er 12.85', () => {

@@ -69,6 +69,14 @@ export interface LossView {
 
 const LOSS_LEDGER_IDS: readonly string[] = ['S-029d', 'S-029e', 'S-029f'];
 
+/** The core note starts with the label that the block caption already shows once: drop it from the row, keep the rest (the ledger rows). */
+function withoutLabel(note: string | undefined): string | undefined {
+  if (note === undefined) return undefined;
+  if (!note.startsWith(LOSS_LABEL)) return note;
+  const rest = note.slice(LOSS_LABEL.length).replace(/^[.;:,]?\s*/, '');
+  return rest === '' ? undefined : rest;
+}
+
 function numberText(value: Quantity, bound: CalcResult['results'][number]['bound']): string {
   return formatResult({ value: q(value.si, DIM.DIMENSIONLESS), bound }, { accuracyClass: LOSS_RANK });
 }
@@ -84,7 +92,7 @@ export function buildLossView(raw: CalcResult, roleOf: (id: string) => string | 
       if (n.unit === 'length') text = formatResult({ value: r.value, bound: r.bound }, { accuracyClass: LOSS_RANK, lengthRole: 'thickness' });
       else if (n.unit === 'ohm') text = `${formatResult({ value: r.value, bound: r.bound }, { accuracyClass: LOSS_RANK })} per square`;
       else text = `${numberText(r.value, r.bound)} ${unitText}`;
-      rows.push({ label: `${n.label}${suffix}${unitText !== '' ? ` (${unitText})` : ''}`, text, hint: r.note });
+      rows.push({ label: `${n.label}${suffix}${unitText !== '' ? ` (${unitText})` : ''}`, text, hint: withoutLabel(r.note) });
     }
   }
   const ws: CalcWarning[] = raw.warnings.filter((w) => w.code !== undefined && LOSS_CODES.includes(w.code));

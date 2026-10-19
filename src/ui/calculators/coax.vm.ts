@@ -1,5 +1,6 @@
 // View-model for the coaxial line impedance page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/coax compute().
+import { STANDING_ASSUMPTION } from '../../core/calculators/impedance-shared';
 import { compute, type Inputs } from '../../core/calculators/coax/calc';
 import { meta } from '../../core/calculators/coax/meta';
 import type { HashState } from '../../state/hash';
@@ -22,6 +23,9 @@ import {
 
 export { ER_HELP, ER_SOURCE_HELP };
 export type { ImpedanceView as CoaxView };
+
+/** Replaces the core standing assumption on this page: a cable has no PCB stackup (PCB2-9). */
+export const COAX_STANDING_ASSUMPTION = 'cable dimensions and dielectric not verified against the cable datasheet; connector and launch not modelled';
 
 export const CALCULATOR_ID = 'coax';
 export const PAGE_INTRO =
@@ -133,6 +137,8 @@ const SPEC: ImpedanceSpec<CoaxState> = {
   accuracyClass: meta.accuracyClass,
   thicknessNames: {},
   netClass: false,
+  epsHandoff: true,
+  assumptionRewrite: { [STANDING_ASSUMPTION]: COAX_STANDING_ASSUMPTION },
   ext: { tol: [tolDiameter('outerDiameter', 'Outer diameter D', 'outerDiameter'), tolDiameter('innerDiameter', 'Inner diameter d', 'innerDiameter'), tolEr()] },
 };
 
