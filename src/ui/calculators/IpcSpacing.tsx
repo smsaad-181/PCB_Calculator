@@ -84,7 +84,8 @@ export default function IpcSpacing() {
                 help="Selects a column of your table T8. This app adds no credit of its own."
                 onChange={(coating) => patch({ coating })}
               />
-              {(state.coating === 'permanent-polymer-or-solder-mask' || state.coating === 'conformal-coating') && (
+              {/* Once a result is shown it carries the same caution as a core warning (COATED_COLUMN_EXPOSED_COPPER): no duplicate. */}
+              {view.status !== 'ok' && (state.coating === 'permanent-polymer-or-solder-mask' || state.coating === 'conformal-coating') && (
                 <p class="field-warning" role="note">
                   {EXPOSED_PAD_WARNING}
                 </p>

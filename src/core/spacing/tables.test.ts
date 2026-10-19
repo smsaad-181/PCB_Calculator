@@ -191,8 +191,13 @@ describe('parseSpacingTable (strict schema)', () => {
     const rule = (id: string): Rec => rules.find((r) => r['rule'] === id) as Rec;
     expect(bad([{ ...(rules[0] as Rec), rule: 'groove-credit' }])).toContain('rule');
     expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: 0.5 }])).toContain('value');
+    // a multiplier of exactly 1 would make reinforced equal basic silently: refused (strictly greater than 1)
+    expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: 1 }])).toContain('greater than 1');
+    expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: 1.0000001 }])).toBe('');
     expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: undefined }])).toContain('value');
-    expect(bad([{ ...rule('reinforced-clearance'), mode: 'multiplier' }])).toContain('value');
+    // the multiplier mode of reinforced-clearance no longer exists: only the next preferred impulse step
+    expect(bad([{ ...rule('reinforced-clearance'), mode: 'multiplier' }])).toContain('mode must be "next-preferred-impulse-step"');
+    expect(bad([{ ...rule('reinforced-clearance'), mode: 'multiplier', value: 2, unit: '1', series: undefined }])).toContain('mode must be "next-preferred-impulse-step"');
     expect(bad([{ ...rule('reinforced-clearance'), mode: 'bogus' }])).toContain('mode');
     expect(bad([{ ...rule('reinforced-clearance'), mode: 'next-higher-row', series: undefined }])).toContain('next-preferred-impulse-step');
     expect(bad([{ ...rule('scope-max-frequency'), unit: 'kHz', value: 7 }])).toBe('');
@@ -224,14 +229,16 @@ describe('parseSpacingTable (strict schema)', () => {
     const other = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'scope-max-frequency') as Rec;
     expect(errs(parseSpacingTable({ ...raw, rules: [{ ...other, series: [1, 2] }] }))).toContain('series is only allowed');
   });
-  it('T7 reinforced-clearance-steady-state: its own multiplier record, at least 1', () => {
+  it('T7 reinforced-clearance-steady-state: its own multiplier record, strictly greater than 1', () => {
     const raw = rawSynthetic('T7');
     const base = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'reinforced-clearance-steady-state') as Rec;
     const bad = (over: Rec): string => errs(parseSpacingTable({ ...raw, rules: [{ ...base, ...over }] }));
     expect(bad({})).toBe('');
     expect(bad({ mode: 'next-preferred-impulse-step' })).toContain('mode must be "multiplier"');
     expect(bad({ mode: undefined })).toContain('mode must be "multiplier"');
-    expect(bad({ value: 0.5 })).toContain('at least 1');
+    expect(bad({ value: 0.5 })).toContain('greater than 1');
+    expect(bad({ value: 1 })).toContain('greater than 1');
+    expect(bad({ value: 1.5 })).toBe('');
     expect(bad({ unit: 'V' })).toContain('unit must be "1"');
     expect(bad({ series: [1, 2] })).toContain('series is only allowed');
   });
@@ -544,6 +551,9 @@ describe('VERIFIED needs a second person (verifiedBy differs from every enteredB
     ['table enteredBy with spaces', { enteredBy: '  TEST-VERIFIER ' }],
     ['a cell enteredBy', { cells: cells({ enteredBy: 'test-verifier' }) }],
     ['a cell checkedBy', { cells: cells({ checkedBy: 'TEST-verifier ' }) }],
+    ['table enteredBy with inner spaces', { verifiedBy: 'Test   Verifier', enteredBy: '  test VERIFIER ' }],
+    ['a cell enteredBy with a no-break space', { cells: cells({ enteredBy: 'test-verifier\u00a0' }) }],
+    ['a cell checkedBy with a full-width letter (NFKC)', { cells: cells({ checkedBy: '\uff54est-verifier' }) }],
   ])('verifiedBy equal to %s is refused with a clear message', (_n, over) => {
     const m = errs(parseSpacingTable({ ...v(), ...over }));
     expect(m).toContain('second person');

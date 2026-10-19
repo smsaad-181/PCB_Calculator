@@ -63,10 +63,6 @@ const cr = (over: Partial<CreepageInputs> = {}): CreepageInputs => ({
   ...over,
 });
 const ip = (over: Partial<IpcInputs> = {}): IpcInputs => ({ tables: synthSet(['T8']), edition: ED, voltagePeak: V(15), location: 'internal', ...over });
-const primary = (o: ReturnType<typeof clearance>): number => {
-  if (!o.ok) throw new Error(o.error.message);
-  return (o.value.results.find((r) => r.role === 'primary') as { value: Quantity }).value.si;
-};
 
 describe('waveform guard edge cases', () => {
   it('overflow, malformed quantities and a bad peak are refused as values', () => {
@@ -197,6 +193,13 @@ describe('scope, coating, provenance helpers', () => {
     expect(waveformFrequencyError(undefined, 0)).toBeUndefined();
     expect(waveformFrequencyError('sine', 50)).toBeUndefined();
   });
+  it('a declared DC waveform with a frequency above 0 is refused: DC means 0 Hz', () => {
+    const e = waveformFrequencyError('dc', 50);
+    expect(e?.code).toBe('INVALID_INPUT');
+    expect(e?.field).toBe('frequency');
+    expect(e?.message).toContain('DC means 0 Hz');
+    expect(waveformFrequencyError('dc', 1e-3)?.message).toContain('DC means 0 Hz');
+  });
   it('provenance line without cells and with a checked cell', () => {
     const t = synthTable('T4', { verified: true });
     const l = lookupGrid(t, { rowSi: 1000, selectors: {}, edition: ED });
@@ -207,27 +210,19 @@ describe('scope, coating, provenance helpers', () => {
 });
 
 describe('calculator paths not reached elsewhere', () => {
-  const t7With = (over: (rules: Rec[]) => Rec[]) => {
-    const raw7 = rawSynthetic('T7');
-    const p = parseSpacingTable({ ...raw7, rules: over(raw7['rules'] as Rec[]) });
-    if (!p.ok) throw new Error(p.error.join('; '));
-    return p.value;
-  };
-  it('clearance: T1 and T3 lookups can fail; reinforced multiplier mode; a hostile input object never throws', () => {
+  it('clearance: T1 and T3 lookups can fail; the reinforced multiplier mode no longer exists; a hostile input object never throws', () => {
     const noImp = (o: Partial<ClearanceInputs>) => cl({ ratedImpulseVoltage: undefined as never, overvoltageCategory: 'II', ...o });
     const a = clearance(noImp({ supplyVoltage: V(500) }));
     expect(!a.ok && a.error.gate).toBe('OUT_OF_SCOPE');
     const b = clearance(cl({ workingVoltagePeak: V(4000) }));
     expect(!b.ok && b.error.gate).toBe('OUT_OF_SCOPE');
-    const mult = makeTableSet({
-      T2: synthTable('T2'),
-      T3: synthTable('T3'),
-      T4: synthTable('T4'),
-      T7: t7With((rules) => rules.map((r) => (r['rule'] === 'reinforced-clearance' ? { ...r, mode: 'multiplier', value: 4, unit: '1', series: undefined } : r))),
+    const rawT7 = rawSynthetic('T7');
+    const multMode = parseSpacingTable({
+      ...rawT7,
+      rules: (rawT7['rules'] as Rec[]).map((r) => (r['rule'] === 'reinforced-clearance' ? { ...r, mode: 'multiplier', value: 4, unit: '1', series: undefined } : r)),
     });
-    if (!mult.ok) throw new Error(mult.error.join('; '));
-    const plain = primary(clearance(cl({ tables: mult.value })));
-    expect(primary(clearance(cl({ tables: mult.value, insulationType: 'reinforced' })))).toBeCloseTo(plain * 4, 12);
+    expect(multMode.ok).toBe(false);
+    if (!multMode.ok) expect(multMode.error.join(' ')).toContain('mode must be "next-preferred-impulse-step"');
     const boom = new Proxy({}, { get: () => { throw new Error('boom'); } });
     const out = clearance(boom as never);
     expect(!out.ok && out.error.code).toBe('INTERNAL');

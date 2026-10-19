@@ -387,7 +387,9 @@ describe('waveform entry (peak and rms helper)', () => {
     expect(sc.waveformHelper({ ...W, waveValue: '0 V' }).status).toBe('error');
   });
   it('creepage and ipc accept a declared waveform too', () => {
-    expect(ok(cr.computeView({ ...CR_OK, rms: '', voltageMode: 'waveform', shape: 'dc', basis: 'peak', waveValue: '150 V' }, FAKE)).status).toBe('ok');
+    expect(ok(cr.computeView({ ...CR_OK, rms: '', voltageMode: 'waveform', shape: 'dc', basis: 'peak', waveValue: '150 V', frequency: '0 Hz' }, FAKE)).status).toBe('ok');
+    // DC means 0 Hz: a DC waveform with a frequency above 0 is refused
+    expect(cr.computeView({ ...CR_OK, rms: '', voltageMode: 'waveform', shape: 'dc', basis: 'peak', waveValue: '150 V', frequency: '50 Hz' }, FAKE).status).toBe('error');
     expect(ok(ip.computeView({ ...IP_OK, peak: '', voltageMode: 'waveform', shape: 'triangle', basis: 'rms', waveValue: '10 V' }, FAKE)).status).toBe('ok');
   });
 });

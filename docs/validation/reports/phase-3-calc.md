@@ -1,237 +1,224 @@
-# Phase 3 calculations validation (calc-validator)
+# Phase 3 calculations validation (calc-validator), RE-VALIDATION
 
-Date: 2026-10-19. Branch `phase-3`, head 2876cea. Validator: calc-validator. I am independent of the implementers and made no edits to `src/` or `tests/`.
+Date: 2026-10-19. Branch `phase-3`, head 5bada17. This supersedes the first report (head 2876cea, PASS-WITH-CONDITIONS, F-1 MAJOR and F-2..F-7 MINOR). Validator: calc-validator. I am independent of the implementers and made no edits to `src/` or `tests/`.
 
-Scope:
-- waveform peak/RMS conversions (S-035);
-- arithmetic of the gated spacing calculators (clearance, creepage, IPC spacing), run on validator-made synthetic tables only;
-- whether ledger rows S-030..S-035 state their status honestly;
-- whether any IEC 60664-1 / IPC-2221 numeric table value is present in the repository.
+Scope of this re-run:
+- the core changes in 5bada17:
+  - reinforced clearance through the T7 mode `next-preferred-impulse-step`;
+  - a separate T3 reinforced rule;
+  - the second-person VERIFIED rule;
+  - frequency gating on the T7 limit;
+  - the peak-vs-impulse refusal;
+  - the waveform refusal at 0 Hz;
+  - S-035/S-006 citations;
+  - NUL removal;
+- a fresh grep of `docs/`, `src/` and `tests/` for IEC 60664-1 / IPC-2221 table numbers;
+- whether the S-030f ledger edit is honest.
 
 ## Verdict: PASS-WITH-CONDITIONS
 
-**There is no BLOCKER and no numeric defect.**
-- Every conversion and every lookup/arithmetic rule matched my independent oracle exactly. Relative error is 0 in all comparable cases.
-- The table shells are empty. `src/` and `tests/` contain no IEC 60664-1 or IPC-2221 table value.
+**No BLOCKER, no MAJOR and no numeric defect.**
+- F-1 (MAJOR) is closed:
+  - the CTI band limits, the IPC elevation breakpoint and the IPC top voltage-band boundary are gone from `docs/`;
+  - OPEN_RISKS now says exactly which numbers remain (the IEC abstract scope limits and the Phase 0 trace-current fit constants).
+- F-2, F-3, F-5 and F-7 are closed.
+- F-6 is mostly closed. The residual is R-2.
+- F-4 is unchanged (an accepted deferral, P3-6).
+- Two new MINOR findings (N-1, N-2) and one residual MINOR (R-2) are conditions for OPEN_RISKS.
 
-**One non-numeric MAJOR (F-1) must be resolved before the phase closes.** The repository-wide claim "Nothing numeric from IEC 60664-1 or IPC-2221 exists anywhere in the repository" (OPEN_RISKS, Phase 3 core section) is not true for `docs/`. Values from those standards' tables or headings appear in:
-- the ledger;
-- the source notes;
-- the KiCad research doc.
-
-They come from public secondary pages, not from memory, and nothing in `src/` reads them. Either way, the statement and the phase rule disagree with the repository.
-
-Six MINOR findings (F-2..F-7) go to OPEN_RISKS as conditions.
+Every lookup and arithmetic rule I tested on my own synthetic tables matched my hand oracle exactly (relative error 0). Every refusal fired where the rules say it should.
 
 ## Method (independence protocol)
-1. Before reading any implementation, I read:
+1. Before reading any implementation, I took the expected rules from:
    - `docs/phases/phase-3.md`;
-   - skill `iec60664-gating`;
-   - `docs/research/spacing-structure-and-gating.md`;
-   - ledger rows S-030..S-035.
-2. From those I derived the expected rules:
-   - sine V_pk = √2·V_rms; symmetric square V_pk = V_rms; triangle V_pk = √3·V_rms; DC equal;
-   - DC+sine: V_rms = √(V_dc² + V_ac,rms²) and V_pk = V_dc + √2·V_ac,rms;
-   - pulse: V_rms = V_pk·√D;
-   - lookup: next-higher row, first row below the table, refusal above it, no interpolation unless the table says so;
-   - clearance = max(T2, T3) × T4(altitude);
-   - creepage = max(T5 × k_reinf, associated clearance), with no altitude term;
-   - IPC: next-higher band, or above the top band, top + (V − V_top)·k_per-volt;
-   - the reinforced rule comes only from T7.
-3. I wrote a fresh python3 + math oracle (`tools/reference/validator_scratch/phase3_oracle.py`, deleted afterwards). Its RMS figures come from numerical integration of the RMS definition, not from crest-factor constants. It agrees with closed form to ≤ 5e-11 (midpoint rule, N = 2e5).
-4. I drove the public APIs (`voltageFromWaveform`, `dcPlusSine`, `pulseRms`, `resolveVoltage`, and `compute()` of clearance, creepage and ipc-spacing) through a scratch vitest harness.
-   - The harness used **my own synthetic tables**, built through `parseSpacingTable`/`makeTableSet`. I chose arbitrary round values. They were neither the repo's synthetic values nor standard values, and the harness was deleted afterwards.
-   - The repo's own installed vitest was used; no third-party code was fetched.
-5. Only after that did I read `waveform.ts`, `tables.ts` (lookup, parser), `gating.ts`, the three `calc.ts`/`guards.ts` files and the spacing view-models.
-6. Repo suite for this phase: `src/core/spacing`, the three calculators and `tests/audit.test.ts` give 8 files and 394 tests, all passing.
+   - the reworded skill `iec60664-gating`;
+   - the SPEC corrections table;
+   - LEDGER S-030f;
+   - `notes/spacing-iec60664-ipc2221.md`;
+   - the OPEN_RISKS sections "Phase 3 redaction" and "Phase 3 core fixes" (CF-1..CF-9);
+   - the import help text (`src/ui/components/spacing-help.ts`, for the schema only).
+2. The rules I expected:
+   - reinforced clearance = T2(next series value above the required impulse) × T4;
+   - a required impulse that is not in the series is refused, and the last series value is refused;
+   - multiplier mode = T2(U) × m × T4;
+   - with T3 populated, reinforced needs `reinforced-clearance-steady-state`, and the result is max(T2 part, T3 × m_ss) × T4;
+   - with T3 empty, a peak above the impulse used for T2 is refused;
+   - f > 0 needs `scope-max-frequency`, and f above that limit is refused with IEC 60664-4 named;
+   - a non-DC waveform at 0 Hz is refused;
+   - VERIFIED needs `verifiedBy` to be a person who did not enter or check any record.
+3. I built a new scratch vitest harness in the session scratchpad, outside the repo.
+   - I ran it with the repo's installed vitest and a scratch config.
+   - There was no npm install, no worktree and no change to `node_modules`.
+   - The harness was deleted after the run, and `git status` showed no change from me.
+4. **The tables were my own fake values.** I chose them so that the "next series step" and the "next table row" give different answers:
+   - T2 rows 0.7/1.3/1.9/2.6/3.4/5.1 kV → 0.17/0.31/0.47/0.83/1.29/2.03 mm (PD2 inhomogeneous), plus a homogeneous column;
+   - T7 series 0.7/1.9/3.4/5.1 kV (it skips 1.3 and 2.6);
+   - T3 0.6/1.2/2.4 kV → 0.21/0.44/0.95 mm;
+   - T4 2500/4500 m → 1.0/1.17;
+   - T1 rows 120/260 V (cat II 1.3/1.9 kV, cat III 1.9/3.4 kV);
+   - T5 60/130/270/430 V → 0.41/0.77/1.63/2.71 mm (PD2 IIIa);
+   - T6 groups I ≥ 77, II [55,77), IIIa [33,55), IIIb [11,33);
+   - T7 m_reinf,creep 2.3, m_ss 1.7, multiplier 1.4, f_max 13 kHz;
+   - T8 B1 22/47/95 V → 0.07/0.13/0.29 mm, plus a per-volt row of 0.0031 mm/V.
 
-## Numeric results
+   None of these is, or approximates, a standard value.
+5. Only after that did I read:
+   - `signedBySelf` and `nextPreferredImpulseStep` (`tables.ts`);
+   - `requiredDataError`, `scopeTable`, `waveformFrequencyError`, `withWaveformRow` and `squareRmsWarning` (`gating.ts`);
+   - the waveform diff.
+6. Repo suite: spacing core, the three calculators, `spacing.vm.test.ts`, `tests/audit.test.ts` and `tests/ledger-sync.test.ts` give 10 files and 509 tests, all passing. `node tools/check-audit.mjs` passes (10 data tables, 92 ledger rows).
 
-### Waveform conversions (S-035). Oracle = integral definition
-| Case | Kind | Oracle (peak, rms) V | App (peak, rms) V | Rel. err |
+## Numeric results (oracle = hand arithmetic on my fake tables; altitude 100 m → first T4 row, factor 1.0, unless stated)
+
+### Clearance
+| # | Case | Kind | Oracle | App | Rel. err |
+|---|---|---|---|---|---|
+| C1 | basic, 2.0 kV → next row 2.6 | golden | 0.83 mm | 0.83 | 0 |
+| C2 | reinforced 1.9 kV → series step 3.4 (a row step would give 2.6 → 0.83) | golden | 1.29 mm | 1.29 | 0 |
+| C5 | reinforced 0.7 kV → 1.9; 3000 m → factor 1.17 | golden | 0.5499 mm | 0.5499 | 0 |
+| C15a | category II, supply 230 V → T1 row 260 → 1.9 kV; reinforced → 3.4 | golden | 1.29 mm | 1.29 | 0 |
+| C16 / C16b | multiplier 1.4, 2.0 kV (0 m / 3000 m) | golden | 1.162 / 1.35954 mm | same | 0 |
+| C17 | homogeneous column, 2.0 kV | golden | 0.747 mm | 0.747 | 0 |
+| C18 | reinforced 3.4 → 5.1 (top T2 row) | boundary | 2.03 mm | 2.03 | 0 |
+| C22 | series entered in V instead of kV | units | 1.29 mm | 1.29 | 0 |
+| C24 | impulse 1900·(1+1e-15) V; 0.7·1e3 V | float boundary | treated as a series value | yes (relative tolerance 1e-12) | 0 |
+| C6b | basic, peak 1900 V = impulse 1.9 kV | boundary | allowed, 0.47 mm | 0.47 | 0 |
+| C8 | basic, T3 populated, peak 1000 V, impulse 1.3 kV | golden | max(0.44, 0.31) = 0.44 mm | 0.44 | 0 |
+| C10a | reinforced, T3 and m_ss 1.7, peak 1000 V | golden | max(1.29, 0.748) = 1.29 mm | 1.29 | 0 |
+| C10b | same, peak 2000 V | golden | 0.95·1.7 = 1.615 mm | 1.615 | 0 |
+| C10c | same, 3000 m | golden | 1.615·1.17 = 1.88955 mm | 1.88955 | 0 |
+| C3 / C15b / E5 | reinforced, impulse not in the series (2.0 kV; 1.3 kV via T1; 0.5 kV below the series) | gating | refuse | INSUFFICIENT DATA "not a value of the preferred impulse series" | n/a |
+| C4 | reinforced 5.1 kV (last series value) | out-of-range | refuse | OUT OF TABLE RANGE | n/a |
+| C19 | series step 6.0 kV above the last T2 row | out-of-range | refuse | OUT OF TABLE RANGE (T2) | n/a |
+| C6a / C6c / C13f | basic, T3 empty, peak 2500 V / 1901 V / sine 1500 V rms (2121.3 V peak) above the impulse | out-of-scope | refuse | OUT_OF_DOMAIN, field workingVoltagePeak, names T3 | n/a |
+| C7b | reinforced, T3 empty, peak 3500 V > stepped 3.4 kV | out-of-scope | refuse | refused | n/a |
+| C9 | reinforced, T3 populated, no steady-state rule | gating | refuse | INSUFFICIENT DATA names `reinforced-clearance-steady-state` | n/a |
+| C10d | basic, peak 2500 V above the last T3 row | out-of-range | refuse | OUT OF TABLE RANGE (T3) | n/a |
+| C11a / C11f | f = 5 kHz, T7 without `scope-max-frequency` / no T7 at all | gating | refuse | INSUFFICIENT DATA names the rule | n/a |
+| C11b / C11c | f = 5 kHz / 13 kHz exact, limit 13 kHz | boundary | allowed | 0.83 mm | 0 |
+| C11d | f = 20 kHz > 13 kHz | out-of-scope | refuse, name 60664-4 | refused, names IEC 60664-4 (S-031) | n/a |
+| C11e | basic, f = 0, no T7 | gating | allowed (T7 not needed) | 0.83 mm, SCOPE_NOT_CHECKED | 0 |
+| C12 / C12b | shipped empty tables, f = 5 kHz / 0 | gating | INSUFFICIENT DATA, with T7 listed only when f > 0 | as expected | n/a |
+| C13a | sine, f = 0 | degenerate | reject | INVALID_INPUT "0 Hz means DC" | n/a |
+| C13b | DC waveform, f = 0 | golden | allowed, S-035 cited | allowed, S-035 in ledgerIds | 0 |
+| C13e | square stated by rms | warning | SQUARE_RMS_UNIPOLAR | present | n/a |
+| C20 / C21 / C23 | T7 series not strictly increasing; series plus `value`; old mode `next-higher-row` | degenerate | reject the table | rejected with clear messages | n/a |
+| E1 / E2 / E3 | T7 of another edition: basic f = 0 / basic f = 5 kHz / reinforced | gating | allowed / refuse / refuse | as expected | n/a |
+| E6 | supplementary 2.0 kV | assumption | basic lookup, 0.83 mm | 0.83 | 0 |
+
+### Creepage
+| # | Case | Kind | Oracle | App | Rel. err |
+|---|---|---|---|---|---|
+| K1 | basic 250 V rms → row 270 | golden | 1.63 mm | 1.63 | 0 |
+| K2 | reinforced, m = 2.3 | golden | 3.749 mm | 3.749 | 0 |
+| K3 | CTI 40 → IIIa | golden | 1.63 mm | 1.63 | 0 |
+| K3b | CTI 55 (lower bound of II, inclusive) → II, no II column | boundary | refuse | INSUFFICIENT DATA (no column for II) | n/a |
+| K7 | associated clearance 2 mm | golden | 2.0 mm, raised to clearance | 2.0, CREEPAGE_RAISED_TO_CLEARANCE | 0 |
+| K8 | altitude 9000 m | altitude must not matter | 1.63 mm | 1.63, ALTITUDE_NOT_USED | 0 |
+| K6 | sine peak 353.553 V, f = 50 Hz → rms 250 | golden | 1.63 mm, S-035 cited | same | 0 |
+| K5 | sine, f = 0 | degenerate | reject | INVALID_INPUT | n/a |
+| K4 / K4b | f = 5 kHz with no limit / f = 20 kHz over the limit | gating | refuse | refused | n/a |
+| E4 | reinforced, no creepage rule | gating | refuse | INSUFFICIENT DATA | n/a |
+| K9 | basic, f = 0, no T7 | golden | 1.63 mm | 1.63 | 0 |
+
+### IPC spacing
+| # | Case | Kind | Oracle | App | Rel. err |
+|---|---|---|---|---|---|
+| I1 | internal 60 V → row 95 | golden | 0.29 mm | 0.29 | 0 |
+| I3 | 95 V exact (top row) | boundary | 0.29 mm | 0.29 | 0 |
+| I2 | 150 V, per-volt extension | golden | 0.29 + 55·0.0031 = 0.4605 mm | 0.4605 | 0 |
+| I4 | sine 100 V rms → 141.421 V peak | golden | 0.29 + 46.421·0.0031 = 0.433906 mm | 0.4339062 | 0 |
+| I5 | rms only, no waveform | gating | Insufficient inputs: voltagePeak | same | n/a |
+| all | ledger ids | traceability | S-006 cited; S-035 when a waveform is used | yes | n/a |
+
+### Second-person VERIFIED rule (CF-3)
+| # | Case | Expected | App |
+|---|---|---|---|
+| V1 | verifiedBy equals the table's enteredBy | refuse | refused |
+| V2 | verifiedBy equals a cell's checkedBy | refuse | refused |
+| V5 | verifiedBy equals a T7 rule's checkedBy | refuse | refused |
+| V6 | verifiedBy equals the T8 elevation-breakpoint enteredBy | refuse | refused |
+| V4 | self-signed table inside an imported bundle | refuse | refused, names the table |
+| V3 | a genuine third person | accept | accepted, VERIFIED |
+| V1b | `"  val   ENTERER "` against `"Val Enterer"` (extra inner spaces) | refuse (the rule says "ignoring case and spaces") | **ACCEPTED**, see N-1 |
+
+### Sensitivity
+These are step functions; see the first report (table unchanged). The new step rule moves the result only at series values. Between series values reinforced is refused, so no non-conservative intermediate-row step can occur (C2 versus a row step: 1.29 against 0.83 mm).
+
+## Closure of earlier findings
+| Id | Was | Now | Evidence |
+|---|---|---|---|
+| F-1 MAJOR | standard numbers in `docs/`; OPEN_RISKS claim false | **CLOSED** | Grep finds no CTI band limits, IPC elevation breakpoint, IPC band boundaries, impulse table, clearance/creepage cells or altitude factors in `docs/`, `src/` or `tests/`. The ledger header and the OPEN_RISKS Phase 3 core sentence now name exactly what remains: S-030a/S-031a scope limits quoted from official IEC abstracts, and S-001/S-010 trace-current fit constants. Both are honest. |
+| F-2 MINOR | one reinforced rule for T2 and T3 | CLOSED | C9, C10a-c |
+| F-3 MINOR | row step ≠ impulse step | CLOSED | `next-preferred-impulse-step` with a human-entered series; the old mode is rejected (C2, C3, C23) |
+| F-4 MINOR | coating credit as a multiplier | OPEN (accepted deferral P3-6/CF-8). Now `appliesTo` and the description "user-stated rule; may not match your standard" are in place | not retested numerically (needs VERIFIED T7) |
+| F-5 MINOR | S-035 / S-006 not cited | CLOSED | C13b, K6, I1, I4 |
+| F-6 MINOR | waveform/frequency mismatch, unipolar square | MOSTLY CLOSED | 0 Hz refusal and SQUARE_RMS_UNIPOLAR in place. Residual R-2 below |
+| F-7 MINOR | raw NUL bytes | CLOSED | byte scan of `src/ tests/ docs/ tools/`: no NUL except `__pycache__/*.pyc` (binary, not source) |
+
+## Grep for standard table numbers (2026-10-19, head 5bada17)
+I searched `docs/`, `src/`, `tests/`, `tools/` and `.claude/` (excluding `node_modules`/`dist`) for:
+- the IPC elevation breakpoint (metres and feet forms);
+- CTI comparisons and CTI-adjacent band numbers;
+- IPC band-range strings and "> top band" forms;
+- impulse-voltage figures next to "impulse/OVC/overvoltage";
+- altitude-factor-like decimals;
+- the scope figures.
+
+Results:
+- **Shells:** all 8 are still empty: status PAYWALLED-USER-MUST-VERIFY, `entered: false`, 0 rows/columns/cells/groups/rules, no breakpoint, `verifiedBy` blank.
+- **`src/` and `tests/`:** clean.
+  - The numbers added in 5bada17 are synthetic (fake series 1/2/4/5 kV, 0 Hz cases).
+  - Two UI input-format examples in `src/state/state-key-docs.ts` coincide with standard-looking figures. They are a sample impulse entry ("2.5 kV") and a sample CTI entry ("400 V"). They are examples of the text format the user types, not table records, and no code reads them as data. INFO only (see N-2).
+- **`docs/`:**
+  - The remaining figures are the scope limits quoted from IEC abstracts. They appear in the ledger, the notes and the phase-3-phase report, and are documented as deliberate.
+  - The KiCad help quote "frequencies higher than 30kHz" is the same scope figure.
+  - Inputs in cross-check plans and earlier validation scenarios are also present (for example "230 V RMS, OVC II, PD2, MG IIIa, 2000 m" in E1/I1, and scenario impulses in phase-3-pcb).
+  - None of these is a table value.
+
+## Ledger honesty: S-030f (re-fetched by me, 2026-10-19)
+| Claim in S-030f | URL | What I read | Status | Assessment |
 |---|---|---|---|---|
-| sine, rms 230 | golden | 325.2691193458119, 230 | 325.2691193458119, 230 | 0 |
-| sine, peak 100 | golden | 100, 70.71067811865474 | same | 0 |
-| triangle, peak 100 / rms 100 | golden | 57.73502691896258 / 173.2050807568877 | same | 0 |
-| symmetric square, rms 100 | golden | 100, 100 | same | 0 |
-| DC 100 | golden | 100, 100 | same | 0 |
-| DC 120 + sine 30 rms | golden | 162.42640687119285, 123.69316876852982 | same | 0 |
-| pulse 10 V, D = 0.36 | golden | rms 6 | 6 | 0 |
-| sine rms 1e-3 V / 1e8 V | boundary | 1.41421e-3 / 1.41421e8 | same | 0 |
-| sine rms 1e308 V | out-of-range | finite peak 1.414e308, or reject | finite 1.414e308 (overflow guard present, not triggered) | n/a |
-| rms 0, −1, NaN, ±Inf; shape "sawtooth"; duty 0; peak < rms | degenerate | reject | INVALID_INPUT for each | n/a |
-| 60 random cases (LCG seed 20261019, 4 shapes × both bases, 1e-2..1e7 V) | random | | | worst 0 |
+| Reinforced clearance: Table F.2 "corresponding to the rated impulse voltage but one step higher in the preferred series of values than that specified for basic insulation" | https://www.ti.com/document-viewer/lit/html/SLUAAR5/GUID-B1A84E91-DDEE-4C92-A54D-03C5F8DE95DD | Verbatim, as quoted in the ledger. The page also prints worked impulse and clearance numbers; I did not record them | PAYWALLED-USER-MUST-VERIFY | Honest. "Re-read 2026-10-19 by fetcher; previously search snippet only" is accurate |
+| Reinforced creepage "twice the creepage distance for basic insulation" | same | Verbatim | same | Honest |
+| No public rule for reinforced T3 (steady-state / recurring peak / temporary overvoltage) | same, plus AMC1411 | SLUAAR5 says nothing on these for reinforced | same | Honest |
+| AMC1411 (SBASAB3 §8.2.2.1): clearance "taken from the line corresponding to the next higher impulse voltage rating"; creepage "doubled for reinforced isolation"; "The value must be doubled for reinforced isolation" concerns the temporary overvoltage compared with the device rating, not a clearance table | https://ti.com/document-viewer/lit/html/SBASAB3/GUID-E226C2E8-2871-425C-A26D-C554E661C8A1 | Confirmed: the doubled value is the temporary overvoltage, then checked against the device's VIOTM | same | Honest. The correction to the pcb report's reading is right. "Same publisher, not independent" is correctly stated |
+| Status unchanged; one publisher; "do not implement except from a human-entered T7 record" | n/a | The code takes the step only from the T7 `series` (no series in code) | PAYWALLED | Status is right: one publisher (two TI documents), numeric rule, standard not read |
 
-`ref_calcs.py` pinned waveform vectors (11) agree with my oracle to ≤ 5e-11. The triangle case is limited by midpoint-rule resolution.
+`ledger-sync.test.ts` passes, so `ledger-status.ts` still matches LEDGER.md. The compliance gate is unchanged and still denies IEC 60664-1. No spacing text claims compliance.
 
-### Clearance (synthetic T2 rows 0.5/1/2/4/8 kV → 0.11/0.22/0.44/0.88/1.76 mm; T4 rows 2000/3000/5000 m → 1.0/1.1/1.3; validator values, not from any standard)
-| Case | Kind | Oracle | App | Rel. err |
-|---|---|---|---|---|
-| 2.5 kV, 1500 m (next-higher row 4 kV, below the first T4 row) | golden | 0.88 mm | 0.00088 m | 0 |
-| 2.0 kV exact, 2000 m exact | golden | 0.44 mm | 0.44 mm | 0 |
-| 2.5 kV, 2001 m (T4 next-higher row 3000) | golden | 0.968 mm | 0.968 mm | 0 |
-| 0.3 kV (below the first row), 0 m | boundary | 0.11 mm | 0.11 mm | 0 |
-| 8.0 kV exact (top row) | boundary | 1.76 mm | 1.76 mm | 0 |
-| altitude −400 m | boundary | 0.88 mm (first T4 row) | 0.88 mm | 0 |
-| 8.1 kV; altitude 6000 m | out-of-range | refuse | OUT_OF_SCOPE "OUT OF TABLE RANGE" | n/a |
-| reinforced, T7 `next-higher-row`, 2.5 kV | golden | 1.76 mm (one row above 4 kV) | 1.76 mm | 0 |
-| reinforced, 8.0 kV (no row above) | out-of-range | refuse | OUT_OF_SCOPE | n/a |
-| reinforced, T7 `multiplier` 1.5, 2500 m | golden | 0.88·1.5·1.1 = 1.452 mm | 1.452 mm | 0 |
-| reinforced, T7 without the rule | gating | refuse | INSUFFICIENT_DATA | n/a |
-| impulse 0 V; altitude NaN | degenerate | reject | INVALID_INPUT | n/a |
-| altitude missing | gating | "Insufficient inputs: altitude" | same | n/a |
-| both impulse routes given | gating | reject | INVALID_INPUT | n/a |
-| f = 2000 Hz > T7 limit 1000 Hz | out-of-scope | refuse, name IEC 60664-4 | refused, message names IEC 60664-4 (S-031) | n/a |
-| all tables empty (shipped) | gating | INSUFFICIENT DATA | INSUFFICIENT_DATA | n/a |
-| unverified data | claim | "indicative only" + UNVERIFIED | name "indicative only: minimum clearance"; warnings UNVERIFIED_TABLE_DATA, PRODUCT_STANDARD, PAYWALLED_TABLE_DATA, SOLDERMASK_NOT_COATING, SCOPE_NOT_CHECKED, T3_NOT_ENTERED | n/a |
+## Defects / conditions
 
-### Creepage (synthetic T5 rows 50/100/250/500 V → 0.3/0.6/1.5/3.0 mm; T7 reinforced multiplier 2)
-| Case | Kind | Oracle | App | Rel. err |
-|---|---|---|---|---|
-| 240 V rms, clearance 0.88 mm | golden | 1.5 mm | 1.5 mm | 0 |
-| 240 V, clearance 2.0 mm (floor applies) | golden | 2.0 mm | 2.0 mm (+ CREEPAGE_RAISED_TO_CLEARANCE) | 0 |
-| reinforced 240 V, clearance 0.5 mm | golden | 1.5·2 = 3.0 mm | 3.0 mm | 0 |
-| 50 V exact; 10 V (below the first row) | boundary | 0.3 mm | 0.3 mm | 0 |
-| sine peak 353.5533905932738 V → rms 250.0000000000 (float) | boundary | exact row 250, 1.5 mm (not 3.0) | 1.5 mm | 0 |
-| sine peak 240·√2 | golden (waveform route) | 1.5 mm | 1.5 mm | 0 |
-| 600 V | out-of-range | refuse | OUT_OF_SCOPE | n/a |
-| altitude 0 / 5000 / 99999 m | altitude must not matter | 1.5 mm for all | 1.5 mm for all | 0 |
-| rms 0 V; materialGroup + CTI both | degenerate | reject | INVALID_INPUT | n/a |
-| no associated clearance; peak only (no rms, no waveform) | gating | Insufficient inputs | `associatedClearance`; `workingVoltageRms` | n/a |
-| reinforced with T7 lacking the multiplier | gating | refuse | INSUFFICIENT_DATA | n/a |
+### N-1. MINOR: the second-person name check does not ignore inner spaces, although its message and help say it does
+- **Repro:** a T4 table with `enteredBy: "Val Enterer"`, cells checked by "Other Checker", status VERIFIED, `verifiedBy: "  val   ENTERER "`.
+- **Expected:** refused, because the help says "different (ignoring case and spaces)" and the error says "names compared ignoring case and spaces".
+- **Actual:** accepted as VERIFIED. `normName` is `trim().toLowerCase()` (`src/core/spacing/tables.ts`, near `signedBySelf`), and `tools/audit-lib.mjs` lines 112-114 do the same. Inner whitespace, non-breaking spaces and Unicode case variants are not normalised.
+- **Risk:** low. The check guards against an honest mistake, not deliberate evasion. The wording overstates it, though.
+- **Fix:** either normalise (`normalize('NFKC')`, collapse or strip all whitespace, then lowercase) in both places, or change the wording to "ignoring case and leading/trailing spaces".
+- **Owner:** calc-implementer (core and audit-lib), ui-engineer (help text).
 
-### IPC spacing (synthetic T8 rows 15/30/50/100 V; B1 internal, B2/B3 external uncoated below/above breakpoint 4000 m; per-volt 0.005 mm/V, or 0.2 mil/V in set B)
-| Case | Kind | Oracle | App | Rel. err |
-|---|---|---|---|---|
-| internal 25 V | golden | 0.1 mm | 0.1 mm | 0 |
-| internal 150 V (per-volt extension) | golden | 1.5 + 50·0.005 = 1.75 mm | 1.75 mm | 0 |
-| internal 150 V, per-volt in mil/V | golden (units) | 1.5 + 50·0.2·0.0254 = 1.754 mm | 1.754 mm | 0 |
-| external uncoated 40 V, 1000 m → B2 | golden | 1.2 mm | 1.2 mm | 0 |
-| external uncoated 40 V, 4000 m (at the breakpoint) → B3 | boundary | 1.8 mm ("above", conservative) | 1.8 mm | 0 |
-| 15.0001 V (just above a row) | boundary | next row, 0.1 mm | 0.1 mm | 0 |
-| 100 V exact (top row) | boundary | 1.5 mm | 1.5 mm | 0 |
-| sine 100 V rms declared → 141.42 V peak | golden | 1.5 + 41.421·0.005 = 1.70711 mm | 1.7071068 mm | 0 |
-| rms only, no waveform | gating | "Insufficient inputs: voltagePeak" (no peak inferred) | same | n/a |
-| external uncoated, no elevation | gating | Insufficient inputs: elevation | same | n/a |
-| vacuum with no vacuum column; coated with no column | gating | INSUFFICIENT DATA | INSUFFICIENT_DATA | n/a |
-| 0 V | degenerate | reject | INVALID_INPUT | n/a |
+### N-2. INFO/MINOR: input-format examples resemble standard figures
+- **Where:** `src/state/state-key-docs.ts:432` (`"2.5 kV"` impulse) and `:447` (`"400 V"` CTI).
+- **Why it matters:** these are format examples, not data. A reader could still take them as typical values, and the repository rule is to keep standard-looking figures out.
+- **Suggested fix:** neutral examples such as "1.23 kV" and "123 V".
+- **Owner:** ui-engineer.
 
-### Sensitivity (±1 %, ±10 % around a row boundary)
-| Input | ×0.90 | ×0.99 | ×1.00 | ×1.01 | ×1.10 | Direction |
-|---|---|---|---|---|---|---|
-| impulse around 2 kV → clearance mm | 0.44 | 0.44 | 0.44 | 0.88 | 0.88 | non-decreasing step ✓ |
-| altitude around 3000 m → clearance mm (2.5 kV) | 0.968 | 0.968 | 0.968 | 1.144 | 1.144 | non-decreasing step ✓ |
-| rms around 250 V → creepage mm | 1.5 | 1.5 | 1.5 | 3.0 | 3.0 | non-decreasing step ✓ |
-| peak around 150 V → IPC mm (extension) | 1.675 | 1.7425 | 1.75 | 1.7575 | 1.825 | linear, slope = per-volt ✓ |
-
-These calculators are step lookups, so a ±1 % input change can produce a full row step. The spacing results have no sensitivity readout, which is correct for a step function; the steps list names the matched row.
-
-### Known-pitfall checklist (Phase 3 items)
-| Pitfall | Status |
-|---|---|
-| Creepage never derived from voltage alone (needs PD, material group, surface, table) | ✓ all mandatory, no defaults |
-| Altitude factor applied to clearance only | ✓ (K10: altitude has no effect on creepage; clearance × T4) |
-| Creepage ≥ clearance | ✓ max(creepage, associated clearance), with a warning |
-| Reinforced rule only from T7 | ✓ no constant in code; a missing record means INSUFFICIENT DATA |
-| No interpolation by default | ✓ next-higher row; linear only with `interpolation: "linear"` plus a non-empty `interpolationSource` |
-| Clearance uses peak, creepage uses RMS, IPC uses DC/AC peak | ✓ (TI SLUAAR5 quotes below) |
-| Peak never inferred from RMS without a declared waveform | ✓ (P6, K12) |
-| mil ↔ mm exact (S-006) | ✓ 25.4e-6 m/mil, including mil/V |
-| Per-volt extension uses (V − V_top) | ✓ (Altair PollEx: per-volt values "must be added"; the excess voltage is multiplied) |
-
-## Cross-checks
-`tests/crosscheck/` has no spacing record. X-03-twc-ipc2221 covers trace width, not spacing. A numeric cross-check against a reference tool needs real table values, which the repository must not contain. Status: **not yet obtained / not applicable** until the human enters licensed tables.
-
-## Source table (re-fetched by me, 2026-10-19)
-| Claim | URL | What I read | Ledger status | My assessment |
-|---|---|---|---|---|
-| RMS definition; sine V_rms = V0/√2 | https://openstax.org/books/university-physics-volume-2/pages/15-4-power-in-an-ac-circuit | "By definition" I_rms = √(i²_ave), with i²_ave = (1/T)∫₀ᵀ i² dt; "I_rms = I₀/√2", "V_rms = V₀/√2" (radical garbled by the fetcher) | S-035 VERIFIED | Honest |
-| sine 0.707, square crest factor 1, triangle/sawtooth 0.577, "only for pure forms" | Kuphaldt LibreTexts §1.3 (URL in S-035) | Verbatim quotes as in the ledger. The square-wave text does not say "symmetric"; it says "the peak is the same as the RMS and average values", which holds only for a bipolar symmetric square. The app's label "Symmetric square" is the correct reading | S-035 VERIFIED | Honest. Two independent tier-2 sources. The DC+AC line is derived algebra (my integral oracle confirms it) |
-| IEC 60664-1 scope, ed. 3.0 2020-05-26, Annex G/H, Table F.10 | https://webstore.iec.ch/publication/59671 | Verbatim, as the ledger states | S-030 VERIFIED (structure) | Honest |
-| Scope limits AC 1 000 V / DC 1 500 V, 30 kHz, 2 000 m | same | Verbatim | S-030a PAYWALLED | Conservative (abstract verbatim, clause 1 unread). Acceptable |
-| Clearance from impulse withstand; clearance working voltage = peak; creepage = RMS; reinforced creepage "twice" basic; reinforced clearance "as specified in Table F.2"; creepage raised to clearance; final distance = max | https://www.ti.com/document-viewer/lit/html/SLUAAR5/GUID-B1A84E91-DDEE-4C92-A54D-03C5F8DE95DD | Verbatim quotes. No statement on interpolation | S-030b UNVERIFIED, S-030f PAYWALLED | Honest |
-| Creepage ≥ associated clearance; creepage from long-term RMS; altitude factors for clearance (nothing said about creepage) | https://ptr-hartmann.com/know-how/connection-technology/approvals-standards/clearance-and-creepage-distances | Verbatim; cites EN 60664-1:2007 | S-030b, S-032 | Honest. "Altitude does not scale creepage" is correctly left unconfirmed (S-032, Q-43) |
-| IEC 60664-4 scope above 30 kHz up to 10 MHz, only with Part 1/5, values apply to basic insulation | https://webstore.iec.ch/en/publication/2804 | Verbatim | S-031 VERIFIED, S-031a PAYWALLED | Honest |
-| IPC-2221 Table 6-1 headings; per-volt "must be added" for the excess over the top band | https://help.altair.com/pollex/topics/pollex/verification/dfe_ipc_material_r.htm | Heading texts B1..A7; per-volt term multiplies only the voltage above the top band | S-033 PAYWALLED | Honest. Supports the app's extension formula structure |
-| S-030c CONFLICT, S-030d VERIFIED (structure), S-030e PAYWALLED, S-033a / S-034 UNVERIFIED | ledger URLs | Not re-fetched beyond the above | as listed | Plausible and conservative. S-030d VERIFIED rests on two manufacturer (tier-3) pages for definitions only, and the app shows no default degree, so this is acceptable |
-
-`src/core/data/ledger-status.ts` matches `LEDGER.md` for every S-030..S-035 row, including the umbrella pointer. The compliance gate still denies IEC 60664-1 because the umbrella row is PAYWALLED. No spacing source or UI text contains "compliant", "certified", "production safe" or "fab-ready". The VERIFIED-data recommendation says only "lookups from user-entered tables signed off by <name> … the product standard may require more".
-
-## "No numeric table value in the repository" check
-- **Shells:** confirmed empty. All 8 shells (`src/core/data/iec60664/T1..T7`, `src/core/data/ipc2221-spacing.json`) have status PAYWALLED-USER-MUST-VERIFY, `entered: false`, and 0 rows, columns, cells, groups and rules, with no breakpoint.
-- **`src/` and `tests/`:** confirmed clean.
-  - I scanned for the characteristic impulse, altitude, per-volt, breakpoint and scope figures. Every hit is an input in a test, a unit-slip window, or the repo's synthetic data (fake round values: T1 1..5 kV, T4 1/2/3, T8 0.25 mm/V, breakpoint 3000 m, CTI 0/20/50/90).
-  - No scope limit (30 kHz, 1 000 V, 1 500 V, 2 000 m) is in code. Scope limits are T7 records only.
-- **`docs/`:** NOT clean (finding F-1). See the defects list.
-
-## Defects
-
-### F-1. MAJOR (policy/claim honesty, non-numeric): IEC 60664-1 / IPC-2221 numeric values are present in `docs/`, and OPEN_RISKS states the opposite
-- **Where:**
-  - `docs/sources/LEDGER.md` S-030e and `docs/sources/notes/spacing-iec60664-ipc2221.md` lines 82-85 hold the four CTI band limits of the material groups. These are the complete content of human-owned table T6.
-  - `docs/sources/LEDGER.md` S-010 (notes column) and `docs/sources/notes/ipc2221.md` lines 34-40 hold the IPC-2221 elevation breakpoint in metres. This is the content of T8 `elevationBreakpoint`, which the research doc says must come "from the data file".
-  - `docs/research/kicad-pcb-calculator.md` C-K14, line 98 and E1 hold the IPC top voltage-band boundary used for the per-volt extension. The research doc §1 lists "voltage band boundaries" among the values that must not be written.
-- **Context:** none of these is a spacing distance, impulse voltage or altitude factor. All came from public secondary pages (PTR Hartmann, In Compliance, KiCad source), not from memory. All are labelled PAYWALLED or tier-4. Nothing in `src/` reads them.
-- **Problem:** OPEN_RISKS ("Phase 3 core") says "Nothing numeric from IEC 60664-1 or IPC-2221 exists anywhere in the repository". The phase-3 ledger header says "STRICT: no numeric … table value is recorded anywhere in this ledger". Both are untrue as written.
-- **Expected:** either (a) redact these values from the docs and replace them with "see licensed copy", or (b) have the human record an explicit exception for publicly printed definitional/heading facts, and correct the OPEN_RISKS sentence.
-- **Owner:** standards-researcher (redaction or wording); human (exception decision).
-
-### F-2. MINOR: one `reinforced-clearance` rule record is applied to both T2 (impulse) and T3 (steady-state/recurring peak)
-- **Repro:** reinforced insulation with T3 populated. `stepUp` is passed to both lookups (`clearance/calc.ts` lines 115 and 131).
-- **Problem:** the standard's reinforced rule for the steady-state case may differ from the impulse case. This is paywalled, and I cannot verify it.
-- **Suggested fix:** separate rule ids (`reinforced-clearance-impulse`, `reinforced-clearance-steady-state`), or refuse reinforced with T3 populated until the human records how T3 is treated.
-- **Owner:** calc-implementer, with the human for the rule text.
-
-### F-3. MINOR: "next-higher-row" for reinforced clearance means the next T2 row, not necessarily the next rated-impulse step
-- **Problem:** the two are the same only if the T2 rows the human enters are exactly the preferred impulse series. If T2 has intermediate rows, the step-up is smaller than "next impulse step" (non-conservative).
-- **Suggested fix:**
-  - state in the import help and in the rule's assumption text that `next-higher-row` steps one T2 row; and/or
-  - add a mode that steps in the T1 cell series.
-- **Owner:** calc-implementer / ui-engineer.
-
-### F-4. MINOR: the coating credit is modelled as a distance multiplier ≤ 1
-- **Problem:** IEC 60664-3 as described publicly (S-030g) works differently. Type 1 "improves the microenvironment", i.e. a different pollution-degree column, and type 2 is "similar to solid insulation". A single factor cannot express "use the PD1 column". The credit is applied only when the user selects it AND T7 is VERIFIED, so there is no numeric risk today.
-- **Suggested fix:** model type 1 as a pollution-degree substitution before any human enters a coating record (already partly logged as P3-6).
+### R-2. MINOR (residual of F-6): a DC waveform with frequency > 0 is accepted silently
+- **Repro:** clearance with `waveform {shape: 'dc', basis: 'peak', value: 230 V}` and frequency 50 Hz (C13c). Result 0.83 mm, no warning.
+- **Impact:** the result is numerically the same, but the frequency still drives the T7 scope check, so contradictory inputs pass without comment. The 0 Hz case is refused; this case is not.
+- **Suggested fix:** a warning (or a refusal for symmetry), for example "DC declared but frequency > 0".
 - **Owner:** calc-implementer.
 
-### F-5. MINOR: traceability gap, S-035 not cited when a declared waveform is used
-- **Repro:** clearance, creepage or IPC with `waveform` set.
-- **Problem:** `reference.ledgerIds` lacks S-035. The IPC result also lacks S-006 (mil/mm and mil/V conversion). The input `sourceDetail` says "from the declared … waveform", but the ledger id is missing.
-- **Suggested fix:** append S-035 when `voltageHow === 'waveform'`.
-- **Owner:** calc-implementer.
-
-### F-6. MINOR: no consistency check between the declared waveform and the frequency, and no unipolar-square hint
-- **Problems:**
-  - `shape: 'sine'` with `frequency: 0` is accepted and treated as DC for the T7 voltage-scope rule (peak used against the DC limit).
-  - `shape: 'dc'` with f > 0 is also accepted.
-  - A unipolar 0..V square (gate drive) declared as "Symmetric square" from an RMS value gives peak = RMS. The true peak is √2·RMS, so this is non-conservative for the clearance/IPC working voltage. The "Symmetric" label mitigates this.
-- **Suggested fix:** warn on a shape/frequency mismatch, and add a hint "for unipolar pulses enter peak and RMS directly".
-- **Owner:** calc-implementer / ui-engineer.
-
-### F-7. MINOR (hygiene): `src/core/spacing/tables.ts` contains two raw NUL bytes inside template literals (lines 1047 and 1091, the cell-map key separator)
-- **Problems:**
-  - `grep` treats the file as binary ("Binary file matches"), which hampers review and audit greps. Git still diffs it as text because the NUL is beyond the first 8 KB.
-  - Keys containing `\u0000` (legal in JSON) could collide in theory.
-- **Suggested fix:** use the escape `'\u0000'` in source, or a `Map<string, Map<string, Cell>>`.
-- **Owner:** calc-implementer.
-
-### Not defects, noted
-- `dcPlusSine` and `pulseRms` are correct (verified above) but are not wired to any calculator or UI. `dcPlusSine` rejects V_dc ≤ 0 with a clear message, so it never produces a wrong number.
-- Functional and supplementary insulation use the basic lookup. This is stated as an assumption and is conservative.
-- At the IPC elevation breakpoint the "above" column is used. This is conservative and stated.
-- `npm run check:size` reports a BLOCKER (bundle total). This is logged by the UI work and outside calculation scope; the phase-validator owns it.
+### Observations (not defects)
+- **CF-5 peak comparison for reinforced (C7):** with T3 empty, the peak working voltage is compared with the stepped impulse value (3.4 kV), not with the basic one (1.9 kV). A 2.5 kV peak is therefore accepted for reinforced, while the same input with basic insulation is refused. This is a sanity check, not a standard rule, and T3_NOT_ENTERED (confidence low) is shown. The reinforced steady-state requirement stays unchecked until T3 and its rule are entered. Acceptable as documented, but the pcb-domain-reviewer may want the basic impulse used for this check.
+- **Error code:** "INSUFFICIENT DATA" and "OUT OF TABLE RANGE" refusals carry the code `OUT_OF_DOMAIN`, with the state named in the message. The UI distinguishes them by message prefix. This is unchanged from before and consistent.
+- **Bundle ceiling:** raised to 430 KB by a logged user decision (SPEC). This is outside calculation scope.
+- **Cross-checks:** `tests/crosscheck/` still has no spacing record. One needs real table values, which must not enter the repository. Status: not yet obtained / not applicable.
 
 ## What I could NOT verify
-- Any IEC 60664-1, IEC 60664-3/-4 or IPC-2221 table value, clause text, or rule:
-  - reinforced rules (S-030f);
-  - interpolation permission (Q-41);
-  - whether altitude correction excludes creepage (S-032 / Q-43);
-  - the T1 row-key semantics (Q-36);
-  - the IPC column set per revision (S-033).
+- Any IEC 60664-1/-3/-4 or IPC-2221 clause text, table value or rule. This includes the preferred impulse series itself, the reinforced rule for T3, interpolation permission and altitude versus creepage. All of these are paywalled, and I read only the TI pages and official abstracts listed above.
+- That `next-preferred-impulse-step` is the standard's own wording. Only TI (two documents from one publisher) states it.
+- The correctness of any human-entered table. None exists yet (P3-1), so "Human has signed verifiedBy" is still vacuous.
+- The UI rendering of the new help panel and banners. I checked only the help text source, not a browser.
 
-  All of these are paywalled. I read only the official abstracts and manufacturer/tool pages listed above.
-- The correctness of any human-entered table. None exists yet (P3-1), so the exit criterion "Human has signed verifiedBy" is vacuous.
-- A numeric cross-check against a reference tool (for example the KiCad IEC 60664 panel). It needs real table values, and those must not enter the repository.
-- The UI rendering of banners, which I checked only in view-model code, not in a browser.
-
-Validator scratch files (`tools/reference/validator_scratch/`) were deleted after the run.
+Validator scratch files were kept in the session scratchpad only and deleted after the run. No repository file other than this report was written by me.

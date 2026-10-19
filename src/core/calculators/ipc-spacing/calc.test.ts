@@ -82,6 +82,15 @@ describe('ipc-spacing: numbers from the synthetic T8', () => {
     delete i['elevation'];
     expect(primary(ok(i as unknown as Inputs))).toBeCloseTo(mm(t8(3, 1)), 12);
   });
+  it('a coated column carries the exposed-pad caution as a core warning; uncoated and internal do not', () => {
+    const i = external({ coating: 'permanent-polymer-or-solder-mask' }) as unknown as Record<string, unknown>;
+    delete i['elevation'];
+    const coated = ok(i as unknown as Inputs).warnings.find((w) => w.code === 'COATED_COLUMN_EXPOSED_COPPER');
+    expect(coated?.message).toMatch(/uncoated/);
+    expect(coated?.message).toMatch(/Pads/);
+    expect(ok(external()).warnings.some((w) => w.code === 'COATED_COLUMN_EXPOSED_COPPER')).toBe(false);
+    expect(ok(base()).warnings.some((w) => w.code === 'COATED_COLUMN_EXPOSED_COPPER')).toBe(false);
+  });
   it('a combination the edition has no column for is refused with the table named, never a neighbour column', () => {
     expect(fails(external({ coating: 'conformal-coating' })).message).toContain('T8');
     expect(fails(external({ conductorKind: 'component-lead' })).gate).toBe('INSUFFICIENT_DATA');

@@ -130,6 +130,32 @@ describe('clearance: numbers from synthetic tables', () => {
     // basic insulation does not need it
     expect(compute(base({}, set.value)).ok).toBe(true);
   });
+  it('reinforced with T3: the steady-state multiplier is an explicit calculation step, strictly above 1, and the T3 part shows its product', () => {
+    const r = ok(base({ insulationType: 'reinforced' }));
+    const step = r.steps.find((s) => s.label.startsWith('Reinforced steady-state multiplier'));
+    expect(step?.value.si).toBe(T7_REINFORCED_STEADY_MULTIPLIER);
+    expect(T7_REINFORCED_STEADY_MULTIPLIER).toBeGreaterThan(1);
+    const prod = r.steps.find((s) => s.label.startsWith('Clearance from T3 after the reinforced multiplier'));
+    expect(prod?.value.si).toBeCloseTo(mm(t3(1, true) * T7_REINFORCED_STEADY_MULTIPLIER), 12);
+    // basic insulation has no such step
+    expect(ok(base()).steps.some((s) => s.label.includes('multiplier'))).toBe(false);
+  });
+  it('reinforced with T3 empty: the peak working voltage is compared with the BASIC impulse value, not the stepped one', () => {
+    const noT3 = synthSet(['T2', 'T4', 'T7']);
+    // fake series 1, 2, 4, 5 kV: basic impulse 2 kV steps to 4 kV for reinforced. A 3 kV peak is above 2 kV.
+    const peak3k = { workingVoltagePeak: V(3000) };
+    const basic = fails(base({ ...peak3k }, noT3));
+    expect(basic.gate).toBe('OUT_OF_SCOPE');
+    const reinforced = fails(base({ insulationType: 'reinforced', ...peak3k }, noT3));
+    expect(reinforced.gate).toBe('OUT_OF_SCOPE');
+    expect(reinforced.field).toBe('workingVoltagePeak');
+    expect(reinforced.message).toContain('2000');
+    expect(reinforced.message).not.toContain('4000');
+    // at the basic value it passes and keeps the T3_NOT_ENTERED warning
+    const edge = ok(base({ insulationType: 'reinforced', workingVoltagePeak: V(2000) }, noT3));
+    expect(edge.warnings.some((w) => w.code === 'T3_NOT_ENTERED')).toBe(true);
+    expect(primary(edge)).toBeCloseTo(mm(t2(4, 2, true)), 12);
+  });
   it('a T7 without the reinforced-clearance record is refused with the rule named', () => {
     const raw7 = rawSynthetic('T7');
     const rules = (raw7['rules'] as Record<string, unknown>[]).filter((r) => r['rule'] !== 'reinforced-clearance');
@@ -389,9 +415,9 @@ describe('clearance: peak working voltage against the impulse withstand voltage 
     expect(e.message).toContain('T3');
     expect(compute(base({ workingVoltagePeak: V(2000) }, noT3)).ok).toBe(true);
   });
-  it('for reinforced insulation the voltage used is the stepped series value', () => {
-    expect(compute(base({ insulationType: 'reinforced', workingVoltagePeak: V(3500) }, noT3)).ok).toBe(true);
-    expect(fails(base({ insulationType: 'reinforced', workingVoltagePeak: V(4500) }, noT3)).gate).toBe('OUT_OF_SCOPE');
+  it('for reinforced insulation the BASIC impulse value is used (more conservative), not the stepped series value', () => {
+    expect(fails(base({ insulationType: 'reinforced', workingVoltagePeak: V(3500) }, noT3)).gate).toBe('OUT_OF_SCOPE');
+    expect(compute(base({ insulationType: 'reinforced', workingVoltagePeak: V(2000) }, noT3)).ok).toBe(true);
   });
   it('with T3 populated the larger of the two clearances wins instead', () => {
     const r = ok(base({ workingVoltagePeak: V(2500) }));
@@ -406,6 +432,12 @@ describe('clearance: waveform, frequency and traceability', () => {
     expect(sine.field).toBe('frequency');
     expect(sine.message).toContain('frequency 0 Hz means DC');
     expect(compute(base({ frequency: HZ(0), workingVoltagePeak: undefined as never, waveform: { shape: 'dc', basis: 'peak', value: V(300) } })).ok).toBe(true);
+  });
+  it('a declared DC waveform with a frequency above 0 is refused ("DC means 0 Hz")', () => {
+    const e = fails(base({ frequency: HZ(50), workingVoltagePeak: undefined as never, waveform: { shape: 'dc', basis: 'peak', value: V(300) } }));
+    expect(e.code).toBe('INVALID_INPUT');
+    expect(e.field).toBe('frequency');
+    expect(e.message).toContain('DC means 0 Hz');
   });
   it('a square waveform declared from an rms value warns that a unipolar pulse would have a higher peak', () => {
     const w = (basis: 'rms' | 'peak') => ok(base({ workingVoltagePeak: undefined as never, waveform: { shape: 'square', basis, value: V(100) } }));

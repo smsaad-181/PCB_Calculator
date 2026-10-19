@@ -113,7 +113,8 @@ function build(raw: unknown): CalcOutcome {
     used.push(T.T7);
     const k = rule.value as number;
     creepage *= k;
-    steps.push({ label: 'Reinforced multiplier (T7)', expr: 'user-entered rule record', value: dimless(k) });
+    steps.push({ label: 'Reinforced multiplier (T7)', expr: 'user-entered rule record (greater than 1)', value: dimless(k) });
+    steps.push({ label: 'Creepage after the reinforced multiplier', expr: 'T5 value x reinforced multiplier', value: lenQ(creepage), bound: 'min-requirement' });
     lines.push(`T7 rule reinforced-creepage-multiplier = ${String(k)}, source ${rule.source}: ${rule.clauseText}`);
   }
 

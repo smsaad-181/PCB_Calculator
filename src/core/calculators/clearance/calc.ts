@@ -109,34 +109,32 @@ function build(raw: unknown): CalcOutcome {
   // 4. reinforced insulation: only the T7 rule records. The impulse part steps in the T7 preferred impulse series (never a T2 row);
   //    the steady-state (T3) part needs its own record.
   let lookupV = impulseV;
-  let multiplier = 1;
   let steadyMultiplier = 1;
   if (reinforced) {
     const rule = findRule(T.T7, 'reinforced-clearance');
     if (rule === undefined) return { ok: false, error: ruleMissingError(T.T7, 'reinforced-clearance') };
     used.push(T.T7);
     lines.push(`T7 rule reinforced-clearance (${rule.mode ?? ''}), source ${rule.source}: ${rule.clauseText}`);
-    if (rule.mode === 'multiplier') multiplier = rule.value as number;
-    else {
-      const st = nextPreferredImpulseStep(rule, impulseV);
-      if (!st.ok) return { ok: false, error: st.above ? { code: 'OUT_OF_DOMAIN', gate: 'OUT_OF_SCOPE', message: st.message } : insufficientData([st.message]) };
-      lookupV = st.valueSi;
-      steps.push({ label: 'Next preferred impulse step (T7 series)', expr: 'T7 series value above the required impulse voltage', value: q(lookupV, DIM.VOLTAGE), bound: 'min-requirement' });
-    }
+    const st = nextPreferredImpulseStep(rule, impulseV);
+    if (!st.ok) return { ok: false, error: st.above ? { code: 'OUT_OF_DOMAIN', gate: 'OUT_OF_SCOPE', message: st.message } : insufficientData([st.message]) };
+    lookupV = st.valueSi;
+    steps.push({ label: 'Next preferred impulse step (T7 series)', expr: 'T7 series value above the required impulse voltage', value: q(lookupV, DIM.VOLTAGE), bound: 'min-requirement' });
     if (!isTableEmpty(T.T3)) {
       const steady = findRule(T.T7, 'reinforced-clearance-steady-state');
       if (steady === undefined) return { ok: false, error: ruleMissingError(T.T7, 'reinforced-clearance-steady-state') };
       steadyMultiplier = steady.value as number;
+      steps.push({ label: 'Reinforced steady-state multiplier (T7)', expr: 'user-entered rule record (greater than 1)', value: dimless(steadyMultiplier) });
     }
   }
-  if (isTableEmpty(T.T3) && peakV > lookupV * (1 + 1e-12)) {
+  // With T3 empty the peak is compared with the BASIC impulse value (the more conservative one), never the stepped reinforced value.
+  if (isTableEmpty(T.T3) && peakV > impulseV * (1 + 1e-12)) {
     return {
       ok: false,
       error: {
         code: 'OUT_OF_DOMAIN',
         gate: 'OUT_OF_SCOPE',
         field: 'workingVoltagePeak',
-        message: `The peak working voltage ${String(peakV)} V exceeds the impulse withstand voltage ${String(lookupV)} V used for T2, and table T3 is not entered: the clearance for that voltage cannot be found. Enter T3 from your licensed copy.`,
+        message: `The peak working voltage ${String(peakV)} V exceeds the impulse withstand voltage ${String(impulseV)} V (the basic value, used for the reinforced check too), and table T3 is not entered: the clearance for that voltage cannot be found. Enter T3 from your licensed copy.`,
       },
     };
   }
@@ -148,7 +146,6 @@ function build(raw: unknown): CalcOutcome {
   lines.push(provenanceLine(T.T2, l2));
   steps.push({ label: 'Clearance from T2', expr: 'T2(impulse withstand voltage, pollution degree, field condition)', value: lenQ(l2.valueSi), bound: 'min-requirement' });
   let base = l2.valueSi;
-  base *= multiplier;
   const safetyDefaults: string[] = [...scope.unchecked];
   const warnings: CalcWarning[] = [];
   if (isTableEmpty(T.T3)) {
@@ -164,7 +161,12 @@ function build(raw: unknown): CalcOutcome {
     used.push(T.T3);
     lines.push(provenanceLine(T.T3, l3));
     steps.push({ label: 'Clearance from T3', expr: 'T3(peak working voltage, field condition)', value: lenQ(l3.valueSi), bound: 'min-requirement' });
-    base = Math.max(base, l3.valueSi * steadyMultiplier);
+    let t3Part = l3.valueSi;
+    if (reinforced) {
+      t3Part *= steadyMultiplier;
+      steps.push({ label: 'Clearance from T3 after the reinforced multiplier', expr: 'T3 clearance x steady-state multiplier', value: lenQ(t3Part), bound: 'min-requirement' });
+    }
+    base = Math.max(base, t3Part);
   }
 
   // 6. altitude: clearance only

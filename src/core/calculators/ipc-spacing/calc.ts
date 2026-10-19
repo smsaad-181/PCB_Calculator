@@ -39,6 +39,8 @@ export interface Inputs {
 
 const DATA_STATUS = dataStatusForLedgerIds(meta.ledgerIds);
 const lenQ = (m: number): Quantity => q(m, DIM.LENGTH);
+export const COATED_COLUMN_EXPOSED_COPPER_NOTE =
+  'Pads, lands and component leads are normally uncoated: use the uncoated column (or the component-lead column) for gaps that touch them. A coated column fits only where mask or coating covers both conductors along the whole gap.';
 export const IPC_LABEL = 'IPC-2221 conductor spacing (design guideline; not a safety insulation assessment)';
 const IPC_NOTE =
   'IPC-2221 conductor spacing is a design guideline, not a safety insulation assessment: it has no pollution degree, material group or overvoltage category and does not replace the IEC 60664-1 calculators or the product standard (S-033a).';
@@ -105,6 +107,9 @@ function build(raw: unknown): CalcOutcome {
   const warnings: CalcWarning[] = [...commonWarnings({ unverified, iec: false }), { severity: 'warning', message: IPC_NOTE, code: 'IPC_NOT_SAFETY' }];
   const sq = squareRmsWarning(inp.waveformShape, inp.waveformBasis);
   if (sq !== undefined) warnings.push(sq);
+  if (inp.location === 'external' && inp.coating !== undefined && inp.coating !== 'uncoated') {
+    warnings.push({ severity: 'caution', message: COATED_COLUMN_EXPOSED_COPPER_NOTE, code: 'COATED_COLUMN_EXPOSED_COPPER' });
+  }
   const ledgerIds = withWaveformRow(meta.reference.ledgerIds, inp.voltageHow === 'waveform');
   const recommendation = unverified
     ? `${INDICATIVE_PREFIX}: the table data is UNVERIFIED (entered by a user, not verified by a named person). ${IPC_LABEL}. Check every cell against your licensed copy of IPC-2221 before using this spacing.`

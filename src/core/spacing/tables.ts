@@ -628,8 +628,8 @@ function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean 
     const coatingType = getKey(r, 'coatingType');
     const appliesTo = getKey(r, 'appliesTo');
     const seriesRaw = getKey(r, 'series');
-    const num = (min: number, max: number, what: string): number | undefined => {
-      if (!finiteNumber(value) || value < min || value > max) {
+    const num = (min: number, max: number, what: string, minExclusive = false): number | undefined => {
+      if (!finiteNumber(value) || value < min || value > max || (minExclusive && value === min)) {
         c.errors.push(`${p}.value must be a finite number ${what}`);
         return undefined;
       }
@@ -647,8 +647,8 @@ function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean 
       ok = false;
     };
     /** A dimensionless multiplier record: value in [min, max], unit "1". */
-    const multiplier = (min: number, max: number, what: string): void => {
-      outValue = num(min, max, what);
+    const multiplier = (min: number, max: number, what: string, minExclusive = false): void => {
+      outValue = num(min, max, what, minExclusive);
       outUnit = '1';
       if (unit !== '1') bad('unit must be "1" (a multiplier)');
       ok = ok && outValue !== undefined;
@@ -661,31 +661,29 @@ function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean 
       if (outValue !== undefined && !inWindow(outValue * (unitFactorSi(unit) ?? 1), w)) bad('value is outside the unit slip window (check the unit); this is not a standard limit');
       ok = ok && outValue !== undefined;
     };
-    const ATLEAST1 = 'of at least 1 (a reinforced distance is never below basic)';
+    const ABOVE1 = 'greater than 1 (a multiplier of 1 would make the reinforced distance equal to basic)';
     switch (rule as RuleId) {
       case 'reinforced-creepage-multiplier':
-        multiplier(1, 1e3, ATLEAST1);
+        multiplier(1, 1e3, ABOVE1, true);
         break;
       case 'reinforced-clearance':
-        if (mode !== 'next-preferred-impulse-step' && mode !== 'multiplier') bad('mode must be "next-preferred-impulse-step" or "multiplier"');
+        // Only the next preferred impulse step: a multiplier mode could be entered as 1 and silently make reinforced equal basic.
+        if (mode !== 'next-preferred-impulse-step') bad('mode must be "next-preferred-impulse-step"');
         else {
           outMode = mode;
-          if (mode === 'multiplier') multiplier(1, 1e3, ATLEAST1);
+          if (value !== undefined) bad('value must be absent for mode next-preferred-impulse-step');
+          if (typeof unit !== 'string' || !VOLT_UNITS.includes(unit)) bad(`unit must be one of ${VOLT_UNITS.join(', ')}`);
           else {
-            if (value !== undefined) bad('value must be absent for mode next-preferred-impulse-step');
-            if (typeof unit !== 'string' || !VOLT_UNITS.includes(unit)) bad(`unit must be one of ${VOLT_UNITS.join(', ')}`);
-            else {
-              outUnit = unit;
-              outSeries = parseSeries(seriesRaw, unit, p, c);
-              ok = ok && outSeries !== undefined;
-            }
+            outUnit = unit;
+            outSeries = parseSeries(seriesRaw, unit, p, c);
+            ok = ok && outSeries !== undefined;
           }
         }
         break;
       case 'reinforced-clearance-steady-state':
         if (mode !== 'multiplier') bad('mode must be "multiplier"');
         else outMode = mode;
-        multiplier(1, 1e3, ATLEAST1);
+        multiplier(1, 1e3, ABOVE1, true);
         break;
       case 'scope-max-frequency':
         limit(FREQ_UNITS, UNIT_SLIP_WINDOWS.frequencyHz);
@@ -910,8 +908,9 @@ export function parseSpacingTable(raw: unknown, opts: { today?: string } = {}): 
 // ---- state ---------------------------------------------------------------------------------------------------------------
 
 type SignedParts = Pick<SpacingTable, 'enteredBy' | 'verifiedBy' | 'cells' | 'groups' | 'rules'> & { readonly elevationBreakpoint?: ElevationBreakpoint };
-const normName = (x: string | undefined): string => (x ?? '').trim().toLowerCase();
-/** VERIFIED needs a second person: verifiedBy differs (ignoring case and spaces) from every enteredBy and checkedBy. True if it does not. */
+/** Name comparison for the second-person rule: Unicode NFKC, runs of whitespace collapsed to one space, trimmed, lower-cased. */
+const normName = (x: string | undefined): string => (x ?? '').normalize('NFKC').replace(/\s+/g, ' ').trim().toLowerCase();
+/** VERIFIED needs a second person: verifiedBy differs (ignoring case, Unicode compatibility forms and runs of spaces) from every enteredBy and checkedBy. True if it does not. */
 export function signedBySelf(t: SignedParts): boolean {
   const who = normName(t.verifiedBy);
   const recs: { enteredBy: string; checkedBy?: string | undefined }[] = [t, ...t.cells, ...t.groups, ...t.rules, ...(t.elevationBreakpoint === undefined ? [] : [t.elevationBreakpoint])];

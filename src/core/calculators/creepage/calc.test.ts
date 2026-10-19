@@ -100,6 +100,11 @@ describe('creepage: numbers from synthetic tables', () => {
   it('reinforced insulation applies only the T7 multiplier record', () => {
     const r = ok(base({ insulationType: 'reinforced', associatedClearance: MM(1) }));
     expect(primary(r)).toBeCloseTo(mm(t5(2, 2, 1)) * T7_REINFORCED_CREEPAGE, 12);
+    const step = r.steps.find((s) => s.label.startsWith('Reinforced multiplier'));
+    expect(step?.value.si).toBe(T7_REINFORCED_CREEPAGE);
+    expect(T7_REINFORCED_CREEPAGE).toBeGreaterThan(1);
+    expect(r.steps.map((s) => s.label)).toContain('Creepage after the reinforced multiplier');
+    expect(ok(base({ associatedClearance: MM(1) })).steps.some((s) => s.label.includes('multiplier'))).toBe(false);
     const e = fails(base({ insulationType: 'reinforced' }, synthSet(['T5'])));
     expect(e.message).toBe('INSUFFICIENT DATA: table T7 rule records is empty (enter values from your licensed copy)');
     const raw7 = rawSynthetic('T7');

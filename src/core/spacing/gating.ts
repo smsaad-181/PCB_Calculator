@@ -179,8 +179,15 @@ export function scopeTable(t7: SpacingTable, edition: string, needed: boolean): 
   return needed ? { table: t7, error } : { table: SHIPPED_TABLES.tables.T7 };
 }
 
-/** Frequency 0 Hz means DC: a declared waveform that is not DC contradicts it. */
+/** Frequency 0 Hz means DC: a declared waveform that is not DC contradicts it, and a declared DC waveform with a frequency above 0 does too. */
 export function waveformFrequencyError(shape: string | undefined, frequencyHz: number): CalcError | undefined {
+  if (shape === 'dc' && frequencyHz > 0) {
+    return {
+      code: 'INVALID_INPUT',
+      field: 'frequency',
+      message: `The declared dc waveform contradicts a frequency of ${String(frequencyHz)} Hz: DC means 0 Hz. Set the frequency to 0 or declare an AC waveform.`,
+    };
+  }
   if (shape === undefined || shape === 'dc' || frequencyHz !== 0) return undefined;
   return {
     code: 'INVALID_INPUT',

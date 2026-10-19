@@ -527,3 +527,31 @@ Tests use only synthetic or FAKE data. No IEC 60664-1 or IPC-2221 value was ente
 
 ## Phase 3 bundle budget decision (2026-10-19)
 User decision (AskUserQuestion): total gzip JS ceiling raised from 400 KB to 430 KB (docs/SPEC.md, tools/check-size.mjs). Per-route first-load limit stays 150 KB. Reason: Phase 3 core + pages + entry guide reached 402.9 KB after 11 KB of trims; no further cheap savings without editing closed phases. Supersedes the UI BLOCKER and PV3-1/M-1 paragraphs about check:size; headroom for Phase 4 is about 27 KB.
+
+## Phase 3 final fixes and conditions (logged 2026-10-19, branch phase-3, uncommitted; calc-implementer)
+
+Tests use only synthetic data (fake round numbers). No IEC 60664-1 or IPC-2221 value was entered anywhere. The shipped tables are still empty.
+
+Fixed:
+
+| # | Finding | Fix |
+|---|---|---|
+| FF-1 | pcb N-1 (MAJOR): reinforced `multiplier` mode accepting 1 made reinforced equal to basic silently | `reinforced-clearance` now has only mode `next-preferred-impulse-step` (importer refuses `multiplier`; audit-lib mirrors it). `reinforced-creepage-multiplier` and `reinforced-clearance-steady-state` must be strictly greater than 1 (importer, audit-lib, tests). The multiplier is now an explicit calculation step in the clearance result ("Reinforced steady-state multiplier (T7)", "Clearance from T3 after the reinforced multiplier") and the creepage result ("Reinforced multiplier (T7)", "Creepage after the reinforced multiplier"). Help text updated. |
+| FF-2 | calc N-1: second-person name check ignored inner spaces and Unicode forms | `normName` in `src/core/spacing/tables.ts` and `tools/audit-lib.mjs`: NFKC, whitespace runs collapsed, trim, lower-case. |
+| FF-3 | calc N-2: input-format examples looked like standard figures | `src/state/state-key-docs.ts` examples now read "a value with a unit". |
+| FF-4 | calc R-2: DC waveform with frequency above 0 accepted silently | Refused ("DC means 0 Hz"), same guard as the 0 Hz case in reverse, in clearance and creepage. |
+| FF-5 | calc observation / pcb N-2: with T3 empty and reinforced insulation the peak was compared with the stepped impulse value | Compared with the BASIC impulse value (more conservative); T3_NOT_ENTERED warning kept. |
+| FF-6 | pcb N-4: IPC exposed-pad caution only in the UI | Core warning `COATED_COLUMN_EXPOSED_COPPER` for a coated external column. The UI inline note shows only while no result is shown (no duplicate). The "both conductors covered" yes/no input is NOT built (see F-8 residual). |
+
+Open conditions (not fixed here):
+
+| # | Condition | Note |
+|---|---|---|
+| F-6 | Coating credit is a user-entered multiplier, while IEC 60664-3 may work by pollution-degree substitution; there is no "100 % coverage" input | The credit stays blocked unless a VERIFIED T7 record exists and the user selects it. To be resolved before any real table is imported. |
+| F-7 | The creepage associated clearance is typed by hand; there is no check that it belongs to the same insulation type | Hint and link exist on the page. A later feature may link it to the clearance result. |
+| N-3 | Second-person names are free text | NFKC and whitespace normalisation reduce honest mistakes only. They do not prove two different people. |
+| N-5 | T1 row-key definition field, table-level provenance defaults, CSV importer not built | Convenience and clarity features for data entry, planned after the data policy is settled. |
+| PV3 | PV3 items remaining (human-only items in the Phase 3 phase-validator section above) | Unchanged by this change set. |
+
+## Phase 3 closure record (2026-10-19, branch phase-3)
+All three validators PASS-WITH-CONDITIONS after fixes; full record in `docs/validation/reports/phase-3-closure.md`. Human items: enter T1-T8 from licensed copies with a second-person verifier (P3-1), run a cross-check with real values, decide on F-6 (coating credit) and F-7; PR for `phase-3` (chain: phase-1-closure -> phase-2 -> phase-2-closure -> phase-3).
