@@ -245,3 +245,5 @@ td.num { font-variant-numeric: tabular-nums; }
 .state-pill.state-verified { border-style: double; border-width: 4px; }
 .button-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0; }
 .ok-box { border: 2px solid var(--muted); border-radius: 6px; padding: 0.1rem 1rem; background: var(--bg); }
+.example-json { overflow: auto; max-height: 24rem; padding: 0.5rem; border: 1px solid var(--border); font-size: 0.8125rem; }
+.spacing-help dt { font-weight: 600; margin-top: 0.5rem; } .spacing-help dd { margin-left: 0; }

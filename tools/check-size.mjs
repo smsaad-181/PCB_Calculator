@@ -1,7 +1,7 @@
 // npm run check:size: gzip JS budgets (docs/SPEC.md non-functional). Run after `npm run build`.
 // (1) First-load per calculator route <= 150 KB gzip: entry chunk + its static shared chunks
 //     + that route's lazy chunk and its static dependencies.
-// (2) Total across all JS <= 400 KB gzip.
+// (2) Total across all JS <= 430 KB gzip (user decision 2026-10-19).
 // Uses dist/.vite/manifest.json when present; otherwise parses import statements in the built chunks.
 import { readdirSync, readFileSync, existsSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -10,7 +10,7 @@ import { dirname, join, relative, posix } from 'node:path';
 import { evaluateBudget } from './size-lib.mjs';
 
 const FIRST_LOAD_BUDGET = 150 * 1024;
-const TOTAL_BUDGET = 400 * 1024;
+const TOTAL_BUDGET = 430 * 1024;
 const CHUNK_WARN_BYTES = 50 * 1024;
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');

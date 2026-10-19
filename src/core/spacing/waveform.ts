@@ -107,6 +107,7 @@ export interface ResolvedVoltage {
   /** How the numbers were obtained, for the result's input provenance. */
   readonly how: 'direct' | 'waveform' | 'none';
   readonly waveformShape?: WaveformShape;
+  readonly waveformBasis?: VoltageBasis;
 }
 
 /**
@@ -124,7 +125,7 @@ export function resolveVoltage(spec: VoltageSpec): Result<ResolvedVoltage, CalcE
   if (spec.waveform !== undefined) {
     const w = voltageFromWaveform(spec.waveform.shape, spec.waveform.basis, spec.waveform.value);
     if (!w.ok) return w;
-    return { ok: true, value: { peak: w.value.peak, rms: w.value.rms, how: 'waveform', waveformShape: spec.waveform.shape } };
+    return { ok: true, value: { peak: w.value.peak, rms: w.value.rms, how: 'waveform', waveformShape: spec.waveform.shape, waveformBasis: spec.waveform.basis } };
   }
   if (!direct) return { ok: true, value: { how: 'none' } };
   let peak: Quantity | undefined;

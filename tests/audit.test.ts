@@ -236,11 +236,17 @@ describe('spacing table audit (Phase 3: build fails if a safety table without ve
   });
   it('VERIFIED needs verifiedBy and verifiedDate, no banner, every record checked; a signer needs status VERIFIED', () => {
     const cell = { row: 'a', col: 'b', value: 1, unit: 'mm' };
-    const verified = shell({ status: 'VERIFIED', entered: true, verifiedBy: 'A. Person', verifiedDate: '2026-01-02', bannerRequired: false, cells: [{ ...cell, checkedBy: 'A. Person', checkedDate: '2026-01-02' }] });
+    const verified = shell({ status: 'VERIFIED', entered: true, verifiedBy: 'A. Person', verifiedDate: '2026-01-02', bannerRequired: false, cells: [{ ...cell, enteredBy: 'C. Author', checkedBy: 'B. Checker', checkedDate: '2026-01-02' }] });
     expect(validateTable(verified, path)).toEqual([]);
     expect(errs({ ...verified, verifiedDate: '' })).toContain('verifiedDate');
     expect(errs({ ...verified, bannerRequired: true })).toContain('bannerRequired');
     expect(errs({ ...verified, cells: [cell] })).toContain('checkedBy');
+    // second person: the signer may not be an enterer or checker of any record (case-insensitive, trimmed)
+    const cells = (over: Record<string, unknown>) => [{ ...cell, enteredBy: 'C. Author', checkedBy: 'B. Checker', checkedDate: '2026-01-02', ...over }];
+    expect(errs({ ...verified, cells: cells({ checkedBy: ' a. PERSON ' }) })).toContain('second person');
+    expect(errs({ ...verified, cells: cells({ enteredBy: 'a. person' }) })).toContain('second person');
+    expect(errs({ ...verified, enteredBy: 'A. Person' })).toContain('second person');
+    expect(errs({ ...verified, elevationBreakpoint: { checkedBy: 'A. Person' } })).toContain('second person');
     expect(errs(shell({ verifiedBy: 'A. Person' }))).toContain('status');
   });
   it('an unentered table must hold no values, and values need entered true', () => {

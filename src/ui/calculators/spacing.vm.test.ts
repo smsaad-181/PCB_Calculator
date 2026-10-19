@@ -2,11 +2,12 @@
 // Every table value here is the synthetic fake data of src/core/spacing/synthetic-tables.testutil.ts (never a standard value, never shipped).
 import { describe, expect, it } from 'vitest';
 import { PRODUCT_STANDARD_BANNER, SOLDERMASK_NOTE, UNVERIFIED_BANNER } from '../../core/spacing/gating';
-import { synthSet } from '../../core/spacing/synthetic-tables.testutil';
-import { MAX_IMPORT_CHARS, SHIPPED_TABLES, TABLE_IDS, importSpacingTables, serializeTableSet } from '../../core/spacing/tables';
+import { rawSynthetic, synthSet, synthTable } from '../../core/spacing/synthetic-tables.testutil';
+import { MAX_IMPORT_CHARS, SHIPPED_TABLES, TABLE_IDS, importSpacingTables, makeTableSet, parseSpacingTable, serializeTableSet, type TableId } from '../../core/spacing/tables';
 import { MAX_HASH_LENGTH, MAX_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
 import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { createSpacingStore } from '../../state/spacing-store';
+import { COMMON_HELP, EXAMPLE_FILE_NAME, FAKE_LABEL, TABLE_HELP, exampleJson } from '../components/spacing-help';
 import { SpacingBanners } from '../components/SpacingBanners';
 import { SpacingResults } from '../components/SpacingResults';
 import * as cl from './clearance.vm';
@@ -165,9 +166,13 @@ describe('needs-input: Insufficient inputs, no number', () => {
 
 describe('INSUFFICIENT DATA with the shipped empty tables', () => {
   const cases = [
-    ['clearance', () => cl.computeView(CL_OK, EMPTY), ['T2', 'T4']],
-    ['creepage', () => cr.computeView(CR_OK, EMPTY), ['T5']],
+    // frequency above 0 needs the T7 scope-max-frequency record, so T7 is listed next to the empty tables
+    ['clearance', () => cl.computeView(CL_OK, EMPTY), ['T2', 'T4', 'T7']],
+    ['creepage', () => cr.computeView(CR_OK, EMPTY), ['T5', 'T7']],
     ['ipc-spacing', () => ip.computeView(IP_OK, EMPTY), ['T8']],
+    // DC (0 Hz) and basic insulation: T7 is not consulted
+    ['clearance at 0 Hz', () => cl.computeView({ ...CL_OK, frequency: '0 Hz' }, EMPTY), ['T2', 'T4']],
+    ['creepage at 0 Hz', () => cr.computeView({ ...CR_OK, frequency: '0 Hz' }, EMPTY), ['T5']],
   ] as const;
   for (const [page, view, tables] of cases) {
     it(`${page}: complete inputs land in INSUFFICIENT DATA naming the table and offering the import box`, () => {
@@ -283,7 +288,7 @@ describe('results with ENTERED_UNVERIFIED tables', () => {
     expect(t).not.toMatch(BANNED);
   });
   it('the banner texts are shown once on the page (banners) and not repeated in the warning list', () => {
-    const v = ok(cl.computeView(CL_OK, synthSet(['T2', 'T4'])));
+    const v = ok(cl.computeView(CL_OK, synthSet(['T2', 'T4', 'T7'])));
     const listed = v.result.warnings.map((w) => w.message);
     expect(listed).not.toContain(UNVERIFIED_BANNER);
     expect(listed).not.toContain(PRODUCT_STANDARD_BANNER);
@@ -339,12 +344,26 @@ describe('verified tables remove the banner and the prefix (a signed synthetic s
     expect(v.banners.product).toBe(PRODUCT_STANDARD_BANNER);
     expect(v.result.confidence.level).not.toBe('high');
   });
-  it('a verified T7 coating record is applied only when the user selects it', () => {
+  it('clearance takes no coating credit by default: a verified creepage-only record is not applied to it', () => {
     const none = ok(cl.computeView(CL_OK, FAKE_VERIFIED));
     const type1 = ok(cl.computeView({ ...CL_OK, coating: 'type1' }, FAKE_VERIFIED));
-    expect(type1.result.headline.text).not.toBe(none.result.headline.text);
+    expect(type1.result.headline.text).toBe(none.result.headline.text);
+    expect(type1.result.warnings.some((w) => /NOT applied.*creepage only/.test(w.message))).toBe(true);
     const unverified = ok(cl.computeView({ ...CL_OK, coating: 'type1' }, FAKE));
     expect(unverified.result.warnings.some((w) => /NOT applied/.test(w.message))).toBe(true);
+  });
+  it('a verified T7 coating record that states appliesTo both is applied to clearance, and only when the user selects it', () => {
+    const raw = rawSynthetic('T7', { verified: true }) as { rules: Record<string, unknown>[] };
+    const rules = raw.rules.map((r) => (r['rule'] === 'coating-credit' ? { ...r, appliesTo: 'both' } : r));
+    const t7 = parseSpacingTable({ ...raw, rules });
+    if (!t7.ok) throw new Error(t7.error.join('; '));
+    const parts: Partial<Record<TableId, ReturnType<typeof synthTable>>> = {};
+    for (const id of TABLE_IDS) parts[id] = id === 'T7' ? t7.value : synthTable(id, { verified: true });
+    const set = makeTableSet(parts);
+    if (!set.ok) throw new Error(set.error.join('; '));
+    const none = ok(cl.computeView(CL_OK, set.value));
+    const type1 = ok(cl.computeView({ ...CL_OK, coating: 'type1' }, set.value));
+    expect(type1.result.headline.text).not.toBe(none.result.headline.text);
   });
   it('solder mask earns no credit: declaring it changes nothing but a note', () => {
     const a = ok(cl.computeView(CL_OK, FAKE_VERIFIED));
@@ -527,5 +546,70 @@ describe('live summaries', () => {
     expect(cr.liveSummary(cr.computeView(CR_OK, EMPTY))).toMatch(/INSUFFICIENT DATA/);
     expect(ip.liveSummary(ip.computeView(IP_OK, FAKE))).toMatch(/^Result: /);
     expect(sc.liveSummaryOf({ status: 'ok' })).toBe('Result ready.');
+  });
+});
+
+describe('Phase 3 UI fixes: import help, worked example, export, hints', () => {
+  it('the worked example is labelled FAKE, imports as ENTERED_UNVERIFIED and never as VERIFIED', () => {
+    const text = exampleJson();
+    expect(text).toContain(FAKE_LABEL);
+    expect(EXAMPLE_FILE_NAME).toMatch(/FAKE/);
+    const r = importSpacingTables(text);
+    expect(r.ok).toBe(true);
+    if (r.ok) expect(r.value.imported.map((i) => `${i.table}:${i.state}`)).toEqual(['T2:ENTERED_UNVERIFIED', 'T7:ENTERED_UNVERIFIED']);
+    expect(text).not.toContain('"VERIFIED"');
+  });
+  it('the help covers T1 to T8 and the T7 rules, the second-person rule and the edition rule', () => {
+    expect(TABLE_HELP.map((t) => t.id)).toEqual([...TABLE_IDS]);
+    const all = [...COMMON_HELP, ...TABLE_HELP.map((t) => t.text)].join(' ');
+    for (const w of ['series', 'reinforced-clearance-steady-state', 'appliesTo', 'second person', 'letter for letter', 'pollutionDegree', 'perVolt', 'elevationBreakpoint']) expect(all, w).toContain(w);
+  });
+  it('an exported set re-imports to the same states', () => {
+    const r = importSpacingTables(exampleJson());
+    if (!r.ok) throw new Error('example did not import');
+    const again = importSpacingTables(serializeTableSet(r.value.tables));
+    expect(again.ok && again.value.imported.length).toBe(8);
+    expect(again.ok && again.value.imported.filter((x) => x.state === 'ENTERED_UNVERIFIED').map((x) => x.table)).toEqual(['T2', 'T7']);
+    expect(sc.tableStatusRows(r.value.tables).filter((x) => x.state !== 'EMPTY').map((x) => x.id)).toEqual(['T2', 'T7']);
+  });
+  it('a self-signed VERIFIED file is refused with the second-person message', () => {
+    const raw = JSON.parse(exampleJson()) as { tables: Record<string, unknown>[] };
+    const t = raw.tables[0] as Record<string, unknown>;
+    const signed = { ...t, status: 'VERIFIED', bannerRequired: false, verifiedBy: 'example person a', verifiedDate: '2000-01-02' };
+    const r = importMessage(createSpacingStore(undefined), JSON.stringify(signed));
+    expect(r.kind).toBe('error');
+    if (r.kind === 'error') expect(r.lines.join(' ')).toMatch(/second person/);
+  });
+  it('a missing T7 frequency record is named in the refusal on both IEC pages', () => {
+    const t = synthSet(['T2', 'T4', 'T5']);
+    const c = cl.computeView(CL_OK, t);
+    expect(c.status === 'insufficient-data' && c.items.join(' ')).toMatch(/scope-max-frequency/);
+    const k = cr.computeView(CR_OK, t);
+    expect(k.status === 'insufficient-data' && k.tables).toContain('T7');
+  });
+  it('a column combination that does not exist gets the plain hint', () => {
+    const v = ip.computeView({ ...IP_OK, location: 'external', kind: 'component-lead', coating: 'permanent-polymer-or-solder-mask' }, FAKE);
+    expect(v.status).toBe('insufficient-data');
+    if (v.status === 'insufficient-data') expect(v.items).toContain(sc.NO_COLUMN_HINT);
+  });
+  it('the supply and peak voltage help separates the two and names the converter case', () => {
+    expect(cl.SUPPLY_HELP).toMatch(/NOT the voltage across this gap/);
+    expect(cl.SUPPLY_HELP).toMatch(/line-to-neutral/);
+    expect(cl.SUPPLY_HELP).toMatch(/DC bus/);
+    expect(cl.SUPPLY_HELP).toMatch(/isolating transformer or converter/);
+    expect(cl.PEAK_HELP).toMatch(/Not the supply voltage/);
+  });
+  it('the IPC exposed-pad warning keeps the policy that the choice only selects a column', () => {
+    expect(ip.EXPOSED_PAD_WARNING).toMatch(/uncoated/);
+    expect(ip.EXPOSED_PAD_WARNING).toMatch(/Pads/);
+    expect(sc.IPC_COATING_NOTE).toMatch(/only selects a column/);
+  });
+  it('the inner-layer and unipolar notes exist', () => {
+    expect(sc.INNER_LAYER_NOTE).toMatch(/inner layers/);
+    expect(sc.WAVEFORM_HELP).toMatch(/unipolar/);
+  });
+  it('the creepage page links to the clearance page and says creepage is raised to clearance', () => {
+    expect(sc.ASSOCIATED_HINT).toMatch(/same pair and the same insulation type/);
+    expect(sc.ASSOCIATED_HINT).toMatch(/raised to it/);
   });
 });

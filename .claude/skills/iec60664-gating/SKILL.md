@@ -7,8 +7,8 @@ description: Input gating, structure, and warnings for IEC 60664-1 clearance/cre
 Key relations (verify in ledger, paywalled):
 - **Clearance** is driven by *rated impulse withstand voltage* (from overvoltage category + supply voltage), pollution degree, altitude factor.
 - **Creepage** is driven by *RMS working voltage*, pollution degree, material group/CTI. It is never derived from voltage alone. Creepage ≥ clearance. Altitude does not scale creepage.
-- Frequency above about 30 kHz: IEC 60664-4 applies; show a warning (switching nodes in SMPS often exceed this).
-- Insulation types: functional, basic, supplementary, reinforced; reinforced doubles basic requirements per the standard's rules.
+- High frequency: the Part 1 frequency limit is a user-entered T7 record (the IEC 60664-4 abstract states a boundary; ledger S-031a, PAYWALLED). No frequency figure in code. Above a recorded limit: refuse a Part 1 number and name IEC 60664-4; no recorded limit: warn that high-frequency applicability was not checked (SMPS switch nodes often run at high frequency).
+- Insulation types: functional, basic, supplementary, reinforced. Reinforced rules come ONLY from user-entered T7 records, never from code (ledger S-030f, PAYWALLED). Per secondary sources (TI SLUAAR5 §2.2, TI AMC1411; unconfirmed): reinforced clearance (impulse case) uses the NEXT STEP OF THE PREFERRED IMPULSE-VOLTAGE SERIES, which is not the next row of the clearance table; the series must itself be a human-entered list. Reinforced creepage is twice basic (unconfirmed). No public source gives the reinforced rule for the steady-state / recurring-peak clearance case (T3); do not reuse the impulse step or a factor for it without its own T7 record.
 - Product standards (IEC 62368-1, 61010-1, 60601-1, etc.) can override. Show always: **"IEC 60664-1 is an insulation-coordination framework; product-specific safety standards may impose additional requirements."**
 
 Gating rules:

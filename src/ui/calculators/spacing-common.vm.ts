@@ -105,6 +105,7 @@ export function templateJson(): string {
   return serializeTableSet(SHIPPED_TABLES);
 }
 export const TEMPLATE_FILE_NAME = 'safety-tables-blank-template.json';
+export const EXPORT_FILE_NAME = 'safety-tables-loaded.json';
 
 export const MAX_ERRORS_SHOWN = 20;
 /** Import problems in plain language, capped so a broken file does not flood the page. */
@@ -174,7 +175,7 @@ export const BASIS_OPTIONS: readonly { value: VoltageBasis; label: string }[] = 
   { value: 'rms', label: 'RMS value' },
 ];
 export const WAVEFORM_HELP =
-  'The app never guesses a shape: peak and rms are converted only for the shape you declare (textbook crest factors, ledger S-035). A real converter or switching waveform may differ; measure it or use the datasheet.';
+  'The app never guesses a shape: peak and rms are converted only for the shape you declare (textbook crest factors, ledger S-035). A real converter or switching waveform may differ; measure it or use the datasheet. A unipolar 0-to-V pulse (a switch node) is not a symmetric square: enter its peak directly.';
 
 export interface VoltageState {
   readonly voltageMode: VoltageMode;
@@ -222,6 +223,10 @@ export const INSUFFICIENT_DATA_LEAD =
   'No number is given because the table data this calculation needs is missing. The app ships no standard values; the tables must be entered from your licensed copy and imported below.';
 export const OUT_OF_RANGE_LEAD = 'No number is given: the request is outside the range or scope recorded in the tables you entered.';
 export const IMPORT_LINK_TEXT = 'Go to the table import box';
+export const INNER_LAYER_NOTE = 'Not covered: conductors on inner layers are separated by solid insulation (distance through insulation), which this page does not assess.';
+export const ASSOCIATED_HINT =
+  'Use the clearance of the same pair and the same insulation type. Creepage cannot be below clearance: a smaller value is raised to it and the result says so.';
+export const NO_COLUMN_HINT = 'No column of that table matches these choices. This combination may not exist in your edition; check the selectors of the table columns before importing again.';
 
 export type FailureView =
   | { readonly status: 'needs-input'; readonly summary: string; readonly needs: readonly string[] }
@@ -241,6 +246,7 @@ export function classifyFailure(e: CalcError, labels: Readonly<Record<string, st
     const items = e.message.split(/;\s+(?=INSUFFICIENT DATA)/).map((m) => m.trim());
     const found = new Set<TableId>();
     for (const m of e.message.match(TABLE_REF) ?? []) found.add(m as TableId);
+    if (e.message.includes(' has no column for ')) items.push(NO_COLUMN_HINT);
     return { status: 'insufficient-data', heading: INSUFFICIENT_DATA_HEADING, lead: INSUFFICIENT_DATA_LEAD, items, tables: TABLE_IDS.filter((id) => found.has(id)) };
   }
   if (e.gate === 'OUT_OF_SCOPE') return { status: 'out-of-range', heading: OUT_OF_RANGE_HEADING, lead: OUT_OF_RANGE_LEAD, message: e.message };

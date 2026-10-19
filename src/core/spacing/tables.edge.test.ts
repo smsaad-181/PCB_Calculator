@@ -109,7 +109,7 @@ describe('validator: T6 and T7 shapes', () => {
     expect(msg(r('reinforced-creepage-multiplier', { unit: 'V' }))).toContain('unit must be "1"');
     expect(msg(r('reinforced-clearance', { value: 3 }))).toContain('must be absent');
     expect(msg(r('reinforced-clearance', { mode: 'multiplier', value: 3, unit: 'V' }))).toContain('unit must be "1"');
-    expect(msg(r('reinforced-clearance', { mode: 'multiplier', value: 3, unit: '1' }))).toBe('');
+    expect(msg(r('reinforced-clearance', { mode: 'multiplier', value: 3, unit: '1', series: undefined }))).toBe('');
     expect(msg(r('scope-max-frequency', { value: 0 }))).toContain('value');
     expect(msg(r('scope-max-frequency', { value: 1e30 }))).toContain('unit slip');
     expect(msg(r('scope-max-voltage-dc', { unit: 'A' }))).toContain('unit must be one of');

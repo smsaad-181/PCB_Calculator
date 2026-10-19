@@ -4,6 +4,7 @@ import { NoticeBanner } from '../components/NoticeBanner';
 import { QuantityField } from '../components/QuantityField';
 import { RadioGroup } from '../components/RadioGroup';
 import { ResetButton } from '../components/ResetButton';
+import { INNER_LAYER_NOTE } from './spacing-common.vm';
 import { ChoiceField, CoatingAndMask, EditionField, InsulationField, PollutionField } from '../components/SpacingFields';
 import { SpacingBanners } from '../components/SpacingBanners';
 import { SpacingResults } from '../components/SpacingResults';
@@ -19,7 +20,9 @@ import {
   FIELD_OPTIONS,
   METHOD_TEXT,
   PAGE_INTRO,
+  PEAK_HELP,
   ROUTE_OPTIONS,
+  SUPPLY_HELP,
   computeView,
   fromHashState,
   liveSummary,
@@ -41,6 +44,7 @@ export default function Clearance() {
   return (
     <div class="calc-layout">
       <p class="muted">{PAGE_INTRO}</p>
+      <p class="muted">{INNER_LAYER_NOTE}</p>
       <SpacingBanners banners={view.banners} />
       <NoticeBanner notices={notices} onDismiss={() => setNotices([])} />
       <div class="calc-grid">
@@ -85,7 +89,7 @@ export default function Clearance() {
                 text={state.supply}
                 onText={(supply) => patch({ supply })}
                 expectedDim={DIM.VOLTAGE}
-                help="The nominal supply voltage as it is the row key of your table T1. How a system voltage maps to a row is your responsibility."
+                help={SUPPLY_HELP}
                 required
                 externalError={fe['supply']}
               />
@@ -117,7 +121,7 @@ export default function Clearance() {
             state={state}
             patch={patch}
             fieldErrors={fe}
-            peak={{ label: FIELD_LABEL.peak, help: 'The highest steady or recurring peak voltage across the insulation (DC counts as peak).', required: true }}
+            peak={{ label: FIELD_LABEL.peak, help: PEAK_HELP, required: true }}
             rms={{ label: `${FIELD_LABEL.rms} (optional)`, help: 'Optional here; used only for the scope check recorded in table T7.', required: false }}
           />
           <QuantityField

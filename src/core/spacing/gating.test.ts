@@ -20,10 +20,14 @@ import {
   readQuantity,
   readTables,
   readWorkingVoltage,
+  requiredDataError,
   rulesEditionError,
+  scopeTable,
+  waveformFrequencyError,
+  withWaveformRow,
 } from './gating';
 import { dcPlusSine, pulseRms, voltageFromWaveform } from './waveform';
-import { SHIPPED_TABLES, lookupGrid, makeTableSet, parseSpacingTable } from './tables';
+import { COATING_RULE_KIND, SHIPPED_TABLES, lookupGrid, makeTableSet, parseSpacingTable } from './tables';
 import { rawSynthetic, synthSet, synthTable } from './synthetic-tables.testutil';
 import type { Rec } from './synthetic-tables.testutil';
 
@@ -127,6 +131,12 @@ describe('gate readers and collector', () => {
 
 describe('scope, coating, provenance helpers', () => {
   const t7 = synthTable('T7');
+  it('a frequency above zero with no recorded T7 limit is a refusal naming T7 (not a warning)', () => {
+    const none = checkScope(SHIPPED_TABLES.tables.T7, { frequencyHz: 100 });
+    expect(none.refusal?.gate).toBe('INSUFFICIENT_DATA');
+    expect(none.refusal?.message).toContain('rule "scope-max-frequency" is not entered in table T7');
+    expect(checkScope(SHIPPED_TABLES.tables.T7, { frequencyHz: 0 }).refusal).toBeUndefined();
+  });
   it('DC working voltage within the recorded limit passes and is recorded as a check', () => {
     const s = checkScope(t7, { frequencyHz: 0, peakV: 100 });
     expect(s.refusal).toBeUndefined();
@@ -141,11 +151,51 @@ describe('scope, coating, provenance helpers', () => {
     expect(rulesEditionError(t7, ED)).toBeUndefined();
     expect(rulesEditionError(SHIPPED_TABLES.tables.T7, 'OTHER')).toBeUndefined();
   });
-  it('coating decision: none, missing record, unverified record', () => {
-    expect(coatingDecision(t7, 'none')).toMatchObject({ applied: false, factor: 1 });
-    expect(coatingDecision(t7, 'type2').warnings[0]?.code).toBe('COATING_CREDIT_NOT_APPLIED');
-    expect(coatingDecision(t7, 'type1').applied).toBe(false);
-    expect(coatingDecision(synthTable('T7', { verified: true }), 'type1').applied).toBe(true);
+  it('coating decision: none, missing record, unverified record, scope of the record', () => {
+    expect(coatingDecision(t7, 'none', 'creepage')).toMatchObject({ applied: false, factor: 1 });
+    expect(coatingDecision(t7, 'type2', 'creepage').warnings[0]?.code).toBe('COATING_CREDIT_NOT_APPLIED');
+    expect(coatingDecision(t7, 'type1', 'creepage').applied).toBe(false);
+    const v7 = synthTable('T7', { verified: true });
+    expect(coatingDecision(v7, 'type1', 'creepage').applied).toBe(true);
+    // a record that does not state its scope is a creepage rule only
+    const d = coatingDecision(v7, 'type1', 'clearance');
+    expect(d.applied).toBe(false);
+    expect(d.warnings[0]?.message).toContain('creepage only');
+    expect(d.warnings[0]?.message).toContain(COATING_RULE_KIND);
+    expect(coatingDecision(v7, 'type1', 'creepage').note).toContain(COATING_RULE_KIND);
+  });
+  it('requiredDataError lists empty tables and the missing T7 frequency limit when a frequency above zero is given', () => {
+    const empty = SHIPPED_TABLES.tables;
+    expect(requiredDataError([empty.T2], empty.T7, 0)?.message).toBe('INSUFFICIENT DATA: table T2 clearance to withstand transient overvoltages is empty (enter values from your licensed copy)');
+    expect(requiredDataError([], empty.T7, 0)).toBeUndefined();
+    const withF = requiredDataError([empty.T2], empty.T7, 50);
+    expect(withF?.gate).toBe('INSUFFICIENT_DATA');
+    expect(withF?.message).toContain('table T2');
+    expect(withF?.message).toContain('rule "scope-max-frequency" is not entered in table T7');
+    // when T7 is itself listed as empty it is not named twice
+    expect(requiredDataError([empty.T7], empty.T7, 50)?.message).toBe('INSUFFICIENT DATA: table T7 rule records is empty (enter values from your licensed copy)');
+    expect(requiredDataError([], t7, 50)).toBeUndefined();
+    expect(requiredDataError([], t7, 0)).toBeUndefined();
+  });
+  it('scopeTable consults T7 only when needed; a T7 of another edition is then left out (voltage scope reads not checked)', () => {
+    const other = synthTable('T7', { edition: 'OTHER' });
+    expect(scopeTable(other, ED, true).error?.gate).toBe('INSUFFICIENT_DATA');
+    const ignored = scopeTable(other, ED, false);
+    expect(ignored.error).toBeUndefined();
+    expect(ignored.table).toBe(SHIPPED_TABLES.tables.T7);
+    expect(scopeTable(t7, ED, false)).toEqual({ table: t7 });
+    expect(scopeTable(t7, ED, true)).toEqual({ table: t7 });
+  });
+  it('withWaveformRow adds S-035 only for a declared waveform', () => {
+    expect(withWaveformRow(['S-030'], false)).toEqual(['S-030']);
+    expect(withWaveformRow(['S-030'], true)).toEqual(['S-030', 'S-035']);
+  });
+  it('frequency 0 Hz means DC: a non-DC shape is refused, a DC shape or no shape is not', () => {
+    expect(waveformFrequencyError('sine', 0)?.message).toContain('frequency 0 Hz means DC');
+    expect(waveformFrequencyError('sine', 0)?.field).toBe('frequency');
+    expect(waveformFrequencyError('dc', 0)).toBeUndefined();
+    expect(waveformFrequencyError(undefined, 0)).toBeUndefined();
+    expect(waveformFrequencyError('sine', 50)).toBeUndefined();
   });
   it('provenance line without cells and with a checked cell', () => {
     const t = synthTable('T4', { verified: true });
@@ -173,7 +223,7 @@ describe('calculator paths not reached elsewhere', () => {
       T2: synthTable('T2'),
       T3: synthTable('T3'),
       T4: synthTable('T4'),
-      T7: t7With((rules) => rules.map((r) => (r['rule'] === 'reinforced-clearance' ? { ...r, mode: 'multiplier', value: 4, unit: '1' } : r))),
+      T7: t7With((rules) => rules.map((r) => (r['rule'] === 'reinforced-clearance' ? { ...r, mode: 'multiplier', value: 4, unit: '1', series: undefined } : r))),
     });
     if (!mult.ok) throw new Error(mult.error.join('; '));
     const plain = primary(clearance(cl({ tables: mult.value })));

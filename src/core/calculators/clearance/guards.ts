@@ -15,6 +15,7 @@ import {
   readQuantity,
   readTables,
   readWorkingVoltage,
+  waveformFrequencyError,
 } from '../../spacing/gating';
 import type { CoatingCredit, InsulationType, PollutionDegree } from '../../spacing/gating';
 import type { SpacingTableSet } from '../../spacing/tables';
@@ -40,6 +41,7 @@ export interface ValidInputs {
   readonly rms?: Quantity;
   readonly voltageHow: 'direct' | 'waveform';
   readonly waveformShape?: string;
+  readonly waveformBasis?: string;
   readonly frequency: Quantity;
   readonly coating: CoatingCredit;
   readonly soldermask: boolean;
@@ -80,6 +82,8 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   const v = readWorkingVoltage(raw, c, { peak: 'workingVoltagePeak', rms: 'workingVoltageRms' });
   if (v.peak === undefined) c.missing.push('workingVoltagePeak');
   const frequency = c.take(readQuantity(raw, 'frequency', DIM.FREQUENCY, 'frequency (Hz; 0 for DC)', { allowZero: true, window: WINDOWS.frequency }), 'frequency');
+  const shapeError = frequency === undefined ? undefined : waveformFrequencyError(v.waveformShape, frequency.si);
+  if (shapeError !== undefined) c.note(shapeError);
   const coating = c.opt(readEnum(raw, 'coatingCredit', COATING_CREDITS)) ?? 'none';
   const soldermask = c.opt(readFlag(raw, 'soldermask')) ?? false;
 
@@ -99,6 +103,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       ...(v.rms !== undefined ? { rms: v.rms } : {}),
       voltageHow: v.how === 'waveform' ? 'waveform' : 'direct',
       ...(v.waveformShape !== undefined ? { waveformShape: v.waveformShape } : {}),
+      ...(v.waveformBasis !== undefined ? { waveformBasis: v.waveformBasis } : {}),
       frequency: frequency as Quantity,
       coating,
       soldermask,

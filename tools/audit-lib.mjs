@@ -108,6 +108,11 @@ function validateSpacingTable(t, relPath, status) {
     if (t.bannerRequired !== false) e('status VERIFIED requires "bannerRequired": false');
     if (records.some((r) => r === null || typeof r !== 'object' || blank(r.checkedBy) || blank(r.checkedDate)))
       e('status VERIFIED requires "checkedBy" and "checkedDate" on every entered record');
+    // second person (mirrors src/core/spacing/tables.ts): the verifier is not the enterer or checker of anything, ignoring case and spaces
+    const who = blank(t.verifiedBy) ? '' : String(t.verifiedBy).trim().toLowerCase();
+    const named = [t, ...records, ...(t.elevationBreakpoint && typeof t.elevationBreakpoint === 'object' ? [t.elevationBreakpoint] : [])];
+    if (who !== '' && named.some((r) => r !== null && typeof r === 'object' && [r.enteredBy, r.checkedBy].some((n) => typeof n === 'string' && n.trim().toLowerCase() === who)))
+      e('status VERIFIED requires a second person: "verifiedBy" is also named as enteredBy or checkedBy');
   } else if (!blank(t.verifiedBy) || !blank(t.verifiedDate)) {
     e('"verifiedBy"/"verifiedDate" are present but status is not VERIFIED');
   }

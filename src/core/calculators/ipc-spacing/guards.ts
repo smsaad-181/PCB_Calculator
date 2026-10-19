@@ -19,6 +19,7 @@ export interface ValidInputs {
   readonly peak: Quantity;
   readonly voltageHow: 'direct' | 'waveform';
   readonly waveformShape?: string;
+  readonly waveformBasis?: string;
   readonly location: Location;
   readonly conductorKind?: ConductorKind;
   readonly coating?: Coating;
@@ -71,6 +72,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       peak: v.peak as Quantity,
       voltageHow: v.how === 'waveform' ? 'waveform' : 'direct',
       ...(v.waveformShape !== undefined ? { waveformShape: v.waveformShape } : {}),
+      ...(v.waveformBasis !== undefined ? { waveformBasis: v.waveformBasis } : {}),
       location: location as Location,
       ...(external && kind !== undefined ? { conductorKind: kind } : {}),
       ...(external && coating !== undefined ? { coating } : {}),

@@ -1,5 +1,8 @@
+import type { ComponentType } from 'preact';
 import { useState } from 'preact/hooks';
+import { downloadText } from '../download';
 import {
+  EXPORT_FILE_NAME,
   IMPORT_ANCHOR_ID,
   TABLES_PANEL_ID,
   TEMPLATE_FILE_NAME,
@@ -8,6 +11,7 @@ import {
   templateJson,
 } from '../calculators/spacing-common.vm';
 import { MAX_IMPORT_CHARS, PANEL_INTRO, VERIFIED_NOTE, checkFileSize, importMessage, type PanelMessage } from '../calculators/spacing-panel.vm';
+import { serializeTableSet } from '../../core/spacing/tables';
 import { useSpacingTables } from '../useSpacingTables';
 
 /** Shared by the three spacing pages. Shows T1 to T8 status and the import box; it can never produce a VERIFIED table. */
@@ -19,13 +23,13 @@ export function SpacingTablePanel() {
   const editions = loadedEditions(tables);
   const note = store.note();
 
-  const download = (): void => {
-    const url = URL.createObjectURL(new Blob([templateJson()], { type: 'application/json' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = TEMPLATE_FILE_NAME;
-    a.click();
-    URL.revokeObjectURL(url);
+  const [Help, setHelp] = useState<ComponentType | 'failed' | undefined>(undefined);
+  const loadHelp = (e: Event): void => {
+    if (Help !== undefined || !(e.currentTarget as HTMLDetailsElement).open) return;
+    import('./SpacingHelp').then(
+      (m) => setHelp(() => m.default),
+      () => setHelp('failed'),
+    );
   };
   const onFile = (e: Event): void => {
     const input = e.currentTarget as HTMLInputElement;
@@ -118,8 +122,11 @@ export function SpacingTablePanel() {
         <button type="button" onClick={() => setMessage(importMessage(store, text))}>
           Import tables
         </button>
-        <button type="button" class="secondary" onClick={download}>
+        <button type="button" class="secondary" onClick={() => downloadText(templateJson(), TEMPLATE_FILE_NAME)}>
           Download blank template
+        </button>
+        <button type="button" class="secondary" disabled={rows.every((r) => r.state === 'EMPTY')} onClick={() => downloadText(serializeTableSet(tables), EXPORT_FILE_NAME)}>
+          Export my loaded tables
         </button>
         <button
           type="button"
@@ -132,6 +139,10 @@ export function SpacingTablePanel() {
           Clear imported tables
         </button>
       </div>
+      <details class="more" onToggle={loadHelp}>
+        <summary>Help: the file format (schema pcb-calc/safety-table@1), per table, with a worked example</summary>
+        {Help === undefined ? <p class="help">Open to load the help.</p> : Help === 'failed' ? <p class="field-error">The help could not be loaded. Reload the page.</p> : <Help />}
+      </details>
       <div class="visually-hidden" role="status" aria-live="polite">
         {message?.kind === 'ok' ? message.title : ''}
       </div>

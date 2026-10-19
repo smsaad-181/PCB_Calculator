@@ -46,6 +46,20 @@ const fails = (i: unknown) => {
 };
 const primary = (r: CalcResult): number => (r.results.find((x) => x.role === 'primary') as { value: Quantity }).value.si;
 
+describe('ipc-spacing: traceability and waveform notes', () => {
+  it('always cites S-006 (mm/mil conversion) and cites S-035 only for a declared waveform', () => {
+    expect(ok(base()).reference.ledgerIds).toContain('S-006');
+    expect(ok(base()).reference.ledgerIds).not.toContain('S-035');
+    const w = ok(base({ voltagePeak: undefined as never, waveform: { shape: 'sine', basis: 'rms', value: V(10) } }));
+    expect(w.reference.ledgerIds).toEqual(expect.arrayContaining(['S-006', 'S-035']));
+  });
+  it('a square waveform declared from rms warns that a unipolar pulse would have a higher peak', () => {
+    const w = (basis: 'rms' | 'peak') => ok(base({ voltagePeak: undefined as never, waveform: { shape: 'square', basis, value: V(10) } }));
+    expect(w('rms').warnings.find((x) => x.code === 'SQUARE_RMS_UNIPOLAR')?.message).toMatch(/understates/);
+    expect(w('peak').warnings.some((x) => x.code === 'SQUARE_RMS_UNIPOLAR')).toBe(false);
+  });
+});
+
 describe('ipc-spacing: numbers from the synthetic T8', () => {
   it('internal conductors: next higher voltage band', () => {
     expect(primary(ok(base()))).toBeCloseTo(mm(t8(0, 1)), 12); // 15 V -> row 20 V

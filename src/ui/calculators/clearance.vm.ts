@@ -76,7 +76,7 @@ export const FIELD_LABEL = {
   insulation: 'Insulation type',
   impulse: 'Rated impulse withstand voltage',
   category: 'Overvoltage category',
-  supply: 'Supply voltage',
+  supply: 'Nominal supply voltage (T1 row key)',
   pollution: 'Pollution degree',
   field: 'Field condition',
   altitude: 'Altitude above sea level',
@@ -86,6 +86,9 @@ export const FIELD_LABEL = {
   waveValue: 'Waveform value',
 } as const;
 
+export const SUPPLY_HELP =
+  'The row key of your table T1: the nominal system voltage as your edition keys it (often line-to-neutral, not the line-to-line value). It is NOT the voltage across this gap. For a DC bus or a circuit behind an isolating transformer or converter, use the impulse route with the level your product standard assigns to that circuit.';
+export const PEAK_HELP = 'The actual highest steady or recurring peak voltage across this insulation (DC counts as peak). Not the supply voltage.';
 export const CATEGORY_OPTIONS = OVERVOLTAGE_CATEGORIES.map((v) => ({ value: v, label: `Category ${v}` }));
 export const FIELD_OPTIONS: readonly { value: FieldCondition; label: string }[] = [
   { value: 'inhomogeneous', label: 'Inhomogeneous field' },

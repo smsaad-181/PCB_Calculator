@@ -43,12 +43,18 @@ export type Interpolation = 'none' | 'linear';
 export const RULE_IDS = [
   'reinforced-creepage-multiplier',
   'reinforced-clearance',
+  'reinforced-clearance-steady-state',
   'scope-max-frequency',
   'scope-max-voltage-ac-rms',
   'scope-max-voltage-dc',
   'coating-credit',
 ] as const;
 export type RuleId = (typeof RULE_IDS)[number];
+
+/** How the coating-credit record is described in code and messages: it is a user-stated rule that may not match the standard (S-030g). */
+export const COATING_RULE_KIND = 'coating-credit multiplier (user-stated rule; may not match your standard)';
+export const COATING_APPLIES_TO = ['creepage', 'clearance', 'both'] as const;
+export type CoatingAppliesTo = (typeof COATING_APPLIES_TO)[number];
 
 export const MATERIAL_GROUPS = ['I', 'II', 'IIIa', 'IIIb'] as const;
 export type MaterialGroup = (typeof MATERIAL_GROUPS)[number];
@@ -93,8 +99,12 @@ export interface RuleRecord {
   readonly rule: RuleId;
   readonly mode?: string;
   readonly coatingType?: string;
+  /** Distances a coating-credit multiplier applies to; absent means creepage only. */
+  readonly appliesTo?: CoatingAppliesTo;
   readonly value?: number;
   readonly unit?: string;
+  /** Human-entered ordered preferred impulse series (in `unit`) of a reinforced-clearance record with mode next-preferred-impulse-step. */
+  readonly series?: readonly number[];
   readonly clauseText: string;
   readonly source: string;
   readonly page?: string;
@@ -241,7 +251,7 @@ export const UNIT_SLIP_WINDOWS = Object.freeze({
 });
 
 const MAX_STRING = 2000;
-const LIMITS = { cells: 5000, rows: 200, columns: 100, groups: 20, rules: 50, notes: 50, ledgerIds: 20 } as const;
+const LIMITS = { cells: 5000, rows: 200, columns: 100, groups: 20, rules: 50, notes: 50, ledgerIds: 20, series: 100 } as const;
 
 // ---- registry (a table or set is trusted only if the validator produced it) ---------------------------------------------
 
@@ -268,7 +278,7 @@ const COL_KEYS = ['key', 'selectors'];
 const PROV_KEYS = ['source', 'printed', 'page', 'enteredBy', 'enteredDate', 'checkedBy', 'checkedDate'];
 const CELL_KEYS = ['row', 'col', 'value', 'unit', ...PROV_KEYS];
 const GROUP_KEYS = ['group', 'ctiMin', 'ctiMax', 'minInclusive', 'maxInclusive', 'unit', ...PROV_KEYS];
-const RULE_KEYS = ['rule', 'mode', 'coatingType', 'value', 'unit', 'clauseText', 'source', 'page', 'enteredBy', 'enteredDate', 'checkedBy', 'checkedDate'];
+const RULE_KEYS = ['rule', 'mode', 'coatingType', 'appliesTo', 'series', 'value', 'unit', 'clauseText', 'source', 'page', 'enteredBy', 'enteredDate', 'checkedBy', 'checkedDate'];
 const BP_KEYS = ['value', 'unit', ...PROV_KEYS];
 
 interface Ctx {
@@ -566,6 +576,20 @@ function parseGroups(o: Rec, c: Ctx): { groups: MaterialGroupRecord[]; allChecke
 }
 
 const FREQ_UNITS = ['Hz', 'kHz', 'MHz'];
+/** The human-entered preferred impulse series: at least two finite positive values, strictly increasing, inside the unit-slip window. */
+function parseSeries(raw: unknown, unit: string, path: string, c: Ctx): number[] | undefined {
+  const f = unitFactorSi(unit) ?? 1;
+  const err = (m: string): undefined => {
+    c.errors.push(`${path}.series ${m}`);
+    return undefined;
+  };
+  if (!Array.isArray(raw) || raw.length < 2 || raw.length > LIMITS.series) return err(`must be an array of 2 to ${String(LIMITS.series)} preferred impulse voltages in ${unit}`);
+  const v = raw as unknown[];
+  if (!v.every((x) => finiteNumber(x) && x > 0 && inWindow(x * f, UNIT_SLIP_WINDOWS.voltageSi))) return err('values must be finite numbers greater than zero inside the unit slip window (check the unit)');
+  const n = v as number[];
+  return n.every((x, i) => i === 0 || x > (n[i - 1] as number)) ? n : err('must be strictly increasing');
+}
+
 function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean } {
   const raw = getKey(o, 'rules');
   if (raw === undefined) return { rules: [], allChecked: true };
@@ -602,6 +626,8 @@ function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean 
     const unit = getKey(r, 'unit');
     const mode = getKey(r, 'mode');
     const coatingType = getKey(r, 'coatingType');
+    const appliesTo = getKey(r, 'appliesTo');
+    const seriesRaw = getKey(r, 'series');
     const num = (min: number, max: number, what: string): number | undefined => {
       if (!finiteNumber(value) || value < min || value > max) {
         c.errors.push(`${p}.value must be a finite number ${what}`);
@@ -614,77 +640,72 @@ function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean 
     let outUnit: string | undefined;
     let outMode: string | undefined;
     let outCoating: string | undefined;
+    let outApplies: CoatingAppliesTo | undefined;
+    let outSeries: number[] | undefined;
+    const bad = (m: string): void => {
+      c.errors.push(`${p}.${m}`);
+      ok = false;
+    };
+    /** A dimensionless multiplier record: value in [min, max], unit "1". */
+    const multiplier = (min: number, max: number, what: string): void => {
+      outValue = num(min, max, what);
+      outUnit = '1';
+      if (unit !== '1') bad('unit must be "1" (a multiplier)');
+      ok = ok && outValue !== undefined;
+    };
+    /** A scope limit: value greater than zero in one of the units, inside the unit slip window. */
+    const limit = (units: readonly string[], w: readonly [number, number]): void => {
+      if (typeof unit !== 'string' || !units.includes(unit)) return bad(`unit must be one of ${units.join(', ')}`);
+      outUnit = unit;
+      outValue = num(Number.MIN_VALUE, Infinity, 'greater than zero');
+      if (outValue !== undefined && !inWindow(outValue * (unitFactorSi(unit) ?? 1), w)) bad('value is outside the unit slip window (check the unit); this is not a standard limit');
+      ok = ok && outValue !== undefined;
+    };
+    const ATLEAST1 = 'of at least 1 (a reinforced distance is never below basic)';
     switch (rule as RuleId) {
-      case 'reinforced-creepage-multiplier': {
-        outValue = num(1, 1e3, 'of at least 1 (a reinforced distance is never below basic)');
-        if (unit !== '1') c.errors.push(`${p}.unit must be "1" (a multiplier)`);
-        outUnit = '1';
-        ok = outValue !== undefined && unit === '1';
+      case 'reinforced-creepage-multiplier':
+        multiplier(1, 1e3, ATLEAST1);
         break;
-      }
-      case 'reinforced-clearance': {
-        if (mode !== 'next-higher-row' && mode !== 'multiplier') {
-          c.errors.push(`${p}.mode must be "next-higher-row" or "multiplier"`);
-          ok = false;
-        } else {
+      case 'reinforced-clearance':
+        if (mode !== 'next-preferred-impulse-step' && mode !== 'multiplier') bad('mode must be "next-preferred-impulse-step" or "multiplier"');
+        else {
           outMode = mode;
-          if (mode === 'multiplier') {
-            outValue = num(1, 1e3, 'of at least 1 (a reinforced distance is never below basic)');
-            if (unit !== '1') c.errors.push(`${p}.unit must be "1" (a multiplier)`);
-            outUnit = '1';
-            ok = outValue !== undefined && unit === '1';
-          } else if (value !== undefined) {
-            c.errors.push(`${p}.value must be absent for mode next-higher-row`);
-            ok = false;
+          if (mode === 'multiplier') multiplier(1, 1e3, ATLEAST1);
+          else {
+            if (value !== undefined) bad('value must be absent for mode next-preferred-impulse-step');
+            if (typeof unit !== 'string' || !VOLT_UNITS.includes(unit)) bad(`unit must be one of ${VOLT_UNITS.join(', ')}`);
+            else {
+              outUnit = unit;
+              outSeries = parseSeries(seriesRaw, unit, p, c);
+              ok = ok && outSeries !== undefined;
+            }
           }
         }
         break;
-      }
-      case 'scope-max-frequency': {
-        if (typeof unit !== 'string' || !FREQ_UNITS.includes(unit)) {
-          c.errors.push(`${p}.unit must be one of ${FREQ_UNITS.join(', ')}`);
-          ok = false;
-        } else {
-          outUnit = unit;
-          outValue = num(Number.MIN_VALUE, Infinity, 'greater than zero');
-          if (outValue !== undefined && !inWindow(outValue * (unitFactorSi(unit) ?? 1), UNIT_SLIP_WINDOWS.frequencyHz)) {
-            c.errors.push(`${p}.value is outside the unit slip window (check the unit); this is not a standard limit`);
-            ok = false;
-          }
-          ok = ok && outValue !== undefined;
-        }
+      case 'reinforced-clearance-steady-state':
+        if (mode !== 'multiplier') bad('mode must be "multiplier"');
+        else outMode = mode;
+        multiplier(1, 1e3, ATLEAST1);
         break;
-      }
+      case 'scope-max-frequency':
+        limit(FREQ_UNITS, UNIT_SLIP_WINDOWS.frequencyHz);
+        break;
       case 'scope-max-voltage-ac-rms':
-      case 'scope-max-voltage-dc': {
-        if (typeof unit !== 'string' || !VOLT_UNITS.includes(unit)) {
-          c.errors.push(`${p}.unit must be one of ${VOLT_UNITS.join(', ')}`);
-          ok = false;
-        } else {
-          outUnit = unit;
-          outValue = num(Number.MIN_VALUE, Infinity, 'greater than zero');
-          if (outValue !== undefined && !inWindow(outValue * (unitFactorSi(unit) ?? 1), UNIT_SLIP_WINDOWS.voltageSi)) {
-            c.errors.push(`${p}.value must be inside the unit slip window (check the unit); this is not a standard limit`);
-            ok = false;
-          }
-          ok = ok && outValue !== undefined;
-        }
+      case 'scope-max-voltage-dc':
+        limit(VOLT_UNITS, UNIT_SLIP_WINDOWS.voltageSi);
         break;
-      }
-      case 'coating-credit': {
-        if (coatingType !== 'type1' && coatingType !== 'type2') {
-          c.errors.push(`${p}.coatingType must be "type1" or "type2"`);
-          ok = false;
-        } else {
-          outCoating = coatingType;
+      case 'coating-credit':
+        if (coatingType !== 'type1' && coatingType !== 'type2') bad('coatingType must be "type1" or "type2"');
+        else outCoating = coatingType;
+        if (appliesTo !== undefined) {
+          if (typeof appliesTo === 'string' && (COATING_APPLIES_TO as readonly string[]).includes(appliesTo)) outApplies = appliesTo as CoatingAppliesTo;
+          else bad(`appliesTo must be ${COATING_APPLIES_TO.join(', ')}`);
         }
-        outValue = num(Number.MIN_VALUE, 1, 'greater than 0 and at most 1 (a credit never increases a distance)');
-        if (unit !== '1') c.errors.push(`${p}.unit must be "1" (a multiplier)`);
-        outUnit = '1';
-        ok = ok && outValue !== undefined && unit === '1';
+        multiplier(Number.MIN_VALUE, 1, `greater than 0 and at most 1 (a credit never increases a distance; ${COATING_RULE_KIND})`);
         break;
-      }
     }
+    if (appliesTo !== undefined && rule !== 'coating-credit') bad('appliesTo is only allowed for coating-credit');
+    if (seriesRaw !== undefined && !(rule === 'reinforced-clearance' && mode === 'next-preferred-impulse-step')) bad('series is only allowed for reinforced-clearance with mode next-preferred-impulse-step');
     const dupKey = rule === 'coating-credit' ? `${rule}:${String(coatingType)}` : rule;
     if (seen.has(dupKey)) c.errors.push(`${p}: duplicate rule record ${dupKey}`);
     seen.add(dupKey);
@@ -693,6 +714,8 @@ function parseRules(o: Rec, c: Ctx): { rules: RuleRecord[]; allChecked: boolean 
         rule: rule as RuleId,
         ...(outMode !== undefined ? { mode: outMode } : {}),
         ...(outCoating !== undefined ? { coatingType: outCoating } : {}),
+        ...(outApplies !== undefined ? { appliesTo: outApplies } : {}),
+        ...(outSeries !== undefined ? { series: outSeries } : {}),
         ...(outValue !== undefined ? { value: outValue } : {}),
         ...(outUnit !== undefined ? { unit: outUnit } : {}),
         clauseText,
@@ -841,6 +864,9 @@ export function parseSpacingTable(raw: unknown, opts: { today?: string } = {}): 
     if (bannerRaw !== false) c.errors.push('status VERIFIED requires bannerRequired false');
     if (empty) c.errors.push('an empty table cannot be VERIFIED');
     if (!(cellsChecked && groupsChecked && rulesChecked && bpChecked)) c.errors.push('status VERIFIED requires checkedBy and checkedDate on every entered record');
+    if (signedBySelf({ enteredBy, verifiedBy, cells, groups, rules, ...(bp !== undefined ? { elevationBreakpoint: bp } : {}) })) {
+      c.errors.push('status VERIFIED needs a second person: verifiedBy is also named as enteredBy or checkedBy (names compared ignoring case and spaces)');
+    }
   } else if (status !== undefined) {
     if (bannerRaw !== true) c.errors.push('a table that is not VERIFIED must set bannerRequired to true');
     if (verifiedBy.trim() !== '' || verifiedDate !== '') c.errors.push('verifiedBy/verifiedDate are present but status is not VERIFIED; set status to VERIFIED to claim verification');
@@ -883,6 +909,15 @@ export function parseSpacingTable(raw: unknown, opts: { today?: string } = {}): 
 
 // ---- state ---------------------------------------------------------------------------------------------------------------
 
+type SignedParts = Pick<SpacingTable, 'enteredBy' | 'verifiedBy' | 'cells' | 'groups' | 'rules'> & { readonly elevationBreakpoint?: ElevationBreakpoint };
+const normName = (x: string | undefined): string => (x ?? '').trim().toLowerCase();
+/** VERIFIED needs a second person: verifiedBy differs (ignoring case and spaces) from every enteredBy and checkedBy. True if it does not. */
+export function signedBySelf(t: SignedParts): boolean {
+  const who = normName(t.verifiedBy);
+  const recs: { enteredBy: string; checkedBy?: string | undefined }[] = [t, ...t.cells, ...t.groups, ...t.rules, ...(t.elevationBreakpoint === undefined ? [] : [t.elevationBreakpoint])];
+  return who !== '' && recs.some((r) => normName(r.enteredBy) === who || normName(r.checkedBy) === who);
+}
+
 export function isTableEmpty(t: SpacingTable): boolean {
   return isEmptyParts(TABLE_SPECS[t.table].kind, { cells: t.cells.length, groups: t.groups.length, rules: t.rules.length });
 }
@@ -907,7 +942,7 @@ function computeState(t: SpacingTable): DataState {
   if (t.elevationBreakpoint !== undefined) records.push(t.elevationBreakpoint);
   const allChecked = records.every((r) => nonEmpty(r.checkedBy) && nonEmpty(r.checkedDate));
   const signed = t.status === 'VERIFIED' && nonEmpty(t.verifiedBy) && nonEmpty(t.verifiedDate) && t.bannerRequired === false;
-  return PARSED.has(t) && signed && allChecked ? 'VERIFIED' : 'ENTERED_UNVERIFIED';
+  return PARSED.has(t) && signed && allChecked && !signedBySelf(t) ? 'VERIFIED' : 'ENTERED_UNVERIFIED';
 }
 
 export function emptyTableMessage(t: SpacingTable): string {
@@ -1044,7 +1079,7 @@ function indexOf(t: SpacingTable): TableIndex {
     .map((r) => ({ key: r.key, si: (r.value as number) * factor }))
     .sort((a, b) => a.si - b.si);
   const cells = new Map<string, SpacingCell>();
-  for (const c of t.cells) cells.set(`${c.row} ${c.col}`, c);
+  for (const c of t.cells) cells.set(`${c.row}\u0000${c.col}`, c);
   const built: TableIndex = { numeric, cells, perVoltRow: t.rows.find((r) => r.perVolt) };
   INDEX_CACHE.set(t, built);
   return built;
@@ -1068,10 +1103,10 @@ function editionOk(t: SpacingTable, edition: string): boolean {
  *  - exactly one column must match the selectors (a column's absent selector is a wildcard);
  *  - the row is the exact row, else the next HIGHER row; below the first row the first row is used; above the last row it is refused
  *    (T8 alone may extend with its per-volt row);
- *  - linear interpolation only if the table record says "linear"; an absent cell is "no data", never zero;
- *  - stepUp reads the row after the matched one (used by a rule record such as reinforced insulation).
+ *  - linear interpolation only if the table record says "linear"; an absent cell is "no data", never zero.
+ * There is no row step-up: reinforced clearance steps in the T7 preferred impulse series (nextPreferredImpulseStep), not in rows of T2.
  */
-export function lookupGrid(t: SpacingTable, req: LookupRequest, opts: { stepUp?: boolean } = {}): LookupOutcome {
+export function lookupGrid(t: SpacingTable, req: LookupRequest): LookupOutcome {
   if (TABLE_SPECS[t.table].kind !== 'grid') return fail('BAD_REQUEST', `table ${t.name} is not a grid table`);
   if (req.rowSi === undefined || !Number.isFinite(req.rowSi)) return fail('BAD_REQUEST', 'the requested row value must be a finite number');
   if (isTableEmpty(t)) return fail('EMPTY', emptyTableMessage(t));
@@ -1088,7 +1123,7 @@ export function lookupGrid(t: SpacingTable, req: LookupRequest, opts: { stepUp?:
   }
   const col = cols[0] as SpacingColumn;
   const numeric = idx0.numeric;
-  const cellOf = (rowKey: string): SpacingCell | undefined => idx0.cells.get(`${rowKey} ${col.key}`);
+  const cellOf = (rowKey: string): SpacingCell | undefined => idx0.cells.get(`${rowKey}\u0000${col.key}`);
   const noCell = (rowKey: string): LookupOutcome => fail('NO_CELL', `INSUFFICIENT DATA: table ${t.name} has no entered cell for row "${rowKey}" column "${col.key}"`);
   const x = req.rowSi;
   const tol = Math.abs(x) * REL;
@@ -1105,7 +1140,7 @@ export function lookupGrid(t: SpacingTable, req: LookupRequest, opts: { stepUp?:
   if (idx === -1) {
     const top = numeric[numeric.length - 1];
     const pvRow = idx0.perVoltRow;
-    if (!opts.stepUp && top !== undefined && pvRow !== undefined) {
+    if (top !== undefined && pvRow !== undefined) {
       const topCell = cellOf(top.key);
       const pvCell = cellOf(pvRow.key);
       if (topCell === undefined) return noCell(top.key);
@@ -1115,12 +1150,6 @@ export function lookupGrid(t: SpacingTable, req: LookupRequest, opts: { stepUp?:
     return fail('ABOVE_TABLE', `OUT OF TABLE RANGE: the requested value is above the last row of table ${t.name}; no extrapolation is done`);
   }
   const row = numeric[idx] as { key: string; si: number };
-  if (opts.stepUp) {
-    const next = numeric[idx + 1];
-    if (next === undefined) return fail('ABOVE_TABLE', `OUT OF TABLE RANGE: there is no row above the matched row of table ${t.name}`);
-    const cell = cellOf(next.key);
-    return cell === undefined ? noCell(next.key) : done('next-higher-row', next.key, cellSi(cell), [cell]);
-  }
   const exact = Math.abs(row.si - x) <= tol;
   if (!exact && t.interpolation === 'linear' && idx > 0) {
     const lo = numeric[idx - 1] as { key: string; si: number };
@@ -1169,6 +1198,31 @@ export function findRule(t7: SpacingTable, rule: RuleId, filter: { coatingType?:
 /** True if the rule record itself carries a named checker (used before any credit is applied). */
 export function ruleIsChecked(r: RuleRecord): boolean {
   return nonEmpty(r.checkedBy) && nonEmpty(r.checkedDate);
+}
+
+/** The preferred impulse series of a reinforced-clearance record in V, or undefined for any other record. */
+export function ruleSeriesSi(r: RuleRecord): number[] | undefined {
+  if (r.series === undefined) return undefined;
+  const f = unitFactorSi(r.unit ?? 'V') ?? 1;
+  return r.series.map((v) => v * f);
+}
+
+export type StepOutcome =
+  | { readonly ok: true; readonly valueSi: number }
+  | { readonly ok: false; readonly above: boolean; readonly message: string };
+
+/**
+ * Reinforced clearance step: the next value of the human-entered preferred impulse series ABOVE the required impulse voltage.
+ * The required value must itself be a value of the series (within 1e-12 relative); between values, below the first value or for a
+ * record without a series the step is undefined and refused, never guessed. The last value has no step above it (above: true).
+ */
+export function nextPreferredImpulseStep(rule: RuleRecord, requiredSi: number): StepOutcome {
+  const series = ruleSeriesSi(rule) ?? [];
+  const i = series.findIndex((x) => Math.abs(x - requiredSi) <= Math.abs(requiredSi) * REL);
+  const next = series[i + 1];
+  if (i === -1) return { ok: false, above: false, message: `INSUFFICIENT DATA: ${String(requiredSi)} V is not a value of the preferred impulse series in table T7; the reinforced step is undefined for it` };
+  if (next === undefined) return { ok: false, above: true, message: `OUT OF TABLE RANGE: no higher value in the preferred impulse series in table T7 above ${String(requiredSi)} V` };
+  return { ok: true, valueSi: next };
 }
 
 /** Value of a rule record converted to SI (Hz, V or dimensionless). */

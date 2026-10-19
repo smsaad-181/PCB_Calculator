@@ -52,6 +52,8 @@ export const DEFAULT_STATE: IpcSpacingState = Object.freeze({
 export const GUIDELINE_LABEL = IPC_LABEL;
 export const PAGE_INTRO =
   'Conductor spacing from the IPC-2221 electrical spacing table that you enter from your licensed copy. This is a design guideline, not a safety insulation assessment: it has no pollution degree, material group or overvoltage category, and it never replaces the IEC 60664-1 clearance and creepage pages or your product standard. The app ships no standard values, so every input below is required and nothing is pre-filled.';
+export const EXPOSED_PAD_WARNING =
+  'Pads, lands and component leads are normally uncoated: use the uncoated column (or the component-lead column) for gaps that touch them. A coated column fits only where mask or coating covers both conductors along the whole gap.';
 export const METHOD_TEXT = 'Method: spacing = lookup in your table T8 by voltage between conductors, location, conductor kind, coating and elevation; above the top band the per-volt rule from the same column.';
 
 export const FIELD_LABEL = {

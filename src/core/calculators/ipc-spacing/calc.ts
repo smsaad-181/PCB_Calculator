@@ -10,9 +10,13 @@ import {
   emptyTablesError,
   insufficientData,
   lookupError,
+  primaryResult,
   provenanceLine,
   spacingConfidence,
+  standardChecks,
+  squareRmsWarning,
   userInput,
+  withWaveformRow,
 } from '../../spacing/gating';
 import { lookupGrid } from '../../spacing/tables';
 import type { Selectors, SpacingTableSet } from '../../spacing/tables';
@@ -37,7 +41,7 @@ const DATA_STATUS = dataStatusForLedgerIds(meta.ledgerIds);
 const lenQ = (m: number): Quantity => q(m, DIM.LENGTH);
 export const IPC_LABEL = 'IPC-2221 conductor spacing (design guideline; not a safety insulation assessment)';
 const IPC_NOTE =
-  'IPC-2221 conductor spacing is a design guideline, not a safety insulation assessment. It has no pollution degree, material group or overvoltage category input and does not replace the IEC 60664-1 clearance and creepage calculators or the product standard (S-033a).';
+  'IPC-2221 conductor spacing is a design guideline, not a safety insulation assessment: it has no pollution degree, material group or overvoltage category and does not replace the IEC 60664-1 calculators or the product standard (S-033a).';
 
 function internal(message: string): CalcOutcome {
   const error: CalcError = { code: 'INTERNAL', message };
@@ -99,15 +103,16 @@ function build(raw: unknown): CalcOutcome {
   if (inp.location === 'internal') assumptions.push('Internal conductors: any coating or elevation entered is not used.');
 
   const warnings: CalcWarning[] = [...commonWarnings({ unverified, iec: false }), { severity: 'warning', message: IPC_NOTE, code: 'IPC_NOT_SAFETY' }];
-  const name = unverified ? `${INDICATIVE_PREFIX}: minimum conductor spacing (IPC-2221 design guideline)` : 'minimum conductor spacing (IPC-2221 design guideline)';
-  const note = unverified ? 'indicative only (UNVERIFIED table data)' : undefined;
+  const sq = squareRmsWarning(inp.waveformShape, inp.waveformBasis);
+  if (sq !== undefined) warnings.push(sq);
+  const ledgerIds = withWaveformRow(meta.reference.ledgerIds, inp.voltageHow === 'waveform');
   const recommendation = unverified
     ? `${INDICATIVE_PREFIX}: the table data is UNVERIFIED (entered by a user, not verified by a named person). ${IPC_LABEL}. Check every cell against your licensed copy of IPC-2221 before using this spacing.`
     : `${IPC_LABEL}. The table was signed off by ${t8.verifiedBy}. Use the IEC 60664-1 calculators and your product standard for insulation spacing.`;
 
   const result: CalcResult = {
     method: meta.method,
-    reference: { standard: meta.reference.standard, edition, ledgerIds: [...meta.reference.ledgerIds] },
+    reference: { standard: meta.reference.standard, edition, ledgerIds },
     formula: meta.formula,
     inputs,
     assumptions,
@@ -115,12 +120,8 @@ function build(raw: unknown): CalcOutcome {
       { label: 'Voltage between conductors (peak)', expr: inp.voltageHow === 'waveform' ? 'from the declared waveform' : 'user-entered', value: inp.peak, bound: 'min-requirement' },
       { label: `Spacing from T8 (${l.method})`, expr: 'T8(voltage, location, conductor kind, coating, elevation)', value: lenQ(l.valueSi), bound: 'min-requirement' },
     ],
-    results: [{ name, value: lenQ(l.valueSi), role: 'primary', bound: 'min-requirement', ...(note !== undefined ? { note } : {}) }],
-    validityChecks: [
-      { name: 'all mandatory inputs given', ok: true, detail: `Mandatory inputs: ${meta.mandatoryInputs.join('; ')}. None has a default.` },
-      { name: 'table populated and of the selected edition', ok: true, detail: `T8 holds entered values of edition ${edition}.` },
-      { name: 'looked-up cell carries provenance', ok: true, detail: 'Each cell records its printed text, source, who entered it and when.' },
-    ],
+    results: [primaryResult(unverified, 'minimum conductor spacing (IPC-2221 design guideline)', l.valueSi)],
+    validityChecks: standardChecks(meta.mandatoryInputs, [t8], edition),
     warnings,
     confidence: spacingConfidence({ verified: !unverified, safetyRelevantDefaults: [], dataStatus: DATA_STATUS }),
     recommendation,
