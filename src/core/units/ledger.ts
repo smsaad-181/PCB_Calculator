@@ -1,13 +1,13 @@
-import { LEDGER, type LedgerStatus } from '../data/ledger';
+import { ledgerStatusOf, type LedgerStatus } from '../data/ledger-status';
 
 export type { LedgerStatus };
 
 type UnitsLedgerId = 'S-003' | 'S-003d' | 'S-005' | 'S-006';
 
 function statusOf(id: UnitsLedgerId): LedgerStatus {
-  const row = LEDGER.find((r) => r.id === id);
-  if (row === undefined) throw new Error(`Ledger row ${id} missing from src/core/data/ledger.ts`);
-  return row.status;
+  const status = ledgerStatusOf(id);
+  if (status === undefined) throw new Error(`Ledger row ${id} missing from src/core/data/ledger.ts`);
+  return status;
 }
 
 /**

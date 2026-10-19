@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import vmSrc from './via.vm.ts?raw';
 import pageSrc from './Via.tsx?raw';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   CAUTION_CODES,

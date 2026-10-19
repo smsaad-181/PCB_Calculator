@@ -3,7 +3,8 @@ import pageSrc from './ResistorDivider.tsx?raw';
 import schemSrc from '../components/DividerSchematic.tsx?raw';
 import { meta } from '../../core/calculators/resistor-divider/meta';
 import { formatResult } from '../../core/format-result';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { HIGH_VOLTAGE_DISPLAY_THRESHOLD_V, OVER_RATING_HEADING } from './divider-emphasis';
 import {
   CALCULATOR_ID,

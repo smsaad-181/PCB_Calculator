@@ -3,7 +3,8 @@ import vmSrc from './self-heating.vm.ts?raw';
 import pageSrc from './SelfHeating.tsx?raw';
 import { meta } from '../../core/calculators/self-heating/meta';
 import { DIM } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { RESERVED_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,

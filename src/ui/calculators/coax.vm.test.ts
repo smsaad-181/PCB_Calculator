@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import vmSrc from './coax.vm.ts?raw';
 import pageSrc from './Coax.tsx?raw';
 import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { CALCULATOR_ID, DEFAULT_STATE, WRITTEN_KEYS, computeView, fromHashState, toHashState, type CoaxState } from './coax.vm';
 
 const BANNED_WORDS = new RegExp(String.raw`${'compl'}iant|production[- ]${'saf'}e|${'cert'}ified`, 'i');

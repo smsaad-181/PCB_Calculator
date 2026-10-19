@@ -11,7 +11,8 @@ import warnSrc from '../components/WarningList.tsx?raw';
 import fieldSrc from '../components/QuantityField.tsx?raw';
 import { meta } from '../../core/calculators/copper-converter/meta';
 import { formatResult } from '../../core/format-result';
-import { parseHash, serializeHash, CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS } from '../../state/hash';
+import { parseHash, serializeHash, RESERVED_STATE_KEYS } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,

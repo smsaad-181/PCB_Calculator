@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { meta } from '../../core/calculators/feedback-divider/meta';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { runTask } from '../../workers/pair-search.protocol';
 import {
   CALCULATOR_ID,

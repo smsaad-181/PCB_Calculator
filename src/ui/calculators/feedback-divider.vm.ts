@@ -8,7 +8,8 @@ import { meta } from '../../core/calculators/feedback-divider/meta';
 import { formatResult } from '../../core/format-result';
 import type { CalcOutcome, CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
+import { type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultRowView, type ResultView } from '../components/view';
 import type { SearchTask } from '../../workers/pair-search.protocol';
@@ -157,7 +158,7 @@ const CORE_FIELD: Readonly<Record<string, FieldKey | 'series' | 'biasDirection'>
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-export const WRITTEN_KEYS: readonly string[] = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+export const WRITTEN_KEYS: readonly string[] = stateKeyNames(CALCULATOR_ID);
 const TEXT_HASH_KEY: Readonly<Record<Exclude<FieldKey, 'vrefSource'>, string>> = {
   vref: 'vr',
   r1: 'r1',

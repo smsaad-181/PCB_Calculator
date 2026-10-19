@@ -5,7 +5,8 @@ import { meta } from '../../core/calculators/led-resistor/meta';
 import { formatPercent } from '../../core/format-result';
 import type { CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
+import { type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
 import { ERROR_ACCURACY, isLedSeries, parseCountField, signedPercent, type StockSeries } from './circuit-choices';
@@ -64,7 +65,7 @@ const NEEDS: Readonly<Record<'vs' | 'vf' | 'current', string>> = {
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-export const WRITTEN_KEYS: readonly string[] = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+export const WRITTEN_KEYS: readonly string[] = stateKeyNames(CALCULATOR_ID);
 const TEXT_HASH_KEY: Readonly<Record<FieldKey, string>> = { vs: 'vs', vf: 'vf', current: 'i', nLeds: 'n', rating: 'pr' };
 const TEXT_KEYS = Object.keys(TEXT_HASH_KEY) as FieldKey[];
 

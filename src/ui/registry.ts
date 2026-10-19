@@ -1,6 +1,6 @@
 import type { ComponentType } from 'preact';
 
-export type Category = 'trace' | 'impedance' | 'load' | 'circuit';
+export type Category = 'trace' | 'impedance' | 'load' | 'circuit' | 'spacing';
 
 export interface CalculatorEntry {
   readonly id: string;
@@ -15,6 +15,7 @@ export const CATEGORIES: readonly { id: Category; title: string; phase: number }
   { id: 'impedance', title: 'Impedance and delay', phase: 2 },
   { id: 'load', title: 'Load / path', phase: 1 },
   { id: 'circuit', title: 'Circuit values', phase: 1 },
+  { id: 'spacing', title: 'Safety / Spacing', phase: 3 },
 ];
 
 /** Each calculator is a lazy import, so it ships as its own code-split chunk. */
@@ -179,6 +180,27 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     category: 'circuit',
     phase: 1,
     load: () => import('./calculators/ESeries'),
+  },
+  {
+    id: 'clearance',
+    title: 'Clearance (IEC 60664-1 method, gated table lookup)',
+    category: 'spacing',
+    phase: 3,
+    load: () => import('./calculators/Clearance'),
+  },
+  {
+    id: 'creepage',
+    title: 'Creepage (IEC 60664-1 method, gated table lookup)',
+    category: 'spacing',
+    phase: 3,
+    load: () => import('./calculators/Creepage'),
+  },
+  {
+    id: 'ipc-spacing',
+    title: 'IPC-2221 conductor spacing (design guideline; not a safety insulation assessment)',
+    category: 'spacing',
+    phase: 3,
+    load: () => import('./calculators/IpcSpacing'),
   },
 ];
 

@@ -3,7 +3,8 @@ import vmSrc from './quarter-wave.vm.ts?raw';
 import pageSrc from './QuarterWave.tsx?raw';
 import { ANTENNA_MESSAGE, END_EFFECTS_MESSAGE } from '../../core/calculators/quarter-wave';
 import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { findCalculator } from '../registry';
 import {
   ANTENNA_HEADING,

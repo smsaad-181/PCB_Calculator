@@ -4,7 +4,8 @@ import { compute, type Inputs } from '../../core/calculators/reactance/calc';
 import { meta, type Kind } from '../../core/calculators/reactance/meta';
 import type { CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
+import { type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import type { CalloutView } from '../components/Callout';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
@@ -79,7 +80,7 @@ export function activeFields(kind: KindChoice): readonly FieldKey[] {
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-export const WRITTEN_KEYS: readonly string[] = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+export const WRITTEN_KEYS: readonly string[] = stateKeyNames(CALCULATOR_ID);
 const HASH_KEY: Readonly<Record<FieldKey, string>> = { reactance: 'x', frequency: 'f', component: 'cv' };
 
 export function toHashState(s: ReactanceState): Record<string, string> {

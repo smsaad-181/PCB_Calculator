@@ -4,7 +4,8 @@ import { compute, type Inputs } from '../../core/calculators/ohm-power/calc';
 import { meta } from '../../core/calculators/ohm-power/meta';
 import type { CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
+import { type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
 
 export const CALCULATOR_ID = 'ohm-power';
@@ -63,7 +64,7 @@ export const FIELD_PLACEHOLDER: Readonly<Record<FieldKey, string>> = { voltage: 
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+const LOCAL_KEYS = stateKeyNames(CALCULATOR_ID);
 
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS. */
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS];

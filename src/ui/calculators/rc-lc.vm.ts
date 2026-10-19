@@ -5,7 +5,8 @@ import { FIELDS_OF, type Field } from '../../core/calculators/rc-lc/guards';
 import { meta, type Family } from '../../core/calculators/rc-lc/meta';
 import type { CalcResult } from '../../core/result';
 import { DIM, type Dim, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
+import { type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import type { CalloutView } from '../components/Callout';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
 import { MAX_FIELD_CHARS, buildResultView, parseField, type FieldView, type ResultView } from '../components/view';
@@ -77,7 +78,7 @@ export function formulaOf(family: Family): string {
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-export const WRITTEN_KEYS: readonly string[] = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+export const WRITTEN_KEYS: readonly string[] = stateKeyNames(CALCULATOR_ID);
 const HASH_KEY: Readonly<Record<FieldKey, string>> = { resistance: 'r', capacitance: 'c', inductance: 'l', frequency: 'f' };
 const ALL_FIELDS: readonly FieldKey[] = ['resistance', 'capacitance', 'inductance', 'frequency'];
 

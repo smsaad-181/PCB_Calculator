@@ -4,7 +4,8 @@ import genericSrc from './impedance.vm.ts?raw';
 import pageSrc from './Microstrip.tsx?raw';
 import commonSrc from '../components/ImpedanceCommon.tsx?raw';
 import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
-import { CALCULATOR_STATE_KEYS, MAX_HASH_LENGTH, parseHash, serializeHash } from '../../state/hash';
+import { MAX_HASH_LENGTH, parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,

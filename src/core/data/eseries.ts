@@ -1,5 +1,4 @@
-import { LEDGER } from './ledger';
-import type { LedgerStatus } from './ledger';
+import { ledgerStatusOf, type LedgerStatus } from './ledger-status';
 
 // E-series preferred values (IEC 60063), one decade of mantissas 1.0 <= m < 10 per series.
 // Source: ledger S-016 (status PAYWALLED-USER-MUST-VERIFY: the standard itself was not read, the lists come from tertiary
@@ -35,9 +34,9 @@ export const ESERIES: Readonly<Record<SeriesName, readonly number[]>> = Object.f
   E192: Object.freeze([...E192]),
 });
 
-const sourceRow = LEDGER.find((r) => r.id === 'S-016');
-if (sourceRow === undefined) throw new Error('Ledger row S-016 (E-series) is missing; the E-series data cannot carry its status.');
-const sourceStatus: LedgerStatus = sourceRow.status;
+const sourceStatus0 = ledgerStatusOf('S-016');
+if (sourceStatus0 === undefined) throw new Error('Ledger row S-016 (E-series) is missing; the E-series data cannot carry its status.');
+const sourceStatus: LedgerStatus = sourceStatus0;
 
 /** Where the E-series lists come from; the status is read from the in-code ledger so the UI badge cannot drift. */
 export const ESERIES_SOURCE: Readonly<{ ledgerId: 'S-016'; status: LedgerStatus }> = Object.freeze({ ledgerId: 'S-016', status: sourceStatus });

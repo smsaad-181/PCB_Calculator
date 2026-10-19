@@ -1,5 +1,5 @@
 import { WEIGHT_DATA_STATUS, type DataStatus } from './confidence';
-import { LEDGER, type LedgerRow, type LedgerStatus } from './data/ledger';
+import { LEDGER_STATUS_ROWS, type LedgerStatus, type LedgerStatusRow } from './data/ledger-status';
 
 /** Typed failure for data-status lookups; never swallowed into a default status. */
 export class DataStatusError extends Error {
@@ -57,7 +57,7 @@ export function worstDataStatus(statuses: readonly LedgerStatus[]): DataStatus {
  */
 export function dataStatusForLedgerIds(
   ids: readonly string[],
-  ledger: readonly LedgerRow[] = LEDGER,
+  ledger: readonly LedgerStatusRow[] = LEDGER_STATUS_ROWS,
   opts?: { readonly exclude?: readonly string[] },
 ): DataStatus {
   if (ids.length === 0) {

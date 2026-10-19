@@ -8,7 +8,8 @@ import * as conv from './copper-converter.vm';
 import * as tw from './trace-width.vm';
 import * as tr from './trace-resistance.vm';
 import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, WEIGHT_SOURCE_OPTIONS, WEIGHT_SOURCE_QUESTION, finishedGuidance, weightSourceFromHash } from './copper-source';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 
 describe('the question', () => {
   it('is asked with the two options and no preselected answer', () => {

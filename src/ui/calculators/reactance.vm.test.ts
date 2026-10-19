@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { meta } from '../../core/calculators/reactance/meta';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { CALCULATOR_ID, DEFAULT_STATE, WRITTEN_KEYS, activeFields, computeView, fromHashState, liveSummary, toHashState, type ReactanceState } from './reactance.vm';
 
 const st = (p: Partial<ReactanceState>): ReactanceState => ({ ...DEFAULT_STATE, ...p });
