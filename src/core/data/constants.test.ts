@@ -1,8 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import { LEDGER } from './ledger';
 import {
+  CIRCULAR_MIL_M2,
   COPPER_ALPHA_20C,
+  COPPER_DENSITY_KG_M3,
+  COPPER_MELTING_POINT_C,
   COPPER_RESISTIVITY_20C,
+  DEFAULT_COPPER_SPECIFIC_HEAT,
+  ONDERDONK_DIVISOR,
+  ONDERDONK_OFFSET_C,
+  PREECE_COPPER_A_INCH,
+  UnknownSpecificHeatError,
+  copperSpecificHeat,
   DEFAULT_COPPER_K_MATERIAL,
   DEFAULT_FOIL_CONVENTION,
   copperThermalConductivity,
@@ -230,5 +239,28 @@ describe('PV-8: vacuum permeability lives in the constants module with its ledge
     expect(mod.MU0_H_PER_M).toBe(4e-7 * Math.PI);
     expect(Math.abs(mod.MU0_H_PER_M - 1.25663706127e-6) / 1.25663706127e-6).toBeLessThan(1e-9);
     expect(mod.MU0_LEDGER_ID).toBe('S-013');
+  });
+});
+
+describe('fusing constants (S-003d, S-042c, S-042d, S-042, S-042b)', () => {
+  it('copper specific heat: three sourced values, CONFLICT status, never averaged, unknown choice throws', () => {
+    const vals = (['pppl-293k', 'pppl-300k', 'hyperphysics-20c'] as const).map((s) => copperSpecificHeat(s));
+    expect(vals.map((v) => v.valueJPerKgK)).toEqual([383.48, 385, 386]);
+    for (const v of vals) {
+      expect(v.ledgerId).toBe('S-042d');
+      expect(v.status).toBe('CONFLICT');
+    }
+    expect(DEFAULT_COPPER_SPECIFIC_HEAT).toBe('pppl-300k');
+    expect(() => copperSpecificHeat('mean' as never)).toThrow(UnknownSpecificHeatError);
+    expect(() => copperSpecificHeat(385 as never)).toThrow(UnknownSpecificHeatError);
+    expect(() => copperSpecificHeat('toString' as never)).toThrow(UnknownSpecificHeatError);
+  });
+  it('density, melting point, Onderdonk, circular mil and Preece constants', () => {
+    expect(COPPER_DENSITY_KG_M3).toBe(8890);
+    expect(COPPER_MELTING_POINT_C).toBe(1084.62);
+    expect(ONDERDONK_DIVISOR).toBe(33);
+    expect(ONDERDONK_OFFSET_C).toBe(234);
+    expect(PREECE_COPPER_A_INCH).toBe(10244);
+    expect(Math.abs(CIRCULAR_MIL_M2 / 5.067074790974979e-10 - 1)).toBeLessThan(1e-12);
   });
 });

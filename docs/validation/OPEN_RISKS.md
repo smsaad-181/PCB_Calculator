@@ -555,3 +555,38 @@ Open conditions (not fixed here):
 
 ## Phase 3 closure record (2026-10-19, branch phase-3)
 All three validators PASS-WITH-CONDITIONS after fixes; full record in `docs/validation/reports/phase-3-closure.md`. Human items: enter T1-T8 from licensed copies with a second-person verifier (P3-1), run a cross-check with real values, decide on F-6 (coating credit) and F-7; PR for `phase-3` (chain: phase-1-closure -> phase-2 -> phase-2-closure -> phase-3).
+
+## Phase 4 core (thermal via and fusing), logged 2026-10-19, branch phase-4, uncommitted; calc-implementer
+
+Two separate core calculators, no UI yet: `src/core/calculators/thermal-via/` (id `thermal-via`) and `src/core/calculators/fusing/` (id `fusing`). The fusing code shares nothing with the steady-state heating calculator (a test greps the sources). Oracle vectors (`thermalvia_*`, `fusing_*`) were written in `tools/reference/ref_calcs.py` before the code and mirrored in `docs/golden-vectors.json` (45 new vectors, existing ones unchanged). Added minimally: `DIM.ACTION_INTEGRAL` (A²·s) with unit spellings and a display entry; fusing constants in `src/core/data/constants.ts` (density S-003d, melting point S-042c, specific heat choices S-042d, Onderdonk and Preece constants, circular mil); state key names and docs for both ids.
+
+Decisions taken by the orchestrator and implemented (Q-50 to Q-61 from `docs/research/phase-4-thermal-via-and-fusing.md`):
+
+| # | Question | Decision implemented | Status |
+|---|---|---|---|
+| Q-50 | Thermal via scope | Conduction-only 1-D estimate, no spreading model. Always labelled an estimate and a lower bound; S-041c CONFLICT shown as a warning | DECIDED |
+| Q-51 | Copper k for barrels | No default: `kMaterial` ("pure-401" or "c11000-391") is a required input; S-007 CONFLICT and the non-conservative direction are stated | DECIDED |
+| Q-52 | Fill conductivity | User input only, required when `fill` is "filled", forbidden when "none"; no fill material value is built in | DECIDED |
+| Q-53 | Fusing primary result | Adiabatic time to reach the melting point (S-042a, derived) is primary; Onderdonk (S-042) is a secondary check shown with the ratio | DECIDED |
+| Q-54 | Specific heat | Selectable among the three sourced values (383.48, 385.00, 386 J/(kg·K)); the conflict warning lists all three; default `pppl-300k` (385.00) is a PRODUCT CHOICE (it is the value used in the published derivation and in the research sanity check) and counts as a defaulted assumption | DECIDED, default needs human confirmation |
+| Q-55 | IEC 60364-5-54 | No direct citation or implementation of the IEC form | DECIDED |
+| Q-56 | IPC scope for fusing (S-042f) | Shown as a validity check that is NOT passed ("PAYWALLED, not checked") plus an info warning; no IPC statement is made | OPEN for the human (read IPC-2152 scope and IPC-2221 section 6.2) |
+| Q-57 | Time thresholds | Warnings only, no refusal: above 1 s (warning, code `OVER_1S`) and above 10 s (critical, `OVER_10S`), both worded "product choices, not sourced limits" (S-042e, one author group) | DECIDED |
+| Q-58 | Preece | Computed and returned as a secondary result named "historical reference (no time term)" with a "not a PCB model" warning. Whether the UI shows it in a collapsed panel is a UI decision | DECIDED (core); UI pending |
+| Q-59 | Melting point | 1084.62 °C (S-042c), no override input (an extra field is ignored and tested) | DECIDED |
+| Q-60 | Initial temperature | Required, absolute, no default; at or above the melting point is rejected | DECIDED |
+| Q-61 | I²t input | Accepted: `actionIntegral` is one of three mutually exclusive inputs; the result is the melting I²t and the fraction of it that the user's pulse reaches. No duration means the time warnings cannot be checked and a `NO_DURATION` caution says so | DECIDED |
+
+Behaviour and conditions for the validators:
+
+| # | Item | Note |
+|---|---|---|
+| P4-1 | Confidence is never above low for both calculators | The rule-based score is estimate 2 + CONFLICT 2 = 4, so level is low whatever the inputs (the research doc described a reachable `medium`; with the current weights it is not, and nothing was hand-assigned). The reasons list shows why. Decide later whether a rule change is wanted |
+| P4-2 | Fusing always carries one failed validity check (the PAYWALLED IPC scope item) | Honest representation, but the UI should render it as "not checked" rather than a red failure |
+| P4-3 | Fusing accepts a trace thickness only with an explicit `thicknessBasis` (finished, measured, nominal) | `nominal` (converted from a foil weight) adds the S-003 and S-009 warning and a safety-relevant default weight. The core does no foil conversion: the UI must pass a length |
+| P4-4 | Plausibility ranges (trace thickness 5 to 500 um, initial temperature -55 to 150 °C, plating below hole diameter) are engineering ranges, not standards | Marked as such in the check text |
+| P4-5 | Rounding bound is `nominal` for every fusing result (no sourced safety direction); thermal via resistances and rise are `prediction` (print rounded up) | Estimates print to 2 significant figures by the display rules |
+| P4-6 | Thermal via: the fab-profile plating path is a flag `platingSource: "fab-profile-average"` (input source `fab-profile`, AVERAGE caution) | The core does not read a profile; the UI passes the value and the flag |
+| P4-7 | Fusing steps show K = D·c/(ρ20·α20) with a local dimension (A²·s/m⁴) that has no display unit | The UI should print the step value from `expr` or SI |
+
+Deferred (not built): UI pages for both calculators; the hole-to-hole and pad-fit geometry check against a fab profile limit (S-019k) for the thermal via; a tolerance envelope for either calculator; a spreading model (new research pass needed); any fill material table; an exposed-pad or theta-JA calculator (out of scope by user decision). Needs the human: confirm the specific heat default (Q-54), read the IPC scope (Q-56), and decide whether the unreachable `medium` confidence is acceptable (P4-1).

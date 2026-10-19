@@ -128,6 +128,7 @@ function plainFor(dim: Dim, prefs: DisplayPrefs): Plain | undefined {
   if (dimEqual(dim, DIM.THERMAL_CONDUCTIVITY)) return { unit: 'W/mK', label: 'W/(m·K)' };
   if (dimEqual(dim, DIM.PER_KELVIN)) return { unit: '/K', label: '/K' };
   if (dimEqual(dim, DIM.CURRENT_DENSITY)) return { unit: 'A/mm2', label: `A/mm${SQ}` };
+  if (dimEqual(dim, DIM.ACTION_INTEGRAL)) return { unit: 'A2s', label: `A${SQ}·s` };
   return undefined;
 }
 
