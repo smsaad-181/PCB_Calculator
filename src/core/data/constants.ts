@@ -166,3 +166,51 @@ export const ETA0_OHM = MU0_H_PER_M * C_M_PER_S;
 export const Z_PREFACTOR_OHM = ETA0_OHM / (2 * Math.PI);
 /** eta0 / 4, ohm (about 94.18): the stripline prefactor that textbooks write as 30 pi (94.25). */
 export const Z_STRIPLINE_PREFACTOR_OHM = ETA0_OHM / 4;
+
+/** Copper density at 20 degC, kg/m3: IACS reference value 8.89 g/cm3 [S-003d, VERIFIED]. */
+export const COPPER_DENSITY_KG_M3 = 8890;
+/** Copper melting (freezing) point, degC: ITS-90 fixed point 1357.77 K = 1084.62 degC [S-042c, VERIFIED]. Pure copper. */
+export const COPPER_MELTING_POINT_C = 1084.62;
+
+/**
+ * Copper specific heat near room temperature, J/(kg K) [S-042d, CONFLICT]. The sourced values disagree by 0.7 percent and none is
+ * preferred by the ledger; the default 'pppl-300k' (385.00) is a product choice (it matches the value used in the published
+ * derivation, S-042a) and is shown as a default with the conflict stated. Never averaged.
+ */
+export type CopperSpecificHeatSource = 'pppl-293k' | 'pppl-300k' | 'hyperphysics-20c';
+export const DEFAULT_COPPER_SPECIFIC_HEAT: CopperSpecificHeatSource = 'pppl-300k';
+const CP_TABLE: Readonly<Record<CopperSpecificHeatSource, { readonly c: number; readonly label: string }>> = {
+  'pppl-293k': { c: 383.48, label: 'PPPL pure-copper table at 293 K' },
+  'pppl-300k': { c: 385.0, label: 'PPPL pure-copper table at 300 K' },
+  'hyperphysics-20c': { c: 386, label: 'HyperPhysics at 20 degC' },
+};
+
+export class UnknownSpecificHeatError extends Error {
+  constructor(source: string) {
+    super(`Unknown copper specific heat source "${source}"; expected one of ${Object.keys(CP_TABLE).join(', ')}`);
+    this.name = 'UnknownSpecificHeatError';
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
+export interface CopperSpecificHeat {
+  readonly valueJPerKgK: number;
+  readonly ledgerId: 'S-042d';
+  readonly status: LedgerStatus;
+  readonly label: string;
+}
+
+/** Copper specific heat for a chosen sourced value. The caller must surface the CONFLICT status. */
+export function copperSpecificHeat(source: CopperSpecificHeatSource): CopperSpecificHeat {
+  if (typeof source !== 'string' || !Object.prototype.hasOwnProperty.call(CP_TABLE, source)) throw new UnknownSpecificHeatError(String(source));
+  const e = CP_TABLE[source];
+  return { valueJPerKgK: e.c, ledgerId: 'S-042d', status: ledgerStatus('S-042d'), label: e.label };
+}
+
+/** Onderdonk constants as printed in the source [S-042, UNVERIFIED]: 33 (I/A)^2 s = log10((Tm + 234)/(Ta + 234)), A in circular mils. */
+export const ONDERDONK_DIVISOR = 33;
+export const ONDERDONK_OFFSET_C = 234;
+/** One circular mil in m2: (pi/4) mil^2, mil = 25.4e-6 m exactly [S-006]. */
+export const CIRCULAR_MIL_M2 = (Math.PI / 4) * 25.4e-6 * 25.4e-6;
+/** Preece copper constant for a wire diameter in INCHES [S-042b, VERIFIED form]: I = a d^1.5. Historical reference only. */
+export const PREECE_COPPER_A_INCH = 10244;

@@ -67,8 +67,8 @@ describe('registry', () => {
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);
   });
-  it('has the five categories, none empty', () => {
-    expect(CATEGORIES.map((c) => c.id)).toEqual(['trace', 'impedance', 'load', 'circuit', 'spacing']);
+  it('has the seven categories, none empty', () => {
+    expect(CATEGORIES.map((c) => c.id)).toEqual(['trace', 'impedance', 'load', 'circuit', 'spacing', 'thermal', 'fusing']);
     for (const c of CATEGORIES) expect(calculatorsIn(c.id).length, c.id).toBeGreaterThan(0);
   });
   it('lists the impedance calculators under Impedance as lazy phase-2 entries that resolve to a component', async () => {

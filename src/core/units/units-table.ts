@@ -100,6 +100,8 @@ def(['K/W', '°C/W', 'degC/W'], DIM.THERMAL_RESISTANCE, 1);
 def(['K·m/W', 'K*m/W', 'K.m/W', 'K m/W', '°C·m/W', '°C*m/W', '°C.m/W', '°C m/W', 'degC·m/W', 'degC*m/W', 'degC.m/W', 'degC m/W'], DIM.THERMAL_RESISTANCE_PER_LENGTH, 1);
 def(['K·mm/W', 'K*mm/W', 'K.mm/W', 'K mm/W', '°C·mm/W', '°C*mm/W', '°C.mm/W', '°C mm/W', 'degC·mm/W', 'degC*mm/W', 'degC.mm/W', 'degC mm/W'], DIM.THERMAL_RESISTANCE_PER_LENGTH, 1e-3, { den: 1e3 });
 def(['W/mK', 'W/(mK)', 'W/m·K', 'W/(m·K)', 'W/m.K'], DIM.THERMAL_CONDUCTIVITY, 1);
+// Action integral I^2 t of a current pulse (fusing)
+def(['A2s', 'A²s', 'A²·s', 'A2*s', 'A^2 s', 'A2.s'], DIM.ACTION_INTEGRAL, 1);
 def(['/K', '1/K', '/°C', '1/°C', '/degC', '1/degC'], DIM.PER_KELVIN, 1);
 def(['ppm/K', 'ppm/°C', 'ppm/degC'], DIM.PER_KELVIN, 1e-6, { den: 1e6 });
 def(['%'], DIM.DIMENSIONLESS, 0.01, { den: 1e2 });

@@ -2615,6 +2615,178 @@ ref_impedance.self_checks()
 GOLDEN.extend(ref_impedance.pinned_vectors())
 
 
+# ---------------------------------------------------------------------------------------------------------------
+# Phase 4 core: thermal via (S-041, S-041a, S-041b, S-019d) and fusing (S-042, S-042a, S-042b, S-042c, S-042d).
+# INDEPENDENT oracle: written from the ledger formulas only, never from src/. Test geometry and plating values are
+# TEST values (never defaults). Nothing here verifies a ledger row; it compares an implementation with the formulas.
+# ---------------------------------------------------------------------------------------------------------------
+def tv_theta_barrel(d, t, L, k):
+    """S-041: theta = L / (k pi t (d + t)); d FINISHED hole, t plating, SI units."""
+    return L / (k * math.pi * t * (d + t))
+
+def tv_theta_core(d, L, k_fill):
+    """S-041a (derived): core cylinder of the finished hole, A = pi d^2 / 4."""
+    return L / (k_fill * math.pi * d * d / 4.0)
+
+def tv_theta_via(d, t, L, k, k_fill=None):
+    tb = tv_theta_barrel(d, t, L, k)
+    if k_fill is None:
+        return tb
+    return 1.0 / (1.0 / tb + 1.0 / tv_theta_core(d, L, k_fill))
+
+def tv_theta_array(d, t, L, k, n, k_fill=None):
+    """S-041b: ideal parallel, theta / N."""
+    return tv_theta_via(d, t, L, k, k_fill) / n
+
+# Self-check: a copper-filled via (k_fill = k) equals a solid cylinder of outer radius d/2 + t (S-041a closed form).
+_cu_fill = tv_theta_via(0.3e-3, 25e-6, 1.6e-3, 401.0, 401.0)
+_cu_solid = 1.6e-3 / (401.0 * math.pi * (0.15e-3 + 25e-6) ** 2)
+assert abs(_cu_fill - _cu_solid) <= 1e-12 * _cu_solid
+
+# Fusing constants (ledger S-003d, S-004, S-042c, S-042d, S-006): kept as separate named values.
+CU_DENSITY = 8890.0                 # kg/m3 (S-003d)
+CU_TM_C = 1084.62                   # degC (S-042c)
+CU_C_PPPL_300K, CU_C_PPPL_293K, CU_C_HYPER_20C = 385.0, 383.48, 386.0   # J/(kg K) (S-042d, CONFLICT)
+CMIL_M2 = math.pi / 4.0 * (25.4e-6) ** 2   # 1 circular mil = (pi/4) mil^2 (S-006 arithmetic)
+
+def fu_beta20():
+    return 1.0 / ALPHA_CU - 20.0
+
+def fu_i2t_melt(area_m2, ta_c, c, tm_c=CU_TM_C):
+    """S-042a: I^2 t = A^2 (D c / (rho20 alpha20)) ln((Tm + beta20) / (Ta + beta20))."""
+    kk = CU_DENSITY * c / (RHO_CU_20C * ALPHA_CU)
+    return area_m2 ** 2 * kk * math.log((tm_c + fu_beta20()) / (ta_c + fu_beta20()))
+
+def fu_i2t_onderdonk(area_m2, ta_c, tm_c=CU_TM_C):
+    """S-042: 33 (I/A)^2 s = log10((Tm + 234) / (Ta + 234)), A in circular mils; returned as I^2 t in A^2 s."""
+    a_cmil = area_m2 / CMIL_M2
+    return a_cmil ** 2 * math.log10((tm_c + 234.0) / (ta_c + 234.0)) / 33.0
+
+def fu_preece_current(d_m):
+    """S-042b: I = 10244 d^1.5 with d in INCHES (S-006: 0.0254 m); historical reference only."""
+    return 10244.0 * (d_m / 0.0254) ** 1.5
+
+# Self-check against the researcher sanity arithmetic recorded in the research note (not a golden vector):
+# A = 0.254 mm x 35 um, I = 10 A, Ta = 20 degC, c = 385 -> t about 0.0657 s; Onderdonk about 0.0667 s.
+_a = 0.254e-3 * 35e-6
+assert abs(fu_i2t_melt(_a, 20.0, 385.0) / 100.0 - 0.0657) < 5e-4
+assert abs(fu_i2t_onderdonk(_a, 20.0) / 100.0 - 0.0667) < 5e-4
+
+_TV_CASES = [  # tag, d mm, t um, L mm, N, k, k_fill, P W
+    ("A_d0.3_t25_L1.6_N1_k401", 0.3, 25.0, 1.6, 1, 401.0, None, None),
+    ("B_d0.3_t25_L1.6_N16_k391_P2W", 0.3, 25.0, 1.6, 16, 391.0, None, 2.0),
+    ("C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W", 0.25, 20.0, 1.0, 9, 401.0, 1.0, 1.5),
+    ("D_d0.3_t25_L1.6_N4_k401_fillCu", 0.3, 25.0, 1.6, 4, 401.0, 401.0, 0.5),
+]
+
+def _p4_vectors():
+    out = []
+    ids = ("S-041", "S-041b", "S-007")
+    ids_f = ("S-041", "S-041a", "S-041b", "S-007")
+    for tag, dmm, tum, Lmm, N, k, kf, P in _TV_CASES:
+        d, t, L = dmm * 1e-3, tum * 1e-6, Lmm * 1e-3
+        use = ids if kf is None else ids_f
+        out.append(("thermalvia_" + tag + "_barrel_area_mm2", math.pi * t * (d + t) * 1e6, 1e-9, (), "barrel annulus pi t (d + t), pure geometry"))
+        out.append(("thermalvia_" + tag + "_theta_barrel_KperW", tv_theta_barrel(d, t, L, k), 1e-9, use, "L / (k A), one barrel (S-041)"))
+        if kf is not None:
+            out.append(("thermalvia_" + tag + "_theta_core_KperW", tv_theta_core(d, L, kf), 1e-9, use, "L / (k_fill pi d^2/4), user fill k (S-041a derived)"))
+        out.append(("thermalvia_" + tag + "_theta_via_KperW", tv_theta_via(d, t, L, k, kf), 1e-9, use, "barrel alone, or barrel and core in parallel"))
+        th = tv_theta_array(d, t, L, k, N, kf)
+        out.append(("thermalvia_" + tag + "_theta_array_KperW", th, 1e-9, use, "theta_via / N (S-041b ideal)"))
+        if P is not None:
+            out.append(("thermalvia_" + tag + "_dT_K", th * P, 1e-9, use + ("S-019d",), "dT = theta_array x P (S-019d)"))
+    return out
+
+_FU_IDS = ("S-003d", "S-004", "S-042a", "S-042c", "S-042d")
+_FU_ONDER_IDS = ("S-042", "S-042c", "S-006")
+
+def _fu_geoms():
+    """(tag, area m2, Ta degC, c J/(kg K)); geometries are TEST values."""
+    w1, t1 = 0.254e-3, 35e-6
+    w2, t2 = 1.0e-3, 35e-6
+    dw = 0.5e-3
+    w4, t4 = 0.5e-3, 70e-6
+    return [
+        ("trace0.254mmx35um_Ta20_c385", w1 * t1, 20.0, 385.0),
+        ("trace1mmx35um_Ta25_c383.48", w2 * t2, 25.0, 383.48),
+        ("wire0.5mm_Ta20_c386", math.pi * dw * dw / 4.0, 20.0, 386.0),
+        ("trace0.5mmx70um_Ta40_c385", w4 * t4, 40.0, 385.0),
+    ]
+
+def _fu_vectors():
+    out = []
+    for tag, A, ta, c in _fu_geoms():
+        out.append(("fusing_" + tag + "_area_mm2", A * 1e6, 1e-9, (), "conductor cross-section, pure geometry"))
+        out.append(("fusing_" + tag + "_i2t_melt_A2s", fu_i2t_melt(A, ta, c), 1e-9, _FU_IDS, "S-042a adiabatic I^2 t to reach Tm (derived)"))
+        out.append(("fusing_" + tag + "_i2t_onderdonk_A2s", fu_i2t_onderdonk(A, ta), 1e-9, _FU_ONDER_IDS, "S-042 Onderdonk, cmil form, Tm = S-042c value"))
+        out.append(("fusing_" + tag + "_preece_current_A", fu_preece_current(math.sqrt(4.0 * A / math.pi)), 1e-9, ("S-042b", "S-006"), "Preece, equivalent round wire of the same area; historical reference only"))
+    g = {t: (A, ta, c) for t, A, ta, c in _fu_geoms()}
+    A, ta, c = g["trace0.254mmx35um_Ta20_c385"]
+    out.append(("fusing_trace0.254mmx35um_Ta20_c385_I10A_time_s", fu_i2t_melt(A, ta, c) / 10.0 ** 2, 1e-9, _FU_IDS, "t = I^2 t / I^2"))
+    out.append(("fusing_trace0.254mmx35um_Ta20_c385_I10A_onderdonk_time_s", fu_i2t_onderdonk(A, ta) / 10.0 ** 2, 1e-9, _FU_ONDER_IDS, "t = I^2 t / I^2"))
+    A, ta, c = g["trace1mmx35um_Ta25_c383.48"]
+    out.append(("fusing_trace1mmx35um_Ta25_c383.48_t0.5s_current_A", math.sqrt(fu_i2t_melt(A, ta, c) / 0.5), 1e-9, _FU_IDS, "I = sqrt(I^2 t / t)"))
+    out.append(("fusing_trace1mmx35um_Ta25_c383.48_t0.5s_onderdonk_current_A", math.sqrt(fu_i2t_onderdonk(A, ta) / 0.5), 1e-9, _FU_ONDER_IDS, "I = sqrt(I^2 t / t)"))
+    A, ta, c = g["wire0.5mm_Ta20_c386"]
+    out.append(("fusing_wire0.5mm_Ta20_c386_I30A_time_s", fu_i2t_melt(A, ta, c) / 30.0 ** 2, 1e-9, _FU_IDS, "t = I^2 t / I^2"))
+    A, ta, c = g["trace0.5mmx70um_Ta40_c385"]
+    out.append(("fusing_trace0.5mmx70um_Ta40_c385_i2t50_ratio", 50.0 / fu_i2t_melt(A, ta, c), 1e-9, _FU_IDS, "user I^2 t / I^2 t to reach Tm (ratio >= 1 means the melting point is reached in the adiabatic model)"))
+    out.append(("fusing_beta20_degC", fu_beta20(), 1e-12, ("S-004", "S-042a"), "1/alpha20 - 20 degC"))
+    out.append(("fusing_K_c385_A2s_per_m4", CU_DENSITY * 385.0 / (RHO_CU_20C * ALPHA_CU), 1e-12, _FU_IDS, "D c / (rho20 alpha20)"))
+    return out
+
+_P4_RAW = _p4_vectors() + _fu_vectors()
+# Pinned literals recorded from this oracle (regression pins, same policy as _VIA_PINNED).
+_P4_PINNED = {
+    'thermalvia_A_d0.3_t25_L1.6_N1_k401_barrel_area_mm2': 0.025525440310417067,
+    'thermalvia_A_d0.3_t25_L1.6_N1_k401_theta_barrel_KperW': 156.31561646470448,
+    'thermalvia_A_d0.3_t25_L1.6_N1_k401_theta_via_KperW': 156.31561646470448,
+    'thermalvia_A_d0.3_t25_L1.6_N1_k401_theta_array_KperW': 156.31561646470448,
+    'thermalvia_B_d0.3_t25_L1.6_N16_k391_P2W_barrel_area_mm2': 0.025525440310417067,
+    'thermalvia_B_d0.3_t25_L1.6_N16_k391_P2W_theta_barrel_KperW': 160.31345831802167,
+    'thermalvia_B_d0.3_t25_L1.6_N16_k391_P2W_theta_via_KperW': 160.31345831802167,
+    'thermalvia_B_d0.3_t25_L1.6_N16_k391_P2W_theta_array_KperW': 10.019591144876355,
+    'thermalvia_B_d0.3_t25_L1.6_N16_k391_P2W_dT_K': 20.03918228975271,
+    'thermalvia_C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W_barrel_area_mm2': 0.01696460032938488,
+    'thermalvia_C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W_theta_barrel_KperW': 146.99819256663469,
+    'thermalvia_C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W_theta_core_KperW': 20371.832715762604,
+    'thermalvia_C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W_theta_via_KperW': 145.94508828820886,
+    'thermalvia_C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W_theta_array_KperW': 16.216120920912097,
+    'thermalvia_C_d0.25_t20_L1.0_N9_k401_fill1.0_P1.5W_dT_K': 24.324181381368145,
+    'thermalvia_D_d0.3_t25_L1.6_N4_k401_fillCu_barrel_area_mm2': 0.025525440310417067,
+    'thermalvia_D_d0.3_t25_L1.6_N4_k401_fillCu_theta_barrel_KperW': 156.31561646470448,
+    'thermalvia_D_d0.3_t25_L1.6_N4_k401_fillCu_theta_core_KperW': 56.44730594558772,
+    'thermalvia_D_d0.3_t25_L1.6_N4_k401_fillCu_theta_via_KperW': 41.47149008247261,
+    'thermalvia_D_d0.3_t25_L1.6_N4_k401_fillCu_theta_array_KperW': 10.367872520618153,
+    'thermalvia_D_d0.3_t25_L1.6_N4_k401_fillCu_dT_K': 5.183936260309077,
+    'fusing_trace0.254mmx35um_Ta20_c385_area_mm2': 0.008889999999999999,
+    'fusing_trace0.254mmx35um_Ta20_c385_i2t_melt_A2s': 6.569275022235377,
+    'fusing_trace0.254mmx35um_Ta20_c385_i2t_onderdonk_A2s': 6.671978566260786,
+    'fusing_trace0.254mmx35um_Ta20_c385_preece_current_A': 2.7770129472890503,
+    'fusing_trace1mmx35um_Ta25_c383.48_area_mm2': 0.034999999999999996,
+    'fusing_trace1mmx35um_Ta25_c383.48_i2t_melt_A2s': 100.22260959568771,
+    'fusing_trace1mmx35um_Ta25_c383.48_i2t_onderdonk_A2s': 102.19185544197784,
+    'fusing_trace1mmx35um_Ta25_c383.48_preece_current_A': 7.761624302439612,
+    'fusing_wire0.5mm_Ta20_c386_area_mm2': 0.19634954084936207,
+    'fusing_wire0.5mm_Ta20_c386_i2t_melt_A2s': 3212.9227022841637,
+    'fusing_wire0.5mm_Ta20_c386_i2t_onderdonk_A2s': 3254.6995254509984,
+    'fusing_wire0.5mm_Ta20_c386_preece_current_A': 28.292674383760424,
+    'fusing_trace0.5mmx70um_Ta40_c385_area_mm2': 0.034999999999999996,
+    'fusing_trace0.5mmx70um_Ta40_c385_i2t_melt_A2s': 97.14205965628231,
+    'fusing_trace0.5mmx70um_Ta40_c385_i2t_onderdonk_A2s': 98.65676466468625,
+    'fusing_trace0.5mmx70um_Ta40_c385_preece_current_A': 7.761624302439612,
+    'fusing_trace0.254mmx35um_Ta20_c385_I10A_time_s': 0.06569275022235377,
+    'fusing_trace0.254mmx35um_Ta20_c385_I10A_onderdonk_time_s': 0.06671978566260786,
+    'fusing_trace1mmx35um_Ta25_c383.48_t0.5s_current_A': 14.15786774875989,
+    'fusing_trace1mmx35um_Ta25_c383.48_t0.5s_onderdonk_current_A': 14.29628311429078,
+    'fusing_wire0.5mm_Ta20_c386_I30A_time_s': 3.569914113649071,
+    'fusing_trace0.5mmx70um_Ta40_c385_i2t50_ratio': 0.5147101078247154,
+    'fusing_beta20_degC': 234.45292620865138,
+    'fusing_K_c385_A2s_per_m4': 5.051239185750636e+16,
+}
+GOLDEN.extend((n, got, _P4_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _P4_RAW)
+
+
 def main():
     rows, bad = [], 0
     for name, got, want, rtol, _ids, _note in GOLDEN:

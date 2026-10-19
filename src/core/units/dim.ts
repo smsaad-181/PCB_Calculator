@@ -42,6 +42,7 @@ export const DIM = Object.freeze({
   PER_KELVIN: d([0, 0, 0, 0, -1, 0, 0]),
   CURRENT_DENSITY: d([-2, 0, 0, 1, 0, 0, 0]),
   THERMAL_CONDUCTIVITY: d([1, 1, -3, 0, -1, 0, 0]),
+  ACTION_INTEGRAL: d([0, 0, 1, 2, 0, 0, 0]), // A^2*s: the Joule integral I^2 t of a current pulse
 });
 
 export function expsEqual(a: Exps, b: Exps): boolean {
