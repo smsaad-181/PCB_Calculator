@@ -1,0 +1,24 @@
+{
+  "schema": "pcb-calc/safety-table@1",
+  "schemaVersion": 1,
+  "table": "T2",
+  "standard": "IEC 60664-1",
+  "source": "fixture",
+  "edition": "fixture",
+  "ledgerIds": [
+    "S-030b"
+  ],
+  "status": "VERIFIED",
+  "entered": true,
+  "verifiedBy": "someone",
+  "verifiedDate": "",
+  "bannerRequired": false,
+  "cells": [
+    {
+      "row": "a",
+      "col": "b",
+      "value": 1,
+      "unit": "mm"
+    }
+  ]
+}

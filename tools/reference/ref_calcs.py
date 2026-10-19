@@ -2530,6 +2530,83 @@ GOLDEN.extend((n, got, _TW_RMS_PINNED[n], tol, ids, note) for n, got, tol, ids, 
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# Phase 3 core: working-voltage waveform conversions (S-035 VERIFIED textbook relations, S-019e for the pulse). TABLE-FREE
+# arithmetic only: no IEC 60664-1 or IPC-2221 table value exists anywhere in this oracle (the spacing tables are human-owned).
+# The oracle does NOT use the crest-factor shortcuts (sqrt 2, sqrt 3) that src uses: it integrates the RMS DEFINITION
+# V_rms = sqrt((1/T) integral v(t)^2 dt) numerically over one period (midpoint rule), then converts by ratio.
+# ---------------------------------------------------------------------------------------------------------------
+_WF_N = 200000
+
+def _wf_unit(shape, k):
+    """Unit-peak waveform at sample k of _WF_N over one period (midpoint)."""
+    x = (k + 0.5) / _WF_N
+    if shape == "sine":
+        return math.sin(2.0 * math.pi * x)
+    if shape == "square":
+        return 1.0 if x < 0.5 else -1.0
+    if shape == "triangle":
+        return 4.0 * x - 1.0 if x < 0.5 else 3.0 - 4.0 * x
+    if shape == "dc":
+        return 1.0
+    raise ValueError(shape)
+
+def wf_rms_per_peak(shape):
+    """RMS of a unit-peak waveform, from the definition (numerical integral over one period)."""
+    return math.sqrt(sum(_wf_unit(shape, k) ** 2 for k in range(_WF_N)) / _WF_N)
+
+def wf_peak_to_rms(shape, peak):
+    return peak * wf_rms_per_peak(shape)
+
+def wf_rms_to_peak(shape, rms):
+    return rms / wf_rms_per_peak(shape)
+
+def wf_dc_plus_sine_rms(vdc, vac_rms):
+    vpk = vac_rms / wf_rms_per_peak("sine")
+    return math.sqrt(sum((vdc + vpk * _wf_unit("sine", k)) ** 2 for k in range(_WF_N)) / _WF_N)
+
+def wf_pulse_rms(peak, duty):
+    on = int(round(duty * _WF_N))
+    return math.sqrt(sum(peak * peak for _ in range(on)) / _WF_N)
+
+_WF_PINNED = {
+    'waveform_sine_peak_to_rms_V_pk100': 70.71067811865474,
+    'waveform_sine_rms_to_peak_V_rms100': 141.4213562373095,
+    'waveform_sine_rms_to_peak_V_rms230': 325.2691193458119,
+    'waveform_square_peak_to_rms_V_pk100': 100.0,
+    'waveform_square_rms_to_peak_V_rms100': 100.0,
+    'waveform_triangle_peak_to_rms_V_pk100': 57.73502691896258,
+    'waveform_triangle_rms_to_peak_V_rms100': 173.20508075688772,
+    'waveform_dc_value_to_rms_V_dc100': 100.0,
+    'waveform_dc_plus_sine_rms_V_dc120_ac30rms': 123.69316876852982,
+    'waveform_dc_plus_sine_peak_V_dc120_ac30rms': 162.42640687119285,
+    'waveform_pulse_rms_V_pk10_D0.36': 6.0,
+}
+_WF_IDS = ("S-035",)
+_WF_IDS_PULSE = ("S-035", "S-019e")
+
+def _wf_vectors():
+    out = []
+    n = "waveform_sine_peak_to_rms_V_pk100"
+    out.append((n, wf_peak_to_rms("sine", 100.0), 1e-9, _WF_IDS, "sine: V_rms from the integral definition"))
+    out.append(("waveform_sine_rms_to_peak_V_rms100", wf_rms_to_peak("sine", 100.0), 1e-9, _WF_IDS, "sine peak from RMS"))
+    out.append(("waveform_sine_rms_to_peak_V_rms230", wf_rms_to_peak("sine", 230.0), 1e-9, _WF_IDS, "sine peak from RMS"))
+    out.append(("waveform_square_peak_to_rms_V_pk100", wf_peak_to_rms("square", 100.0), 1e-9, _WF_IDS, "symmetric square: RMS = peak"))
+    out.append(("waveform_square_rms_to_peak_V_rms100", wf_rms_to_peak("square", 100.0), 1e-9, _WF_IDS, "symmetric square"))
+    out.append(("waveform_triangle_peak_to_rms_V_pk100", wf_peak_to_rms("triangle", 100.0), 1e-9, _WF_IDS, "symmetric triangle/sawtooth"))
+    out.append(("waveform_triangle_rms_to_peak_V_rms100", wf_rms_to_peak("triangle", 100.0), 1e-9, _WF_IDS, "symmetric triangle/sawtooth"))
+    out.append(("waveform_dc_value_to_rms_V_dc100", wf_peak_to_rms("dc", 100.0), 1e-9, _WF_IDS, "DC: RMS = peak = value"))
+    out.append(("waveform_dc_plus_sine_rms_V_dc120_ac30rms", wf_dc_plus_sine_rms(120.0, 30.0), 1e-9, _WF_IDS,
+                "DC plus zero-mean sine: integral of (Vdc + Vpk sin)^2"))
+    out.append(("waveform_dc_plus_sine_peak_V_dc120_ac30rms", 120.0 + wf_rms_to_peak("sine", 30.0), 1e-9, _WF_IDS,
+                "DC plus zero-mean sine: peak = Vdc + Vac,pk"))
+    out.append(("waveform_pulse_rms_V_pk10_D0.36", wf_pulse_rms(10.0, 0.36), 1e-9, _WF_IDS_PULSE,
+                "rectangular 0-to-peak pulse: integral of v^2 over one period (S-019e)"))
+    return out
+
+GOLDEN.extend((n, got, _WF_PINNED[n], tol, ids, note) for n, got, tol, ids, note in _wf_vectors())
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # Phase 2 part A: impedance models (microstrip S-020/S-020a, stripline S-021/S-021a wide, coax S-024, elliptic S-023b,
 # delay S-029/S-029a/S-029b). The oracle lives in ref_impedance.py (written from the recorded equations, independent of src/).
 # ---------------------------------------------------------------------------------------------------------------

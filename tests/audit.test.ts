@@ -191,3 +191,100 @@ describe('ledger audit', () => {
     expect(r.errors[0]).toContain('S-999');
   });
 });
+
+describe('spacing table audit (Phase 3: build fails if a safety table without verifiedBy lacks bannerRequired true)', () => {
+  const shell = (over: Record<string, unknown> = {}): Record<string, unknown> => ({
+    schema: 'pcb-calc/safety-table@1',
+    schemaVersion: 1,
+    table: 'T2',
+    standard: 'IEC 60664-1',
+    source: 'licensed copy held by the user',
+    edition: 'not entered',
+    ledgerIds: ['S-030b'],
+    status: 'PAYWALLED-USER-MUST-VERIFY',
+    entered: false,
+    verifiedBy: '',
+    verifiedDate: '',
+    bannerRequired: true,
+    cells: [],
+    groups: [],
+    rules: [],
+    ...over,
+  });
+  const path = 'src/core/data/iec60664/T2.json';
+  const errs = (o: unknown, p = path): string => validateTable(o, p).join(' | ');
+
+  it('accepts an empty shell', () => {
+    expect(validateTable(shell(), path)).toEqual([]);
+  });
+  it('a table lacking verifiedBy (missing, empty or blank) must set bannerRequired true, for ANY table', () => {
+    const generic = { source: 's', edition: 'e', ledgerIds: ['S-001'], status: 'UNVERIFIED' };
+    expect(errs({ ...generic, bannerRequired: false, verifiedBy: '' }, 'x.json')).toContain('bannerRequired');
+    expect(errs({ ...generic, bannerRequired: false, verifiedBy: '   ' }, 'x.json')).toContain('bannerRequired');
+    expect(errs({ ...generic, bannerRequired: false }, 'x.json')).toContain('verifiedBy');
+    expect(errs(shell({ bannerRequired: false }))).toContain('bannerRequired');
+    expect(errs(shell({ verifiedBy: undefined, bannerRequired: undefined }))).toContain('verifiedBy');
+    // VERIFIED with a blank verifiedBy is refused even for a non-spacing table
+    expect(errs({ ...generic, status: 'VERIFIED', verifiedBy: '   ', bannerRequired: false }, 'x.json')).toContain('verifiedBy');
+  });
+  it('a spacing table (by path or by schema) must declare the safety-table schema and an entered flag', () => {
+    expect(errs(shell({ schema: 'other' }))).toContain('schema');
+    expect(errs({ source: 's', edition: 'e', ledgerIds: ['S-030b'], status: 'UNVERIFIED', verifiedBy: '', bannerRequired: true }, path)).toContain('schema');
+    expect(errs(shell({ entered: 'no' }))).toContain('entered');
+    expect(errs(shell({ schemaVersion: 2 }))).toContain('schemaVersion');
+    expect(errs({ ...shell(), table: 'T2' }, 'src/core/data/ipc2221-spacing.json')).toEqual('');
+  });
+  it('VERIFIED needs verifiedBy and verifiedDate, no banner, every record checked; a signer needs status VERIFIED', () => {
+    const cell = { row: 'a', col: 'b', value: 1, unit: 'mm' };
+    const verified = shell({ status: 'VERIFIED', entered: true, verifiedBy: 'A. Person', verifiedDate: '2026-01-02', bannerRequired: false, cells: [{ ...cell, checkedBy: 'A. Person', checkedDate: '2026-01-02' }] });
+    expect(validateTable(verified, path)).toEqual([]);
+    expect(errs({ ...verified, verifiedDate: '' })).toContain('verifiedDate');
+    expect(errs({ ...verified, bannerRequired: true })).toContain('bannerRequired');
+    expect(errs({ ...verified, cells: [cell] })).toContain('checkedBy');
+    expect(errs(shell({ verifiedBy: 'A. Person' }))).toContain('status');
+  });
+  it('an unentered table must hold no values, and values need entered true', () => {
+    const cell = { row: 'a', col: 'b', value: 1, unit: 'mm' };
+    expect(errs(shell({ cells: [cell] }))).toContain('entered');
+    expect(errs(shell({ entered: true }))).toContain('entered');
+  });
+  it('the fixture with a signer but no date and no checker fails the audit', () => {
+    const r = auditDataTables(fx('spacing-bad'));
+    expect(r.count).toBe(1);
+    expect(r.errors.join(' | ')).toContain('verifiedDate');
+  });
+  it('the shipped spacing tables pass the audit and are empty shells with the banner on', () => {
+    const root = fx('../../..');
+    const audit = auditDataTables(root);
+    expect(audit.errors).toEqual([]);
+    const shipped = import.meta.glob('../src/core/data/**/*.json', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+    const files = [
+      'iec60664/T1-impulse-voltage.json',
+      'iec60664/T2-clearance-transient.json',
+      'iec60664/T3-clearance-steady-state.json',
+      'iec60664/T4-altitude-factor.json',
+      'iec60664/T5-creepage.json',
+      'iec60664/T6-material-groups.json',
+      'iec60664/T7-rules.json',
+      'ipc2221-spacing.json',
+    ];
+    for (const f of files) {
+      const text = shipped[`../src/core/data/${f}`];
+      expect(text).toBeDefined();
+      const o = JSON.parse(text as string) as Record<string, unknown>;
+      expect(validateTable(o, `src/core/data/${f}`)).toEqual([]);
+      expect(o['bannerRequired']).toBe(true);
+      expect(o['verifiedBy']).toBe('');
+      expect(o['entered']).toBe(false);
+      expect(o['cells']).toEqual([]);
+      expect(o['groups']).toEqual([]);
+      expect(o['rules']).toEqual([]);
+      expect(o['rows']).toEqual([]);
+      // the hard rule: no entered value, edition, clause, table number or date in a shipped shell
+      for (const k of ['edition', 'clause', 'tableNumber', 'enteredBy', 'enteredDate', 'verifiedDate']) {
+        expect(String(o[k])).not.toMatch(/\d/);
+      }
+      expect(o['status']).toBe('PAYWALLED-USER-MUST-VERIFY');
+    }
+  });
+});

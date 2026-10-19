@@ -1,0 +1,36 @@
+{
+  "schema": "pcb-calc/safety-table@1",
+  "schemaVersion": 1,
+  "table": "T8",
+  "name": "T8 IPC-2221 Table 6-1 electrical conductor spacing",
+  "standard": "IPC-2221",
+  "source": "IPC-2221 (licensed copy held by the user; not read by agents)",
+  "edition": "not entered",
+  "clause": "",
+  "tableNumber": "",
+  "ledgerIds": [
+    "S-033",
+    "S-033a"
+  ],
+  "status": "PAYWALLED-USER-MUST-VERIFY",
+  "entered": false,
+  "enteredBy": "",
+  "enteredDate": "",
+  "verifiedBy": "",
+  "verifiedDate": "",
+  "bannerRequired": true,
+  "units": {
+    "row": "V",
+    "cell": "mm"
+  },
+  "interpolation": "none",
+  "interpolationSource": "",
+  "rows": [],
+  "columns": [],
+  "cells": [],
+  "groups": [],
+  "rules": [],
+  "notes": [
+    "EMPTY SHELL. No value is shipped: the human enters values from a licensed copy and imports this file (see docs/research/spacing-structure-and-gating.md section 5). Agents must not enter values from memory."
+  ]
+}
