@@ -479,6 +479,7 @@ export const CALCULATOR_STATE_KEYS = {
     w: 'Entered trace width text, with a unit (max 40 characters). Used with geometry "trace".',
     th: 'Entered FINISHED copper thickness text of the trace, with a unit (max 40 characters). Absent means not entered: required, never pre-filled.',
     tb: 'Thickness basis: "finished", "measured" or "nominal" (converted from a foil weight). Absent means not chosen: no result.',
+    cv: 'Foil convention used when the thickness is typed as a foil weight (a key of the foil conventions). Absent means the foil default, shown as a default.',
     ta: 'Entered conductor temperature at the start of the pulse (absolute), with a unit (max 40 characters). Absent means not entered: required, there is no default.',
     pm: 'What is given: "current" (solves the time), "time" (solves the current) or "i2t" (an action integral). Absent means not chosen: no result.',
     i: 'Entered pulse current text, with a unit (max 40 characters). Used when pm is "current".',

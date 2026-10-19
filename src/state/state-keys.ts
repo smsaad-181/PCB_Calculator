@@ -28,7 +28,7 @@ export const CALCULATOR_STATE_KEY_NAMES: Readonly<Record<string, readonly string
   creepage: ['ed', 'it', 'pd', 'mt', 'mg', 'cti', 'sf', 'ac', 'gr', 'alt', 'vm', 'vp', 'vr', 'ws', 'wb', 'wv', 'fq', 'cc', 'sm'],
   'ipc-spacing': ['ed', 'lc', 'ck', 'co', 'el', 'eh', 'vm', 'vp', 'vr', 'ws', 'wb', 'wv'],
   'thermal-via': ['d', 't', 'l', 'n', 'km', 'fl', 'kf', 'p', 'ps'],
-  fusing: ['gm', 'a', 'dw', 'w', 'th', 'tb', 'ta', 'pm', 'i', 'tp', 'it', 'cp'],
+  fusing: ['gm', 'a', 'dw', 'w', 'th', 'tb', 'cv', 'ta', 'pm', 'i', 'tp', 'it', 'cp'],
 };
 
 /** Local state key names of one calculator (a fresh array; empty for an unknown id). */

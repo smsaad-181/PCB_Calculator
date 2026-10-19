@@ -590,3 +590,20 @@ Behaviour and conditions for the validators:
 | P4-7 | Fusing steps show K = D·c/(ρ20·α20) with a local dimension (A²·s/m⁴) that has no display unit | The UI should print the step value from `expr` or SI |
 
 Deferred (not built): UI pages for both calculators; the hole-to-hole and pad-fit geometry check against a fab profile limit (S-019k) for the thermal via; a tolerance envelope for either calculator; a spreading model (new research pass needed); any fill material table; an exposed-pad or theta-JA calculator (out of scope by user decision). Needs the human: confirm the specific heat default (Q-54), read the IPC scope (Q-56), and decide whether the unreachable `medium` confidence is acceptable (P4-1).
+
+## Phase 4 UI (thermal via and fusing pages), logged 2026-10-19, branch phase-4, uncommitted; ui-engineer
+
+Two lazy pages: `thermal-via` (category Thermal) and `fusing` (its own category "Fusing (short pulse to melting; not steady-state heating)"). Files: `src/ui/calculators/{thermal-via,fusing}.vm.ts` with `.vm.test.ts` (written first), `ThermalVia.tsx`, `Fusing.tsx`; registry and categories; state key `cv` added for fusing; `ValidityChecksList` and `buildResultView` gained a "not checked" state. Not verified in a real browser by this agent (no browser tool); the build is on :4173 for the human.
+
+| # | Item | Note |
+|---|---|---|
+| P4U-1 | Fusing is visibly separate from steady-state heating | Own category and heading, a notice at the top of the page saying the two answer different questions, with a link to `#/calc/self-heating`. The self-heating page has no reverse link yet (not asked) |
+| P4U-2 | P4-2 handled: the IPC scope check (S-042f PAYWALLED) renders as "Not checked, needs your copy of the standard", counted separately from failures | New optional `notChecked` flag in `ValidityChecksList` and `BuildOptions.notCheckedChecks`; the core still returns `ok: false` for it |
+| P4U-3 | P4-7 handled: the K step is printed from its SI value with the local unit, e.g. `5.0512e+16 A²·s/m⁴` | The step is removed from the generic formatter and re-inserted at its position, so no formatter change was needed |
+| P4U-4 | Foil weight to thickness: the thickness field accepts a length or a foil weight (oz/ft2). A weight is converted by the core `foilThickness` with the chosen convention (default shown as a default, key `cv`), passed to the core as a length with basis `nominal`, and the conversion is stated on the page and carries the core S-003/S-009 warning | Assumes the user writes `oz/ft2`; plain `oz` is a mass and is refused with a hint |
+| P4U-5 | Specific heat: the select shows the default (385 J/(kg·K), "product choice, needs your confirmation") and all three sourced values with the S-042d CONFLICT sentence listing them. Leaving the default counts as a defaulted assumption in the core confidence | Q-54 still needs the human decision |
+| P4U-6 | Preece is not among the result rows: it sits in a collapsed "Historical reference (not a PCB model)" panel (Q-58 UI decision) | |
+| P4U-7 | Confidence is always low (P4-1); the page says "Estimate, low confidence" statically (also before any result) and the result shows the core reasons. A test fails if the core ever returns a different level for the sample inputs, so the static line cannot silently drift | |
+| P4U-8 | The 1 s and 10 s warnings show as core warnings (10 s first, critical) worded "product choices, not sourced limits"; they are not refusals | |
+| P4U-9 | Bundle: total gzip 426.75 of 430 KB (was 404.47; +22.28 KB for core and UI of both pages), largest route PathLoad 133.31 of 150 KB; Fusing route 58.53 KB, ThermalVia 54.77 KB. Headroom is now 3.25 KB: the next feature needs a ceiling decision or a trim | |
+| P4U-10 | Deferred: tolerance inputs and net-class export for these pages (not asked; no sourced tolerance model); hole-to-hole check (S-019k); the fab-profile plating path is a manual choice ("a fabricator AVERAGE") rather than a profile read | |

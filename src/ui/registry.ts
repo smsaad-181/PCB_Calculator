@@ -1,6 +1,6 @@
 import type { ComponentType } from 'preact';
 
-export type Category = 'trace' | 'impedance' | 'load' | 'circuit' | 'spacing';
+export type Category = 'trace' | 'impedance' | 'load' | 'circuit' | 'spacing' | 'thermal' | 'fusing';
 
 export interface CalculatorEntry {
   readonly id: string;
@@ -16,6 +16,8 @@ export const CATEGORIES: readonly { id: Category; title: string; phase: number }
   { id: 'load', title: 'Load / path', phase: 1 },
   { id: 'circuit', title: 'Circuit values', phase: 1 },
   { id: 'spacing', title: 'Safety / Spacing', phase: 3 },
+  { id: 'thermal', title: 'Thermal', phase: 4 },
+  { id: 'fusing', title: 'Fusing (short pulse to melting; not steady-state heating)', phase: 4 },
 ];
 
 /** Each calculator is a lazy import, so it ships as its own code-split chunk. */
@@ -201,6 +203,20 @@ export const REGISTRY: readonly CalculatorEntry[] = [
     category: 'spacing',
     phase: 3,
     load: () => import('./calculators/IpcSpacing'),
+  },
+  {
+    id: 'thermal-via',
+    title: 'Thermal via array (1-D conduction estimate, lower bound)',
+    category: 'thermal',
+    phase: 4,
+    load: () => import('./calculators/ThermalVia'),
+  },
+  {
+    id: 'fusing',
+    title: 'Fusing: adiabatic time to melting (estimate, not a fuse rating)',
+    category: 'fusing',
+    phase: 4,
+    load: () => import('./calculators/Fusing'),
   },
 ];
 
