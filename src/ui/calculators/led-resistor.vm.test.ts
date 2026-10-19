@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { meta } from '../../core/calculators/led-resistor/meta';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { CALCULATOR_ID, DEFAULT_STATE, WRITTEN_KEYS, computeView, fromHashState, liveSummary, toHashState, type LedState } from './led-resistor.vm';
 
 const st = (p: Partial<LedState>): LedState => ({ ...DEFAULT_STATE, ...p });

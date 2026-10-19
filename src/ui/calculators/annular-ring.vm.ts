@@ -6,7 +6,8 @@ import { meta } from '../../core/calculators/annular-ring/meta';
 import { formatResult, formatStep, type HeadlineOpts } from '../../core/format-result';
 import type { Bound, CalcInput, CalcResult } from '../../core/result';
 import { DIM, type Dim, type DisplayPrefs, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { echoPrefs, headlinePrefs, type Units } from '../components/prefs';
 import { buildResultView, ledgerView, MAX_FIELD_CHARS, parseField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
 import { BUNDLED_LABEL, bundledProfile, choiceFromHash, choiceToHash, type ProfileChoice } from './fab-profile-choice';
@@ -137,7 +138,7 @@ const PROFILE_FLAG: Readonly<Record<'holeTol' | 'posTol' | 'padTol', 'holeTolPro
   padTol: 'padTolProfile',
 };
 const PROFILE_WORD = 'profile';
-const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+const LOCAL_KEYS = stateKeyNames(CALCULATOR_ID);
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (fp and u are reserved keys). */
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS, 'fp', 'u'];
 

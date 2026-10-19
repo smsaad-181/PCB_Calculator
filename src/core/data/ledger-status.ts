@@ -1,0 +1,113 @@
+// Source ledger mirror, STATUS half. Transcribed from docs/sources/LEDGER.md; tests/ledger-sync.test.ts
+// fails if ids or statuses drift from the markdown. Status here never upgrades the markdown.
+// Kept apart from the long item/edition text (./ledger.ts) so a bundle that only needs a status (for example the
+// pair-search worker) does not ship the text. ./ledger.ts joins the two and fails at load if an id has no status.
+export type LedgerStatus = 'VERIFIED' | 'UNVERIFIED' | 'PAYWALLED-USER-MUST-VERIFY' | 'CONFLICT';
+
+export interface LedgerStatusRow {
+  readonly id: string;
+  readonly status: LedgerStatus;
+}
+
+const STATUS_ROWS: readonly LedgerStatusRow[] = [
+  { id: 'S-001', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-002', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-003', status: 'CONFLICT' },
+  { id: 'S-003d', status: 'VERIFIED' },
+  { id: 'S-003e', status: 'CONFLICT' },
+  { id: 'S-004', status: 'VERIFIED' },
+  { id: 'S-005', status: 'VERIFIED' },
+  { id: 'S-006', status: 'VERIFIED' },
+  { id: 'S-007', status: 'CONFLICT' },
+  { id: 'S-008', status: 'UNVERIFIED' },
+  { id: 'S-009', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-018', status: 'UNVERIFIED' },
+  { id: 'S-019', status: 'VERIFIED' },
+  { id: 'S-019b', status: 'UNVERIFIED' },
+  { id: 'S-019c', status: 'UNVERIFIED' },
+  { id: 'S-019d', status: 'VERIFIED' },
+  { id: 'S-019e', status: 'VERIFIED' },
+  { id: 'S-019f', status: 'UNVERIFIED' },
+  { id: 'S-019g', status: 'UNVERIFIED' },
+  { id: 'S-019h', status: 'VERIFIED' },
+  { id: 'S-019i', status: 'UNVERIFIED' },
+  { id: 'S-019j', status: 'UNVERIFIED' },
+  { id: 'S-019k', status: 'UNVERIFIED' },
+  { id: 'S-019l', status: 'UNVERIFIED' },
+  { id: 'S-019m', status: 'UNVERIFIED' },
+  { id: 'S-010', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-011a', status: 'UNVERIFIED' },
+  { id: 'S-011b', status: 'UNVERIFIED' },
+  { id: 'S-011c', status: 'CONFLICT' },
+  { id: 'S-011d', status: 'UNVERIFIED' },
+  { id: 'S-011e', status: 'UNVERIFIED' },
+  { id: 'S-012', status: 'UNVERIFIED' },
+  { id: 'S-013', status: 'VERIFIED' },
+  { id: 'S-016', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-020', status: 'VERIFIED' },
+  { id: 'S-020a', status: 'CONFLICT' },
+  { id: 'S-020b', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-020c', status: 'UNVERIFIED' },
+  { id: 'S-020d', status: 'UNVERIFIED' },
+  { id: 'S-021', status: 'VERIFIED' },
+  { id: 'S-021a', status: 'CONFLICT' },
+  { id: 'S-021b', status: 'UNVERIFIED' },
+  { id: 'S-022', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-022a', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-022b', status: 'VERIFIED' },
+  { id: 'S-023', status: 'CONFLICT' },
+  { id: 'S-023a', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-023b', status: 'VERIFIED' },
+  { id: 'S-023c', status: 'UNVERIFIED' },
+  { id: 'S-024', status: 'VERIFIED' },
+  { id: 'S-025', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-026', status: 'VERIFIED' },
+  { id: 'S-026a', status: 'CONFLICT' },
+  { id: 'S-026b', status: 'CONFLICT' },
+  { id: 'S-026c', status: 'VERIFIED' },
+  { id: 'S-026d', status: 'VERIFIED' },
+  { id: 'S-026e', status: 'UNVERIFIED' },
+  { id: 'S-026f', status: 'VERIFIED' },
+  { id: 'S-026g', status: 'UNVERIFIED' },
+  { id: 'S-027', status: 'UNVERIFIED' },
+  { id: 'S-027a', status: 'UNVERIFIED' },
+  { id: 'S-028', status: 'UNVERIFIED' },
+  { id: 'S-028a', status: 'UNVERIFIED' },
+  { id: 'S-029', status: 'VERIFIED' },
+  { id: 'S-029a', status: 'VERIFIED' },
+  { id: 'S-029b', status: 'UNVERIFIED' },
+  { id: 'S-029c', status: 'UNVERIFIED' },
+  { id: 'S-029d', status: 'VERIFIED' },
+  { id: 'S-029e', status: 'UNVERIFIED' },
+  { id: 'S-029f', status: 'UNVERIFIED' },
+  { id: 'S-030…S-034', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-030', status: 'VERIFIED' },
+  { id: 'S-030a', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-030b', status: 'UNVERIFIED' },
+  { id: 'S-030c', status: 'CONFLICT' },
+  { id: 'S-030d', status: 'VERIFIED' },
+  { id: 'S-030e', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-030f', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-030g', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-031', status: 'VERIFIED' },
+  { id: 'S-031a', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-032', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-033', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-033a', status: 'UNVERIFIED' },
+  { id: 'S-034', status: 'UNVERIFIED' },
+  { id: 'S-035', status: 'VERIFIED' },
+  { id: 'S-040…S-044', status: 'UNVERIFIED' },
+  { id: 'S-050', status: 'VERIFIED' },
+  { id: 'S-051', status: 'VERIFIED' },
+  { id: 'S-014', status: 'UNVERIFIED' },
+  { id: 'S-015', status: 'PAYWALLED-USER-MUST-VERIFY' },
+  { id: 'S-017', status: 'UNVERIFIED' },
+];
+
+/** Frozen so no code path can mark a row VERIFIED at runtime (the compliance gate trusts these statuses). */
+export const LEDGER_STATUS_ROWS: readonly LedgerStatusRow[] = Object.freeze(STATUS_ROWS.map((r) => Object.freeze({ ...r })));
+
+/** Status of one ledger row, or undefined when the id is not in the ledger. */
+export function ledgerStatusOf(id: string): LedgerStatus | undefined {
+  return LEDGER_STATUS_ROWS.find((r) => r.id === id)?.status;
+}

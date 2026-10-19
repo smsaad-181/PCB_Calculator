@@ -9,7 +9,8 @@ import { DEFAULT_FOIL_CONVENTION } from '../../core/data/constants';
 import { formatMargin, formatPercent, formatResult, formatUtilisation, type HeadlineOpts } from '../../core/format-result';
 import { NET_CLASS_KEYS, type Bound, type CalcExport, type CalcResult, type CopperBasisKind, type ElementResult } from '../../core/result';
 import { DIM, FOIL_CONVENTIONS, q, type Dim, type DisplayPrefs, type FoilConvention, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, MAX_HASH_LENGTH, MAX_STATE_KEYS, RESERVED_STATE_KEYS, decodeList, encodeList, serializeHash, type HashState } from '../../state/hash';
+import { MAX_HASH_LENGTH, MAX_STATE_KEYS, RESERVED_STATE_KEYS, decodeList, encodeList, serializeHash, type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { conventionSpreadText, echoPrefs, headlinePrefs, type CopperLayer, type Units } from '../components/prefs';
 import { buildResultView, ledgerView, MAX_FIELD_CHARS, parseField, type FieldView, type LedgerEntryView, type ProvenanceRow, type ResultView } from '../components/view';
 import { BUNDLED_LABEL, bundledProfile, choiceFromHash, choiceToHash, type ProfileChoice } from './fab-profile-choice';
@@ -216,7 +217,7 @@ export function removeElement(list: readonly ElementForm[], index: number): read
 // single encoding reads to the same state. shareHash() is the one place a link is made, for the page and the length check.
 // ---------------------------------------------------------------------------
 const slotKey = (side: Side, n: number): string => `${side === 'forward' ? 'fe' : 're'}${String(n)}`;
-export const WRITTEN_KEYS: readonly string[] = [...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'fp', 'u'];
+export const WRITTEN_KEYS: readonly string[] = [...stateKeyNames(CALCULATOR_ID), 'fp', 'u'];
 
 const KIND_CODE: Readonly<Record<ElementKind, string>> = { trace: 't', via: 'v', connector: 'c', pad: 'p', spoke: 's', 'pour-neck': 'n', cable: 'k', resistance: 'r' };
 const CODE_KIND: Readonly<Record<string, ElementKind>> = Object.fromEntries(Object.entries(KIND_CODE).map(([k, c]) => [c, k as ElementKind]));

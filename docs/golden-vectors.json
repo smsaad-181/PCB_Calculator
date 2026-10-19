@@ -20994,6 +20994,162 @@
       "note": "legacy IPC-2221 MEAN temperature rise at I_rms (the peak is higher)"
     },
     {
+      "name": "waveform_sine_peak_to_rms_V_pk100",
+      "oracle_value": 70.71067811865476,
+      "pinned_expected": 70.71067811865474,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "sine: V_rms from the integral definition"
+    },
+    {
+      "name": "waveform_sine_rms_to_peak_V_rms100",
+      "oracle_value": 141.42135623730948,
+      "pinned_expected": 141.4213562373095,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "sine peak from RMS"
+    },
+    {
+      "name": "waveform_sine_rms_to_peak_V_rms230",
+      "oracle_value": 325.2691193458118,
+      "pinned_expected": 325.2691193458119,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "sine peak from RMS"
+    },
+    {
+      "name": "waveform_square_peak_to_rms_V_pk100",
+      "oracle_value": 100.0,
+      "pinned_expected": 100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "symmetric square: RMS = peak"
+    },
+    {
+      "name": "waveform_square_rms_to_peak_V_rms100",
+      "oracle_value": 100.0,
+      "pinned_expected": 100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "symmetric square"
+    },
+    {
+      "name": "waveform_triangle_peak_to_rms_V_pk100",
+      "oracle_value": 57.735026916075824,
+      "pinned_expected": 57.73502691896258,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "symmetric triangle/sawtooth"
+    },
+    {
+      "name": "waveform_triangle_rms_to_peak_V_rms100",
+      "oracle_value": 173.205080765548,
+      "pinned_expected": 173.20508075688772,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "symmetric triangle/sawtooth"
+    },
+    {
+      "name": "waveform_dc_value_to_rms_V_dc100",
+      "oracle_value": 100.0,
+      "pinned_expected": 100.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "DC: RMS = peak = value"
+    },
+    {
+      "name": "waveform_dc_plus_sine_rms_V_dc120_ac30rms",
+      "oracle_value": 123.69316876852982,
+      "pinned_expected": 123.69316876852982,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "DC plus zero-mean sine: integral of (Vdc + Vpk sin)^2"
+    },
+    {
+      "name": "waveform_dc_plus_sine_peak_V_dc120_ac30rms",
+      "oracle_value": 162.42640687119285,
+      "pinned_expected": 162.42640687119285,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "DC plus zero-mean sine: peak = Vdc + Vac,pk"
+    },
+    {
+      "name": "waveform_pulse_rms_V_pk10_D0.36",
+      "oracle_value": 6.0,
+      "pinned_expected": 6.0,
+      "rel_tol": 1e-09,
+      "ledger_ids": [
+        "S-035",
+        "S-019e"
+      ],
+      "ledger_status": {
+        "S-035": "VERIFIED",
+        "S-019e": "VERIFIED"
+      },
+      "status": "VERIFIED",
+      "note": "rectangular 0-to-peak pulse: integral of v^2 over one period (S-019e)"
+    },
+    {
       "name": "microstrip_z0_ohm_w600um_h635um_er4.1",
       "oracle_value": 75.26613765215878,
       "pinned_expected": 75.26613765215878,

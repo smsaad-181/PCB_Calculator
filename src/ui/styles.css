@@ -219,3 +219,29 @@ td.num { font-variant-numeric: tabular-nums; }
 .stackup-table input[type="text"], .stackup-table select { min-width: 6rem; }
 .stackup-table td:nth-child(7) input[type="text"] { min-width: 12rem; }
 .stackup-table td:nth-child(4) select { margin-bottom: 0.25rem; }
+
+/* ---- Safety spacing pages (Phase 3) ---- */
+.spacing-banners { margin: 0.75rem 0; }
+.unverified-banner { border: 3px solid var(--err-fg); background: var(--err-bg); color: var(--err-fg); border-radius: 6px; padding: 0.25rem 1rem; margin: 0.75rem 0; }
+.unverified-banner p { margin: 0.4rem 0; }
+.pill-unverified-red { display: inline-block; background: var(--err-fg); color: var(--err-bg); border-radius: 4px; padding: 0 0.5rem; font-weight: 800; letter-spacing: 0.05em; }
+.soldermask-note { border-left: 4px solid var(--muted); padding: 0.15rem 0.75rem; margin: 0.5rem 0; }
+.guideline-label { border: 2px dashed var(--muted); border-radius: 6px; padding: 0.25rem 0.75rem; }
+.gate-box { border: 3px solid var(--err-fg); background: var(--err-bg); color: var(--err-fg); border-radius: 6px; padding: 0.25rem 1rem; }
+.gate-box.out-of-range { border-style: double; }
+.gate-box .gate-heading { font-size: 1.15rem; margin: 0.5rem 0; }
+.gate-box button.secondary { background: var(--bg); color: var(--fg); margin: 0.5rem 0; }
+.output[data-pending="true"] .gate-box { opacity: 0.55; }
+.field.checkbox { display: flex; gap: 0.5rem; align-items: flex-start; }
+.field.checkbox input { margin-top: 0.35rem; width: 1.25rem; height: 1.25rem; flex: none; }
+.field.checkbox label { margin: 0; font-weight: 400; }
+.spacing-tables { margin-top: 1.5rem; }
+.spacing-tables textarea { width: 100%; font: 0.875rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); border: 2px solid var(--muted); border-radius: 6px; padding: 0.5rem; }
+.table-scroll { overflow-x: auto; }
+.status-table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+.status-table th, .status-table td { border: 1px solid var(--border); padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+.state-pill { display: inline-block; border: 2px solid var(--muted); border-radius: 4px; padding: 0 0.4rem; font-weight: 700; font-size: 0.8125rem; }
+.state-pill.state-entered_unverified { border-color: var(--err-fg); background: var(--err-bg); color: var(--err-fg); }
+.state-pill.state-verified { border-style: double; border-width: 4px; }
+.button-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.75rem 0; }
+.ok-box { border: 2px solid var(--muted); border-radius: 6px; padding: 0.1rem 1rem; background: var(--bg); }

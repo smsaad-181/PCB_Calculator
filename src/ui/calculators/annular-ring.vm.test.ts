@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import vmSrc from './annular-ring.vm.ts?raw';
 import pageSrc from './AnnularRing.tsx?raw';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { isoDayUtc } from '../today';
 import { BUNDLED_LABEL, NONE_LABEL, bundledProfile } from './fab-profile-choice';
 import {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { DIM, fromUnit } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS } from '../../state/hash';
+import { RESERVED_STATE_KEYS } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { ledgerView, orderWarnings, parseField } from './view';
 
 describe('parseField', () => {

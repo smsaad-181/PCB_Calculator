@@ -82,6 +82,38 @@ export function scanForbiddenPhrases(root, opts = {}) {
   return hits;
 }
 
+const SPACING_SCHEMA = 'pcb-calc/safety-table@1';
+const isSpacingPath = (relPath) => relPath.includes('data/iec60664/') || /(^|\/)ipc2221-spacing[^/]*\.json$/i.test(relPath);
+function isSpacingTable(t, relPath) {
+  return t.schema === SPACING_SCHEMA || isSpacingPath(relPath);
+}
+const blank = (v) => typeof v !== 'string' || v.trim() === '';
+
+/**
+ * Extra rules for the IEC 60664 / IPC-2221 spacing tables (Phase 3). These mirror src/core/spacing/tables.ts (the importer):
+ * the build fails if a shipped table claims verification it cannot back up or holds values without provenance.
+ */
+function validateSpacingTable(t, relPath, status) {
+  const errs = [];
+  const e = (m) => errs.push(`${relPath}: ${m}`);
+  if (t.schema !== SPACING_SCHEMA) e(`spacing tables must declare "schema": "${SPACING_SCHEMA}"`);
+  if (t.schemaVersion !== 1) e('spacing tables need "schemaVersion": 1');
+  if (typeof t.entered !== 'boolean') e('spacing tables need a boolean "entered"');
+  const parts = ['cells', 'groups', 'rules'].map((k) => (Array.isArray(t[k]) ? t[k] : []));
+  const records = parts.flat();
+  if (t.entered === false && records.length > 0) e('"entered" is false but the table holds values');
+  if (t.entered === true && records.length === 0) e('"entered" is true but the table holds no values');
+  if (status === 'VERIFIED') {
+    if (blank(t.verifiedDate)) e('status VERIFIED requires "verifiedDate"');
+    if (t.bannerRequired !== false) e('status VERIFIED requires "bannerRequired": false');
+    if (records.some((r) => r === null || typeof r !== 'object' || blank(r.checkedBy) || blank(r.checkedDate)))
+      e('status VERIFIED requires "checkedBy" and "checkedDate" on every entered record');
+  } else if (!blank(t.verifiedBy) || !blank(t.verifiedDate)) {
+    e('"verifiedBy"/"verifiedDate" are present but status is not VERIFIED');
+  }
+  return errs;
+}
+
 /** Validate one parsed data-table object. Returns list of error strings. */
 export function validateTable(obj, relPath) {
   const errs = [];
@@ -97,9 +129,14 @@ export function validateTable(obj, relPath) {
   if (typeof status !== 'string' || !ALLOWED_STATUS.includes(status))
     e(`"status" must be one of ${ALLOWED_STATUS.join('|')}`);
   if (typeof t.verifiedBy !== 'string') e('"verifiedBy" must be a string');
-  else if (t.verifiedBy === '' && status === 'VERIFIED') e('"verifiedBy" may not be empty when status is VERIFIED');
+  else if (t.verifiedBy.trim() === '' && status === 'VERIFIED') e('"verifiedBy" may not be empty or blank when status is VERIFIED');
   if (typeof status === 'string' && status !== 'VERIFIED' && t.bannerRequired !== true)
     e('non-VERIFIED table requires "bannerRequired": true');
+  // Phase 3 build-failing rule (skill iec60664-gating): a safety table lacking verifiedBy MUST have bannerRequired true.
+  // Applies to every data table: a missing, empty or blank verifiedBy never goes with the banner off.
+  const unsigned = typeof t.verifiedBy !== 'string' || t.verifiedBy.trim() === '';
+  if (unsigned && t.bannerRequired !== true) e('a table lacking "verifiedBy" must set "bannerRequired": true (build-failing rule)');
+  if (isSpacingTable(t, relPath)) errs.push(...validateSpacingTable(t, relPath, status));
   const isFab = /fab-profile[^/]*\.json$/i.test(relPath) || relPath.includes('data/fab-profiles/');
   if (isFab) {
     if (

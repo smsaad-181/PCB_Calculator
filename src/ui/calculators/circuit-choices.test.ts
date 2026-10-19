@@ -22,7 +22,8 @@ import schemSrc from '../components/DividerSchematic.tsx?raw';
 import noticeSrc from '../components/NoticeBanner.tsx?raw';
 import statusSrc from '../components/ResultStatus.tsx?raw';
 import hookSrc from '../useCalcState.ts?raw';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS } from '../../state/hash';
+import { RESERVED_STATE_KEYS } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   ALL_SERIES,
   CATALOG_OPTS,

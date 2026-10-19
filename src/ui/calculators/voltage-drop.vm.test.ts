@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import vmSrc from './voltage-drop.vm.ts?raw';
 import pageSrc from './VoltageDrop.tsx?raw';
-import { CALCULATOR_STATE_KEYS, MAX_HASH_LENGTH, MAX_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { MAX_HASH_LENGTH, MAX_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   CAP_MESSAGE,

@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import pageSrc from './OhmPower.tsx?raw';
 import { meta } from '../../core/calculators/ohm-power/meta';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,

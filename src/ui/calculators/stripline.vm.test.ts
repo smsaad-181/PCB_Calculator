@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import vmSrc from './stripline.vm.ts?raw';
 import pageSrc from './Stripline.tsx?raw';
 import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,

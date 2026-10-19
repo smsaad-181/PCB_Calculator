@@ -5,7 +5,8 @@ import { meta } from '../../core/calculators/self-heating/meta';
 import { DEFAULT_FOIL_CONVENTION } from '../../core/data/constants';
 import type { CalcResult, CopperBasisKind } from '../../core/result';
 import { DIM, FOIL_CONVENTIONS, type Dim, type DisplayPrefs, type FoilConvention, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { echoPrefs, headlinePrefs, conventionSpreadText, type CopperLayer, type Units } from '../components/prefs';
 import {
   buildResultView,
@@ -103,7 +104,7 @@ export const RANGE_HINT =
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+const LOCAL_KEYS = stateKeyNames(CALCULATOR_ID);
 
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (and `u`, which is reserved). */
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS, 'u'];

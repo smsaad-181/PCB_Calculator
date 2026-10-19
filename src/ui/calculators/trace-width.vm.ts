@@ -7,7 +7,8 @@ import { DEFAULT_FOIL_CONVENTION, foilSpreadPercent } from '../../core/data/cons
 import { formatResult } from '../../core/format-result';
 import type { CalcResult, CopperBasisKind } from '../../core/result';
 import { DEFAULT_DISPLAY_PREFS, DIM, FOIL_CONVENTIONS, type Dim, type DisplayPrefs, type FoilConvention, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { LAYER_COUNT_INPUTS, type LayerCountInput } from '../../core/calculators/annular-ring/guards';
 import type { NearNote, NearResultView } from '../components/NearResultNotes';
 import { buildResultView, factorText, MAX_FIELD_CHARS, orderWarnings, parseField, parseFractionField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
@@ -199,7 +200,7 @@ export function echoPrefs(units: Units, kind: 'width' | 'thickness' | 'other' = 
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+const LOCAL_KEYS = stateKeyNames(CALCULATOR_ID);
 
 /** Keys this page writes. Documented in CALCULATOR_STATE_KEYS (and `fp` and `u`, which are reserved). */
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS, 'fp', 'u'];

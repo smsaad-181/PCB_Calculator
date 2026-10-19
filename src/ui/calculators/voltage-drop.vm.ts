@@ -8,7 +8,8 @@ import { DEFAULT_FOIL_CONVENTION } from '../../core/data/constants';
 import { formatPercent, formatResult, type HeadlineOpts } from '../../core/format-result';
 import type { Bound, CalcResult, CopperBasisKind } from '../../core/result';
 import { DIM, FOIL_CONVENTIONS, q, type Dim, type DisplayPrefs, type FoilConvention, type Quantity } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, MAX_HASH_LENGTH, RESERVED_STATE_KEYS, decodeList, encodeList, serializeHash, type HashState } from '../../state/hash';
+import { MAX_HASH_LENGTH, RESERVED_STATE_KEYS, decodeList, encodeList, serializeHash, type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { conventionSpreadText, echoPrefs, headlinePrefs, type CopperLayer, type Units } from '../components/prefs';
 import { buildResultView, MAX_FIELD_CHARS, parseField, parseFractionField, type FieldView, type ProvenanceRow, type ResultView } from '../components/view';
 import { FINISHED_NEEDS, NOT_ANSWERED_NOTE, weightSourceFromHash, type WeightSource } from './copper-source';
@@ -182,7 +183,7 @@ export const LAYER_OPTIONS: readonly { value: CopperLayer; label: string }[] = [
 //   resistance r ~ label ~ resistance ~ source note
 // ---------------------------------------------------------------------------
 const slotKey = (side: Side, n: number): string => `${side === 'forward' ? 'fe' : 're'}${String(n)}`;
-export const WRITTEN_KEYS: readonly string[] = [...Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]), 'u'];
+export const WRITTEN_KEYS: readonly string[] = [...stateKeyNames(CALCULATOR_ID), 'u'];
 
 function encodeElement(e: ElementForm): string {
   const label = e.label.slice(0, LABEL_MAX_CHARS);

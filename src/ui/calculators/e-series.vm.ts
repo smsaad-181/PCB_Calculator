@@ -6,7 +6,8 @@ import { bestPairs, dropNoisePairs, nearest, nearestRatio, valuesInDecade, type 
 import type { CalcError, Result } from '../../core/result';
 import { DIM, type Dim } from '../../core/units';
 import type { SearchTask } from '../../workers/pair-search.protocol';
-import { CALCULATOR_STATE_KEYS, type HashState } from '../../state/hash';
+import { type HashState } from '../../state/hash';
+import { stateKeyNames } from '../../state/state-keys';
 import { MAX_FIELD_CHARS, parseField, parseFractionField, type FieldView } from '../components/view';
 import { ALL_SERIES, LOOKUP_MODES, TOPOLOGIES, catalogRatio, catalogResistance, isSeriesName, isTopology, signedPercent } from './circuit-choices';
 
@@ -49,7 +50,7 @@ export const TOPOLOGY_OPTIONS = TOPOLOGIES;
 // ---------------------------------------------------------------------------
 // Hash state
 // ---------------------------------------------------------------------------
-const LOCAL_KEYS = Object.keys(CALCULATOR_STATE_KEYS[CALCULATOR_ID]);
+const LOCAL_KEYS = stateKeyNames(CALCULATOR_ID);
 export const WRITTEN_KEYS: readonly string[] = [...LOCAL_KEYS];
 
 export function toHashState(s: ESeriesState): Record<string, string> {

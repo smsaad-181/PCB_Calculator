@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { CATEGORIES, REGISTRY, calculatorsIn, findCalculator, type CalculatorEntry } from './registry';
-import { CALCULATOR_STATE_KEYS } from '../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../state/state-key-docs';
 import { badgeText } from './components/UnverifiedBadge';
 
 describe('registry', () => {
@@ -67,8 +67,8 @@ describe('registry', () => {
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);
   });
-  it('has the four categories, none empty', () => {
-    expect(CATEGORIES.map((c) => c.id)).toEqual(['trace', 'impedance', 'load', 'circuit']);
+  it('has the five categories, none empty', () => {
+    expect(CATEGORIES.map((c) => c.id)).toEqual(['trace', 'impedance', 'load', 'circuit', 'spacing']);
     for (const c of CATEGORIES) expect(calculatorsIn(c.id).length, c.id).toBeGreaterThan(0);
   });
   it('lists the impedance calculators under Impedance as lazy phase-2 entries that resolve to a component', async () => {

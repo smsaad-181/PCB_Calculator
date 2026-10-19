@@ -9,6 +9,12 @@ export interface CalcError {
   code: 'INVALID_INPUT' | 'OUT_OF_DOMAIN' | 'DIMENSION' | 'NO_CONVERGENCE' | 'INTERNAL';
   field?: string;
   message: string;
+  /**
+   * Gated calculators only (Phase 3 spacing): why no number was given. INSUFFICIENT_INPUTS lists `missing` mandatory inputs,
+   * INSUFFICIENT_DATA means a table is empty, of another edition or lacks the cell, OUT_OF_SCOPE means a recorded scope limit was exceeded.
+   */
+  gate?: 'INSUFFICIENT_INPUTS' | 'INSUFFICIENT_DATA' | 'OUT_OF_SCOPE';
+  missing?: string[];
 }
 
 export type InputSource = 'user' | 'default' | 'fab-profile' | 'preset';

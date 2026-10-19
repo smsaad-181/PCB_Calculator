@@ -11,7 +11,8 @@ import confSrc from '../components/ConfidenceBadge.tsx?raw';
 import { meta } from '../../core/calculators/trace-resistance/meta';
 import { formatResult } from '../../core/format-result';
 import { DIM } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, RESERVED_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { RESERVED_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import { headlinePrefs } from '../components/prefs';
 import {
   ADVANCED_CAUTION,

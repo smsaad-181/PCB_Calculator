@@ -5,7 +5,8 @@ import nearSrc from '../components/NearResultNotes.tsx?raw';
 import { compute } from '../../core/calculators/trace-width/calc';
 import { PEAK_HIGHER_WARNING } from '../../core/calculators/pulse-shared';
 import { DIM, fromUnit, q } from '../../core/units';
-import { CALCULATOR_STATE_KEYS, parseHash, serializeHash } from '../../state/hash';
+import { parseHash, serializeHash } from '../../state/hash';
+import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
