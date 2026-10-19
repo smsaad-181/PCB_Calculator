@@ -100,11 +100,19 @@ export function PresetComparison({ view }: { readonly view: PresetView }) {
       <p>
         <span class="pill-unverified">UNVERIFIED</span> {c.statement}
       </p>
+      {c.solvedNote !== undefined && <p class="muted">{c.solvedNote}</p>}
       {c.bandTag !== undefined && (
         <p>
           <strong>[{c.bandTag}]</strong>
         </p>
       )}
+      {c.envelopeTag !== undefined && (
+        <p>
+          <strong>[{c.envelopeTag}]</strong>
+        </p>
+      )}
+      {c.envelopeNote !== undefined && <p class="muted">{c.envelopeNote}</p>}
+      <p class="muted">{c.exclusions}</p>
       {view.designTargetLine !== undefined && <p class="muted">{view.designTargetLine}.</p>}
     </section>
   );

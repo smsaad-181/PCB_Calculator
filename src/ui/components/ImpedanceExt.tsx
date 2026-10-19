@@ -96,6 +96,7 @@ export function ExtSections(p: Props) {
   const { form, state, patch, errors } = p;
   const [tolOpen, setTolOpen] = useState(form.hasTolerance);
   const [lossOpen, setLossOpen] = useState(form.hasLoss);
+  const [profOpen, setProfOpen] = useState(form.hasProfile);
   const onTol = (core: string, t: TolInput): void => {
     const key = form.stateKeyOf[core];
     if (key !== undefined) patch({ [key]: rawTol(t) });
@@ -108,8 +109,13 @@ export function ExtSections(p: Props) {
   return (
     <>
       <ToleranceSection fields={form.fields} tol={form.tol} onTol={onTol} errors={tolErrors} lockedReason={form.lockedReason} open={tolOpen} onToggle={setTolOpen}>
-        <ProfileControls form={form} state={state} patch={patch} errors={errors} />
       </ToleranceSection>
+      {form.offerProfile && (
+        <details class="advanced profile-input" open={profOpen} onToggle={(e) => setProfOpen((e.currentTarget as HTMLDetailsElement).open)}>
+          <summary>Fab profile (optional): minimum width and spacing note</summary>
+          <ProfileControls form={form} state={state} patch={patch} errors={errors} />
+        </details>
+      )}
       <details class="advanced loss-input" open={lossOpen} onToggle={(e) => setLossOpen((e.currentTarget as HTMLDetailsElement).open)}>
         <summary>Loss estimate (optional)</summary>
         <p class="help">{LOSS_INTRO}</p>

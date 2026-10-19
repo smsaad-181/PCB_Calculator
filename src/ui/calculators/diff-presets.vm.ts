@@ -13,13 +13,22 @@ export interface PresetInput {
   readonly tolerance: string;
   readonly solveMode: SolveMode;
   readonly targetText: string;
-  /** The computed Zdiff when the page has a result (analysis mode); undefined otherwise. */
+  /** The Zdiff of the result (the computed one, or that of the solved geometry); undefined when there is no result. */
   readonly zdiff?: Quantity;
+  /** The Zdiff corners from the tolerances the user entered; undefined when none were entered or the core gave none for Zdiff. */
+  readonly envelope?: { readonly min: Quantity; readonly max: Quantity };
+  /** True when the user entered tolerances (so a missing envelope is not "none entered"). */
+  readonly tolerancesEntered?: boolean;
 }
 
 export const PRESET_PLACEHOLDER = 'No preset (optional)';
 export const PRESET_HELP =
   'Optional. A preset only fills the target Zdiff field (when you solve for a width or a spacing) or compares the computed Zdiff with the design target (when you compute Zdiff). It never changes er or the geometry. The targets come from application notes and layout guides; the interface standards were not read.';
+export const BAND_EXCLUSIONS = "Fab tolerance and the model's own accuracy are not included in this comparison; it uses the model value and only the tolerances you entered.";
+export const SOLVED_NOTE =
+  'This is the Zdiff of the solved geometry. The solver matches your target, so the nominal value sits at the target by construction; the corners show what the tolerances you entered do to it.';
+export const NO_CORNERS_NOTE = 'No tolerances entered, so only the nominal model value is compared with the band. Enter tolerances in the tolerance section to compare the corners with it.';
+export const NO_ZDIFF_CORNERS_NOTE = 'The tolerance corners the core returned do not include Zdiff, so only the nominal model value is compared with the band.';
 export const NO_TOLERANCE_LABEL = 'No tolerance chosen (show the deviation only)';
 
 const targetPresets = (): readonly ImpedancePreset[] => IMPEDANCE_PRESETS.filter((p) => p.kind === 'differential-target');
@@ -118,7 +127,20 @@ export interface PresetView {
   readonly toleranceNote?: string;
   /** Informational ranges that are not PCB tolerances (LVDS). */
   readonly info: readonly string[];
-  readonly comparison?: { readonly statement: string; readonly bandTag?: string; readonly status: 'UNVERIFIED' };
+  readonly comparison?: {
+    readonly statement: string;
+    /** "nominal model value is within / outside the stated +/-x % band" (only with a chosen tolerance). */
+    readonly bandTag?: string;
+    /** The same band against the corners of the entered tolerances. */
+    readonly envelopeTag?: string;
+    /** Why there is no corner tag although a band was chosen. */
+    readonly envelopeNote?: string;
+    /** Solve modes: what the compared Zdiff is. */
+    readonly solvedNote?: string;
+    /** Always shown: what the comparison leaves out. */
+    readonly exclusions: string;
+    readonly status: 'UNVERIFIED';
+  };
   readonly notes: readonly string[];
 }
 
@@ -153,15 +175,35 @@ export function buildPresetView(i: PresetInput): PresetView {
   }
 
   let comparison: PresetView['comparison'];
-  if (i.zdiff !== undefined && i.solveMode === 'zdiff') {
+  if (i.zdiff !== undefined) {
     const c = compareToPreset(i.zdiff, p.id, tolerance === '' ? undefined : tolerance);
     if (!c.ok) notes.push(c.error.message);
     else {
       const t = c.value.tolerance;
+      let envelopeTag: string | undefined;
+      let envelopeNote: string | undefined;
+      if (t !== undefined) {
+        if (i.envelope === undefined) envelopeNote = i.tolerancesEntered === true ? NO_ZDIFF_CORNERS_NOTE : NO_CORNERS_NOTE;
+        else {
+          const inside = (z: Quantity): boolean | undefined => {
+            const r = compareToPreset(z, p.id, tolerance);
+            return r.ok ? r.value.tolerance?.within : undefined;
+          };
+          const lo = inside(i.envelope.min);
+          const hi = inside(i.envelope.max);
+          const where = lo === undefined || hi === undefined ? undefined : lo && hi ? 'both corners are inside' : !lo && !hi ? 'both corners are outside' : lo ? 'the upper corner is outside' : 'the lower corner is outside';
+          if (where === undefined) envelopeNote = NO_ZDIFF_CORNERS_NOTE;
+          else envelopeTag = `tolerance corners you entered: ${where} the stated +/-${String(t.value)} % band`;
+        }
+      }
       comparison = {
         statement: c.value.statement,
         status: c.value.comparisonStatus,
-        ...(t !== undefined ? { bandTag: `${t.within ? 'within' : 'outside'} the stated +/-${String(t.value)} % band` } : {}),
+        exclusions: BAND_EXCLUSIONS,
+        ...(t !== undefined ? { bandTag: `nominal model value is ${t.within ? 'within' : 'outside'} the stated +/-${String(t.value)} % band` } : {}),
+        ...(envelopeTag !== undefined ? { envelopeTag } : {}),
+        ...(envelopeNote !== undefined ? { envelopeNote } : {}),
+        ...(i.solveMode !== 'zdiff' ? { solvedNote: SOLVED_NOTE } : {}),
       };
     }
   }

@@ -1,3 +1,4 @@
+import { shownMessages } from '../test-helpers';
 import { describe, expect, it } from 'vitest';
 import genericSrc from './diff.vm.ts?raw';
 import msVmSrc from './diff-microstrip.vm.ts?raw';
@@ -148,7 +149,7 @@ describe.each(KINDS)('$name', (k) => {
       const v = ok(st({ thickness: '35 um' }));
       const w = v.raw.warnings.find((x) => x.code === 'FINITE_THICKNESS_NOT_MODELLED');
       expect(w).toBeDefined();
-      expect(v.result.warnings.some((x) => x.message === w?.message)).toBe(true);
+      expect(shownMessages(v).includes(w?.message ?? '')).toBe(true);
       // The result does not change with t.
       expect(val(v, 'differential impedance Zdiff')).toBeCloseTo(k.golden.zdiff, 3);
     });
@@ -157,7 +158,7 @@ describe.each(KINDS)('$name', (k) => {
   describe('core warnings and validity checks are shown, informational ones are marked', () => {
     it('shows every core warning as written', () => {
       const v = ok(st({ thickness: '35 um', frequency: '1 GHz' }));
-      for (const w of v.raw.warnings) expect(v.result.warnings.some((x) => x.message === w.message), w.code).toBe(true);
+      for (const w of v.raw.warnings) expect(shownMessages(v).includes(w.message), w.code).toBe(true);
     });
     it('lists the validity checks; the ordering check is information, not a test', () => {
       const v = ok(st({}));
@@ -174,7 +175,7 @@ describe.each(KINDS)('$name', (k) => {
         const v = ok(st({ width: '0.1 mm', spacing: '0.3 mm' }));
         const codes = v.raw.warnings.map((w) => w.code);
         expect(codes).toContain('NARROW_STRIP_FORM');
-        for (const w of v.raw.warnings) expect(v.result.warnings.some((x) => x.message === w.message)).toBe(true);
+        for (const w of v.raw.warnings) expect(shownMessages(v).includes(w.message)).toBe(true);
       }
     });
     it('out-of-range geometry is shown and the confidence stays low', () => {
@@ -295,7 +296,7 @@ describe.each(KINDS)('$name', (k) => {
     });
     it('with a tolerance chosen a band tag appears as text', () => {
       const v = ok(st({ preset: 'usb2-hs-90', tolerance: 'usb2-tol-15' }));
-      expect(v.preset.comparison?.bandTag).toMatch(/^(within|outside) the stated \+\/-15 % band$/);
+      expect(v.preset.comparison?.bandTag).toMatch(/^nominal model value is (within|outside) the stated \+\/-15 % band$/);
     });
     it('LVDS: no tolerance published', () => {
       const v = ok(st({ preset: 'lvds-100' }));
@@ -308,7 +309,9 @@ describe.each(KINDS)('$name', (k) => {
       const v = ok(s);
       expect(v.preset.targetLine).toMatch(/^target from preset Ethernet/);
       expect(val(v, 'differential impedance Zdiff')).toBeCloseTo(100, 6);
-      expect(v.preset.comparison).toBeUndefined();
+      // the band check works in solve modes too: the compared Zdiff is that of the solved geometry
+      expect(v.preset.comparison?.solvedNote).toMatch(/solved geometry/);
+      expect(v.preset.comparison?.bandTag).toBeUndefined();
     });
     it('choosePreset in analysis mode keeps the target field', () => {
       expect(vm.choosePreset(st({ targetZ: '77 ohm' }), 'usb2-hs-90').targetZ).toBe('77 ohm');

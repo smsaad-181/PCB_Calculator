@@ -1,6 +1,6 @@
 import type { ComponentType } from 'preact';
 
-export type Category = 'routing' | 'trace' | 'impedance' | 'load' | 'circuit';
+export type Category = 'trace' | 'impedance' | 'load' | 'circuit';
 
 export interface CalculatorEntry {
   readonly id: string;
@@ -11,7 +11,6 @@ export interface CalculatorEntry {
 }
 
 export const CATEGORIES: readonly { id: Category; title: string; phase: number }[] = [
-  { id: 'routing', title: 'Routing', phase: 2 },
   { id: 'trace', title: 'Trace', phase: 1 },
   { id: 'impedance', title: 'Impedance and delay', phase: 2 },
   { id: 'load', title: 'Load / path', phase: 1 },

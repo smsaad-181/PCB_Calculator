@@ -1,6 +1,6 @@
 // View-model for the symmetric stripline impedance page. Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculation is src/core/calculators/stripline compute().
-import { compute, type Inputs } from '../../core/calculators/stripline/calc';
+import { COHN_WIDE_DIFF, COHN_WIDE_Z0, compute, type Inputs } from '../../core/calculators/stripline/calc';
 import { STRIPLINE_THICKNESS_MODELS, meta, type StriplineThicknessModel } from '../../core/calculators/stripline/meta';
 import type { HashState } from '../../state/hash';
 import { EXT_DEFAULTS, extFormOf, type ExtForm, tolEr, tolHeight, tolThickness, tolWidth, type ExtState } from './impedance-ext.vm';
@@ -163,6 +163,9 @@ const SPEC: ImpedanceSpec<StriplineState> = {
   accuracyClass: meta.accuracyClass,
   thicknessNames: { thickness: 'thickness' },
   netClass: true,
+  sizeInput: { name: 'spacing', label: 'b' },
+  epsHandoff: true,
+  conflict: { names: [COHN_WIDE_Z0, COHN_WIDE_DIFF], diff: [COHN_WIDE_DIFF] },
   ext: {
     tol: [tolWidth('Strip width w', 'width'), tolHeight('spacing', 'Plane-to-plane spacing b', 'spacing'), tolEr(), tolThickness('Strip copper thickness t', 'thickness')],
     thicknessUsed: (s) => s['thicknessModel'] !== 'none',

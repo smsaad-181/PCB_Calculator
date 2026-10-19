@@ -1,7 +1,6 @@
 // Shared view-model for the two edge-coupled differential pages (microstrip, stripline). Pure: no DOM, no engineering math.
 // Text in, display strings out. The calculations are src/core/calculators/{diff-microstrip,diff-stripline} compute().
 // The per-calculator files (diff-microstrip.vm.ts, diff-stripline.vm.ts) supply only what differs: ids, labels, the core compute.
-import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
 import type { AccuracyClass } from '../../core/confidence';
 import type { CalcOutcome } from '../../core/result';
 import type { HashState } from '../../state/hash';
@@ -172,20 +171,18 @@ export function makeDiffVm(def: DiffKindDef): DiffVm {
   const ACTIVE_TAIL: readonly FieldName[] = ['size', 'thickness', 'er', 'erSource', 'geometrySource', 'frequency', 'length', 'mismatch'];
 
   const modelRow = (r: ResultView, label: string): string => r.details.inputs.find((i) => i.label === label)?.value ?? '';
-  const netClassText = (r: ResultView, s: Record<string, string>): string | undefined => {
+  const netClassText = (r: ResultView, s: Record<string, string>): readonly string[] | undefined => {
     const mode = s['solveFor'];
     if (mode !== 'spacing' && mode !== 'width') return undefined;
     const width = mode === 'width' ? r.headline.text : modelRow(r, 'Width');
     const spacing = mode === 'spacing' ? r.headline.text : modelRow(r, 'Edge spacing');
-    const status = r.ledger.entries.filter((e) => e.status !== 'VERIFIED').map((e) => `${e.id} ${e.status}`);
     return [
       'Edge-coupled differential pair (starting value for a net class)',
       `Trace width: ${width}`,
       `Edge-to-edge spacing: ${spacing}`,
       `Target Zdiff: ${modelRow(r, 'Target Zdiff')}`,
-      `Starting value for a net class, not a design rule. ${IMPEDANCE_BANNER}`,
-      `Model status: ${status.join('; ')}. ${VERIFY_LINE}`,
-    ].join('\n');
+      VERIFY_LINE,
+    ];
   };
 
   const SPEC: ImpedanceSpec<DiffState> = {
@@ -234,6 +231,7 @@ export function makeDiffVm(def: DiffKindDef): DiffVm {
     pinCodes: ['OUT_OF_RANGE', 'MODEL_UNVERIFIED', 'WEAK_COUPLING_FIT', 'FINITE_THICKNESS_NOT_MODELLED', 'ISOLATED_MODEL_MISMATCH'],
     informational: ['Zodd < Z0 < Zeven', 't/h reported', 't/b reported'],
     netClassText,
+    sizeInput: { name: def.size.resultName, label: def.sizeHash },
     ext: { tol: [tolWidth(def.widthLabel, 'width'), tolSpacing('edgeSpacing', 'Edge-to-edge spacing s', 'spacing'), tolHeight(def.sizeCoreField, def.size.label, 'size'), tolEr()] },
   };
 
@@ -242,7 +240,17 @@ export function makeDiffVm(def: DiffKindDef): DiffVm {
   function computeView(s: DiffState, today?: string): DiffView {
     const base = computeViewOf(SPEC, s, today);
     const zdiff = base.status === 'ok' ? base.raw.results.find((r) => r.name === ZDIFF)?.value : undefined;
-    const preset = buildPresetView({ preset: s.preset, tolerance: s.tolerance, solveMode: s.solveFor, targetText: s.targetZ, ...(zdiff !== undefined ? { zdiff } : {}) });
+    const corners = base.status === 'ok' ? base.raw.envelope?.find((e) => e.name === ZDIFF) : undefined;
+    const entered = base.status === 'ok' && (base.raw.envelope?.length ?? 0) > 0;
+    const preset = buildPresetView({
+      preset: s.preset,
+      tolerance: s.tolerance,
+      solveMode: s.solveFor,
+      targetText: s.targetZ,
+      ...(zdiff !== undefined ? { zdiff } : {}),
+      ...(corners !== undefined ? { envelope: { min: corners.min, max: corners.max } } : {}),
+      tolerancesEntered: entered,
+    });
     return { ...base, preset };
   }
 

@@ -1,6 +1,6 @@
 import type { ComponentChildren } from 'preact';
 import { DIM } from '../../core/units';
-import { ER_HELP, ER_SOURCE_HELP, dimOfKind, echoOf, parseNumberField, type ImpedanceView, type TextDef, type Units } from '../calculators/impedance.vm';
+import { ER_HELP, ER_SOURCE_HELP, dimOfKind, echoOf, parseNumberField, type ConflictView, type ImpedanceView, type LimitsView, type TextDef, type Units } from '../calculators/impedance.vm';
 import { Callout } from './Callout';
 import { LedgerRowBadges } from './LedgerRowBadges';
 import { LossResults } from './LossResults';
@@ -162,6 +162,56 @@ export function ThicknessChoice(p: ThicknessProps) {
   );
 }
 
+/** Thickness-variant side values (ledger CONFLICT): labelled rows beside the headline, never the headline itself. */
+function ConflictRows({ view }: { readonly view: ConflictView | undefined }) {
+  if (view === undefined) return null;
+  return (
+    <section class="conflict-rows" aria-labelledby="conflict-h">
+      <h3 id="conflict-h">{view.heading}</h3>
+      {view.rows.length > 0 && (
+        <dl class="rows">
+          {view.rows.map((r) => (
+            <div key={r.label} class="row">
+              <dt>
+                <span aria-hidden="true">{'▲ '}</span>
+                {r.label}
+              </dt>
+              <dd>{r.text}</dd>
+              {r.hint !== undefined && (
+                <dd class="row-note">
+                  <strong>Note:</strong> {r.hint}
+                </dd>
+              )}
+            </div>
+          ))}
+        </dl>
+      )}
+      {view.notes.map((n) => (
+        <p key={n.message} class="muted">
+          <strong>{n.label}.</strong> {n.message}
+        </p>
+      ))}
+    </section>
+  );
+}
+
+/** What the model leaves out and which way it moves the result, in the core's own words, next to the result. */
+function LimitsBlock({ view }: { readonly view: LimitsView | undefined }) {
+  if (view === undefined) return null;
+  return (
+    <section class="limits-block" aria-labelledby="limits-h">
+      <h3 id="limits-h">{view.heading}</h3>
+      <ul>
+        {view.items.map((i) => (
+          <li key={i.title}>
+            <strong>{i.title}.</strong> {i.text}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 /** Result area: the mandatory banner is an Important callout in every state (result, problems, or nothing to show yet). */
 export function ImpedanceResults({ view, extra }: { readonly view: ImpedanceView; readonly extra?: ComponentChildren }) {
   if (view.status === 'ok') {
@@ -174,9 +224,22 @@ export function ImpedanceResults({ view, extra }: { readonly view: ImpedanceView
         afterHeadline={
           <>
             {extra}
+            <ConflictRows view={view.conflict} />
+            <LimitsBlock view={view.limits} />
+            {view.lowNote !== undefined && (
+              <p class="help low-confidence-note" role="note">
+                <strong>Confidence low.</strong> {view.lowNote}
+              </p>
+            )}
             <NearResultNotes view={view.near} />
             <ToleranceResults view={view.tolerance} />
             <LossResults loss={view.loss} needs={view.lossNeeds} />
+            {view.handoff !== undefined && (
+              <p class="handoff">
+                <a href={view.handoff.href}>{view.handoff.label}</a>
+                <span class="help"> {view.handoff.help}</span>
+              </p>
+            )}
             {view.netClass !== undefined && (
               <section class="netclass" aria-labelledby="nc-h">
                 <h3 id="nc-h">Starting value for a net class (mm and mil)</h3>
@@ -184,7 +247,7 @@ export function ImpedanceResults({ view, extra }: { readonly view: ImpedanceView
                   <label for="nc-copy">Plain text to copy</label>
                   <textarea id="nc-copy" class="netclass-text" readOnly rows={3} value={view.netClass} aria-describedby="nc-copy-help" />
                   <p id="nc-copy-help" class="help">
-                    The solved width in mm and mil with the approximation note. A starting point, not a design rule.
+                    {view.netClassHelp}
                   </p>
                 </div>
               </section>

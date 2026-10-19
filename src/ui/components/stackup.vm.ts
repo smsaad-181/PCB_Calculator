@@ -283,7 +283,14 @@ export interface StorageLike {
 }
 
 const STORE_VERSION = 1;
-const MAX_STORED_CHARS = 200_000;
+/** The stored draft is size-checked against the core text cap before it is parsed. */
+const MAX_STORED_CHARS = STACKUP_LIMITS.maxTextLength;
+
+/** Shown under a refusal to derive values (PCB2-5): what the user can do instead. */
+export const NEXT_STEP =
+  'What to do next: take the value from your fabricator (a field-solver result for the real stackup), or enter an approximate b or h yourself in the fields above and label its source as approximate.';
+/** Longest import text the page accepts (the core cap). */
+export const MAX_IMPORT_CHARS = STACKUP_LIMITS.maxTextLength;
 const MAX_FIELD = 500;
 const isRecord = (x: unknown): x is Record<string, unknown> => typeof x === 'object' && x !== null && !Array.isArray(x);
 const str = (x: unknown): string | undefined => (typeof x === 'string' && x.length <= MAX_FIELD ? x : undefined);

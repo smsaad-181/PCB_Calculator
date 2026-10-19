@@ -204,14 +204,14 @@ describe.each(PAGES)('$name', (p) => {
       const v = ok(st());
       expect(v.tolerance).toBeUndefined();
       expect(v.loss).toBeUndefined();
-      expect(v.near).toBeUndefined();
+      expect((v.near?.notes ?? []).every((n) => n.code === 'PROFILE_MINIMUM_NOT_CHOSEN')).toBe(true);
       expect(v.raw.envelope).toBeUndefined();
       expect(v.lossNeeds).toEqual([]);
     });
     it('the form offers a tolerance field only for an input the user entered, and none is pre-filled', () => {
       const empty = p.form(p.defaults, TODAY);
       expect(empty.fields.every((f) => !f.offered)).toBe(true);
-      expect(empty.offerProfile).toBe(false);
+      expect(empty.hasProfile).toBe(false);
       expect(empty.profile).toBe('');
       expect(empty.hasTolerance).toBe(false);
       const f = p.form(st(), TODAY);
@@ -278,7 +278,7 @@ describe.each(PAGES)('$name', (p) => {
       expect(v.loss?.caption).toBe(LOSS_LABEL);
       expect(v.loss?.caption).toMatch(/approximate estimate; roughness not modelled raises conductor loss; dispersion not modelled/);
       expect(v.loss?.rows.length).toBeGreaterThan(0);
-      for (const r of v.loss?.rows ?? []) if (r.label.startsWith('Dielectric') || r.label.startsWith('Conductor') || r.label.startsWith('Total')) expect(r.hint ?? '').toContain(LOSS_LABEL);
+      for (const r of v.loss?.rows ?? []) if (r.label.startsWith('Dielectric') || r.label.startsWith('Conductor') || r.label.startsWith('Total')) expect(r.hint ?? '').not.toContain(LOSS_LABEL);
       expect(v.loss?.ledgerRows.map((x) => x.id)).toEqual(expect.arrayContaining(['S-029d', 'S-029e']));
       expect(v.loss?.ledgerRows.find((x) => x.id === 'S-029e')?.status).toBe('UNVERIFIED');
       expect(v.result.ledger.unverifiedIds).toEqual(expect.arrayContaining(['S-029e']));

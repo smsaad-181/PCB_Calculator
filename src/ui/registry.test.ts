@@ -67,8 +67,9 @@ describe('registry', () => {
   it('registry ids are valid route ids', () => {
     for (const x of REGISTRY) expect(x.id).toMatch(/^[a-z0-9][a-z0-9-]*$/);
   });
-  it('has the five categories', () => {
-    expect(CATEGORIES.map((c) => c.id)).toEqual(['routing', 'trace', 'impedance', 'load', 'circuit']);
+  it('has the four categories, none empty', () => {
+    expect(CATEGORIES.map((c) => c.id)).toEqual(['trace', 'impedance', 'load', 'circuit']);
+    for (const c of CATEGORIES) expect(calculatorsIn(c.id).length, c.id).toBeGreaterThan(0);
   });
   it('lists the impedance calculators under Impedance as lazy phase-2 entries that resolve to a component', async () => {
     expect(calculatorsIn('impedance').map((x) => x.id)).toEqual(['microstrip', 'stripline', 'coax', 'diff-microstrip', 'diff-stripline', 'cpw', 'cpwg', 'quarter-wave']);
@@ -103,6 +104,10 @@ describe('badgeText', () => {
     expect(badgeText('PAYWALLED-USER-MUST-VERIFY', ['S-003'])).toBe(
       'Not checked against the standard (paywalled): compare with your licensed copy — see source ledger S-003',
     );
+  });
+  it('a paywalled paper row says paper, a paywalled standard row keeps the standard wording', () => {
+    expect(badgeText('PAYWALLED-USER-MUST-VERIFY', ['S-022'])).toBe('Primary source is a paywalled paper; not read by this project — see source ledger S-022');
+    expect(badgeText('PAYWALLED-USER-MUST-VERIFY', ['S-022', 'S-003'])).toMatch(/paywalled paper.*licensed copy.*S-003/);
   });
   it('falls back to a generic ledger reference and joins several ids', () => {
     expect(badgeText('UNVERIFIED', [])).toBe('Not independently verified — see the source ledger');

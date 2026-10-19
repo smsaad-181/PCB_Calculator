@@ -140,7 +140,7 @@ describe('thickness model', () => {
     const b = ok(st({ ...EXAMPLE, thickness: '35 um', thicknessModel: 'hj-procedure-B' }));
     expect(a.result.headline.text).toBe(b.result.headline.text);
     const none = ok(st({ ...EXAMPLE, thickness: '35 um' }));
-    expect(none.result.warnings.some((x) => /NOT used/.test(x.message))).toBe(true);
+    expect(none.limits?.items.some((x) => /NOT used/.test(x.text))).toBe(true);
     expect(none.ledgerRows.find((r) => r.id === 'S-020a')).toBeUndefined();
   });
 });
@@ -176,7 +176,7 @@ describe('confidence and warnings', () => {
     expect(v.result.details.validity.some((c) => !c.ok)).toBe(true);
   });
   it('dispersion and soldermask are always stated as not modelled', () => {
-    const msgs = ok(EXAMPLE).result.warnings.map((w) => w.message).join(' ');
+    const msgs = (ok(EXAMPLE).limits?.items ?? []).map((w) => w.text).join(' ');
     expect(msgs).toMatch(/Dispersion is not modelled/);
     expect(msgs).toMatch(/Soldermask/);
   });

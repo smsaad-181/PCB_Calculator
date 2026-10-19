@@ -4,6 +4,8 @@
 import type { AccuracyClass } from '../../core/confidence';
 import { formatDelayPerLength } from '../../core/calculators/delay-shared';
 import { IMPEDANCE_BANNER } from '../../core/calculators/impedance-shared';
+import { LOSS_LABEL } from '../../core/calculators/loss-shared';
+import { MU0_LEDGER_DISPLAY, paywalledPaperRole } from '../../core/data/impedance-wording';
 import type { CalcOutcome, CalcResult } from '../../core/result';
 import { DIM, q, type Dim, type DisplayPrefs, type Quantity } from '../../core/units';
 import { RESERVED_STATE_KEYS, type HashState } from '../../state/hash';
@@ -11,11 +13,12 @@ import type { CalloutView } from '../components/Callout';
 import type { LedgerRowBadge } from '../components/LedgerRowBadges';
 import type { NearNote, NearResultView } from '../components/NearResultNotes';
 import { echoPrefs, headlinePrefs, type Units } from '../components/prefs';
-import { MAX_FIELD_CHARS, buildResultView, orderWarnings, parseField, type FieldView, type ResultRowView, type ResultView } from '../components/view';
+import { MAX_FIELD_CHARS, buildResultView, orderWarnings, parseField, type FieldView, type ResultRowView, type ResultView, type WarningView } from '../components/view';
 import { hasKey, readText } from './circuit-view';
 import {
   EXT_LEDGER_ROLE,
   EXT_TEXT_LABEL,
+  canTakeProfile,
   collectExt,
   extChoiceDefs,
   extProfileFromHash,
@@ -24,6 +27,8 @@ import {
   extTextDefs,
   type ExtSpec,
 } from './impedance-ext.vm';
+import { bundledProfile } from './fab-profile-choice';
+import { epsHandoffHref, signedPercentText } from './result-links';
 import { LOSS_CODES, buildLossView, isLossName, type LossView } from './loss-view';
 import { buildToleranceView, type ToleranceView } from './tolerance-view';
 
@@ -157,8 +162,16 @@ export interface ImpedanceSpec<S extends ImpedanceState> {
   readonly calloutWarnings?: Readonly<Record<string, string>>;
   /** Validity check names that are information, not a test. */
   readonly informational?: readonly string[];
-  /** Replaces the default net-class text (for example to give width and spacing together); undefined means offer none. */
-  readonly netClassText?: (result: ResultView, s: Record<string, string>) => string | undefined;
+  /** The value lines of the net-class text (for example width and spacing together); the shared basis lines are appended. Undefined means offer none. */
+  readonly netClassText?: (result: ResultView, s: Record<string, string>) => readonly string[] | undefined;
+  /** Core input name and short label of h (or b), for the net-class basis. Absent: the page has none (coax). */
+  readonly sizeInput?: { readonly name: string; readonly label: string };
+  /** Core result names of the thickness-variant secondary results; `diff` names print as a signed percent. */
+  readonly conflict?: { readonly names: readonly string[]; readonly diff: readonly string[] };
+  /** True when the page offers the eps_eff -> quarter-wave hand-off link. */
+  readonly epsHandoff?: boolean;
+  /** Text in the core assumptions to replace (exact substring) with the page's own wording. */
+  readonly assumptionRewrite?: Readonly<Record<string, string>>;
 }
 
 const allText = <S extends ImpedanceState>(spec: ImpedanceSpec<S>): readonly TextDef[] => [...spec.text, ...extTextDefs(spec.ext)];
@@ -204,6 +217,11 @@ export function writtenKeysOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>):
 // ---------------------------------------------------------------------------
 // Ledger rows
 // ---------------------------------------------------------------------------
+/** Model description plus the core's status-correct wording for a paywalled paper (the row is never called a standard). */
+function paperRole(id: string, what: string): string {
+  return `${what} ${paywalledPaperRole(id) ?? 'Verify against the primary source and your fabricator stackup.'}.`;
+}
+
 /** What each ledger row backs on the impedance pages. Wording for the reader; the status always comes from the ledger. */
 export const LEDGER_ROLE: Readonly<Record<string, string>> = {
   'S-020': 'Microstrip Z0 and eps_eff at zero strip thickness (Hammerstad-Jensen form; two independent secondary sources agree, the 1980 paper was not read).',
@@ -211,13 +229,13 @@ export const LEDGER_ROLE: Readonly<Record<string, string>> = {
   'S-021': 'Symmetric stripline Z0 at zero strip thickness (Pozar 3.179 form; secondary sources, the textbook was not read).',
   'S-021a': 'Finite-thickness stripline form for wide strips: the sources disagree, so it is an opt-in variant.',
   'S-024': 'Ideal coaxial line Z0 (two sources agree).',
-  'S-022': 'Edge-coupled microstrip even and odd mode (Hammerstad-Jensen coupled-line static model). One secondary source was read; the 1980 paper was not. Verify with your licensed copy / fab stackup.',
-  'S-022a': 'Edge-coupled stripline even and odd mode (Cohn approximate forms). One secondary source was read; the primary paper was not. Verify with your licensed copy / fab stackup.',
+  'S-022': paperRole('S-022', 'Edge-coupled microstrip even and odd mode (Hammerstad-Jensen coupled-line static model). One secondary source was read.'),
+  'S-022a': paperRole('S-022a', 'Edge-coupled stripline even and odd mode (Cohn approximate forms). One secondary source was read.'),
   'S-022b': 'Definitions Zdiff = 2 Zodd and Zcommon = Zeven / 2 (two sources agree).',
   'S-023': 'CPW without a lower ground plane, conformal-map Z0 and eps_e: the sources disagree on the effective permittivity (Steer gives a different empirical fit); the conformal-map form is used and the fit is not implemented. The primary papers were not read.',
-  'S-023a': 'Conductor-backed CPW (CPWG), Ghione-Naldi form as transcribed in one secondary source; the 1983 paper is paywalled and was not read. Verify with your licensed copy / fab stackup.',
+  'S-023a': paperRole('S-023a', 'Conductor-backed CPW (CPWG), Ghione-Naldi form as transcribed in one secondary source.'),
   'S-023b': 'Complete elliptic integral K(k) by the arithmetic-geometric mean (NIST DLMF), used by both coplanar models.',
-  'S-013': 'Permeability of free space mu0, used with c to get the impedance of free space eta0 (exact SI constants).',
+  'S-013': `${MU0_LEDGER_DISPLAY}: permeability of free space, used with c to get the impedance of free space eta0 (exact SI constants).`,
   'S-029': 'Speed of light c = 299 792 458 m/s (exact), used for delay and wavelength.',
   'S-029a': 'Delay = sqrt(eps_eff)/c and guided wavelength = lambda0/sqrt(eps_eff) (independent authors agree).',
   'S-029b': 'Skew from a length mismatch, derived from the delay; one worked table only. Not part of the Z0 or eps_eff result.',
@@ -244,8 +262,18 @@ export type ImpedanceView =
       readonly notes: readonly string[];
       readonly ledgerRows: readonly LedgerRowBadge[];
       readonly banner: CalloutView;
-      /** Plain text with the solved width in mm and mil, offered as a net-class starting value (never a design rule). */
+      /** Plain text with the solved quantity in mm and mil and its basis, offered as a net-class starting value (never a design rule). */
       readonly netClass?: string;
+      /** What the net-class text holds: names the solved quantity. */
+      readonly netClassHelp?: string;
+      /** Labelled secondary results of the thickness variants (ledger CONFLICT), shown beside the headline. */
+      readonly conflict?: ConflictView;
+      /** What the model does not include, from the core warnings and assumptions. */
+      readonly limits?: LimitsView;
+      /** Plain-language line shown with a low confidence. */
+      readonly lowNote?: string;
+      /** Link to the quarter-wave page carrying only eps_eff. */
+      readonly handoff?: { readonly href: string; readonly label: string; readonly help: string };
       /** Tolerance corners and sensitivities from the core result; absent when no tolerance was entered. */
       readonly tolerance?: ToleranceView;
       /** The loss block from the core result; absent when no loss was asked for or it could not be computed yet. */
@@ -260,11 +288,77 @@ export type ImpedanceView =
 
 const DELAY_NAME = 'delay per length';
 
-export function startingValueText(label: string, headlineText: string): string {
-  return `${label}: ${headlineText}\nStarting value for a net class, not a design rule. ${IMPEDANCE_BANNER}`;
+export interface ConflictView {
+  readonly heading: string;
+  readonly rows: readonly ResultRowView[];
+  readonly notes: readonly WarningView[];
+}
+export interface LimitsView {
+  readonly heading: string;
+  readonly items: readonly { readonly title: string; readonly text: string }[];
 }
 
-const NEAR_CODES: readonly string[] = ['FAB_PROFILE_UNVERIFIED', 'FAB_PROFILE_STALE', 'TOLERANCE_NOT_USABLE'];
+export const CONFLICT_HEADING = 'Same geometry with the thickness variant: sources disagree, so these are side values, not the headline';
+export const LIMITS_HEADING = 'What this model does not include, and which way it moves Z0';
+export const LOW_CONFIDENCE_NOTE =
+  "Low means the model's source is conflicting or paywalled, not that the number is wrong: verify with your fabricator. An input outside the model's range is the one case where the number itself is less reliable; the confidence reasons say which rule applied.";
+export const NO_PROFILE_NOTE = 'Width/spacing not checked against any fab minimum: choose a fab profile in the Fab profile section to compare with its published minimum.';
+export const HANDOFF_LABEL = 'eps_eff -> quarter-wave helper';
+export const HANDOFF_HELP = 'Opens the quarter-wave page with this eps_eff only; its data status and source do not travel with the number, so check them on this page.';
+export const NET_CLASS_LEAD = 'Starting value for a net class, not a design rule.';
+
+const CONFLICT_CODES: readonly string[] = ['THICKNESS_VARIANT_SECONDARY', 'THICKNESS_VARIANT_NOT_SHOWN'];
+const MINIMUM_CODES: readonly string[] = ['BELOW_PROFILE_MINIMUM', 'MEETS_PROFILE_MINIMUM', 'PROFILE_MINIMUM_NOT_PUBLISHED', 'PROFILE_MINIMUM_NOT_AVAILABLE', 'PROFILE_MINIMUM_NOT_CHECKED'];
+/** Core warning code to the heading of its entry in the limits block (the core message is shown verbatim). */
+const LIMIT_TITLE: Readonly<Record<string, string>> = {
+  SOLDERMASK_NOT_MODELLED: 'Soldermask or coating',
+  ZERO_THICKNESS_MODEL: 'Finite copper thickness',
+  FINITE_THICKNESS_NOT_MODELLED: 'Finite copper thickness',
+  DISPERSION_NOT_MODELLED: 'Frequency dependence',
+};
+const LIMIT_CODES: readonly string[] = Object.keys(LIMIT_TITLE);
+const ETCH = /etch/i;
+
+/**
+ * The net-class text: the page's value lines, then the basis (model, ledger rows with status, er and its source, h or b, t and whether the
+ * model used it, thickness model, geometry source, confidence), the banner and the date. Every number is the one already printed by
+ * format-result in the result view.
+ */
+export function netClassTextOf(
+  spec: { readonly ext: ExtSpec; readonly sizeInput?: { readonly name: string; readonly label: string } | undefined },
+  lines: readonly string[],
+  result: ResultView,
+  raw: CalcResult,
+  s: Record<string, string>,
+  today: string | undefined,
+): string {
+  const at = (name: string): number => raw.inputs.findIndex((x) => x.name === name);
+  const shown = (name: string): string | undefined => (at(name) < 0 ? undefined : result.details.inputs[at(name)]?.value);
+  const detail = (name: string): string | undefined => (at(name) < 0 ? undefined : result.details.inputs[at(name)]?.detail);
+  const er = shown('er');
+  const size = spec.sizeInput === undefined ? undefined : shown(spec.sizeInput.name);
+  const t = shown('thickness');
+  const used = spec.ext.thicknessUsed?.(s) === true;
+  const model = s['thicknessModel'] ?? 'none';
+  const geo = ['width', 'edge spacing', 'gap', 'height', 'plane spacing', 'spacing'].map(detail).find((d) => d !== undefined);
+  const ledger = result.ledger.entries.map((e) => `${e.id} ${e.status}`).join('; ');
+  return [
+    ...lines,
+    NET_CLASS_LEAD,
+    `Model: ${raw.method}`,
+    `Ledger rows: ${ledger}`,
+    ...(er !== undefined ? [`er: ${er} (source: ${detail('er') ?? 'not given'})`] : []),
+    ...(size !== undefined && spec.sizeInput !== undefined ? [`${spec.sizeInput.label}: ${size}`] : []),
+    ...(t !== undefined ? [`t: ${t}, ${used ? 'used by the thickness model' : 'not used by this model'}`] : []),
+    `Thickness model: ${model === 'none' ? 'zero thickness (t not used)' : `${model} (opt-in variant, sources in CONFLICT)`}`,
+    `Geometry source: ${geo ?? 'not given'}`,
+    `Confidence: ${result.confidence.level}`,
+    IMPEDANCE_BANNER,
+    `Date: ${today !== undefined && today !== '' ? today : 'not available'}`,
+  ].join('\n');
+}
+
+const NEAR_CODES: readonly string[] = ['FAB_PROFILE_UNVERIFIED', 'FAB_PROFILE_STALE', 'TOLERANCE_NOT_USABLE', ...MINIMUM_CODES];
 const capitalise = (s: string): string => (s === '' ? s : s.charAt(0).toUpperCase() + s.slice(1));
 
 function extLabel(ext: ExtSpec, key: string): string | undefined {
@@ -353,15 +447,32 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
   const tolLabels: Record<string, string> = { ...Object.fromEntries(names.map((n) => [n, capitalise(n)])), ...spec.labels };
   const tb = buildToleranceView(raw, { accuracyClass: spec.accuracyClass, prefs, labels: tolLabels, thicknessNames: Object.keys(spec.thicknessNames), printers: Object.fromEntries(delayNames.map((n) => [n, formatDelayPerLength])) }, names);
   const loss = buildLossView(raw, (id) => LEDGER_ROLE[id]);
+  const takesProfile = canTakeProfile(spec.ext);
   const nearWarnings = tb.warnings.filter((w) => w.code !== undefined && NEAR_CODES.includes(w.code));
   const nearNotes: NearNote[] = nearWarnings.flatMap((w) => orderWarnings([w]).map((v) => ({ ...v, code: w.code ?? '' })));
-  const near: NearResultView = { notes: nearNotes, unverified: raw.fabProfile !== undefined && raw.fabProfile.status !== 'VERIFIED' };
+  const minimumShown = nearWarnings.some((w) => w.code !== undefined && MINIMUM_CODES.includes(w.code));
+  if (takesProfile && !minimumShown) nearNotes.push(...orderWarnings([{ severity: 'info', message: NO_PROFILE_NOTE }]).map((v) => ({ ...v, code: 'PROFILE_MINIMUM_NOT_CHOSEN' })));
+  const profileStatus = ext.inputs['fabProfile'] !== undefined ? bundledProfile()?.status : undefined;
+  const near: NearResultView = {
+    notes: nearNotes,
+    unverified: (raw.fabProfile !== undefined && raw.fabProfile.status !== 'VERIFIED') || (minimumShown && profileStatus !== undefined && profileStatus !== 'VERIFIED'),
+  };
   const calloutMap = spec.calloutWarnings ?? {};
   const callouts: CalloutView[] = raw.warnings.flatMap((w) => (w.code !== undefined && calloutMap[w.code] !== undefined ? [{ heading: calloutMap[w.code] as string, text: w.message }] : []));
-  const forView = { ...raw, warnings: tb.warnings.filter((w) => w.code === undefined || !(NEAR_CODES.includes(w.code) || LOSS_CODES.includes(w.code) || calloutMap[w.code] !== undefined)) };
+  const hidden = (w: { readonly code?: string | undefined }): boolean =>
+    w.code !== undefined && (NEAR_CODES.includes(w.code) || LOSS_CODES.includes(w.code) || CONFLICT_CODES.includes(w.code) || LIMIT_CODES.includes(w.code) || calloutMap[w.code] !== undefined);
+  const rewrite = Object.entries(spec.assumptionRewrite ?? {});
+  const forView: CalcResult = {
+    ...raw,
+    assumptions: raw.assumptions.map((a) => rewrite.reduce((acc, [from, to]) => acc.split(from).join(to), a)),
+    warnings: tb.warnings.filter((w) => !hidden(w)),
+  };
   const lossNames = raw.results.filter((r) => isLossName(r.name)).map((r) => r.name);
+  const labelOf = (n: string): string => spec.labels[n] ?? capitalise(n);
+  const conflictLabels = (spec.conflict?.names ?? []).map(labelOf);
+  const diffLabels = (spec.conflict?.diff ?? []).map(labelOf);
 
-  const result = buildResultView(forView, {
+  const built = buildResultView(forView, {
     headline: head,
     accuracyClass: spec.accuracyClass,
     prefs,
@@ -373,12 +484,36 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     pinWarningCodes: spec.pinCodes ?? ['OUT_OF_RANGE', 'THICKNESS_VARIANT_CONFLICT'],
     ...(spec.informational !== undefined ? { informationalChecks: spec.informational } : {}),
   });
-  const netClass =
+  const conflictRows: ResultRowView[] = built.rows
+    .filter((r) => conflictLabels.includes(r.label))
+    .map((r) => {
+      if (!diffLabels.includes(r.label)) return r;
+      const core = raw.results.find((x) => labelOf(x.name) === r.label);
+      return core === undefined ? r : { ...r, text: signedPercentText(core.value, spec.accuracyClass) };
+    });
+  const result: ResultView = { ...built, rows: built.rows.filter((r) => !conflictLabels.includes(r.label)) };
+  const conflictNotes = orderWarnings(tb.warnings.filter((w) => w.code !== undefined && CONFLICT_CODES.includes(w.code)));
+  const conflict: ConflictView | undefined = conflictRows.length > 0 || conflictNotes.length > 0 ? { heading: CONFLICT_HEADING, rows: conflictRows, notes: conflictNotes } : undefined;
+
+  const limitItems: { title: string; text: string }[] = [];
+  for (const w of tb.warnings) {
+    const title = w.code === undefined ? undefined : LIMIT_TITLE[w.code];
+    if (title !== undefined && !limitItems.some((i) => i.title === title)) limitItems.push({ title, text: w.message });
+  }
+  const etch = raw.assumptions.find((a) => ETCH.test(a));
+  if (etch !== undefined) limitItems.push({ title: 'Copper roughness and etch profile', text: [etch, ...(loss === undefined ? [LOSS_LABEL] : [])].join(' ') });
+  const limits: LimitsView | undefined = limitItems.length > 0 ? { heading: LIMITS_HEADING, items: limitItems } : undefined;
+
+  const lines =
     spec.netClassText !== undefined
       ? spec.netClassText(result, s)
       : spec.netClass && /width/.test(head)
-        ? startingValueText(result.headline.label, result.headline.text)
+        ? [`${result.headline.label}: ${result.headline.text}`]
         : undefined;
+  const netClass = lines === undefined ? undefined : netClassTextOf(spec, lines, result, raw, s, today);
+  const netClassHelp = lines === undefined ? undefined : `The solved quantity (${result.headline.label.toLowerCase()}) in mm and mil, with its stackup basis, the data status and the approximation note. A starting point, not a design rule.`;
+  const eps = spec.epsHandoff === true ? raw.results.find((r) => r.name === 'effective permittivity') : undefined;
+  const handoff = eps === undefined ? undefined : { href: epsHandoffHref(eps.value), label: HANDOFF_LABEL, help: HANDOFF_HELP };
   const hasTol = tb.view.envelopes.length > 0 || tb.view.notices.length > 0 || tb.view.sensitivities.length > 0;
   return {
     status: 'ok',
@@ -394,6 +529,11 @@ export function computeViewOf<S extends ImpedanceState>(spec: ImpedanceSpec<S>, 
     ...(loss !== undefined ? { loss } : {}),
     ...(near.notes.length > 0 ? { near } : {}),
     ...(netClass !== undefined ? { netClass } : {}),
+    ...(netClassHelp !== undefined ? { netClassHelp } : {}),
+    ...(conflict !== undefined ? { conflict } : {}),
+    ...(limits !== undefined ? { limits } : {}),
+    ...(result.confidence.level === 'low' ? { lowNote: LOW_CONFIDENCE_NOTE } : {}),
+    ...(handoff !== undefined ? { handoff } : {}),
   };
 }
 
