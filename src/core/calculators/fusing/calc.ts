@@ -86,6 +86,15 @@ const OVER_1S_TEXT =
 const OVER_10S_TEXT =
   'The time is beyond 10 s, beyond the usual stated validity even for wires in air (ledger S-042e); long-time near-melting behaviour on a board is unpredictable. The 10 s threshold is one of the product choices, not sourced limits, behind these warnings.';
 
+const SUB_MS_END_TEXT =
+  'The time to your end temperature is under 1 ms: the adiabatic assumption, uniform current density (skin effect) and negligible inductance are unreliable, and magnetic forces are not modelled. The 1 ms threshold is a product choice, not a sourced limit.';
+const OVER_1S_END_TEXT =
+  'The time to your end temperature is beyond 1 s, past the 1.0 to 1.5 s range where the authors report Onderdonk applies to boards (ledger S-042e); the board and the air cool the trace, so the adiabatic time is optimistic. The 1 s threshold is one of the product choices, not sourced limits, behind these warnings.';
+const OVER_10S_END_TEXT =
+  'The time to your end temperature is beyond 10 s, beyond the usual stated validity even for wires in air (ledger S-042e); heat loss dominates and the adiabatic estimate is not meaningful. The 10 s threshold is one of the product choices, not sourced limits, behind these warnings.';
+const NEAR_START_TEXT = (deltaK: number, limitK: number): string =>
+  `Your end temperature is only ${num(deltaK)} K above the initial temperature (less than ${String(limitK)} K). Check the unit: a value typed in K instead of degC, or the reverse, gives a very short time. The ${String(limitK)} K threshold is a product choice, not a sourced limit; the result is still computed from your values.`;
+
 const REL_TOL = 1e-9;
 const STATUS = dataStatusForLedgerIds([...meta.ledgerIds]);
 /** S-009 only for a nominal thickness basis; S-015 and S-019m only for a via barrel (each is cited only then). */
@@ -277,13 +286,20 @@ function build(raw: unknown): CalcOutcome {
   if (inp.thicknessBasis === 'nominal') warnings.push({ severity: 'warning', message: NOMINAL_TEXT, code: 'THICKNESS_NOMINAL' });
   if (inp.geometry === 'via') warnings.push({ severity: 'caution', message: VIA_TEXT, code: 'VIA_BARREL_PLATING' });
   if (pulseSeconds !== undefined && pulseSeconds < meta.timeWarnings.subMsSeconds) warnings.push({ severity: 'warning', message: SUB_MS_TEXT, code: 'SUB_MS_PULSE' });
+  // The same product-choice time thresholds for the time to the user end temperature (current mode: it differs from the melting time).
+  if (timeE !== undefined) {
+    if (timeE < meta.timeWarnings.subMsSeconds) warnings.push({ severity: 'warning', message: SUB_MS_END_TEXT, code: 'SUB_MS_END_TIME' });
+    if (timeE > meta.timeWarnings.overSeconds) warnings.push({ severity: 'warning', message: OVER_1S_END_TEXT, code: 'OVER_1S_END_TIME' });
+    if (timeE > meta.timeWarnings.strongSeconds) warnings.push({ severity: 'critical', message: OVER_10S_END_TEXT, code: 'OVER_10S_END_TIME' });
+  }
+  if (teC !== undefined && teC - taC < meta.endNearStartKelvin) warnings.push({ severity: 'caution', message: NEAR_START_TEXT(teC - taC, meta.endNearStartKelvin), code: 'END_TEMP_NEAR_START' });
   if (pulseSeconds === undefined) warnings.push({ severity: 'caution', message: NO_DURATION_TEXT, code: 'NO_DURATION' });
   if (pulseSeconds !== undefined && pulseSeconds > meta.timeWarnings.overSeconds) warnings.push({ severity: 'warning', message: OVER_1S_TEXT, code: 'OVER_1S' });
   if (pulseSeconds !== undefined && pulseSeconds > meta.timeWarnings.strongSeconds) warnings.push({ severity: 'critical', message: OVER_10S_TEXT, code: 'OVER_10S' });
 
   const assumptions: string[] = [
     'Adiabatic: all the Joule heat stays in the conductor; no loss to the board, air or connected copper (S-042a, derived). The result is the time to REACH the melting point, heat of fusion excluded.',
-    `Copper constants: density ${String(COPPER_DENSITY_KG_M3)} kg/m3 (S-003d, the IACS wire-table convention; a pure-copper density reference is about 0.5 % different, higher, and is not used: the time scales with the density), resistivity 1/58e6 ohm m and temperature coefficient 0.00393 per K (S-004), melting point ${String(tmC)} °C (S-042c, pure copper; no override, plated or alloyed copper may differ).`,
+    `Copper constants: density ${String(COPPER_DENSITY_KG_M3)} kg/m3 (S-003d, the IACS wire-table convention; a pure-copper density reference, ledger S-003e CONFLICT and S-003d notes, is about 0.5 % different, higher, and is not used: the time scales with the density), resistivity 1/58e6 ohm m and temperature coefficient 0.00393 per K (S-004), melting point ${String(tmC)} °C (S-042c, pure copper; no override, plated or alloyed copper may differ).`,
     `Specific heat ${String(c.valueJPerKgK)} J/(kg·K) (${c.label}; ledger S-042d, status ${c.status})${inp.specificHeatDefaulted ? ': a product DEFAULT, not chosen by the user; the sourced values disagree and are not averaged' : ': chosen by the user from the sourced values'}. Specific heat and density are taken as constant.`,
     'The initial temperature has no default and is the conductor temperature at the start of the pulse.',
     inp.geometry === 'trace'

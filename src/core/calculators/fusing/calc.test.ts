@@ -360,8 +360,63 @@ describe('optional user end temperature (PCB M-1): never defaulted, never a safe
     }
     const dt = compute(trace(0.254, 35, 20, { endTemperature: q(200, DIM.TEMPERATURE_DIFFERENCE) }));
     expect(dt.ok).toBe(false);
-    if (!dt.ok) expect(dt.error.code).toBe('DIMENSION');
+    if (!dt.ok) {
+      expect(dt.error.code).toBe('DIMENSION');
+      expect(dt.error.message).toMatch(/must be an absolute temperature/); // N-6
+      expect(dt.error.message).not.toMatch(/\ba absolute/);
+    }
     expect(compute(trace(0.254, 35, 20, { endTemperature: 300 as unknown as Quantity })).ok).toBe(false);
+  });
+  it('N-7: the density assumption cites the ledger ids S-003d and S-003e', () => {
+    const a = ok(trace(0.254, 35, 20)).assumptions[1] ?? '';
+    expect(a).toMatch(/S-003d/);
+    expect(a).toMatch(/S-003e/);
+  });
+  it('N-5: the sub-1 ms, 1 s and 10 s warnings also apply to the time to the end temperature (product choices, own codes)', () => {
+    const Te = degC(300);
+    // 40 A: melting time about 4 ms (no sub-ms melt warning), end-temperature time about 0.3 ms
+    const sub = ok(trace(0.254, 35, 20, { current: amp(40), endTemperature: degC(50) }));
+    expect(res(sub, E_TIME).value.si).toBeLessThan(1e-3);
+    expect(res(sub, TIME).value.si).toBeGreaterThan(1e-3);
+    expect(codes(sub)).toContain('SUB_MS_END_TIME');
+    expect(codes(sub)).not.toContain('SUB_MS_PULSE');
+    const subMsg = sub.warnings.find((x) => x.code === 'SUB_MS_END_TIME')?.message ?? '';
+    expect(subMsg).toMatch(/end temperature/i);
+    expect(subMsg).toMatch(/product choice/i);
+    // 1.5 A: end-temperature time about 1.3 s
+    const o1 = ok(trace(0.254, 35, 20, { current: amp(1.5), endTemperature: Te }));
+    expect(res(o1, E_TIME).value.si).toBeGreaterThan(1);
+    expect(res(o1, E_TIME).value.si).toBeLessThan(10);
+    expect(codes(o1)).toContain('OVER_1S_END_TIME');
+    expect(codes(o1)).not.toContain('OVER_10S_END_TIME');
+    // 0.5 A: end-temperature time about 12 s
+    const o10 = ok(trace(0.254, 35, 20, { current: amp(0.5), endTemperature: Te }));
+    expect(res(o10, E_TIME).value.si).toBeGreaterThan(10);
+    expect(codes(o10)).toEqual(expect.arrayContaining(['OVER_1S_END_TIME', 'OVER_10S_END_TIME']));
+    expect(o10.warnings.find((x) => x.code === 'OVER_10S_END_TIME')?.severity).toBe('critical');
+    // 1.9 A: end time about 0.8 s, melt time over 1 s: only the melting warning
+    const mid = ok(trace(0.254, 35, 20, { current: amp(1.9), endTemperature: Te }));
+    expect(res(mid, E_TIME).value.si).toBeLessThan(1);
+    expect(codes(mid)).toContain('OVER_1S');
+    expect(codes(mid)).not.toContain('OVER_1S_END_TIME');
+    // no end temperature, or a pulse-time input: no end-time codes (the pulse time warnings already cover it)
+    expect(codes(ok(trace(0.254, 35, 20, { current: amp(0.5) })))).not.toContain('OVER_1S_END_TIME');
+    const pt = ok({ ...trace(0.254, 35, 20, { endTemperature: Te }), current: undefined, pulseTime: sec(20) });
+    expect(codes(pt)).toContain('OVER_10S');
+    expect(codes(pt).some((c) => c.endsWith('_END_TIME'))).toBe(false);
+  });
+  it('m-N3: an end temperature less than 5 K above the start gets a unit-check caution (product choice, not a refusal)', () => {
+    const near = ok(trace(0.254, 35, 25, { endTemperature: fromUnit(300, 'K') })); // 26.85 C, 1.85 K above
+    const w = near.warnings.find((x) => x.code === 'END_TEMP_NEAR_START');
+    expect(w).toBeDefined();
+    expect(w?.severity).toBe('caution');
+    expect(w?.message).toMatch(/check the unit.*K instead of degC/i);
+    expect(w?.message).toMatch(/product choice/i);
+    expect(has(near, E_TIME)).toBe(true);
+    expect(codes(ok(trace(0.254, 35, 25, { endTemperature: degC(29.9) })))).toContain('END_TEMP_NEAR_START');
+    expect(codes(ok(trace(0.254, 35, 25, { endTemperature: degC(30.1) })))).not.toContain('END_TEMP_NEAR_START');
+    expect(codes(ok(trace(0.254, 35, 25, { endTemperature: degC(300) })))).not.toContain('END_TEMP_NEAR_START');
+    expect(codes(ok(trace(0.254, 35, 25)))).not.toContain('END_TEMP_NEAR_START');
   });
   it('a lower end temperature is always a shorter time and a smaller I2t (property)', () => {
     fc.assert(

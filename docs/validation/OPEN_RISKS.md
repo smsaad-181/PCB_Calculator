@@ -652,3 +652,47 @@ Core only (`src/core/calculators/{thermal-via,fusing}`, `src/core/result.ts`, st
 
 ## Phase 4 bundle and offline decisions (2026-10-19)
 User decisions (AskUserQuestion): total gzip JS ceiling raised 430 -> 460 KB (SPEC, tools/check-size.mjs); per-route 150 KB unchanged. Offline test requires NO RUNTIME NETWORK only (every route works with the network cut after load, no cross-origin requests); reload-while-offline and a service worker are not required (SPEC line 42 interpreted accordingly).
+
+## Phase 4 hardening (orchestrator checks, 2026-10-19)
+Report: docs/validation/reports/phase-4-hardening.md. Done: no-runtime-network check on all 27 routes, route-switch timings, structural a11y (labels, h1, landmarks), keyboard tab reach on Fusing. NOT done (open, human or later): throttled broadband first-load measurement (Lighthouse), axe-core (third-party, needs approval), colour contrast, screen-reader live-region check, 200% zoom/reflow, long-task trace; checks are manual scripts, not CI tests. Offline definition per user decision: no runtime network only.
+
+## Phase 4 docs (2026-10-19, branch phase-4; docs only, no code, no commit, no network)
+Written: `README.md` (features, deferrals, no-compliance policy, budget, deployment, honest validation status), `docs/RUNBOOK.md` (definition of done, dev and :4173 preview, manual perf/offline/accessibility procedure, fab profile and spacing data flow, golden regeneration, ledger workflow, agent safety rules, V-13 runner note, action review date), `CHANGELOG.md` (Phases 0 to 4 from closure records and git log). Gap list for the human and orchestrator:
+
+| # | Item | Status |
+|---|---|---|
+| D4-1 | setup-node NOT bumped (m-7). The v7.1.0 release (08 Oct) is known only from the phase-validator report. The repository records contain no commit SHA for it and the workflow history and Dependabot config give no version. Pinning needs the SHA from the releases or tags page (or a Dependabot PR). Left at v7.0.0. | OPEN (devops-engineer or Dependabot) |
+| D4-2 | Performance, offline and accessibility checks have no stored scripts or tests; the RUNBOOK documents them as manual. `phase-4-hardening.md` (orchestrator, scripted Playwright, scripts not kept) covers part of them; throttled load, contrast, screen reader and axe are not done. | OPEN (partial) |
+| D4-3 | No Phase 4 closure record exists (`phase-4-closure.md`). The README says so. SPEC l.15 and row 4, R-6 and `docs/phases/phase-4.md` are not updated by this change (PV4-1, M-2). | OPEN |
+| D4-4 | The README feature list and the RUNBOOK were written from the repository records, not from a browser session. The Phase 1 to 3 closure notes give no per-calculator list; names were taken from the source tree and git log. | NOTED |
+| D4-5 | The Phase 4 test count and size after the validator-fix commit are not in any report (the phase report's 6832 tests and 426.75 KB predate it). The CHANGELOG quotes the 431.00 KB figure from P4U-9 only. | NOTED |
+| D4-6 | RUNBOOK "actions last reviewed 2026-10-19" is a record of the validator's check, not a new check by this change. | NOTED |
+
+## Phase 4 minor UI fixes (PCB reviewer m-N1, m-N2, m-N4, m-N6)
+
+Scope: `src/ui` only. No core change, no allowance or threshold number added to any calculation.
+
+| ID | Fix | Status |
+|---|---|---|
+| m-N1 | The fusing "Not meaningful" headline and its live region now read "Outside this model: beyond 10 s, heat loss to the board and air dominates, so a short-pulse melt time is not meaningful here; use the trace self-heating calculator". The "would not fuse" wording is gone. The end-temperature time row and line carry the same 1 s / 10 s cue, labelled product choices. The thresholds come from `meta.timeWarnings`. | FIXED |
+| m-N2 | The thermal-via diameter help says many fabs read the hole size in your data as the finished hole, some drill plated holes a stated amount larger (Eurocircuits is named as one fab practice, not a standard), to confirm with the fab, and that choosing drill when the size is finished errs conservative. No allowance is built into any calculation. | FIXED (text). The ledger note on fab hole-size conventions stays with the standards researcher. |
+| m-N4 | With an end temperature entered, its result is the first headline line above the melting result, still labelled "your value, not checked". The secondary row is kept. | FIXED |
+| m-N6 | `THERMAL_RELIEF_NOT_MODELLED` is a callout directly under the thermal-via headline (the `underHeadline` slot) and is removed from the warning list. | FIXED |
+
+Still open: the human browser pass (P4U-17) and the P4U-16 deferral row are unchanged.
+
+## Phase 4 minor core fixes (calc-implementer, 2026-10-19; `src/core` only, response to `phase-4-calc.md` N-1, N-2, N-3, N-5, N-6, N-7 and `phase-4-pcb.md` m-N3)
+
+No sourced constant, no golden vector and no ledger row changed. N-4 (ledger wording) stays with the standards researcher.
+
+| ID | Fix | Status |
+|---|---|---|
+| N-1 | `RISE_IS_LOWER_BOUND` now reads "usually a lower bound ... not assured", names both directions (spreading and interfaces push higher, the ignored dielectric between vias pushes lower). | FIXED |
+| N-2 | `THERMAL_RELIEF_NOT_MODELLED` no longer says "usually dominate". It says spokes or non-solid connections add thermal resistance (S-045), the sources advise a solid connection, and the size of the effect is unknown (no magnitude sourced). S-045 added to the thermal-via meta ledger ids and reference ids. | FIXED |
+| N-3 | The `diameterBasis` error says "about 15 % too low (the real theta is about 18 % higher) for 25 um plating on a 0.3 mm drill". Computed: theta_wrong/theta_true = (D - t)/(D + t) = 0.275/0.325 = 0.846; 1/0.846 - 1 = 18.2 %. A test pins both figures. | FIXED |
+| N-5 | With an end temperature in current mode, the time to it also gets the sub-1 ms, over-1 s and over-10 s warnings under their own codes `SUB_MS_END_TIME`, `OVER_1S_END_TIME`, `OVER_10S_END_TIME`, labelled product choices. In pulse-time mode the pulse time is the same for both, so the existing warnings cover it. | FIXED |
+| N-6 | Shared DIMENSION message now picks "a" or "an" ("must be an absolute temperature"); applied in `copper-converter/guards.ts` and `spacing/gating.ts`. | FIXED |
+| N-7 | The fusing density assumption cites S-003e (CONFLICT) and the S-003d notes. S-003e is cited as a reference note only and is not added to the fusing ledger id list (it would turn the data status to CONFLICT for a value that is not used). CF-7 can be closed by the orchestrator. | FIXED (CF-7 closure is orchestrator) |
+| m-N3 | New caution `END_TEMP_NEAR_START` when the end temperature is less than 5 K above the initial temperature: check the unit (K or degC). The 5 K threshold is a product choice (`meta.endNearStartKelvin`), no sourced limit; the result is still computed. | FIXED |
+
+Follow-up for the UI agent: show the new warning codes if the UI filters by a known-code list, and add a one-line note for S-045 in the thermal-via ledger-note map (`thermal-via.vm.ts`).

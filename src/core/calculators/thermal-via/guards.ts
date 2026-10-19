@@ -55,7 +55,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   if (basis !== 'finished' && basis !== 'drill') {
     return {
       ok: false,
-      error: err('INVALID_INPUT', 'diameterBasis', 'diameterBasis is required and must be "finished" (inside the plating) or "drill". There is no default: a drill diameter entered as the finished hole makes theta about 18 % too low for 25 um plating on 0.3 mm.'),
+      error: err('INVALID_INPUT', 'diameterBasis', 'diameterBasis is required and must be "finished" (inside the plating) or "drill". There is no default: a drill diameter entered as the finished hole makes theta about 15 % too low (the real theta is about 18 % higher) for 25 um plating on a 0.3 mm drill.'),
     };
   }
   const enteredDiameter = len.finishedHoleDiameter as Quantity;

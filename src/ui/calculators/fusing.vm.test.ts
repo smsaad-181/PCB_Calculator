@@ -234,11 +234,15 @@ describe('headline suppression where the model has no meaning (PCB M-5)', () => 
   it('over 10 s the headline is replaced by a plain statement, and the number stays below, labelled', () => {
     const v = ok(st({ ...AREA, current: '50 A' }));
     expect(v.result.headline.text).toBe(NOT_MEANINGFUL_TEXT);
-    expect(v.result.headline.text).toBe('Not meaningful for this model: the conductor would not fuse in a short pulse; use the self-heating calculator');
-    expect(v.result.headline.text).not.toMatch(/\d/);
+    expect(v.result.headline.text).toBe(
+      'Outside this model: beyond 10 s, heat loss to the board and air dominates, so a short-pulse melt time is not meaningful here; use the trace self-heating calculator',
+    );
+    expect(v.result.headline.text).not.toMatch(/would not fuse/i);
+    expect(v.result.headline.text.replace('10 s', '')).not.toMatch(/\d/);
     expect(v.suppressedHeadline?.text).toMatch(/\d/);
     expect(v.suppressedHeadline?.label).toMatch(/not meaningful/i);
-    expect(liveSummary(v)).toMatch(/Not meaningful/);
+    expect(liveSummary(v)).toContain(NOT_MEANINGFUL_TEXT);
+    expect(liveSummary(v)).not.toMatch(/would not fuse/i);
     expect(codes(v)).toContain('OVER_10S');
     expect(v.headlineWarnings).toEqual([]);
   });
@@ -263,6 +267,60 @@ describe('headline suppression where the model has no meaning (PCB M-5)', () => 
   it('the page puts the under-headline warnings before the callouts', () => {
     expect(pageSrc).toMatch(/underHeadline=/);
     expect(pageSrc).toMatch(/suppressedHeadline/);
+  });
+});
+
+describe('end temperature first, with a time cue (PCB m-N1, m-N4)', () => {
+  it('without an end temperature there is no end-temperature headline line', () => {
+    expect(ok(st(AREA)).endTempHeadline).toBeUndefined();
+  });
+  it('with an end temperature it is the first headline line, labelled as the user value, not checked', () => {
+    const v = ok(st({ ...AREA, current: '300 A', endTemp: '200 °C' }));
+    expect(v.endTempHeadline?.label).toMatch(/your end temperature/i);
+    expect(v.endTempHeadline?.label).toMatch(/your value, not checked/i);
+    expect(v.endTempHeadline?.text).toMatch(/s$/);
+    expect(v.endTempHeadline?.note).toBeUndefined();
+    expect(pageSrc).toMatch(/aboveHeadline=/);
+  });
+  it('time mode and I2t mode each get their own end-temperature line', () => {
+    const t = ok(st({ ...AREA, mode: 'time', time: '0.5 s', current: '', endTemp: '200 °C' }));
+    expect(t.endTempHeadline?.text).toMatch(/A$/);
+    const f = ok(st({ ...AREA, mode: 'i2t', i2t: '40 A2s', current: '', endTemp: '200 °C' }));
+    expect(f.endTempHeadline?.label).toMatch(/fraction/i);
+  });
+  it('a time over 1 s gets a cue on the line and on the row, labelled product choices', () => {
+    const v = ok(st({ ...AREA, current: '200 A', endTemp: '600 °C' }));
+    const row = v.result.rows.find((r) => /time to reach your end temperature/i.test(r.label));
+    const secs = v.raw.results.find((r) => /time to reach your end temperature/.test(r.name))?.value.si ?? 0;
+    expect(secs).toBeGreaterThan(1);
+    expect(secs).toBeLessThanOrEqual(10);
+    expect(v.endTempHeadline?.note).toMatch(/beyond 1 s/i);
+    expect(v.endTempHeadline?.note).toMatch(/product choice/i);
+    expect(row?.hint).toMatch(/beyond 1 s/i);
+    expect(row?.hint).toMatch(/product choice/i);
+  });
+  it('a time over 10 s says it is not meaningful here and points to self-heating', () => {
+    const v = ok(st({ ...AREA, current: '30 A', endTemp: '600 °C' }));
+    const secs = v.raw.results.find((r) => /time to reach your end temperature/.test(r.name))?.value.si ?? 0;
+    expect(secs).toBeGreaterThan(10);
+    const row = v.result.rows.find((r) => /time to reach your end temperature/i.test(r.label));
+    for (const t of [row?.hint, v.endTempHeadline?.note]) {
+      expect(t).toMatch(/beyond 10 s/i);
+      expect(t).toMatch(/not meaningful/i);
+      expect(t).toMatch(/self-heating/i);
+      expect(t).toMatch(/product choice/i);
+    }
+  });
+  it('the end-temperature core warnings are shown in the list (pinned), not filtered out', () => {
+    const v = ok(st({ ...AREA, current: '30 A', endTemp: '600 °C' }));
+    expect(v.result.warnings.some((w) => /beyond 10 s/.test(w.message))).toBe(true);
+    expect(codes(v)).toContain('OVER_10S_END_TIME');
+    expect(v.result.warnings.length).toBe(v.raw.warnings.filter((w) => !['NOT_A_RATING', 'PCB_ADIABATIC_CAVEAT'].includes(w.code ?? '')).length);
+    for (const c of ['OVER_10S_END_TIME', 'OVER_1S_END_TIME', 'SUB_MS_END_TIME', 'END_TEMP_NEAR_START']) expect(vmSrc).toContain(c);
+  });
+  it('the cue thresholds come from the core meta, not literals', () => {
+    expect(vmSrc).toMatch(/meta\.timeWarnings\.overSeconds/);
+    expect(vmSrc).toMatch(/meta\.timeWarnings\.strongSeconds/);
   });
 });
 

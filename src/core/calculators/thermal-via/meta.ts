@@ -22,11 +22,11 @@ export const meta = {
   reference: {
     standard: 'One-dimensional conduction along the via barrel (TI SPRADB7; Guenin, Electronics Cooling 2004); copper thermal conductivity (S-007)',
     edition: 'n/a',
-    ledgerIds: ['S-007', 'S-015', 'S-019d', 'S-019m', 'S-040', 'S-041', 'S-041a', 'S-041b', 'S-041c', 'S-041d'],
+    ledgerIds: ['S-007', 'S-015', 'S-019d', 'S-019m', 'S-040', 'S-041', 'S-041a', 'S-041b', 'S-041c', 'S-041d', 'S-045'],
   },
   formula:
     'A = π·t·(d + t); θ_barrel = L/(k·A); θ_core = L/(k_fill·π·d²/4) (filled only); θ_via = θ_barrel, or 1/(1/θ_barrel + 1/θ_core); θ_array = θ_via/N; ΔT = θ_array × P; d = finished hole diameter (= D − 2t when the drill diameter D is entered; A = π·t·(D − t)), t = plating thickness, L = barrel length, N = via count; 1-D conduction estimate that ignores spreading',
-  ledgerIds: ['S-007', 'S-015', 'S-019d', 'S-019m', 'S-040', 'S-041', 'S-041a', 'S-041b', 'S-041c', 'S-041d'],
+  ledgerIds: ['S-007', 'S-015', 'S-019d', 'S-019m', 'S-040', 'S-041', 'S-041a', 'S-041b', 'S-041c', 'S-041d', 'S-045'],
   accuracyClass: 'estimate' as AccuracyClass,
   /** The result set has no envelope and no hidden tolerance; none is taken from a fab profile. */
   toleranceInputs: [] as string[],

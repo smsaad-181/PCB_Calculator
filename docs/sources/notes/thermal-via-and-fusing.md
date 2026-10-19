@@ -93,9 +93,19 @@ Inputs: `docs/validation/reports/phase-4-calc.md` (C4-5), `phase-4-phase.md` (m-
 - VERIFIED, qualitative only. Sources:
   - TI THS3091/THS3095 datasheet SLOS423K §9.4.1.1.1: "do not use the typical web or spoke via connection methodology"; "Web connections have a high thermal resistance"; "complete connection around the entire circumference".
   - JLCPCB blog (2026-08): exposed pads "stay solid because moving heat is their whole purpose"; set exposed pads to direct connect.
-- Snippet-only cross-checks (not counted): TI SLOA120, Active-Semi AN-104. Altium "Polygon Connect Style" documents the relief/direct setting in the CAD tool.
-- Not usable (unsourced, single source): "spokes can halve the heat path" (JLCPCB), "3–5×" (Atlas PCB blog), mΩ per relief. No number goes into code or UI.
-- JLCPCB attributes the direct-connect rule to IPC-7093 (paywalled, not read).
+  - LearnEMC "EMC Question of the Week: April 24, 2023" (added 2026-10-19, HTML via fetcher, no author shown): "Thermal reliefs are intended to aid in the soldering process."; "They prevent the planes from pulling too much heat away from the component pad or pin." https://learnemc.com/qotw-230424 . Independent of TI and JLCPCB. Tier: unsigned educational page, recorded as tier 5 (supporting) unless the human rules otherwise. Supports the mechanism only; no thermal-via, exposed-pad or magnitude content. Its "thermal reliefs add negligible inductance" is about electrical inductance, not heat.
+- Snippet-only cross-checks (not counted): TI SLOA120, Active-Semi AN-104. Altium "Polygon Connect Style" documents the relief/direct setting in the CAD tool. A search for a non-TI device-maker app note in HTML (ADI, Maxim, Microchip, NXP, onsemi, Infineon, Renesas, ST) found none stating the relief rule; ADI AN-772 (LFCSP) HTML timed out twice and was not read. TI SLVA959B and the OPA564-Q1 datasheet repeat the TI rule (search snippets; same publisher, not independent).
+- Correction 2026-10-19 (phase-4-calc N-4): JLCPCB was re-fetched with verbatim quotes. The page says "A four-spoke relief with 0.25 mm (10 mil) arms lands around 1 to 3 milliohms per pad". That is PER PAD (the earlier note said per spoke, which was wrong) and it is an electrical resistance with no measurement or source behind it. The page never uses the words "thermal resistance"; it says "Spokes make a joint solderable and resistive at once."
+- Not usable (unsourced, single source, or secondhand standard claims). None may enter code, UI or golden vectors:
+  - JLCPCB "the spokes can halve the heat path";
+  - JLCPCB "1 to 3 milliohms per pad" and the derived "a relief adding 3 milliohms burns 300 mW" on a 10 A pad;
+  - JLCPCB 3 A threshold ("Past 3 A continuous, switch to a solid connection");
+  - JLCPCB "Keep voiding below the IPC-7093 limit of 50%" / "not more than 50% of the pad area": secondhand claim about paywalled IPC-7093, not read; not a constant or pass/fail limit;
+  - Atlas PCB blog "3–5×" (search snippet);
+  - search-summary only, not read: a fabricator DPAK example (about 120 °C/W without vias to under 2 °C/W with a via array) and JLCPCB via drill/pitch suggestions.
+- Magnitude (phase-4-calc N-2): no source read gives any magnitude for relief/spoke thermal resistance, absolute or relative to the via barrel. The current code text "usually dominate the real behaviour" is therefore unsupported. Supported wording: "a relief (spoke) connection adds a thermal resistance that is not modelled and can be large (S-045)". Fix owner: calc-implementer (text and `ledgerIds`), not done here.
+- JLCPCB attributes the direct-connect rule to IPC-7093 ("IPC-7093 calls for a direct copper connection with a via array"; paywalled, not read).
+- HUMAN DECISION NEEDED (tier of fabricator blogs): the source-verification skill does not say whether an unsigned fabricator marketing blog is tier 3 "fabricator documentation" or tier 5 "blog, leads only". S-045 stays VERIFIED (caveat only, no number) because TI is tier 3 and JLCPCB and LearnEMC are independent agreeing sources. If the human rules that VERIFIED needs two tier 1-3 sources, S-045 must become UNVERIFIED in LEDGER.md and `src/core/data/ledger-status.ts` together; the warning text itself would not change.
 - Code follow-up (not done here; calc-implementer): add S-045 to the thermal-via meta reference list next to `THERMAL_RELIEF_NOT_MODELLED`.
 
 ### 4. Via-in-pad solder wicking: vendor guidance CONFLICTS (DFM caution, PCB m-6)

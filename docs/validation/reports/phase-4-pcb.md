@@ -1,155 +1,139 @@
-# Phase 4 PCB domain review: thermal via array and fusing
+# Phase 4 PCB domain re-review: thermal via array and fusing
 
-Reviewer: pcb-domain-reviewer (practising PCB / power hardware lens). Branch `phase-4`, head `3420891`. Date 2026-10-19.
+Reviewer: pcb-domain-reviewer (practising PCB / power hardware lens). Branch `phase-4`, head `2107b42`. Date 2026-10-19.
+This re-review covers the earlier report (head `3420891`, PASS-WITH-CONDITIONS, MAJOR M-1 to M-5) and the fixes logged under "Phase 4 core fixes" (CF-1 to CF-15) and "Phase 4 UI" (P4U-11 to P4U-16) in `docs/validation/OPEN_RISKS.md`.
 I did not edit `src/` or `tests/`.
 
-## Verdict: **PASS-WITH-CONDITIONS**
+## Verdict: **PASS**
 
-Both pages are honest. Neither one presents a number as safe, a rating or a design constant:
-- Required inputs have no hidden defaults: plating thickness, copper k, via fill, initial temperature and thickness basis.
-- "Not theta-JA" and "not a fuse rating" appear as callouts directly under the headline. They also appear in the always-visible status block.
-- Fusing is clearly separated from steady-state heating.
-- The arithmetic matches my hand checks (below).
+All five MAJOR conditions are fixed in both the core and the page. The fixes behave correctly in my scenarios:
+- an optional end temperature;
+- "not a safety margin" labels;
+- a via-barrel geometry and an always-on weakest-link caution;
+- an always-on thermal-relief warning backed by a sourced ledger row (S-045);
+- a required drill/finished basis with a neutral placeholder;
+- the headline replaced above 10 s, and the 1 s warning moved directly under the headline.
 
-Nothing is a BLOCKER. Five MAJOR findings are conditions. The biggest problems are what the pages leave out, and two cases where a busy engineer would read the result the wrong way:
-- **Fusing** is fixed to the copper melting point. On a real board, damage starts several hundred °C lower (M-1).
-- **Fusing** never points out vias and necks, which are usually the elements that fuse first (M-2).
-- **Thermal via** says nothing about thermal-relief spokes or the plane connection, which are the usual weak link (M-3).
-- **Thermal via** asks for the finished hole but uses the typical *drill* size as its placeholder (M-4).
-- **Fusing** shows a confident headline in seconds even where the model is meaningless (M-5).
+The hand checks still agree. I found no BLOCKER and no new MAJOR. The new items below are MINOR. They should go into the `OPEN_RISKS.md` backlog. None of them would make a number on these pages read as "safe".
 
-Log M-1 to M-5 in `docs/validation/OPEN_RISKS.md` if they are not fixed before closure.
+## Previous findings: status
+
+| # | Finding (earlier report) | Status | Evidence (this run) |
+|---|---|---|---|
+| M-1 | Fusing stops at the copper melting point, and the fraction reads as margin | **FIXED** | The optional `te` field has no default. Its results are labelled "your value, not checked", and the input is checked against both the initial temperature and the melting point (F12, F13 refused). F7: the headline is now "…fraction… (estimate, not a safety margin) = 0.32", with the row "fraction of the I²t that reaches your end temperature = **0.72**". That matches my hand value of 0.72 to 300 °C. `BOARD_DAMAGE_BELOW_MELTING` is a warning, first in the list on every result |
+| M-2 | No weakest-link guidance; no via geometry | **FIXED** (N-parallel and drill basis deferred, P4U-16) | The `WEAKEST_LINK` caution is on every fusing result. The new "via barrel" geometry requires the plating, with no pre-fill (F10 gated) and a `VIA_BARREL_PLATING` "average is not a minimum" caution. F8: 0.25 mm finished, 18 µm, 10 ms gives 43 A, which matches my hand value of 43.4 A |
+| M-3 | Thermal relief and plane connection not mentioned | **FIXED** (no input; source S-045) | `THERMAL_RELIEF_NOT_MODELLED` is warning level and first in the warning list on every thermal-via result (T3 to T11). The text says to check the plane connect style in CAD. Ledger S-045 cites the TI PowerPAD guidance ("do not use the typical web or spoke via connection"). It adds no number |
+| M-4 | Drill vs finished hole; the placeholder invited the mistake | **FIXED** | The `db` basis is required with no default: T2 returns "needs input" and no number. An unknown hash value is refused with a notice and stays blank. The placeholder is a unit hint until "finished" is chosen. 0.3 mm drill with 25 µm is the same as 0.25 mm finished: 21 K/W (T3 = T4), and the "finished hole used" row shows 0.25 mm. A drill with t ≥ D/2 is refused (T6). See m-N2 for one correction to my own earlier wording |
+| M-5 | Headline time where the model has no meaning | **FIXED** | F3 (2 mm 1 oz, 5 A) and F6 (30 s pulse) show the headline "Not meaningful for this model…". The number is kept and labelled "Numeric detail, not meaningful…", and the live region says "No meaningful result". F5 (2.8 s), F16 and F19 (6.3 s, 8.2 s) show the 1 s warning in the `underHeadline` slot, before the callouts (`ResultsPanel` line 41) |
+| m-1 | cmil advertised but refused | FIXED (hint) | The unit hint is "mm2 or mil2 (not cmil)", and the help explains that cmil is not mil². cmil is still refused (F14). Acceptable |
+| m-2 | Unqualified "lower bound" | FIXED | Every string now says "usually a lower bound … not assured", and the core names both directions |
+| m-3 | Ratio printed as "1" | FIXED | Now prints 1.016 |
+| m-4 | Which fuse I²t to use | FIXED | The help says to use the total clearing I²t at your fault current |
+| m-5 | Not wired to stackup or fab profile | OPEN (deferred, P4U-16) | Unchanged |
+| m-6 | No pad-fit or pitch check; via-in-pad DFM | PARTLY (P4U-15) | From 100 vias up there is a hint covering the hole-to-hole limit and solder wicking (T11). There is still no fit check |
+| m-7 | One-way link | FIXED | The self-heating page links to `#/calc/fusing` |
+| m-8 | Sub-ms pulse info only | FIXED | F11 (65 ns) shows the `SUB_MS_PULSE` warning: magnetic forces and vaporisation are not modelled, and 1 ms is a product choice |
+| m-9 | Export; series thermal-path builder | OPEN (deferred, P4U-16) | Feature request |
 
 ## Method
 
-- Read the core and UI code:
-  - `src/core/calculators/thermal-via/{calc,guards,meta}.ts` and `src/core/calculators/fusing/{calc,guards,meta}.ts`
-  - `src/ui/calculators/{ThermalVia,Fusing}.tsx`, `thermal-via.vm.ts`, `fusing.vm.ts`, `ResultsPanel.tsx`, `registry.ts`
-  - ledger rows S-040 to S-042f
-- Ran 32 scenarios through the view-model `computeView()`. This path covers text parsing, units, core compute and display formatting.
-  - The runner was a scratch vitest file in the session scratchpad, run with the repo's own vitest binary and a throw-away config.
-  - No worktree, no install, no `node_modules` change.
-- Playwright is not available in this session: no MCP tool, and no `playwright` package in `node_modules`. I confirmed that the preview on :4173 serves the current build: the `ThermalVia-GRX66l_b.js` and `Fusing-DwXqfORV.js` chunks return 200 and match `dist/`. I reviewed the rendered layout from the components (`ResultsPanel` order: headline, callouts, ledger badges, validity checks, warnings, confidence, rows, recommendation, details).
-- Hand checks:
-  - Single via, finished hole 0.3 mm, plating 25 µm, L 1.6 mm, k 401: A = π·25e-6·325e-6 = 2.5525e-8 m², θ = 1.6e-3 / (401·2.5525e-8) = **156.3 K/W**. The tool gives 156.3 K/W. For 9 vias, 17.37 K/W, displayed "18 K/W" (rounded up, the conservative side for a lower bound).
-  - Fusing, 10 mil × 35 µm at 25 °C: K = 8890·385 / (1.7241e-8·0.00393) = 5.051e16, ln(1319.07/259.45) = 1.626, I²t = 7.90e-17·5.051e16·1.626 = **6.49 A²s**. The tool gives 6.49 A²s (65 ms at 10 A), and Onderdonk gives 6.59 A²s.
+- Read the following:
+  - `src/ui/calculators/{fusing,thermal-via}.vm.ts` and `Fusing.tsx`;
+  - the `placeholder` and `underHeadline` wiring in `ThermalVia.tsx` and `ResultsPanel.tsx`;
+  - the fusing and thermal-via warning texts in `src/core/calculators/*/calc.ts`;
+  - ledger row S-045 and OPEN_RISKS CF and P4U rows.
+- Ran 32 scenarios through the view-model `computeView()`. This path covers text parsing, units, core compute, display formatting, headline suppression and warning order.
+  - The runner was a scratch vitest file in the session scratchpad, run with the repo's vitest binary and a throw-away config.
+  - No worktree, no install, no `node_modules` change. The scratch files were deleted afterwards.
+- Browser: no Playwright MCP tool was available in this session. I confirmed that the preview on :4173 serves the current build:
+  - `index-DMZ_AAuX.js` is the same in the served page and `dist/`;
+  - `Fusing-KGpSmRuW.js` returns 200 and contains the "Not meaningful for this model" string;
+  - `ThermalVia-BaUusTX_.js` contains the drill-basis option text.
+  - Keyboard, contrast and screen-reader checks remain with the human (P4U-17).
+- Hand checks (adiabatic K = 5.051e16 A²·s/m⁴, ln-term to melting 1.626 from 25 °C):
 
-### Scenario results
+| Case | Hand value | Tool |
+|---|---|---|
+| End-temperature ln-term to 300 °C: ln(534.45/259.45) | 0.7226 (0.444 of melting) | 10 mil 1 oz: 2.9 A²s and 29 ms (F2) |
+| Via barrel, 0.25 mm finished, 18 µm: A = π·18e-6·268e-6 | 1.5155e-8 m², I²t 18.9 A²s, 43.4 A at 10 ms | 0.0152 mm², 19 A²s, 43 A (F8) |
+| 2 mm × 35 µm, 12 A | I²t 402 A²s, 2.79 s | 400 A²s, 2.8 s (F5) |
+| Thermal via, 0.3 mm drill, 18 µm (fab average) | d = 0.264 mm, A = 1.595e-8 m², θ1 = 250.2 K/W, θ9 = 27.8 K/W | 260 K/W (rounded up), 28 K/W (T9) |
+
+### Scenario results (new run)
 
 | # | Scenario | Result | Judgement |
 |---|---|---|---|
-| T1 | Empty form | Six "needs" lines, no number | Good: gated |
-| T2 | QFN thermal pad, 3×3 array: 0.3 mm (typed as finished), 25 µm, 1.6 mm, 9 vias, pure Cu, unfilled, 2 W | 18 K/W, ΔT 34.8 Δ°C, low confidence, both callouts | Correct arithmetic. But 0.3 mm is the usual *drill* size (see T3, M-4) |
-| T3 | Same with finished 0.25 mm (0.3 drill − 2×25 µm), C11000 | 22 K/W, ΔT 42 Δ°C | Entering the drill as finished gives a θ about 18 % low (non-conservative) |
-| T4 | Fab AVERAGE plating 18 µm | 25 K/W plus a FAB_AVERAGE caution | Good |
-| T5 | Epoxy-filled, k_fill 0.25 W/mK | 21 K/W vs 21.05 unfilled: the fill adds about 0.2 % | Honest: non-conductive fill does not help heat flow |
-| T6 | Copper-filled (k_fill 390) | 6.4 K/W | Plausible, about 3.3× better than unfilled |
-| T7 | Imperial: 10 mil, 1 mil plating, 62 mil, 16 vias | 12 K/W | Units fine |
-| T8 | Plating "1" with no unit / "1 oz/ft2" | Refused: missing unit / wrong dimension | Good |
-| T9 | Plating 0.4 mm on a 0.3 mm hole | 0.51 K/W with a PLATING_EXCEEDS_HOLE warning, confidence forced low | Acceptable: pinned warning |
-| T10 | N = 10 000, 100 W | 0.016 K/W, ΔT 1.6 Δ°C, no pad-fit sanity check | m-6 |
-| T11 | Microvia 0.1 mm / 15 µm / 0.1 mm, 4 vias | 12 K/W | Plausible |
-| T12 | Count "2.5" | Refused | Good |
-| F1 | Empty form | Needs geometry, temperature and mode, no number | Good |
-| F2 | 10 mil, 35 µm finished, 25 °C, 10 A | 65 ms, Onderdonk 66 ms, conf low | Correct |
-| F3 | Same thickness typed as "1 oz/ft2" | Converted to 35 µm, basis forced to nominal, THICKNESS_NOMINAL warning | Good |
-| F4 | 2 mm × 35 µm, 85 °C start, 50 A | 140 ms | Plausible |
-| F5 | 2 mm × 35 µm, 10 ms pulse | 200 A | Plausible for the adiabatic case |
-| F6 | 2 mm × 35 µm, **5 A** | Headline **"16 s"** with OVER_1S and critical OVER_10S | This trace carries 5 A continuously at a modest rise and never melts. The headline would embarrass in review (M-5) |
-| F7 | 0.25 mm trace, fuse I²t 2 A²s | Headline "0.32" (fraction of the melting I²t) | Reads as "3× margin". To a 300 °C limit the fraction is 0.72 (M-1) |
-| F8 | AWG30-size wire, 1 s | 14.6 A, Preece 10.3 A in a collapsed panel | OK |
-| F9 | Thickness or temperature without a unit, temperature as "25 ΔK" | Refused with clear messages | Good |
-| F10 | 77 °F start | Same as 25 °C | Good |
-| F11 | Area "100 cmil" | **Refused: unknown unit "cmil"**, although the field hint says "mm2, mil2 or cmil" | m-1 |
-| F12 | 10 mil at 10 kA | 65 ns, only an info-level uniform-current note | m-8 |
-| F13 | Start at 1000 °C | 2.6 ms, failed plausibility check, conf low | OK |
+| T1 | Empty form | Seven "needs" lines, including the diameter basis | Good |
+| T2 | 0.3 mm with no basis | Needs input only: "Choose the diameter basis…" | Good: gated |
+| T3 | 0.3 mm **drill**, 25 µm, 1.6 mm, 9 vias, pure Cu, unfilled, 2 W | 21 K/W, 41.1 Δ°C, finished 0.25 mm shown | Correct and conservative |
+| T4 | 0.25 mm **finished**, same | 21 K/W (identical to T3) | Correct |
+| T5 | 0.3 mm **finished** | 18 K/W | Correct; the user owns the basis |
+| T6 | 0.3 mm drill, 0.15 mm plating | Refused: "plating must be thinner than D/2 … check the units and the diameter basis" | Good |
+| T7 | 0.3 mm drill, 0.12 mm plating | 6.6 K/W; PLATING_EXCEEDS_HOLE pinned first | Acceptable |
+| T8 | Imperial: 12 mil drill, 1 mil, 62 mil, 16 vias, C11000 | 12 K/W, finished 10 mil | Units fine |
+| T9 | Fab AVERAGE 18 µm, 0.3 mm drill | 28 K/W plus the AVERAGE caution | Good |
+| T10 | Copper-filled (390 W/mK), drill basis | 6.4 K/W | Plausible |
+| T11 | N = 10 000, 100 W | 0.019 K/W, with the ≥100-via fit and wicking hint | Hint present; no fit check (m-6) |
+| T12 | Hash `db=drll` | Notice, basis blank, no result | Good |
+| F1 | 10 mil 1 oz, 25 °C, 10 A | 65 ms; board-damage warning first | Correct |
+| F2 | Same + Te 300 °C | 65 ms headline; rows show 29 ms and 2.9 A²s to "your end temperature (your value, not checked)" | Good (see m-N4) |
+| F3, F4 | 2 mm 1 oz, 5 A (± Te 300 °C) | "Not meaningful…" headline; 16 s kept as labelled detail; Te row 7.2 s | M-5 fixed. Wording: m-N1 |
+| F5 | 2 mm 1 oz, 12 A | 2.8 s, 1 s warning under the headline | Good |
+| F6, F17 | 30 s pulse (± Te) | Headline suppressed; 3.7 A kept as labelled detail | Good. Wording: m-N1 |
+| F7 | 0.25 mm 1 oz, I²t 2 A²s, Te 300 °C | Headline 0.32 "not a safety margin"; row 0.72 to Te; NO_DURATION caution | M-1 fixed (see m-N4) |
+| F8, F9 | Via barrel 0.25/18 µm at 10 ms; 0.3/25 µm at 20 A | 43 A; 130 ms; VIA_BARREL_PLATING caution | Correct |
+| F10 | Via, plating blank | Needs input | Good |
+| F11 | 10 mil at 10 kA | 65 ns with the SUB_MS_PULSE warning | Good |
+| F12, F13 | Te 20 °C (below the initial temperature); Te 1200 °C | Both refused with clear messages | Good |
+| F14 | Area "100 cmil" | Refused; the hint now says "not cmil" | Acceptable |
+| F15 | "1 oz/ft2" with no basis | Converted, nominal, THICKNESS_NOMINAL warning names both directions | Good |
+| F16, F19 | 2 mm 1 oz at 8 A / 7 A, Te 200 / 150 °C | 6.3 s / 8.2 s with the 1 s warning under the headline; Te rows 2 s | Good |
+| F18 | Te "300 K" (26.85 °C, 1.85 K above the start) | 280 µs to "your end temperature", no plausibility note | m-N3 |
+| F20 | 5 s pulse, Te 300 °C | 9 A to melting, 6 A to Te, 1 s warning under the headline | Good |
 
-## Findings
+## New findings (all MINOR; log in the `OPEN_RISKS.md` backlog)
 
-### MAJOR
+**m-N1. The "Not meaningful" headline makes a claim it cannot support.** The text is "the conductor would not fuse in a short pulse; use the self-heating calculator".
+- In time mode (F6: "what current melts it in 30 s?") the sentence does not answer the question that was asked.
+- In current mode, "would not fuse" reads as a reassurance. The adiabatic model only says that heat loss to the board dominates here. It does not say the trace is fine: a narrow trace in a hot or potted enclosure can still run away at steady state.
+- Suggested text: "Outside this model: beyond 10 s, heat loss to the board and air dominates and the adiabatic answer has no meaning. For continuous or long currents, use trace self-heating."
+- When an end temperature is given, apply the same 1 s / 10 s cue to the end-temperature rows. In F4 the Te row shows 7.2 s next to a "not meaningful" headline, with no cue of its own.
+- Owner: ui-engineer (text); calc-implementer (optional codes for the Te time).
 
-**M-1. Fusing only computes to the copper melting point. On a PCB, damage happens far below it, so the I²t "fraction" reads as a large margin.**
-- I use this page mostly for fault coordination: will the trace survive until the fuse or eFuse clears? The useful end temperature for that question is a board-damage temperature, not 1084.6 °C. For example, Isola 370HR has Tg 180 °C and Td 340 °C ([Isola 370HR datasheet](https://www.isola-group.com/wp-content/uploads/data-sheets/370hr.pdf)). Lifted pads and charring happen long before copper melts.
-- The adiabatic I²t to 300 °C is **0.444×** the I²t to melting, and to 260 °C it is 0.397×. In F7 the user sees "0.32" and reads about 3× margin. Against 300 °C the real figure is 0.72, about 1.4× margin.
-- The REACH text says "A trace can also fail earlier (delamination…)", but the page gives no way to quantify that.
-- Fix:
-  - Add an optional *end temperature* choice: "copper melting point (S-042c)" or "a temperature I enter (laminate Td, Tg, solder reflow…)", with no default value. The S-042a derivation already holds for any final temperature.
-  - Relabel the fraction headline "fraction of the I²t to reach <end temperature>: not a safety margin".
-- Owner: calc-implementer (core option), ui-engineer (field and labels), standards-researcher (confirm that S-042a covers an arbitrary end temperature; no laminate value goes in the ledger as a default).
+**m-N2. The diameter-basis help should name the fab convention, and my earlier M-4 wording overstated it.**
+- I wrote that 0.3 mm is "the canonical drill size" and that CAD and fab forms "usually ask for the drill". For plated holes that is not the common fab convention. Eurocircuits reads every hole size in the data as the **finished** size, and drills plated holes at finished + 0.100 mm ([Eurocircuits, drilled holes](https://www.eurocircuits.com/pcb-design-guidelines-drilled-holes/)). JLCPCB states its plated-hole tolerance against the hole size you design: +0.13 / −0.08 mm, so a 1.00 mm hole finishes at 0.92 to 1.13 mm ([JLCPCB capabilities](https://api.jlcpcb.com/capabilities/Capabilities)).
+- The required basis is still the right fix, and choosing "drill" when the number is really finished errs conservative (θ high). But the help should guide the choice. Add to `DIAMETER_HELP`: "Many fabricators read the hole size in your CAD/drill data as the FINISHED hole and drill larger; if unsure, ask your fabricator. Choosing drill when it is finished overstates θ (conservative)." No fab allowance number should be built in; any number belongs in a fab profile.
+- Owner: ui-engineer (text), standards-researcher (ledger note on fab hole-size conventions).
 
-**M-2. Fusing gives no weakest-link guidance: vias, necks and pad entries in series usually fuse first.**
-- The page offers trace, wire or area, and nothing for a via barrel. A single 0.3 mm via with 18 µm plating has a cross-section of about 1.6e-8 m². That is about half the cross-section of a 1 mm × 35 µm trace feeding it, so the via fuses first. The same is true for a 0.25 mm neck-down at a pad or a pour neck.
-- The core result schema already has element kinds `via`, `spoke` and `pour-neck`, but this page does not use them.
-- Fix:
-  - Add a "via barrel" geometry: finished hole (or drill) plus plating, area π·t·(d + t), reusing S-041 geometry, with an N-vias-in-parallel option.
-  - Add an always-visible caution: "The smallest cross-section in the path fuses first (vias, necks, pad entries). Check each one."
-- Owner: calc-implementer, ui-engineer.
+**m-N3. End-temperature plausibility.**
+- F18: "300 K" is accepted as 26.85 °C, 1.85 K above the start, and gives 280 µs to "your end temperature". The unit is legitimate, but no laminate damage criterion is that close to the start temperature.
+- Add a caution, not a refusal, when Te − Ta is small or Te is below about 100 °C: "check the unit; K is absolute". Label the threshold as a product choice.
+- Owner: calc-implementer.
 
-**M-3. The thermal via page never mentions thermal-relief spokes or how the vias connect to the plane.**
-- In practice, the usual reasons a via array does nothing are:
-  - the CAD tool's plane connect style puts thermal reliefs on the vias;
-  - the vias land on a small island instead of a plane;
-  - the bottom copper is cut up.
-- RECEIVING_TEXT covers "no receiving plane" but not reliefs. A 1-D θ of 18 K/W can become several times worse through four 0.25 mm spokes per via.
-- Fix: add a caution: "The vias must be solid-connected (no thermal-relief spokes) to the pad and to the receiving plane; check the plane connect style in your CAD rules." Also consider an input "connection to plane: solid / thermal relief / unknown". Relief or unknown would add a warning and lower the confidence.
-- Owner: ui-engineer (text), standards-researcher (find a public app-note source for the solid-connect advice before adding any number).
-
-**M-4. Drill diameter vs finished hole: the placeholder invites the non-conservative mistake.**
-- The field is labelled "Finished hole diameter (not the drill)", which is correct. But the placeholder and example are "0.3 mm", the canonical *drill* size, and CAD tools and fab order forms usually ask for the drill.
-- Entering a 0.3 mm drill as the finished hole (T2 vs T3, 25 µm plating) gives θ = 17.4 instead of 21.1 K/W, about 18 % optimistic, on top of a result that is already a lower bound.
-- S-041 already records the drill form A = π·t·(D − t).
-- Fix: add a "diameter basis: drill / finished hole" selector with no default, and change the placeholder to something that is clearly finished (for example 0.25 mm).
-- Owner: calc-implementer (accept a drill basis in core), ui-engineer.
-
-**M-5. Fusing shows a big headline time where the model has no meaning.**
-- F6: a 2 mm 1 oz trace at 5 A shows **"16 s"** at headline size. The OVER_10S critical warning sits below the callouts, ledger badges and validity list. That trace runs at steady state indefinitely.
-- In time mode the risk is the reverse. "Current that melts the trace in 30 s" gives a small current that a designer could take as the current at which a trace-as-fuse opens. Brooks and Adam report real trace fusing currents of 1.5 to 6 times the Onderdonk value (S-042e).
-- Fix:
-  - When the time or pulse is longer than the 10 s product threshold, replace the headline value with "Not meaningful: the board cools the trace; use trace self-heating (steady-state)". Keep the number in the rows, labelled.
-  - Between 1 s and 10 s, show the OVER_1S warning directly under the headline, not after the validity list.
+**m-N4. When the user gives an end temperature, it is their failure criterion, but the headline still shows the melting result.**
+- In F7 the headline 0.32 sits above the row 0.72, the number that answers their question. The labels are honest, so this is not a safety finding.
+- Consider showing the Te result as a second headline line, or as the headline when Te is entered, labelled "your value, not checked".
 - Owner: ui-engineer.
 
-### MINOR
+**m-N5. The fusing via barrel accepts only the finished hole: no drill basis and no N-parallel. This is deferred under P4U-16 and must stay logged.**
+- The thermal-via page now trains users to pick "drill". A designer who then types the 0.3 mm drill into the fusing via field (labelled "finished, not the drill", with no placeholder) gets an area 13 to 18 % high. Melting I²t and time are then **27 to 39 % optimistic** (18 to 25 µm plating).
+- Reuse the S-041 drill form and the same required basis selector here, so the two pages behave the same.
+- Owner: calc-implementer, ui-engineer.
 
-- **m-1. The area field advertises "cmil", but the parser rejects it (F11).** Onderdonk users think in circular mils. Either add `cmil` to the units table (S-006 already holds the arithmetic) or change the hint to "mm2 or mil2". Owner: units-engine-engineer / ui-engineer.
-- **m-2. "Lower bound" is stated without conditions, but ignoring the dielectric between vias makes the via-only θ an over-estimate.**
-  - The ledger itself says that excluding the dielectric "overstates θ" (S-041b).
-  - Example: one via under a 10 × 10 mm pad on 1.6 mm FR-4 (k ≈ 0.3) has a laminate path of about 53 K/W in parallel with the 156 K/W via. On thermally conductive prepregs the laminate path matters even more.
-  - Fix: reword to "usually a lower bound because spreading is ignored. For sparse arrays under large pads, or on high-k laminates, the laminate path (not modelled) can make the real through-board resistance lower."
-  - Owner: calc-implementer (text).
-- **m-3. The Onderdonk-to-adiabatic ratio displays as "1" (true value 1.0156).** This looks like perfect agreement. Show 3 significant figures for this ratio. Owner: ui-engineer.
-- **m-4. The I²t help should say which fuse I²t to use.** It should be the fuse's total *clearing* I²t at the prospective fault current, not the melting (pre-arcing) I²t, and the datasheet curve at the actual fault current. Owner: ui-engineer (text), standards-researcher (cite a fuse maker's application note).
-- **m-5. Neither page is wired to the shared stackup or the fab profile.**
-  - Barrel length is not offered from the stackup board thickness or the layer span.
-  - The "fabricator AVERAGE" radio only labels a value the user typed. It does not pull `holePlatingAverage` from the active profile.
-  - On fusing, the trace thickness is not offered from the stackup's finished copper.
-  - Fix: add "use stackup / fab profile" buttons that fill the field and show where the value came from. Owner: ui-engineer.
-- **m-6. There is no pad-fit or pitch check, and no via-in-pad DFM note.**
-  - N is unbounded (T10: 10 000 vias accepted).
-  - There is no pad size or pitch input to show whether N vias fit at the fab's hole-to-hole limit (S-019k, from the profile).
-  - Open vias in an exposed pad wick solder. Public guidance conflicts:
-    - TI recommends vias of 0.3 mm or smaller at about 1 mm spacing, not covered by solder mask ([TI SLOA122](https://ti.com/lit/sloa122)).
-    - MACOM recommends mask over the via areas to stop wicking ([MACOM S2083](https://cdn.macom.com/applicationnotes/S2083_V18.pdf)).
-    - TI package notes suggest filled, plugged or tented vias ([TI QFN/SON attachment SLUA271B](https://docs.ampnuts.ru/ti.com.datasheet/BQ24020/Application_note_SLUA271B.PDF)).
-  - Fix: add a caution that names this conflict, and an optional pad-size / pitch fit check against the fab profile. Owner: standards-researcher, ui-engineer.
-- **m-7. The separation is one-way.** Fusing links to self-heating, but self-heating has no "short pulse / fault: see fusing" link. Owner: ui-engineer.
-- **m-8. Very short pulses get a number with only an info-level note** (F12: 65 ns at 10 kA). Raise UNIFORM_CURRENT to a caution when the solved or entered time is in the sub-millisecond range, and say plainly that magnetic forces and explosive vaporisation are not modelled. Label any threshold as a product choice. Owner: calc-implementer.
-- **m-9. Workflow gaps I would need daily.**
-  - No copy or export of the result block for a design review.
-  - No series thermal-path builder (θJC + TIM/solder + via array + spreading + plane-to-air) with each element and its source shown, the thermal analogue of the path-load calculator.
-  - Not a condition for this phase. Log it as a feature request. Owner: ui-engineer (export), calc-implementer (path builder, future phase).
+**m-N6. Warning placement (observation, no change required).**
+- `THERMAL_RELIEF_NOT_MODELLED` and `WEAKEST_LINK` are first or near the top of the warning list, but the list renders after the ledger badges and validity checks.
+- If a later pass trims the page, promote the relief warning to a third callout on the thermal-via page. In practice it is the most common reason a via array underperforms.
+- Owner: ui-engineer.
 
-### Questions the caller asked
+## Would I trust this on a real board?
 
-- **Is a 1-D thermal via result realistic?** It is right as a via-barrel number, and it is clearly labelled as one. Real boards are dominated by spreading in the pad and plane and by the plane-to-ambient path (Guenin 2004: the 1-D model is 10 to 27 % low; Brooks and Adam 2024: with no plane the vias have almost zero effect). Those caveats are on the page, prominently. The missing piece is the plane connection (M-3).
-- **Is the adiabatic fusing time realistic for PCB traces?** It is conservative for "will it survive" and non-conservative for "will it open". The page says both clearly, and quotes the 1 to 1.5 s board-cooling onset. M-1 and M-5 are about making the number useful and stopping it from being shown where it means nothing.
-- **Could someone use the fusing time as a fuse rating?** Strongly guarded: callout, status block, recommendation and live-region text. Acceptable.
-- **Could someone use θ from the vias as θJA?** Guarded by a callout and a status line. Acceptable.
-- **Is the specific-heat default of 385 acceptable?** Yes. The spread between sourced values is 0.7 %. The default is shown as a default and lowers confidence. The 32 % rise of c with temperature is disclosed, and it makes the time err short, which is the right side for survival checks.
-- **Thickness basis and oz conversion:** good. A foil weight forces the nominal basis and adds a warning, a bare number is refused, and a temperature typed as a Δ is refused. One improvement: the nominal warning names only the "thinner fuses sooner" direction. Outer layers after plating are usually *thicker* than nominal. Saying both directions would help (fold into m-4 text work).
-- **Is it acceptable that confidence is always low?** Yes, for two estimate-class methods with CONFLICT data. The reasons list says why, which is what matters. The badge itself never moves, so the warnings and callouts do the real work. That is acceptable here.
-- **Wording:** clear, if long. The "not checked" IPC-scope state for fusing is shown as neither pass nor fail, which is correct.
+- **Thermal via:** yes, as a barrel-conduction number. The diameter basis is forced, the plating is never pre-filled, the AVERAGE caveat is there, and the relief, receiving-plane, not-θJA and spreading caveats are visible. I would still pair it with a spreading or FEA estimate for the system θ. The page says so.
+- **Fusing:** yes, for fault-coordination screening:
+  - "will this trace or via survive until the fuse clears", using the end temperature from my laminate datasheet and the fuse's clearing I²t;
+  - a first look at "which element goes first", using the via geometry plus the weakest-link caution.
+- Not as a trace-as-fuse design, and the page says that plainly in four places.
+- Remaining workflow gaps (deferred P4U-16): no stackup or fab-profile hand-off, no export, no series thermal path.
 
 ## Conditions for closure
 
-M-1 to M-5 are fixed, or logged in `docs/validation/OPEN_RISKS.md` with an owner and a target phase. Minor findings can be tracked as backlog.
+None from this reviewer. Log m-N1 to m-N6 as backlog in `docs/validation/OPEN_RISKS.md`. Keep m-5, m-6, m-9 and m-N5 in the P4U-16 deferral row. The human browser pass (P4U-17) is still open and outside this report.

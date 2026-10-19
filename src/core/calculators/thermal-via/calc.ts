@@ -58,10 +58,10 @@ const FILL_TEXT =
 const PLATING_TEXT =
   'The plating thickness is at or above the finished hole diameter. The formula stays valid for a finished hole d, but check the units and whether you entered the drill diameter or the plating thickness in the wrong field.';
 const RISE_TEXT =
-  'The temperature difference is theta x P for the power you entered, assuming all of that power flows through the vias between two isothermal copper areas. It is a lower bound on the real rise across the heat path, not a junction or board temperature.';
+  'The temperature difference is theta x P for the power you entered, assuming all of that power flows through the vias between two isothermal copper areas. It is usually a lower bound on the real rise across the heat path (not assured: the real rise is usually higher because spreading and interfaces are ignored, but ignoring the dielectric between the vias can make it lower), and it is not a junction or board temperature.';
 
 const RELIEF_TEXT =
-  'Not modelled: thermal-relief spokes or any non-solid connection of the vias to the pad and the receiving plane usually dominate the real behaviour. Check the plane connect style in your CAD rules; this result assumes a solid connection.';
+  'Not modelled: thermal-relief spokes, or any non-solid connection of the vias to the pad and the receiving plane, add thermal resistance (ledger S-045); this result assumes a solid connection. The sources advise a solid connection for thermal performance. The size of the effect is unknown here (no magnitude is sourced). Check the plane connect style in your CAD rules.';
 
 const num = (x: number): string => String(Number(x.toPrecision(4)));
 

@@ -30,7 +30,7 @@ export function guardQuantity(field: string, v: unknown, dim: Quantity['dim'], d
       return false;
     }
   })();
-  if (!same) return { ok: false, error: err('DIMENSION', field, `${field} must be a ${dimName}.`) };
+  if (!same) return { ok: false, error: err('DIMENSION', field, `${field} must be ${/^[aeiou]/i.test(dimName) ? 'an' : 'a'} ${dimName}.`) };
   const n = qty.si;
   if (Number.isNaN(n)) return { ok: false, error: err('INVALID_INPUT', field, `${field} is NaN (not a number); it must be a finite number greater than zero.`) };
   if (!Number.isFinite(n)) return { ok: false, error: err('INVALID_INPUT', field, `${field} is infinite; it must be a finite number greater than zero.`) };

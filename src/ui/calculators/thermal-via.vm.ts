@@ -62,7 +62,7 @@ export const STATUS_LINES: readonly string[] = [
 
 export const RANGE_HINT = 'Outside the stated plausibility range (an engineering range, not a standard): less reliable. See the confidence reasons.';
 export const DIAMETER_HELP =
-  'Choose the basis first. Finished: the inside diameter after plating. Drill: the drill size, from which the finished hole is D - 2t. Write the unit (mm or mil). A drill size typed as a finished hole makes the resistance too low.';
+  'Choose the basis first. Finished: the inside diameter after plating. Drill: the drill size, from which the finished hole is D - 2t. Write the unit (mm or mil). A drill size typed as a finished hole makes the resistance too low. Many fabs read the hole size in your data as the FINISHED hole, while some drill plated holes a stated amount larger (for example, Eurocircuits states in its guidelines that it drills plated holes finished + 0.1 mm; that is one fab practice, not a standard, and no allowance is built in here). Confirm with your fab. Picking drill when the size is really finished errs conservative (theta too high).';
 export const DIAMETER_BASIS_HELP = 'Required, no default. It is not guessed because the same number means different holes on the two bases.';
 export const DIAMETER_BASIS_OPTIONS: readonly { value: 'finished' | 'drill'; label: string }[] = [
   { value: 'finished', label: 'Finished hole (inside the plating)' },
@@ -259,7 +259,10 @@ const CALLOUT_HEADING: Readonly<Record<(typeof CALLOUT_CODES)[number], string>> 
   NOT_THETA_JA: 'Not theta-JA, not theta-JC',
 };
 
-const LEDGER_ROLE: Readonly<Record<string, string>> = {
+const RELIEF_CODE = 'THERMAL_RELIEF_NOT_MODELLED';
+const RELIEF_HEADING = 'Thermal-relief connections are not modelled: relief or spoke connections add thermal resistance (size not sourced); a solid connection is advised';
+
+const LEDGER_ROLE:Readonly<Record<string, string>> = {
   'S-007': 'Copper thermal conductivity k; sources disagree, so it is a choice you make.',
   'S-019d': 'Temperature difference theta x P for the power you enter.',
   'S-040': 'Package thermal metrics are not design constants; nothing here derives one.',
@@ -267,6 +270,7 @@ const LEDGER_ROLE: Readonly<Record<string, string>> = {
   'S-041a': 'Filled via as a core cylinder in parallel with the barrel (derived; fill conductivity is yours).',
   'S-041b': 'N identical vias in ideal parallel, theta/N.',
   'S-041c': 'Sources disagree on how useful thermal vias are and on 1-D accuracy; the 1-D model underestimates theta in published FEA.',
+  'S-045': 'Relief or spoke connections add thermal resistance; the magnitude is not sourced and sources advise a solid connection.',
   'S-041d': 'Conductivity of plated barrel copper was not found; bulk copper is used.',
 };
 
@@ -303,6 +307,8 @@ export type ThermalViaView =
       readonly fieldErrors: FieldErrors;
       readonly notes: readonly string[];
       readonly callouts: readonly CautionView[];
+      /** The thermal-relief caution, shown directly under the headline and kept out of the warning list (PCB m-N6). */
+      readonly reliefCallout?: CautionView;
       readonly ledgerRows: readonly LedgerRowView[];
     };
 
@@ -376,7 +382,12 @@ export function computeView(s: ThermalViaState): ThermalViaView {
     const w = raw.warnings.find((x) => x.code === code);
     return w === undefined ? [] : [{ code, heading: CALLOUT_HEADING[code], text: w.message }];
   });
-  const forView: CalcResult = { ...raw, warnings: raw.warnings.filter((w) => w.code === undefined || !(CALLOUT_CODES as readonly string[]).includes(w.code)) };
+  const relief = raw.warnings.find((x) => x.code === RELIEF_CODE);
+  const reliefCallout: CautionView | undefined = relief === undefined ? undefined : { code: RELIEF_CODE, heading: RELIEF_HEADING, text: relief.message };
+  const forView: CalcResult = {
+    ...raw,
+    warnings: raw.warnings.filter((w) => w.code === undefined || (!(CALLOUT_CODES as readonly string[]).includes(w.code) && w.code !== RELIEF_CODE)),
+  };
   const extra: ProvenanceRow[] = [
     { label: 'Copper thermal conductivity choice', value: s.kMaterial, source: 'user', detail: 'ledger S-007, CONFLICT' },
     { label: 'Diameter basis', value: s.diameterBasis, source: 'user' },
@@ -393,7 +404,7 @@ export function computeView(s: ThermalViaState): ThermalViaView {
     pinWarningCodes: ['PLATING_EXCEEDS_HOLE'],
   });
   const ledgerRows: LedgerRowView[] = result.ledger.entries.map((e) => ({ ...e, role: LEDGER_ROLE[e.id] ?? e.item }));
-  return { status: 'ok', result, raw, fieldErrors, notes, callouts, ledgerRows };
+  return { status: 'ok', result, raw, fieldErrors, notes, callouts, ...(reliefCallout !== undefined ? { reliefCallout } : {}), ledgerRows };
 }
 
 /** Text for the screen-reader live region. */

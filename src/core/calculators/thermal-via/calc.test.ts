@@ -319,6 +319,39 @@ describe('thermal-relief and plane connection (PCB M-3, always shown)', () => {
       expect(w?.message).toMatch(/solid/i);
     }
   });
+  it('N-2: the relief text claims no magnitude or dominance and cites S-045', () => {
+    const r = ok(base(0.3, 25, 1.6, 1));
+    const m = r.warnings.find((x) => x.code === 'THERMAL_RELIEF_NOT_MODELLED')?.message ?? '';
+    expect(m).not.toMatch(/dominate/i);
+    expect(m).toMatch(/thermal resistance/i);
+    expect(m).toMatch(/magnitude/i);
+    expect(m).toMatch(/unknown/i);
+    expect(r.reference.ledgerIds).toContain('S-045');
+    expect(meta.ledgerIds).toContain('S-045');
+  });
+  it('N-1: the rise text is qualified, both directions, not assured', () => {
+    const r = ok(base(0.3, 25, 1.6, 4, { power: watt(3) }));
+    const m = r.warnings.find((x) => x.code === 'RISE_IS_LOWER_BOUND')?.message ?? '';
+    expect(m).toMatch(/usually a lower bound/i);
+    expect(m).toMatch(/not assured/i);
+    expect(m).toMatch(/higher/i);
+    expect(m).toMatch(/lower/i);
+    expect(m).not.toMatch(/is a lower bound on the real rise/i);
+  });
+  it('N-3: the diameterBasis error gives no wrong percentage (15 % too low, real theta about 18 % higher)', () => {
+    const out = compute({ ...base(0.3, 25, 1.6, 1), diameterBasis: undefined } as unknown as Inputs);
+    expect(out.ok).toBe(false);
+    if (!out.ok) {
+      expect(out.error.message).not.toMatch(/18 % too low/);
+      expect(out.error.message).toMatch(/about 15 % too low/);
+      expect(out.error.message).toMatch(/about 18 % higher/);
+    }
+    // the stated figures follow from the formula: theta_wrong / theta_true = (D - t) / (D + t) for D = 0.3 mm, t = 25 um
+    const wrong = res(ok(base(0.3, 25, 1.6, 1)), TH_ARRAY).value.si;
+    const right = res(ok({ ...base(0.3, 25, 1.6, 1), diameterBasis: 'drill' }), TH_ARRAY).value.si;
+    expect(1 - wrong / right).toBeCloseTo(0.1538, 3);
+    expect(right / wrong - 1).toBeCloseTo(0.1818, 3);
+  });
   it('the lower-bound statement is conditional and names both directions (C4-1)', () => {
     const r = ok(base(0.3, 25, 1.6, 1));
     const one = r.warnings.find((x) => x.code === 'ONE_D_ESTIMATE')?.message ?? '';

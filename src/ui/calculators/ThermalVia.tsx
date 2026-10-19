@@ -54,6 +54,7 @@ function Results({ view }: { view: ThermalViaView }) {
       <ResultsPanel
         view={view.result}
         failedCheckHint={RANGE_HINT}
+        underHeadline={view.reliefCallout !== undefined ? <Callout heading={view.reliefCallout.heading} text={view.reliefCallout.text} /> : undefined}
         callouts={view.callouts}
         afterHeadline={<LedgerRowBadges heading="Data behind this result (one status per ledger row)" rows={view.ledgerRows} />}
       />

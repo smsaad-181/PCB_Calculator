@@ -41,5 +41,7 @@ export const meta = {
   },
   /** PRODUCT CHOICES based on S-042e (one author group), not sourced limits. */
   timeWarnings: { overSeconds: 1, strongSeconds: 10, subMsSeconds: 1e-3 },
+  /** PRODUCT CHOICE, no sourced limit: an end temperature less than this many kelvin above the start gets a unit-check caution. */
+  endNearStartKelvin: 5,
   toleranceInputs: [] as string[],
 } as const;

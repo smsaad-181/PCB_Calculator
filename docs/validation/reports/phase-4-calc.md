@@ -1,143 +1,188 @@
-# Phase 4 calculations validation: thermal via array and fusing
+# Phase 4 calculations re-validation: thermal via array and fusing
 
-Validator: calc-validator (independent). Date: 2026-10-19. Branch `phase-4`, commit `3420891`.
-Scope: `thermal-via` (θ = L/(k·π·t·(d+t)), fill in parallel, θ/N, ΔT = θ·P) and `fusing` (adiabatic I²t = A²·K·ln[(Tm+β20)/(Ta+β20)], Onderdonk secondary, Preece historical, I²t mode). Ledger rows S-040 to S-042f.
+Validator: calc-validator (independent). Date: 2026-10-19. Branch `phase-4`, head `2107b42`.
+This report supersedes the first Phase 4 calc report (commit `3420891`, PASS-WITH-CONDITIONS, C4-1 to C4-6).
+Scope of the re-validation, the changes since then:
+- fusing: optional end temperature Te (adiabatic to Te); new via-barrel geometry with area π·t·(d+t); input plausibility limits; new warnings (WEAKEST_LINK, BOARD_DAMAGE_BELOW_MELTING, SUB_MS_PULSE, VIA_BARREL_PLATING); a `notChecked` validity flag;
+- thermal via: required `diameterBasis` "finished" or "drill" (drill: d = D − 2t, barrel area π·t·(D − t)); warning THERMAL_RELIEF_NOT_MODELLED; reworded "lower bound" text;
+- ledger: new row S-045, an S-003d note (pure-copper density 8933), an S-042 note (Brooks & Adam constants) and an S-042a note (user end temperature).
 
 ## Verdict: PASS-WITH-CONDITIONS
 
-- I found no BLOCKER or MAJOR defects. Thirty-four numeric cases plus 24 sensitivity cases match my independent oracle within 6e-16 relative error, and 22 degenerate inputs are rejected with a clear message.
-- Every formula step matches the derivation I did myself. The dimensions and unit conversions are correct: circular mil, square mil, m², °C inside the log terms, and finished hole diameter rather than drill diameter.
-- The app never calls a result a fuse rating, a safe current, θJA or a design constant. Every match on those phrases is a negative ("not a …").
-- Confidence is always `low` (score 4 to 6). That follows the published rule (estimate 2 + CONFLICT 2), as accepted in P4-1.
-- The 1 s and 10 s thresholds are warnings only, not refusals. Their text says "product choices, not sourced limits".
-- Conditions are listed at the end. They are the open human items Q-54 and Q-56 plus six MINOR items.
+- I found no BLOCKER or MAJOR defects.
+- **Numbers.** All 36 new-mode comparisons match my independent oracle within 4.8e-16 relative error. So do all 16 sensitivity cases. All 14 degenerate or out-of-limit inputs are rejected with a field-specific message.
+- **Formulas.** Every new formula step matches my own derivation. The drill-basis identity π·t·(D − t) = π·t·(d + t) with d = D − 2t holds exactly.
+- **Claims.** No result is called a fuse rating, a safe current, a safety margin or θJA. Every match on those phrases is a negation ("not a …").
+- **S-045.** The ledger status is honest: the two sources I re-fetched say what the ledger quotes. My opinion on whether the fabricator blog is acceptable as a second source is below. It is acceptable for this caveat-only row, but it is weak, and I recommend adding a stronger second source.
+- **Conditions.** There are seven new MINOR items (N-1 to N-7) plus the human items carried over (Q-54, Q-56, P4-1). C4-1 is fixed in the core except for one string (N-1). C4-2, C4-3, C4-4 and C4-5 are fixed.
 
 ## Method (independence)
-1. I read `docs/phases/phase-4.md`, the ledger rows S-040 to S-042f, the research note `docs/research/phase-4-thermal-via-and-fusing.md` and OPEN_RISKS Q-50 to Q-61. I did not open `src/` at this stage.
-2. I wrote my own oracle in the session scratchpad (`oracle4.py`, python3 and `math` only). It does not import `tools/reference/ref_calcs.py` or anything in `src/`. Constants come from the ledger rows: k 401 or 391 (S-007), D 8890 (S-003d), ρ20 = 1/58e6 and α20 0.00393 (S-004), Tm 1084.62 °C (S-042c), c 383.48, 385.00 or 386 (S-042d), 1 cmil = (π/4)·(25.4 µm)² (S-006), Preece a = 10244 with d in inches (S-042b).
-3. Only after that did I read `src/core/calculators/{thermal-via,fusing}/*`. I ran the app's `compute()` from one scratch vitest file using the repo's installed vitest (`node_modules/.bin/vitest --config <scratch config>`). There was no `npm install`, no worktree and no change to `node_modules`, and the scratch files were deleted afterwards. The repo's own Phase 4 suites pass (4 files, 215 tests).
+1. I read `docs/phases/phase-4.md`, the ledger diff `3420891..2107b42` (S-003d, S-042, S-042a, S-045), the source notes "Validator follow-up pass" and OPEN_RISKS "Phase 4 core fixes" CF-1 to CF-15. That is where the new behaviour is specified. I did not open `src/` at this stage.
+2. I wrote a fresh oracle in the session scratchpad: `C:\Users\HI\AppData\Local\Temp\claude\f--pcb-calc-pcb-calc-kit-v2-pcb-calc\99d32e0b-fc16-48ae-91eb-d1507f3e8c9e\scratchpad\oracle4b.py`. It uses python3 and `math` only. It does not import `tools/reference` or `src/`. Constants come from the ledger:
+   - ρ20 = 1/58e6 and α20 = 0.00393 (S-004);
+   - D = 8890 (S-003d);
+   - Tm = 1084.62 °C (S-042c);
+   - c = 385 or 386 (S-042d);
+   - k = 401 or 391 (S-007);
+   - 1 cmil = (π/4)·(25.4 µm)² (S-006);
+   - Preece a = 10244 with d in inches (S-042b).
+3. Only after that did I read `src/core/calculators/{thermal-via,fusing}/{guards,calc,meta}.ts`. I ran the app's `compute()` from a scratch vitest file in the scratchpad, using the repo's installed `node_modules/.bin/vitest` with a scratch config.
+   - There was no npm install or ci, no worktree, and no change to `node_modules`, `src/` or `tests/`.
+   - I deleted the scratch test and config afterwards.
+   - The repo's own Phase 4 suites pass: thermal-via, fusing, both view-models and the result schema (5 files, 423 tests).
 
-## Results: thermal via (θ in K/W; d finished hole, t plating, L barrel length)
-
-| Case | Inputs | Quantity | Oracle | App | Rel. err |
-|---|---|---|---|---|---|
-| G1 golden | d 0.3 mm, t 25 µm, L 1.6 mm, k 401, N 1 | θ_array | 156.31562 | 156.31562 | 0 |
-| G2 golden | as G1, N 9 | θ_array | 17.368402 | 17.368402 | 0 |
-| G3 golden | d 0.2 mm, t 18 µm, L 1.0 mm, k 391, N 4 | θ_array | 51.866194 | 51.866194 | 0 |
-| G4 golden (copper fill) | as G1, filled, k_fill 401 | θ_via (= L/(k·π·(d/2+t)²)) | 41.471490 | 41.471490 | 0 |
-| G5 golden (fill + ΔT) | as G1, k 391, N 16, k_fill 3.5, P 2 W, fab-average plating | θ_array / ΔT | 9.7772282 / 19.554456 K | same | 0 / 0 |
-| B1 boundary (small) | d 0.1 mm, t 10 µm, L 0.2 mm, N 1 | θ_array | 144.32550 | 144.32550 | 2e-16 |
-| B2 boundary (large N) | d 1.0 mm, t 50 µm, L 3.2 mm, k 391, N 100 | θ_array | 0.49620832 | 0.49620832 | 0 |
-| OOR (must warn) | t 0.3 mm ≥ d 0.2 mm | θ_array | 8.4670959 | 8.4670959 | 0; check fails, `PLATING_EXCEEDS_HOLE` warning, low (score 6) |
-| R1 random | d 0.4471 mm, t 31.7 µm, L 2.37 mm, N 7, k_fill 8.3, P 0.75 W | θ_array / ΔT | 16.577162 / 12.432871 K | same | 0 / 0 |
-| Degenerate | d = 0, NaN d, L = ∞, t < 0, N = 0, N = 2.5, no kMaterial, filled without k_fill, k_fill with fill none, P < 0, d given as an area, no plating | all | reject | INVALID_INPUT / DIMENSION, every one | n/a |
-
-Every case returns data status CONFLICT and confidence low (4). The warnings 1-D estimate, receiving copper CONFLICT, bulk k, ideal parallel and NOT_THETA_JA are always present. EQUAL_SHARING appears when N > 1, and the FAB_AVERAGE, FILL and RISE warnings appear when their condition applies.
-
-Sensitivity (±1 %, ±10 %, base G1): d −10 % gives θ +10.17 %; t −10 % gives +11.97 %; L scales exactly; N follows 1/N. The direction is correct each time and every value equals the oracle. Analytic check: θ ∝ 1/[t·(d+t)], so for d +10 % the ratio is 0.325/0.355 = 0.9155, i.e. −8.45 %, which is what the app gives. Neither calculator has a sensitivity or tolerance readout (`toleranceInputs: []`), so there is no readout to compare.
-
-## Results: fusing (A in m²; Ta initial conductor temperature; default c = 385 J/(kg·K))
+## Results: thermal via, diameter basis (θ in K/W; L barrel length; k Cu)
 
 | Case | Inputs | Quantity | Oracle | App | Rel. err |
 |---|---|---|---|---|---|
-| G1 golden (research sanity case) | trace 0.254 mm × 35 µm finished, Ta 20 °C, I 10 A | t_adiabatic / t_Onderdonk / Preece | 0.065692750 s / 0.066719786 s / 2.7770129 A | same | 0 / 4e-16 / 0 |
-| G2 golden | area 0.035 mm², Ta 25 °C, I 30 A | t_adiabatic / ratio O/A | 0.11179985 s / 1.0156231 | same | 0 / 4e-16 |
-| G3 golden (time mode, c 383.48) | trace 0.5 mm × 70 µm, Ta 85 °C, t = 0.03496029 s | I_adiabatic / I_Onderdonk | 50.000000 A / 50.486182 A | same | 0 / 3e-16 |
-| G4 golden (I²t mode, c 386) | wire d 0.5 mm, Ta 25 °C, I²t 50 A²s | melting I²t / fraction | 3174.9288 A²s / 0.015748385 | same | 4e-16 / 4e-16 |
-| B1 boundary | trace 0.15 mm × 17.5 µm, Ta −40 °C, I 5 A, c 386 | t_adiabatic | 0.026723738 s | same | 0 |
-| B2 boundary | area 0.07 mm², Ta 150 °C (upper edge), I 10 A | t_adiabatic | 3.0514683 s | same | 0; `OVER_1S` warning |
-| OOR Ta (must warn) | Ta 200 °C | t_adiabatic | 0.076356840 s | same | 0; check fails, low (score 6) |
-| OOR > 10 s | trace 1.0 mm × 600 µm, I 50 A | t_adiabatic | 11.827967 s | same | 0; thickness check fails, `OVER_1S` warning, `OVER_10S` critical |
-| Nominal foil | trace 1.0 mm × 35 µm nominal, I 5 A | t_adiabatic | 4.0247945 s | same | 0; `THICKNESS_NOMINAL`, safety default |
-| Unit pitfall mil² | area "100 mil2" (square mils, = 127.32 cmil), I 1 A | I²t adiabatic / Onderdonk | 341.88693 / 347.22826 A²s | same | 5e-16 / 0 |
-| R1 random | trace 0.3817 mm × 43.2 µm measured, Ta 61.3 °C, t 0.2173 s | I_adiabatic | 9.7211770 A | same | 0 |
-| Degenerate | Ta = Tm, I = 0, current + time together, NaN area, no Ta, Ta given as a ΔT, trace without basis, free-form c = 400, area + wire together, I²t < 0 | all | reject | OUT_OF_DOMAIN / INVALID_INPUT / DIMENSION, every one | n/a |
+| G1 golden (drill = finished equivalence) | D 0.35 mm drill, t 25 µm, L 1.6 mm, k 401, N 1 | θ_array / d used | 156.31562 / 0.300 mm | same | 0 / 0 |
+| G1' (same via, finished basis) | d 0.30 mm finished, same | θ_array | 156.31562 (identical to G1) | same | 0 |
+| G2 golden | as G1, N 9 | θ_array | 17.368402 | same | 0 |
+| G3 golden (drill + fill) | D 0.25 mm drill, t 18 µm, L 1.0 mm, k 391, N 4, k_fill 3.5 | θ_array / d | 47.568932 / 0.214 mm | same | 0 / 0 |
+| G4 golden (copper fill, drill) | as G1, k_fill 401 | θ_via (= L/(k·π(d/2+t)²)) | 41.471490 | same | 0 |
+| B1 boundary (thin, t near D/4) | D 0.1 mm, t 24.9 µm, L 0.2 mm | θ / d | 84.897806 / 50.2 µm | same | 0 / 0 |
+| OOR (must warn) | D 0.3 mm drill, t 120 µm (d = 60 µm < t) | θ | 58.799277 | same | 0; check fails, `PLATING_EXCEEDS_HOLE`, low |
+| R1 random | D 0.4471 mm drill, t 31.7 µm, L 2.37 mm, k 391, N 7, k_fill 8.3, P 0.75 W | θ / ΔT | 19.759014 / 14.819260 K | same | 3.6e-16 / 4.8e-16 |
+| Degenerate | t = D/2 drill; t > D/2 drill; no `diameterBasis`; `diameterBasis: "Drill"` | n/a | reject | OUT_OF_DOMAIN on `platingThickness` (twice); INVALID_INPUT on `diameterBasis` (twice) | n/a |
 
-Sensitivity (G2 base): I −10 % gives t +23.46 % (1/0.81); A +10 % gives +21.0 % (1.1²); Ta ±10 % gives ∓0.59 %. Directions are correct and every value equals the oracle.
+All accepted runs return confidence low. THERMAL_RELIEF_NOT_MODELLED is always present. The new result "finished hole diameter used in the calculation" equals D − 2t, with the note "derived from the entered DRILL diameter".
 
-Constant checks (my arithmetic):
-- K = D·c/(ρ20·α20) = 5.0512e16 A²·s/m⁴ at c = 385. Its units reduce correctly: kg/m³ · J/(kg·K) / (Ω·m · K⁻¹) = A²·s/m⁴.
-- Against the IEC form as reproduced by myCableEngineering: Qc(β+20)/ρ20 = 3.45e-3 · 254.5 / 17.241e-6 = 50 926 A²s/mm⁴, and k = 226 gives 51 076. Ours is 50 512, which is 0.8 % and 1.1 % lower. This is consistent with S-042a.
-- At Ta 20 °C and Tm 1083 °C our constant gives t = 0.02133·(A_cmil/I)², which reproduces Brooks & Adam's 0.0213. Onderdonk gives 0.021659. The two differ by 1.6 %, which confirms the S-042 CONFLICT.
-- Preece: a·(4/π)^0.75 = 12 278.7 for A in in². This confirms the ledger's 12279 against Brooks' 12277.
+Sensitivity (drill basis; base D 0.35 mm, t 25 µm):
 
-## Formula-by-formula comparison (after the blind recomputation)
+| Perturbation | −10 % | −1 % | +1 % | +10 % |
+|---|---|---|---|---|
+| D | +12.069 % | +1.089 % | −1.065 % | −9.722 % |
+| t | +10.263 % | +0.933 % | −0.914 % | −8.386 % |
+
+All 8 values equal the oracle. The directions are correct: in the drill basis dA/dt = π(D − 2t) > 0, so more plating lowers θ. Neither calculator has a sensitivity or tolerance readout (`toleranceInputs: []`), so there is no readout to compare.
+
+## Results: fusing, end temperature and via barrel (A m²; default c 385)
+
+| Case | Inputs | Quantity | Oracle | App | Rel. err |
+|---|---|---|---|---|---|
+| G1 regression | trace 0.254 mm × 35 µm finished, Ta 20 °C, I 10 A | t to melt | 0.065692750 s | same | 0 (unchanged from the first report) |
+| G2 golden (Te) | as G1, Te 150 °C | t to Te / t to melt | 0.016475618 s / 0.065692750 s | same | 0 / 0 |
+| G3 golden (Te, time mode) | as G1, t 10 ms, Te 150 °C | I to Te | 12.835738 A | same | 0 |
+| G4 golden (Te, I²t mode) | area 0.035 mm², Ta 25 °C, I²t 5 A²s, Te 260 °C | I²t to Te / fraction to Te / fraction to melt | 39.903472 / 0.12530238 / 0.049691978 | same | 0 / 0 / 0 |
+| G5 golden (Te in K) | area 0.035 mm², Ta 25 °C, I 30 A, Te 533.15 K | t to Te | 0.044337191 s (= Te 260 °C) | same | 0 |
+| G6 (c 386) | trace 0.5 mm × 70 µm, Ta 85 °C, I 50 A, Te 300 °C | t to Te | 0.012770822 s | same | 0 |
+| B1 boundary Te = Tm | area 0.035 mm², Ta 25 °C, I 30 A, Te 1084.62 °C | t to Te = t to melt | 0.11179985 s | same | 0 |
+| V1 golden (via) | d 0.3 mm finished, t 25 µm, Ta 25 °C, I 20 A | area / t melt / t Onderdonk / Preece | 2.5525440e-8 m² / 0.13379322 s / 0.13588349 s / 6.1253586 A | same | 0 / 0 / 4e-16 / 0 |
+| V2 (via, Te) | as V1, Te 200 °C | t to Te | 0.042415391 s | same | 0 |
+| V3 boundary (via, 1 ms) | as V1, t 1 ms | I to melt | 231.33804 A | same | 0 (no SUB_MS: the threshold is strictly below 1 ms) |
+| V4 (via, cold) | d 0.2 mm, t 18 µm, Ta −40 °C, I²t mode | I²t to melt | 14.696359 A²s | same | 0 |
+| OOR via (must warn) | d 0.1 mm, t 150 µm | t melt | computed | n/a | check "via plating below finished hole" fails, OVER_1S, low |
+| Sanity edge | area exactly 1 m², I 1e6 A | t melt | 82138.663 s | same | 0; OVER_1S and OVER_10S |
+| Degenerate | Te = Ta; Te 1085 °C; Te given as a ΔT; via without plating; via + area together; via d 2 m; area 1.0001 m²; wire 1.2 m; trace width 2 m; via t 0.6 m (area > 1 m²) | n/a | reject | OUT_OF_DOMAIN on `endTemperature` (twice); DIMENSION on `endTemperature`; INVALID_INPUT on `viaPlatingThickness`; INVALID_INPUT on `geometry`; OUT_OF_DOMAIN sanity on `viaHoleDiameter`, `geometry`, `wireDiameter`, `traceWidth`, `geometry` | n/a |
+
+Sensitivity (via d 0.3 mm, t 25 µm, Ta 25 °C, I 20 A, Te 200 °C):
+
+| Perturbation | −10 % | −1 % | +1 % | +10 % |
+|---|---|---|---|---|
+| Te | −9.142 % | −0.895 % | +0.891 % | +8.731 % |
+| d | −17.610 % | −1.838 % | +1.855 % | +19.314 % |
+
+All values equal the oracle. The directions are correct: the time rises with Te and with area².
+
+Unit checks:
+- Te is an absolute temperature, and a ΔT is rejected with DIMENSION.
+- K input gives the same result as the equivalent °C.
+- The end-temperature I²t uses the same K and β20 as the melt I²t, as S-042a allows ("replace Tm by Tf").
+- The fusing via uses π·t·(d + t) with d finished. The UI field says "Via finished hole diameter (not the drill)". The drill basis for the fusing via is deferred, which OPEN_RISKS CF-3 discloses.
+
+## Formula-by-formula comparison (new steps only)
 
 | Step | Expected (my derivation) | Implementation | Match |
 |---|---|---|---|
-| Barrel area | π·t·(d+t), d finished | `Math.PI * t * (d + t)` | yes |
-| Barrel θ | L/(k·A) | `L / (k.value.si * areaOne)` | yes |
-| Core θ | L/(k_fill·π·d²/4) | same | yes |
-| Parallel | 1/(1/θb + 1/θc) | same | yes |
-| Array | θ/N, N an integer ≥ 1 | same; non-integer rejected | yes |
-| ΔT | θ·P, dimension ΔT (not absolute T) | `mul(THERMAL_RESISTANCE, POWER)`; a test asserts TEMPERATURE_DIFFERENCE | yes |
-| β20 | 1/α20 − 20 = 234.4529 °C | same | yes |
-| Adiabatic I²t | A²·K·ln[(Tm+β)/(Ta+β)], Ta and Tm in °C | `toUnit(Ta,'degC')`, natural log | yes |
-| Onderdonk | A_cmil²·log10[(Tm+234)/(Ta+234)]/33 | log10, 234 + Ta, 33 inside the root | yes |
-| cmil | (π/4)·(25.4e-6)² = 5.0670748e-10 m² | same | yes |
-| Preece | 10244·(d_in)^1.5, d = √(4A/π) | same, converted to inches | yes |
-| t / I | I²t/I², √(I²t/t) | same | yes |
+| Drill basis, finished hole | d = D − 2t; reject 2t ≥ D | `enteredDiameter.si - t2`; `t2 >= D` → OUT_OF_DOMAIN | yes |
+| Drill barrel area | π·t·(D − t) ≡ π·t·(d + t) | `Math.PI * t * (d + t)` with d = D − 2t | yes (identity checked numerically: 2.5525440e-8 both ways) |
+| Drill fill core | π·d²/4, d finished | same d | yes |
+| Plausibility (thermal via) | t < d, finished | `t < d` on the derived d | yes |
+| Fusing I²t to Te | A²·K·ln[(Te+β20)/(Ta+β20)] | same, `toUnit(Te,'degC')` | yes |
+| Te bounds | Ta < Te ≤ Tm | `teC <= taC` reject; `teC > Tm + 1e-9` reject | yes |
+| t, I, fraction to Te | I²t_e/I², √(I²t_e/t), I²t_user/I²t_e | same | yes |
+| Via barrel area (fusing) | π·t·(d + t) | same | yes |
+| Sanity limits | reject absurd magnitudes, labelled not sourced | area > 1 m², any length > 1 m → OUT_OF_DOMAIN, text "input sanity limit … not a sourced limit" | yes |
+| notChecked | a paywalled item is neither passed nor failed | IPC scope item `ok:false, notChecked:true`; confidence still low from the score (P4-1) | yes |
 
 Pitfalls checked:
-- d is the finished diameter, and the UI says "not the drill".
-- Square mils are not circular mils. `mil2` parses as square mils, and there is no `cmil` unit, so a typed circular-mil value is refused rather than misread.
-- A foil weight in oz/ft² is converted by the core `foilThickness` and forced to basis `nominal`, which adds the safety-relevant default.
-- Ta is an absolute temperature; a ΔT input is rejected.
-- Neither Onderdonk mis-transcription (234 − Ta, 33·t outside the root) is present.
+- Finished vs drill is explicit in both calculators and is never defaulted.
+- The via barrel uses π·t·(d+t) on the finished diameter.
+- ΔT and absolute temperature are kept separate.
+- No laminate Tg/Td value exists in the code or the ledger. The end temperature is the user's own value and is labelled "your value, not checked".
 
 ## Claim audit
-- Fusing: the title, results, recommendation and UI headline labels all say "estimate, not a fuse rating", "not a safe overload limit" and "time to REACH the melting point". No positive rating language exists.
-- Thermal via: the title says "lower bound, not a design constant". The `NOT_THETA_JA` warning is always present, the UI callout says "Not theta-JA, not theta-JC", and the S-040 note says nothing here derives θJA.
-- No "compliant", "production safe" or "fab-ready" text appears in either calculator or its UI view model.
-- IPC scope: a validity check is always `ok: false` and labelled "PAYWALLED, not checked". The UI renders it as "not checked" (P4U-2). This is honest.
-- Thresholds: the `OVER_1S` and `OVER_10S` texts and the meta comment say "product choices, not sourced limits". They are warnings and never refuse a result (Q-57).
+- Fusing: the title, recommendation, NOT_A_RATING warning, UI headline labels and live-region text all say "not a fuse rating" and "not a safe overload limit". The melt fraction is named "(not a safety margin)" and carries that note. The end-temperature results say "(your value, not checked)". BOARD_DAMAGE_BELOW_MELTING is always present.
+- Thermal via: NOT_THETA_JA is always present; the UI says "Not theta-JA, not theta-JC".
+- Neither calculator, nor its view-model or page, contains "compliant", "production safe" or "fab-ready".
+- Lower-bound wording: every core and UI string is qualified ("usually … not assured") EXCEPT the core `RISE_IS_LOWER_BOUND` text (N-1).
+- New overclaim: THERMAL_RELIEF_NOT_MODELLED says relief connections "usually dominate the real behaviour". S-045 supports only "adds (high) thermal resistance", with no magnitude (N-2).
 
-## Source table (my re-check, 2026-10-19)
+## Source table (re-check 2026-10-19, changed rows only)
 
-| Claim (ledger) | URL | Status in ledger | My finding |
+| Claim (ledger) | URL | Ledger status | My finding |
 |---|---|---|---|
-| θ = L/(k·A), annulus area (S-041) | https://ti.com/document-viewer/lit/html/SPRADB7/GUID-DD5100C1-40A7-405D-AEC4-9F30DC88A553 ; https://web.mit.edu/16.unified/www/FALL/thermodynamics/notes/node118.html | VERIFIED | Confirmed. TI gives area "π * [ (Drill Hole Radius)² - (Drill Hole Radius - plating thickness)² ]", which equals π·t·(D−t) = π·t·(d+t). TI calls it "a general rule of thumb" and prints λ(Cu) "4 W/m·K" (typo, as the ledger notes). Honest. |
-| θ/N ideal (S-041b) | https://www.electronics-cooling.com/2004/08/thermal-vias-a-packaging-engineers-best-friend/ | VERIFIED (ideal only) | Confirmed quote: "The total resistance is equal to the resistance for a unit cell divided by the total number of vias." |
-| 1-D underestimates θ; vias ineffective without a plane (S-041c) | Guenin as above; https://pcdandf.com/pcdesign/index.php/editorial/menu-features/17991-thermal-vias-are-ineffective-here-s-why | CONFLICT | Confirmed. Guenin: "The error exceeds 10% … as high as 27% for 9 through 16 vias", "the calculation underestimates the thermal resistance". Brooks & Adam: "if no lower pad or plane is present, the thermal vias have almost zero effect"; "Stop wasting time and board area on thermal vias." The CONFLICT on usefulness is honest and is displayed. |
-| Filled via in parallel (S-041a) | derived | UNVERIFIED | Correct; the algebra is consistent (a copper fill gives a solid cylinder). |
-| Plated barrel k (S-041d) | not found | UNVERIFIED | Correct. |
-| θJA caveat (S-040) | https://www.electronics-cooling.com/2019/11/jedec-thermal-standards-developing-a-common-understanding/ | VERIFIED (caveat text only) | Confirmed: "the predictions cannot be expected to be accurate for different environmental conditions or for different test board design." |
-| Onderdonk form (S-042) | https://classicconnectors.com/fault-current-and-the-effects-on-clampstar/ | UNVERIFIED | Confirmed as printed: "33 (I/A)2 S = log [(Tm – Ta / 234 + Ta) + 1]", A in circular mils, no log base. A search-engine snippet (not a page read) also shows "I = A*(log(1 + (Tm-Ta)/(234+Ta))/33*s).5" attributed to a PCB design article. It supports 33·s under the root and 234 + Ta, but it is a snippet, so UNVERIFIED stays correct. The Brooks & Adam 2015 and 2023 pages and Signal Integrity Journal 2020 show the equation only as an image (rechecked). |
-| Adiabatic physics (S-042a) | https://www.pcdandf.com/pcdesign/index.php/editorial/menu-features/10179-pcb-design-1507 ; https://mycableengineering.com/the-adiabatic-equation/ | UNVERIFIED (derived) | Correct status. The IEC form as reproduced is k = √[Qc(β+20)/ρ20 · ln((β+θf)/(β+θi))] with "Values are suitable for durations up to 5 seconds". It is algebraically identical to ours (1/α20 = β+20). |
-| Preece (S-042b) | Brooks 2015 as above; https://www.nessengr.com/technical-data/fuse-equations/ | VERIFIED | Confirmed. Brooks: "a is a constant (10244 for copper)", d in inches, Eq. 2 "12277*A3/4". Ness: copper "10,244", "d is the fuse element diameter in inches" (the equation itself is an image). Ness does NOT give Onderdonk, which is consistent with the ledger only citing it for Preece. |
-| Cu melting point (S-042c) | https://its90.nist.gov/Overview | VERIFIED | Confirmed: "freezing point of Cu at 1357.77 K (1084.62 ° C)". |
-| Specific heat (S-042d) | https://aries.pppl.gov/LIB/PROPS/PANOS/cu.html ; https://hyperphysics.gsu.edu/hbase/Tables/sphtt.html | CONFLICT | Confirmed: PPPL 383.48 (293 K), 385.00 (300 K), 506.00 (1300 K); HyperPhysics 0.386 J/(g·K). PPPL also lists density 8933 kg/m³ and melting point 1083 °C. They are not used, and S-003d (8890, IACS) governs. The CONFLICT is honest (0.7 %). |
-| PCB validity / not a rating (S-042e) | https://www.pcdandf.com/pcdesign/index.php/magazine/10293-pcb-design-1509 | UNVERIFIED (one author group) | Confirmed: "actual fusing currents can be 1.5 to 6.0 times larger than Onderdonk suggests"; plane 12 mil below "from around 33% to over 100%"; "considered a destructive failure". 2023 article: "cooling effect kicks in very quickly, less than 1.5 sec". |
-| IPC scope (S-042f) | Brooks 2015 as above | PAYWALLED-USER-MUST-VERIFY | Confirmed secondhand: "falls outside the scope of IPC-2152". No IPC document was read by me either. |
+| S-045 primary: spokes have high thermal resistance; connect thermal vias around the full circumference | https://ti.com/document-viewer/THS3095/datasheet/GUID-264019F5-1035-4577-8A67-69D99B217A95 | VERIFIED (caveat only) | Confirmed in SLOS423K (rev. Apr 2023) §9.4.1.1.1: "do not use the typical web or spoke via connection methodology"; "Web connections have a high thermal resistance"; "complete connection around the entire circumference". The hole "0.01 inch (0.254 mm)" and "solder wicking" text is also confirmed (DFM note only). |
+| S-045 second source: fabricator blog | https://jlcpcb.com/blog/thermal-relief-pad-design | as above | Confirmed: "Tabs and exposed pads stay solid because moving heat is their whole purpose"; "set exposed pads to direct connect". Published 2026-08-22, updated 2026-08-24, no author. The page never says "thermal resistance"; it says "Spokes make a joint solderable and resistive at once". Ledger inaccuracy: the ledger says "mΩ-per-spoke figures", but the page gives "1 to 3 milliohms per pad" (N-4). The page also quotes an IPC-7093 "50%" voiding limit (paywalled, secondhand); it must not enter code. |
+| S-045 candidate extra source (not in the ledger) | https://learnemc.com/qotw-230424 | n/a | "Thermal reliefs are intended to aid in the soldering process. They prevent the planes from pulling too much heat away from the component pad or pin." (LearnEMC, 2023-04-24, no author shown.) This is an independent, educational publisher that supports the physical mechanism. I recommend adding it as a supporting source. TI SLMA004 and SLOA120 repeat the TI wording (search snippets), but they are the same publisher, so they are not independent. |
+| S-003d note: pure copper density 8933 (reference only) | https://aries.pppl.gov/LIB/PROPS/PANOS/cu.html | VERIFIED row unchanged; note only | Confirmed: Table 1 at 293 K gives "8933"; the general properties give "8.96 g/cm3". 8933/8890 = 1.00484 (my arithmetic). The note is correctly reference-only, and S-003e stays CONFLICT. The code assumption text gives "about 0.5 % … higher, not used", which agrees, but it cites no ledger id (N-7). |
+| S-042 note: Brooks & Adam printed constants do not reproduce 0.0213 | https://www.pcdandf.com/pcdesign/index.php/editorial/menu-features/10179-pcb-design-1507 | UNVERIFIED row unchanged; note only | Confirmed as printed: "1.75×10-8", "8900 kg/m³", "385 J/kgK", "0.00393 1/K", "c = 0.0213 in circular mils". My arithmetic: the printed constants give 0.021034; ours (1/58e6, 8890) give 0.021326, which matches their 0.0213. The note and its "do not tune" instruction are correct. |
+| S-042a note: any end temperature Tf below melting | derived | UNVERIFIED (derived) | Correct algebra: integrating dT from Ta to Tf instead of Tm needs no new source. No laminate value appears in the ledger or the code. Correct. |
 
-Status honesty: all 13 rows are honest. No row is over-claimed. S-042 could cite the snippet as a supporting transcription, but that does not justify an upgrade.
+### Opinion: is a fabricator blog an acceptable second source for VERIFIED on a qualitative caveat?
+Under the project rule (source-verification skill: "two independent sources agree, at least one tier 1-3"), S-045 qualifies. The TI datasheet is tier 3, JLCPCB is an independent publisher, and the two agree. My opinion is **acceptable for this row, with reservations**:
+- **Why it is acceptable:**
+  - The row holds no number.
+  - The claim is basic conduction physics that every source I found agrees on (TI, JLCPCB, LearnEMC; TI SLOA120 and SLMA004 by snippet).
+  - It is used only to add a warning that makes the app more cautious, never to compute or loosen anything.
+  - A wrong VERIFIED here cannot produce a wrong number.
+- **Why it is weak:**
+  - The JLCPCB page is a recent, unsigned marketing blog. Tier 5 in the skill lists "blogs" as "leads only", and the skill does not say whether a fabricator's blog counts as tier 3 "fabricator documentation" or tier 5.
+  - It contains unsourced numbers ("halve the heat path", mΩ per pad) and secondhand IPC-7093 claims.
+  - So it should never be the second source for anything quantitative or normative.
+- **Recommendation (MINOR, standards-researcher):**
+  - Add LearnEMC, or a non-TI device-maker application note, as an additional second source.
+  - Have the human clarify in the skill where fabricator blogs sit in the tiers.
+  - Keep the VERIFIED scope wording "qualitative caveat only, no number".
 
 ## Cross-checks (`tests/crosscheck/`)
-There are no Phase 4 records. No JSON file covers fusing or thermal-via θ. `X-01-via.json` explicitly says KiCad's via thermal resistance is NOT mapped. Status: **not yet obtained / none planned**. That is acceptable, because tool agreement would not upgrade any ledger row anyway.
+There are still no Phase 4 records: no JSON file covers fusing or thermal-via θ, and `X-01-via.json` does not map KiCad's via thermal resistance. Status: **not yet obtained / none planned**. This is acceptable because tool agreement cannot upgrade a ledger row.
+
+## Status of the earlier conditions
+
+| Earlier item | Status at 2107b42 |
+|---|---|
+| C4-1 lower-bound wording | Fixed in the title, recommendation, ONE_D, IDEAL, meta and UI. Residual: core RISE_TEXT (N-1). |
+| C4-2 fusing plausibility | Fixed and verified: area > 1 m² and lengths > 1 m are rejected; the exact edge 1 m² is accepted. |
+| C4-3 Preece date | Fixed: "Preece (1884 or 1888, sources conflict, see S-042b)". |
+| C4-4 cmil help | Fixed: "A circular mil is not a square mil, and cmil is not accepted"; unit hint "(not cmil)". |
+| C4-5 Brooks constants note | Fixed (S-042 note; I re-confirmed it). |
+| C4-6 unknown keys ignored | Unchanged (info, accepted). |
 
 ## Defects
 
 | # | Severity | Finding | Reproduction | Expected vs actual | Fix owner |
 |---|---|---|---|---|---|
-| C4-1 | MINOR | "This value is a lower bound" is stated without qualification. S-041b itself says that leaving out the dielectric parallel path OVERstates θ, which pushes the other way. For a 3×3 array at 1 mm pitch with FR-4 "about 0.6" W/m·K (Brooks & Adam 2024), the dielectric path is roughly 1.6e-3/(0.6·9e-6) ≈ 300 K/W against 17 K/W for the vias. Ignoring it overstates θ by about 5 %, against Guenin's +10 to 27 % understatement. The net direction is still usually "lower bound", but it is not guaranteed. | `thermal-via` G2 | Expected wording: "usually a lower bound (published FEA found the 1-D model underestimates θ); the dielectric path is omitted (small, conservative)". Actual: "this value is a lower bound". | calc-implementer (text), ui-engineer |
-| C4-2 | MINOR | Fusing `area` and `wireDiameter` geometries have no plausibility range, unlike trace thickness. `area = 1e10 m²` with I = 1e-10 A is accepted; only OVER_10S fires. | `fusing {area: 1e10 m², Ta 25 °C, current 1e-10 A}` | Expected: a validity check, as for thickness. Actual: none. | calc-implementer |
-| C4-3 | MINOR | The `meta.reference.standard` string says "Preece equation (1888)", but S-042b records a date CONFLICT (Ness 1884 vs Brooks 1888) and an unconfirmed DOI. | `meta.ts` | Expected: "Preece (1880s; copper constant per Brooks & Adam from the 1888 paper)". Actual: "(1888)". | calc-implementer |
-| C4-4 | MINOR | The area field help ("0.07 mm2 or 100 mil2") does not say that circular mils are not accepted and differ from square mils by 4/π. Typing `cmil` is refused, so this is safe, but users of wire tables think in cmil. | Fusing page, area field | Expected: help adds "square mils, not circular mils (1 cmil = π/4 mil²)". | ui-engineer |
-| C4-5 | MINOR (ledger note) | Brooks & Adam 2015 list ρ20 "1.75×10⁻⁸" and density 8900 kg/m³ as fetched. Those constants give 0.0210, not their stated 0.0213. Their 0.0213 is reproduced exactly with ρ20 = 1/58e6 and D = 8890 (my arithmetic). Possibly a rendering error; it does not affect the app, which uses S-003d and S-004. | none | Add to S-042 notes so nobody "fixes" the constants toward 8900 / 1.75e-8. | standards-researcher |
-| C4-6 | MINOR (info) | Unknown fields such as `meltingPoint` are silently ignored (Q-59, documented and tested). The UI does not offer the field. | `fusing {…, meltingPoint: 900 °C}` gives the same result as without it | Acceptable; it could reject unknown keys. | none required |
+| N-1 | MINOR | The core RISE_TEXT still says the temperature difference "is a lower bound on the real rise", without the qualifier (C4-1 residual). The UI power help is qualified, but the core warning message is shown as is. | `thermal-via` with `power` 0.75 W (R1); warning `RISE_IS_LOWER_BOUND` | Expected: "usually a lower bound … not assured". Actual: unqualified. | calc-implementer |
+| N-2 | MINOR | THERMAL_RELIEF_NOT_MODELLED says relief connections "usually dominate the real behaviour", which is stronger than S-045 (TI: "high thermal resistance"; no magnitude). S-045 is also missing from the thermal-via `meta.ledgerIds` and `reference.ledgerIds`, and the text does not cite it (the researcher flagged this as a calc-implementer follow-up). | any `thermal-via` run | Expected: "…adds a thermal resistance that is not modelled and can be large (ledger S-045)"; S-045 listed in the ids. Actual: unsourced "dominate"; no S-045 id. | calc-implementer |
+| N-3 | MINOR | The `diameterBasis` error text says a drill diameter entered as the finished hole "makes theta about 18 % too low for 25 um plating on 0.3 mm". In fact θ_wrong/θ_true = 0.275/0.325 = 0.846, i.e. 15.4 % too low. 18.2 % is how much HIGHER the true θ is (the research note's "+18 % θ" is right). | `thermal-via` without `diameterBasis` | Expected: "theta about 15 % too low (the real theta is about 18 % higher)". | calc-implementer |
+| N-4 | MINOR (ledger) | The S-045 notes describe JLCPCB "mΩ-per-spoke figures"; the page gives "1 to 3 milliohms per pad". The page also states an IPC-7093 50 % voiding limit, which the ledger should flag as secondhand and paywalled, never a constant. | LEDGER S-045 notes | Correct the wording; add the IPC-7093 voiding mention to the "not usable" list. | standards-researcher |
+| N-5 | MINOR (info) | The 1 s and 10 s thresholds and SUB_MS are evaluated on the time to MELT. With an end temperature Te, the time to Te is shorter and is not checked against SUB_MS. Example: V2 has t_Te 42 ms against t_melt 134 ms; a case with t_melt 2 ms and t_Te 0.6 ms would give no SUB_MS. This is disclosed in CF-1 ("Time thresholds stay on the time to melting"). | `fusing` via d 0.3 mm, t 25 µm, I 20 A, Te 200 °C | Consider also checking SUB_MS on the time to Te. | calc-implementer (optional) |
+| N-6 | MINOR (cosmetic) | Grammar in the shared DIMENSION message: "endTemperature must be a absolute temperature". | `fusing` with `endTemperature` as a ΔT | "an absolute temperature" | units-engine-engineer / calc-implementer |
+| N-7 | MINOR (traceability) | The fusing density assumption mentions "a pure-copper density reference … about 0.5 % … higher" with no ledger id. The value now has a ledger home (S-003d notes, S-003e). CF-7 is still OPEN in OPEN_RISKS although the researcher has done its part. | `fusing` assumptions[1] | Cite "S-003d notes / S-003e"; close CF-7. | calc-implementer, orchestrator |
 
-There are no numeric defects. The relative error is at most 6e-16 against my oracle across all 58 runs.
+There are no numeric defects. The maximum relative error is 4.8e-16 against my oracle across 36 value comparisons and 16 sensitivity cases.
 
 ## Conditions to log in OPEN_RISKS
-1. Q-54: the human confirms the default specific heat (385.00 J/(kg·K), a product choice).
-2. Q-56: the human reads the IPC-2152 scope clause and IPC-2221 §6.2 for fusing or short-time currents (S-042f).
-3. P4-1: confidence can never exceed `low` under the current weights. This was accepted by the orchestrator; it remains a human decision whether to change the rule.
-4. Fix C4-1 to C4-4 (text and plausibility only) when the phase is next touched.
+1. Q-54: the human confirms the default specific heat (385.00 J/(kg·K), a product choice). Carried over.
+2. Q-56: the human reads the IPC-2152 scope clause and IPC-2221 §6.2 for fusing or short-time currents (S-042f). Carried over.
+3. P4-1: confidence can never exceed `low` under the current weights; this is a human decision. Carried over.
+4. N-1 to N-7 (text, ids and ledger wording only) when the phase is next touched.
+5. Strengthen S-045 with a non-blog second source, and have the human clarify the tier of fabricator blogs in the source-verification skill.
 
 ## What I could NOT verify
-- No original Onderdonk document exists online. The Brooks & Adam equation images (2015, 2020, 2023) are not machine-readable. The 1928 GE Review (Stauffacher) was not found. The Artech House blog returned 403.
-- I did not read the Preece 1888 Proc. R. Soc. paper (primary source), so the DOI remains unconfirmed.
-- I did not read IEC 60364-5-54 Annex A (paywalled); I saw only reproductions. I did not read IPC-2152 or IPC-2221B/C, or JEDEC JESD51 (it needs a login).
-- I found no measured thermal conductivity for plated via-barrel copper, and no independent experimental trace-fusing data (S-042e has one author group).
-- I could not check Guenin's spreading equations or the Brooks & Adam simulation set-up, because the equations are images.
-- I did not check the UI live in a browser (out of my tools). The view-model tests pass and the text was audited from source.
+- No PDF was read by me: TI SLOA120, SLMA002/SLMA004 and SLOA122, MACOM S2083 and Active-Semi AN-104 were seen as search snippets only. I did not read IPC-7093 (paywalled), IPC-2152, IPC-2221B/C or IEC 60364-5-54.
+- There is no measured spoke or relief thermal resistance from an independent source, so the magnitude behind "dominate" (N-2) is unverified.
+- The fusing via drill basis and N parallel vias are not built (deferred in CF-3), so they were not tested.
+- Everything listed in the first report remains: no Onderdonk original, Preece 1888 not read, the Brooks & Adam equation images, and no plated-barrel k measurement.
+- I did not check the UI live in a browser. The UI strings were audited from source, and the view-model tests pass.

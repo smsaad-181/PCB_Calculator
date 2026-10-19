@@ -23,6 +23,8 @@ interface Props {
   readonly callouts?: readonly CalloutView[];
   /** Shown directly under the headline, before every callout (for example a time warning that changes how the headline reads). */
   readonly underHeadline?: ComponentChildren;
+  /** Shown first, above the headline (for example the user's own end-temperature result, which answers their question before the melting result). */
+  readonly aboveHeadline?: ComponentChildren;
   /** Extra content directly under the headline and its callout (for example a min/typ/max row). */
   readonly afterHeadline?: ComponentChildren;
 }
@@ -30,10 +32,11 @@ interface Props {
 const DEFAULT_FAILED_HINT = 'This input or result is outside the stated range, so the result is less reliable. See the confidence reasons.';
 
 /** Quick answer first (headline, status, confidence with reasons, warnings); details are in an expandable section. */
-export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, callouts, afterHeadline, underHeadline }: Props) {
+export function ResultsPanel({ view, failedCheckHint, failedHintFor, callout, callouts, afterHeadline, underHeadline, aboveHeadline }: Props) {
   const v = view;
   return (
     <div class="results">
+      {aboveHeadline}
       <p class="answer-label">{v.headline.label}</p>
       <p class="answer">{v.headline.text}</p>
       <p class="muted">{v.headline.meaning}</p>

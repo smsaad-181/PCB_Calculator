@@ -69,7 +69,7 @@ export function readQuantity(raw: Raw, name: string, dim: Dim, dimName: string, 
     return bad('INVALID_INPUT', name, `${name} must be a quantity with a numeric value and a dimension.`);
   }
   const qty = v as Quantity;
-  if (!hasDim(qty, dim)) return bad('DIMENSION', name, `${name} must be a ${dimName}.`);
+  if (!hasDim(qty, dim)) return bad('DIMENSION', name, `${name} must be ${/^[aeiou]/i.test(dimName) ? 'an' : 'a'} ${dimName}.`);
   const n = qty.si;
   if (Number.isNaN(n)) return bad('INVALID_INPUT', name, `${name} is NaN (not a number); it must be a finite number.`);
   if (!Number.isFinite(n)) return bad('INVALID_INPUT', name, `${name} is infinite; it must be a finite number.`);

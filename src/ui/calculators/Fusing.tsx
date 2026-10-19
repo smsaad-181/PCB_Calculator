@@ -66,6 +66,19 @@ function Results({ view }: { view: FusingView }) {
         <ResultsPanel
           view={view.result}
           failedCheckHint={RANGE_HINT}
+          aboveHeadline={
+            view.endTempHeadline !== undefined && (
+              <div class="end-temp-headline">
+                <p class="answer-label">{view.endTempHeadline.label}</p>
+                <p class="answer">{view.endTempHeadline.text}</p>
+                {view.endTempHeadline.note !== undefined && (
+                  <p class="muted">
+                    <strong>Note:</strong> {view.endTempHeadline.note}
+                  </p>
+                )}
+              </div>
+            )
+          }
           underHeadline={<WarningList warnings={view.headlineWarnings} />}
           callouts={view.callouts}
           afterHeadline={

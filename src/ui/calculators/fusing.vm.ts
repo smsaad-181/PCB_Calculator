@@ -128,7 +128,18 @@ export const I2T_HELP =
   'The integral of i squared over time for your pulse (not I rms times an arbitrary time). For a protective fuse use its total clearing I2t at your fault current (from its datasheet), not its melting I2t. Example: 40 A2s. With no duration, the 1 s and 10 s warnings cannot be checked.';
 export const TE_HELP =
   'Optional. From your laminate datasheet (e.g. glass transition/decomposition), no default. Board damage occurs far below the copper melting point. It must be above the initial temperature and below the melting point.';
-export const NOT_MEANINGFUL_TEXT = 'Not meaningful for this model: the conductor would not fuse in a short pulse; use the self-heating calculator';
+export const NOT_MEANINGFUL_TEXT =
+  'Outside this model: beyond 10 s, heat loss to the board and air dominates, so a short-pulse melt time is not meaningful here; use the trace self-heating calculator';
+const CUE_OVER_1S =
+  'Beyond 1 s the adiabatic assumption weakens. The 1 s threshold is a product choice, not a sourced limit: treat this time with caution.';
+const CUE_OVER_10S =
+  'Beyond 10 s heat loss to the board and air dominates, so this time is not meaningful here. The 10 s threshold is a product choice, not a sourced limit: use the trace self-heating calculator.';
+const TIME_END_NAME = 'adiabatic time to reach your end temperature';
+const END_NAME_BY_MODE: Readonly<Record<'current' | 'time' | 'i2t', string>> = {
+  current: TIME_END_NAME,
+  time: 'adiabatic current to reach your end temperature in the pulse time',
+  i2t: 'your I²t as a fraction of the I²t to reach your end temperature',
+};
 export const CONVENTION_HELP = 'How a foil weight becomes a thickness. Conventions differ by a few percent (ledger S-003, CONFLICT).';
 export const CP_HELP = 'The sourced values disagree by under 1 percent and time scales linearly with it. They are not averaged. The default is a product choice that needs your confirmation.';
 
@@ -442,6 +453,8 @@ export type FusingView =
       readonly suppressedHeadline?: { readonly label: string; readonly text: string };
       /** Warnings shown directly under the headline (the 1 s warning, between 1 s and 10 s), removed from the list. */
       readonly headlineWarnings: readonly WarningView[];
+      /** Present only when an end temperature was entered: the user's own criterion, shown above the melting result (PCB m-N4). `note` is the 1 s / 10 s cue. */
+      readonly endTempHeadline?: { readonly label: string; readonly text: string; readonly note?: string };
       /** Validity checks that failed, and checks that could not be made (a paywalled standard): never the same count. */
       readonly failedChecks: number;
       readonly notCheckedCount: number;
@@ -572,7 +585,7 @@ export function computeView(s: FusingState): FusingView {
     lengthRoleByName: THICKNESS_NAMES,
     labels: RESULT_LABELS,
     extraProvenance: extra,
-    pinWarningCodes: ['OVER_10S', 'OVER_1S', 'THICKNESS_NOMINAL', 'SUB_MS_PULSE', 'BOARD_DAMAGE_BELOW_MELTING', 'NO_DURATION'],
+    pinWarningCodes: ['OVER_10S', 'OVER_1S', 'THICKNESS_NOMINAL', 'SUB_MS_PULSE', 'OVER_10S_END_TIME', 'OVER_1S_END_TIME', 'SUB_MS_END_TIME', 'END_TEMP_NEAR_START', 'BOARD_DAMAGE_BELOW_MELTING', 'NO_DURATION'],
     extraRows: ratioRows,
     notCheckedChecks: raw.validityChecks.filter((c) => c.notChecked === true).map((c) => c.name),
   });
@@ -580,7 +593,18 @@ export function computeView(s: FusingState): FusingView {
   if (kStep !== undefined) {
     steps.splice(kIdx, 0, { label: kStep.label, expr: kStep.expr, text: `${kStep.value.si.toExponential(4)} A²·s/m⁴` });
   }
-  const withSteps: ResultView = { ...result, details: { ...result.details, steps } };
+  // The end-temperature time gets the same 1 s / 10 s cue as the melting time (thresholds from the core meta; product choices).
+  const endTime = raw.results.find((r) => r.name === TIME_END_NAME);
+  const endSeconds = endTime?.value.si;
+  const cue: string | undefined =
+    endSeconds === undefined ? undefined : endSeconds > meta.timeWarnings.strongSeconds ? CUE_OVER_10S : endSeconds > meta.timeWarnings.overSeconds ? CUE_OVER_1S : undefined;
+  const timeRowLabel = RESULT_LABELS[TIME_END_NAME];
+  const cuedRows: readonly ResultRowView[] =
+    cue === undefined ? result.rows : result.rows.map((r) => (r.label === timeRowLabel ? { ...r, hint: r.hint === undefined ? cue : `${r.hint} ${cue}` } : r));
+  const endRow = result.rows.find((r) => r.label === RESULT_LABELS[END_NAME_BY_MODE[s.mode as 'current' | 'time' | 'i2t']]);
+  const endTempHeadline =
+    endRow === undefined || endText?.status !== 'ok' ? undefined : { label: endRow.label, text: endRow.text, ...(s.mode === 'current' && cue !== undefined ? { note: cue } : {}) };
+  const withSteps: ResultView = { ...result, rows: cuedRows, details: { ...result.details, steps } };
   const suppressed = over10 ? { label: 'Numeric detail, not meaningful for this model (the time or pulse is over 10 s)', text: `${result.headline.label}: ${result.headline.text}` } : undefined;
   const withK: ResultView = over10
     ? { ...withSteps, headline: { label: 'Result', text: NOT_MEANINGFUL_TEXT, meaning: 'No number is offered as the answer. The numeric detail is kept below, labelled.' } }
@@ -610,6 +634,7 @@ export function computeView(s: FusingState): FusingView {
     failedChecks: failed,
     notCheckedCount: notChecked,
     headlineWarnings,
+    ...(endTempHeadline !== undefined ? { endTempHeadline } : {}),
     ...(suppressed !== undefined ? { suppressedHeadline: suppressed } : {}),
     ...(preece !== undefined ? { preece } : {}),
     ...(thk.kind === 'weight' ? { thicknessNote: thk.note } : {}),

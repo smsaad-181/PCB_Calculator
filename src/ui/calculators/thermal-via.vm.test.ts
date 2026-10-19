@@ -6,6 +6,7 @@ import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
+  DIAMETER_HELP,
   STATUS_LINES,
   VIA_COUNT_HINT_FROM,
   WRITTEN_KEYS,
@@ -96,13 +97,24 @@ describe('a result for a worked case', () => {
     const v = computeView(st({ ...BASE, diameterBasis: 'drill', plating: '0.2 mm' }));
     expect(v.status).toBe('error');
   });
-  it('the thermal-relief warning is shown at warning level, ahead of every caution', () => {
+  it('the thermal-relief warning is a callout directly under the headline and not in the warning list (m-N6)', () => {
     const v = ok(st(BASE));
-    const w = v.result.warnings;
-    const i = w.findIndex((x) => /thermal-relief|connect style/i.test(x.message));
-    expect(i).toBeGreaterThanOrEqual(0);
-    expect(w[i]?.severity).toBe('warning');
-    expect(w.slice(0, i).every((x) => x.severity === 'warning' || x.severity === 'critical')).toBe(true);
+    expect(v.reliefCallout?.code).toBe('THERMAL_RELIEF_NOT_MODELLED');
+    expect(v.reliefCallout?.text).toMatch(/thermal-relief|connect style|relief/i);
+    expect(v.reliefCallout?.heading).toMatch(/relief/i);
+    expect(v.result.warnings.some((x) => /thermal-relief|connect style/i.test(x.message))).toBe(false);
+    expect(v.callouts.some((c) => c.code === 'THERMAL_RELIEF_NOT_MODELLED')).toBe(false);
+    expect(pageSrc).toMatch(/underHeadline=/);
+    expect(pageSrc).toMatch(/reliefCallout/);
+  });
+  it('the diameter help names the fab convention without building in an allowance (m-N2)', () => {
+    expect(DIAMETER_HELP).toMatch(/many fab/i);
+    expect(DIAMETER_HELP).toMatch(/finished hole/i);
+    expect(DIAMETER_HELP).toMatch(/Eurocircuits/);
+    expect(DIAMETER_HELP).toMatch(/confirm with your fab/i);
+    expect(DIAMETER_HELP).toMatch(/drill.*finished.*conservative/i);
+    expect(DIAMETER_HELP).toMatch(/not a standard|no standard/i);
+    expect(vmSrc).not.toMatch(/allowance\s*[:=]\s*[\d.]/i);
   });
   it('"lower bound" is never unqualified in page text', () => {
     expect(vmSrc).not.toMatch(/(?<!usually a )lower bound/i);
