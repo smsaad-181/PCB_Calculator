@@ -383,3 +383,40 @@ Rows are the Phase 2 validator findings fixed in `src/core` (reports `phase-2-ca
 | PCB2-4 core | Solved width/spacing/gap not checked against a fab minimum | calc-implementer | `withProfileMinimum` (microstrip, stripline, diff pairs, cpw, cpwg; not coax): with fabProfile + today + profileScope, exact-scope lookup of `traceWidth`/`traceSpace` kind `min`; notes "below the profile minimum ... for this scope" (warning) or "meets the profile minimum" (info, never "pass"), with profile id, status tag, ledger id, age; "not published" / "not available for this scope" when absent; a missing date or scope gives a "not checked" caution; no profile, no note. No limit is hard-coded | FIXED (core); UI shows its own no-profile note |
 | PCB2-5 messages | Offset / mixed-Dk stripline errors printed "symmetry tolerance 1e-7 %" | calc-implementer | Plain-language errors with a next step (field-solver value or an approximate b / er labelled by the user); codes unchanged. The offset/mixed-Dk modelling gap itself still needs the human acceptance row (Phase 4 candidate) | FIXED (messages); gap OPEN (human acceptance) |
 | PCB2-8 | S-022 badge said "standard" / "licensed copy" for a 1980 paper; S-013 cited as "Skin depth" for mu0 | calc-implementer (core text), ui-engineer (display) | Core: `paywalledPaperRole()` (S-022, S-022a, S-023a) returns "Primary source is a paywalled paper (...); not read by this project: check it yourself"; `MU0_LEDGER_DISPLAY` = "S-013 (mu0 value)" and the S-013 ledger item text says so. The strings in `src/ui` (UnverifiedBadge, LEDGER_ROLE) are for the UI agent | FIXED (core); UI OPEN |
+
+## Phase 2 closure record (logged 2026-10-19, branch phase-2-closure)
+
+Final validator verdicts: calc `phase-2-calc.md` PASS-WITH-CONDITIONS (0 BLOCKER, 0 MAJOR, 6 MINOR); phase `phase-2-phase.md` PASS-WITH-CONDITIONS (2 MAJOR: PV2-1 human, PV2-2 log; 6 MINOR); pcb `phase-2-pcb.md` PASS-WITH-CONDITIONS (0 BLOCKER, PCB2-1..PCB2-5 MAJOR, minors). Closure record: `docs/validation/reports/phase-2-closure.md`.
+
+**Human decisions recorded 2026-10-19 (user, via the session):**
+- **PV2-1 (cross-check exit criterion): CARRIED INTO PHASE 3.** Kit prepared (53 cases, all toolOutputs null, worksheet `docs/validation/crosscheck-impedance.md`); the human may run it any time; the exit criterion 'differences from reference tools documented' is not met until then.
+- **PCB2-5 scope gap: ACCEPTED as a Phase 2 deferral:** offset and broadside stripline, mixed core/prepreg Dk, embedded/coated microstrip, differential CPWG, via/launch models, crosstalk are not offered (no sources found; Q-4). Refusal messages are plain-language with a next step. Candidates for Phase 4.
+- Earlier (2026-10-18): model scope (verified normally, badged for paywalled/conflict), Q-1..Q-20 conservative defaults, Steer textbook acceptance.
+
+| # | Finding | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| F-1 (calc) | Conductor-loss warning direction backwards and 'lower bound' wording | calc-implementer | Reword; single LOSS_LABEL | FIXED (core and notes) |
+| F-2 (calc) | er = 1 with tan delta > 0 silently zeroed dielectric loss | calc-implementer | Refuse when loss requested | FIXED |
+| F-3 (calc) | Thickness variants accepted any t/h | calc-implementer | Geometric guard t >= h; no invented range | FIXED |
+| F-4 (calc) | Stripline cross-check 1 % tolerance omits the 0.441-fit vs conformal-map gap (about -1.16 % at w/b 0.25, +1.34 % at w/b 0.1) | calc-validator at classification | Classify a miss of about 1.2 % at narrow strips as a model difference (S-021b), not a bug | OPEN (human run) |
+| F-5 / PCB2-1 | Preset band tag read like a pass for the nominal value of a paywalled model | ui-engineer | 'nominal model value ...' plus a second corner tag; works in solve modes | FIXED |
+| F-6 (calc) | Santavicca is not a second source for CPWG (supports the tanh convention only); S-023a PAYWALLED stays correct | standards-researcher | Record in the S-023a note | OPEN (minor) |
+| PCB2-2 | Default zero-thickness answer biased high; mask only in words | calc + ui | Variant-A row beside the headline (CONFLICT), one mask wording, 'does not include' block | FIXED; sourced mask magnitude research DEFERRED |
+| PCB2-3 / 13 | Copy-to-CAD text lost its basis; wrong 'solved width' wording | ui-engineer | Basis, status, date on every copy block | FIXED |
+| PCB2-4 | Solved width/spacing never checked against a fab minimum | calc + ui | Exact-scope profile minimum notes; 'not checked' note without a profile | FIXED |
+| PCB2-5 | Refusals unclear | calc + ui | Plain messages with next step | FIXED (messages); scope gap ACCEPTED (above) |
+| PCB2-8 / 9 / 10 / 11 / 16 / 19 | Row wording, coax stackup wording, loss label repetition, confidence-low note, blank tolerance select, buried not-modelled list | ui + core | Fixed in the closure batch | FIXED |
+| PCB2-12 | Dispersion caution identical at 10 MHz and 25 GHz; wants an electrical-size readout (h/lambda_g, w/lambda_g) instead of an invented threshold | calc + ui | Core readout | OPEN (Phase 3) |
+| PCB2-14 | Stackup JSON has no date or fab-reference field | calc-implementer | Add optional fields | OPEN (minor) |
+| PCB2-15 | eps_eff to quarter-wave hand-off added; no inverse skew helper (length mismatch from a skew budget) | ui + calc | Inverse helper | OPEN (minor) |
+| PCB2-17 | Gaps for daily routing: embedded/coated microstrip, offset/broadside stripline, differential CPWG, via/launch, crosstalk | human | Prioritise for Phase 4 | ACCEPTED (deferral) |
+| PV2-2 | OPEN_RISKS completeness | orchestrator | This section | FIXED |
+| PV2-2(b) | Task 1 'fab-profile import/export (JSON)' not built (only stackup JSON; the fab profile is the bundled JLCPCB file) | calc + ui | Profile import/export | DEFERRED (logged) |
+| PV2-3 | Home page 'Routing: Coming in phase 2' (empty category) | ui-engineer | Remove or point to impedance | FIXED |
+| PV2-4 | SPEC repo layout lacked src/core/stackup, math, Phase 2 modules | orchestrator | Update SPEC | FIXED |
+| PV2-5 | impedance-models skill stale (dispersion, IPC-2141, 60/sqrt(er), no not-offered list) | orchestrator | Rewrite | FIXED (skill rewritten as built) |
+| PV2-6 | Stackup import textarea had no maxLength; stored draft size | ui-engineer | maxLength = core cap; size check | FIXED |
+| PV2-7 | Branch coverage 95.5 % vs 95 % varies between runs (same as CF-14) | test-engineer | Include src/state and view-models, add tests; never lower the threshold | OPEN |
+| PV2-8 | Pages disabled; setup-node 7.1.0; no Phase 2 PR | human + devops | Enable Pages; PR for phase-2-closure | OPEN (human) |
+| CP-1 | The mandatory banner and shared STANDING_ASSUMPTION name the 'PCB manufacturer stackup' even on the coax page (a cable); only the UI assumption text was reworded | calc-implementer | Decide coax-specific banner wording (banner text is mandated verbatim by the skill) | OPEN (minor) |
+| CP-2 | Total gzip JS 369.6 KB of 400 KB after Phase 2 (largest route 135.0 KB of 150): about 30 KB headroom before Phase 3 pages | devops / ui-engineer | Watch; split or trim | WATCH |

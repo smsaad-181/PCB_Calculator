@@ -249,7 +249,7 @@ Read from public docs and READMEs only; no code read, nothing run.
 - Ellingson Vol. 2 §7.3 gives the coax analogue R′ = 1/(2πaδσ) + 1/(2πbδσ). Assumptions: δ ≪ a and δ ≪ outer conductor thickness.
 - Researcher example: copper ρ = 1/58e6 Ω·m, 1 GHz: δ = 2.08981 µm (S-013), Rs = 8.2502 mΩ.
 - Status UNVERIFIED: the high-frequency microstrip form rests on tier 4 plus a low-frequency tier-2 structure.
-- Validity: t > 3δ, smooth copper (roughness not modelled unless Q-17 accepts the tier-4 K_r), no current crowding (K_i = 1 is optimistic for narrow strips), no ground-plane loss refinement.
+- Validity: t > 3δ, smooth copper (roughness not modelled unless Q-17 accepts the tier-4 K_r), current crowding not modelled (the recorded K_i < 1 means Rs/(Z0 w) overestimates conductor loss for smooth copper; roughness, not modelled, works the other way: phase-2-calc F-1), no ground-plane loss refinement.
 
 ---
 

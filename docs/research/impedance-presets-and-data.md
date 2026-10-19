@@ -94,7 +94,7 @@ Recommended content, all labelled **"approximate"** with the unverified badge wh
 - Conductor: α_c ≈ Rs/(Z0·w) with Rs = √(π f μ0 ρ(T)), from S-013 and S-004.
   - Assumes a wide strip, smooth copper, t > 3δ, and no current crowding.
   - Roughness (Hammerstad K_r) and current distribution (K_i) are tier 4 only (Qucs). Do not include them unless Q-17 decides so.
-  - The result is optimistic for narrow traces and rough foil.
+  - Direction (corrected, phase-2-calc F-1): for smooth copper Rs/(Z0 w) overestimates the conductor loss (K_i < 1 per Qucs eq. 11.82, and Steer eq. 22), while surface roughness (not modelled) raises real loss. Label it an approximate estimate, not a bound.
 - Show inputs used: f, tanδ at f, εr at f, ρ and temperature, w, Z0, εe.
 
 ## 5. Worked reference cases (for test-first work)

@@ -64,7 +64,7 @@ Vite, TypeScript strict, Preact, Vitest, fast-check, ESLint. `src/core` pure. Py
 
 ## Repo layout
 ```
-src/core/{units,solvers,calculators,data,fab}  src/workers  src/ui  src/state
+src/core/{units,solvers,calculators,data,fab,stackup,math}  src/workers  src/ui  src/state
 tests/  tools/reference/  docs/  .claude/  .github/
 ```
 - `src/core/result.ts`: CalcResult, guards, design-value, envelope, element and copper-basis checks, `rankElements`, `assertCalcResult`.
@@ -72,6 +72,8 @@ tests/  tools/reference/  docs/  .claude/  .github/
 - `src/core/data-status.ts`: ledger status → dataStatus, with an `exclude` option.
 - `src/core/format-result.ts`: bound-aware headline formatters.
 - `src/core/gate.ts`: the only place compliance wording may come from.
+- `src/core/stackup/`: the shared stackup model (layers, er and Df with required source labels, derivation of h, t and b for a signal layer, strict JSON import and export). `src/core/math/elliptic.ts`: K(k) and K'(k) by AGM.
+- `src/core/calculators/{microstrip,stripline,coax,diff-microstrip,diff-stripline,cpw,cpwg}` plus the shared `impedance-shared.ts`, `impedance-envelope.ts`, `loss-shared.ts`, `delay-shared.ts`, `diff-shared.ts`, `cpw-shared.ts`, `profile-minimum.ts` and the standalone `quarter-wave.ts`; `src/core/data/impedance-presets.ts` and `impedance-wording.ts` (offered presets and shared wording).
 - `src/core/units`: dimensions, quantities, field-aware parser (detailed warnings, fractions, parsed echo), directional display formatting and `formatDual`, foil conventions, AWG.
 - `src/core/calculators/copper-converter/`: `meta.ts`, `guards.ts`, `calc.ts` and `calc.test.ts`. This is the reference calculator layout.
 - `src/core/data`:
