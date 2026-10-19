@@ -88,6 +88,8 @@ function isSpacingTable(t, relPath) {
   return t.schema === SPACING_SCHEMA || isSpacingPath(relPath);
 }
 const blank = (v) => typeof v !== 'string' || v.trim() === '';
+/** Name comparison for the second-person rule (mirrors normName in src/core/spacing/tables.ts): NFKC, inner whitespace collapsed, trimmed, lower-cased. */
+const normName = (v) => (typeof v === 'string' ? v.normalize('NFKC').replace(/\s+/g, ' ').trim().toLowerCase() : '');
 
 /**
  * Extra rules for the IEC 60664 / IPC-2221 spacing tables (Phase 3). These mirror src/core/spacing/tables.ts (the importer):
@@ -103,11 +105,23 @@ function validateSpacingTable(t, relPath, status) {
   const records = parts.flat();
   if (t.entered === false && records.length > 0) e('"entered" is false but the table holds values');
   if (t.entered === true && records.length === 0) e('"entered" is true but the table holds no values');
+  // reinforced rules (mirrors the importer): a multiplier of 1 would make reinforced equal basic, and reinforced-clearance has no multiplier mode
+  for (const r of parts[2]) {
+    if (r === null || typeof r !== 'object') continue;
+    if ((r.rule === 'reinforced-creepage-multiplier' || r.rule === 'reinforced-clearance-steady-state') && !(typeof r.value === 'number' && r.value > 1))
+      e(`rule ${r.rule}: "value" must be a number greater than 1`);
+    if (r.rule === 'reinforced-clearance' && r.mode !== 'next-preferred-impulse-step') e('rule reinforced-clearance: "mode" must be "next-preferred-impulse-step"');
+  }
   if (status === 'VERIFIED') {
     if (blank(t.verifiedDate)) e('status VERIFIED requires "verifiedDate"');
     if (t.bannerRequired !== false) e('status VERIFIED requires "bannerRequired": false');
     if (records.some((r) => r === null || typeof r !== 'object' || blank(r.checkedBy) || blank(r.checkedDate)))
       e('status VERIFIED requires "checkedBy" and "checkedDate" on every entered record');
+    // second person (mirrors src/core/spacing/tables.ts): the verifier is not the enterer or checker of anything, ignoring case and spaces
+    const who = normName(t.verifiedBy);
+    const named = [t, ...records, ...(t.elevationBreakpoint && typeof t.elevationBreakpoint === 'object' ? [t.elevationBreakpoint] : [])];
+    if (who !== '' && named.some((r) => r !== null && typeof r === 'object' && [r.enteredBy, r.checkedBy].some((n) => normName(n) === who)))
+      e('status VERIFIED requires a second person: "verifiedBy" is also named as enteredBy or checkedBy');
   } else if (!blank(t.verifiedBy) || !blank(t.verifiedDate)) {
     e('"verifiedBy"/"verifiedDate" are present but status is not VERIFIED');
   }

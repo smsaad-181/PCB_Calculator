@@ -13,7 +13,9 @@ import {
   isTableSet,
   lookupGrid,
   makeTableSet,
+  nextPreferredImpulseStep,
   parseSpacingTable,
+  ruleSeriesSi,
   serializeTableSet,
 } from './tables';
 import type { TableId } from './tables';
@@ -25,6 +27,10 @@ import type { Rec } from './synthetic-tables.testutil';
 
 const ED = 'SYNTH-ED-1';
 const errs = (r: { ok: boolean; error?: string[] }): string => (r.ok ? '' : (r.error ?? []).join(' | '));
+const parseOk = (r: ReturnType<typeof parseSpacingTable>) => {
+  if (!r.ok) throw new Error(r.error.join('; '));
+  return r.value;
+};
 
 describe('shipped tables are empty shells (CLAUDE.md: no table value from memory)', () => {
   it.each(TABLE_IDS)('%s is EMPTY, unverified, banner required, no edition entered', (id) => {
@@ -185,9 +191,15 @@ describe('parseSpacingTable (strict schema)', () => {
     const rule = (id: string): Rec => rules.find((r) => r['rule'] === id) as Rec;
     expect(bad([{ ...(rules[0] as Rec), rule: 'groove-credit' }])).toContain('rule');
     expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: 0.5 }])).toContain('value');
+    // a multiplier of exactly 1 would make reinforced equal basic silently: refused (strictly greater than 1)
+    expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: 1 }])).toContain('greater than 1');
+    expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: 1.0000001 }])).toBe('');
     expect(bad([{ ...rule('reinforced-creepage-multiplier'), value: undefined }])).toContain('value');
-    expect(bad([{ ...rule('reinforced-clearance'), mode: 'multiplier' }])).toContain('value');
+    // the multiplier mode of reinforced-clearance no longer exists: only the next preferred impulse step
+    expect(bad([{ ...rule('reinforced-clearance'), mode: 'multiplier' }])).toContain('mode must be "next-preferred-impulse-step"');
+    expect(bad([{ ...rule('reinforced-clearance'), mode: 'multiplier', value: 2, unit: '1', series: undefined }])).toContain('mode must be "next-preferred-impulse-step"');
     expect(bad([{ ...rule('reinforced-clearance'), mode: 'bogus' }])).toContain('mode');
+    expect(bad([{ ...rule('reinforced-clearance'), mode: 'next-higher-row', series: undefined }])).toContain('next-preferred-impulse-step');
     expect(bad([{ ...rule('scope-max-frequency'), unit: 'kHz', value: 7 }])).toBe('');
     expect(bad([{ ...rule('scope-max-frequency'), unit: 'V' }])).toContain('unit');
     expect(bad([{ ...rule('coating-credit'), value: 1.5 }])).toContain('value');
@@ -195,6 +207,50 @@ describe('parseSpacingTable (strict schema)', () => {
     expect(bad([rule('coating-credit'), rule('coating-credit')])).toContain('duplicate');
     expect(bad([{ ...rule('scope-max-frequency'), clauseText: '' }])).toContain('clauseText');
     expect(bad([rule('scope-max-frequency'), rule('scope-max-frequency')])).toContain('duplicate');
+  });
+  it('T7 reinforced-clearance series mode: an ordered, unit-stated, strictly increasing list of impulse voltages', () => {
+    const raw = rawSynthetic('T7');
+    const base = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'reinforced-clearance') as Rec;
+    const bad = (over: Rec): string => errs(parseSpacingTable({ ...raw, rules: [{ ...base, ...over }] }));
+    expect(bad({})).toBe('');
+    expect(bad({ series: undefined })).toContain('series');
+    expect(bad({ series: 'x' })).toContain('series');
+    expect(bad({ series: [1] })).toContain('2 to 100');
+    expect(bad({ series: Array.from({ length: 101 }, (_, i) => i + 1) })).toContain('2 to 100');
+    expect(bad({ series: [1, 'a', 3] })).toContain('finite number');
+    expect(bad({ series: [1, 3, 2] })).toContain('strictly increasing');
+    expect(bad({ series: [1, 1, 2] })).toContain('strictly increasing');
+    expect(bad({ series: [-1, 1, 2] })).toContain('finite number');
+    expect(bad({ series: [1, 2, 1e12] })).toContain('unit slip');
+    expect(bad({ unit: 'mm' })).toContain('unit must be one of');
+    expect(bad({ unit: undefined })).toContain('unit must be one of');
+    expect(bad({ value: 3 })).toContain('must be absent');
+    expect(bad({ mode: 'multiplier', value: 2, unit: '1' })).toContain('series is only allowed');
+    const other = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'scope-max-frequency') as Rec;
+    expect(errs(parseSpacingTable({ ...raw, rules: [{ ...other, series: [1, 2] }] }))).toContain('series is only allowed');
+  });
+  it('T7 reinforced-clearance-steady-state: its own multiplier record, strictly greater than 1', () => {
+    const raw = rawSynthetic('T7');
+    const base = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'reinforced-clearance-steady-state') as Rec;
+    const bad = (over: Rec): string => errs(parseSpacingTable({ ...raw, rules: [{ ...base, ...over }] }));
+    expect(bad({})).toBe('');
+    expect(bad({ mode: 'next-preferred-impulse-step' })).toContain('mode must be "multiplier"');
+    expect(bad({ mode: undefined })).toContain('mode must be "multiplier"');
+    expect(bad({ value: 0.5 })).toContain('greater than 1');
+    expect(bad({ value: 1 })).toContain('greater than 1');
+    expect(bad({ value: 1.5 })).toBe('');
+    expect(bad({ unit: 'V' })).toContain('unit must be "1"');
+    expect(bad({ series: [1, 2] })).toContain('series is only allowed');
+  });
+  it('T7 coating-credit multiplier: appliesTo is creepage, clearance or both, and only on that rule', () => {
+    const raw = rawSynthetic('T7');
+    const base = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'coating-credit') as Rec;
+    const bad = (over: Rec): string => errs(parseSpacingTable({ ...raw, rules: [{ ...base, ...over }] }));
+    for (const a of ['creepage', 'clearance', 'both']) expect(bad({ appliesTo: a })).toBe('');
+    expect(bad({ appliesTo: 'all' })).toContain('appliesTo must be');
+    const other = (raw['rules'] as Rec[]).find((r) => r['rule'] === 'scope-max-frequency') as Rec;
+    expect(errs(parseSpacingTable({ ...raw, rules: [{ ...other, appliesTo: 'both' }] }))).toContain('appliesTo is only allowed');
+    expect(findRule(parseOk(parseSpacingTable({ ...raw, rules: [{ ...base, appliesTo: 'both' }] })), 'coating-credit')?.appliesTo).toBe('both');
   });
   it('T8 elevation breakpoint: only on T8, a length with provenance', () => {
     const raw = rawSynthetic('T8');
@@ -371,11 +427,35 @@ describe('lookupGrid', () => {
     expect(lookupGrid(T2, { rowSi: kv(1), selectors: sel(1, true), edition: 'OTHER' })).toMatchObject({ ok: false, reason: 'EDITION' });
     expect(lookupGrid(SHIPPED_TABLES.tables.T2, { rowSi: kv(1), selectors: sel(1, true), edition: ED })).toMatchObject({ ok: false, reason: 'EMPTY' });
   });
-  it('step-up reads the row after the matched row (rule-driven, e.g. reinforced)', () => {
-    const r = lookupGrid(T2, { rowSi: kv(2), selectors: sel(1, true), edition: ED }, { stepUp: true });
-    expect(r.ok && r.valueSi).toBeCloseTo(mm(t2(3, 1, true)), 12);
-    const top = lookupGrid(T2, { rowSi: kv(5), selectors: sel(1, true), edition: ED }, { stepUp: true });
-    expect(top).toMatchObject({ ok: false, reason: 'ABOVE_TABLE' });
+  it('lookupGrid takes no row step-up option: the reinforced rule uses the T7 series instead', () => {
+    expect(lookupGrid.length).toBe(2);
+  });
+  it('next preferred impulse step: the next series value above the required impulse, never a T2 row step', () => {
+    const rule = findRule(synthTable('T7'), 'reinforced-clearance');
+    if (rule === undefined) throw new Error('no rule');
+    expect(ruleSeriesSi(rule)).toEqual([1000, 2000, 4000, 5000]);
+    const a = nextPreferredImpulseStep(rule, kv(2));
+    expect(a).toMatchObject({ ok: true, valueSi: kv(4) });
+    expect(nextPreferredImpulseStep(rule, kv(1))).toMatchObject({ ok: true, valueSi: kv(2) });
+    expect(nextPreferredImpulseStep(rule, kv(4) * (1 + 1e-14))).toMatchObject({ ok: true, valueSi: kv(5) });
+    expect(nextPreferredImpulseStep(rule, kv(5))).toMatchObject({ ok: false, above: true });
+    expect(nextPreferredImpulseStep(rule, kv(3))).toMatchObject({ ok: false, above: false });
+    expect(nextPreferredImpulseStep(rule, kv(0.5))).toMatchObject({ ok: false, above: false });
+    const mult = findRule(synthTable('T7'), 'reinforced-creepage-multiplier');
+    if (mult === undefined) throw new Error('no rule');
+    expect(nextPreferredImpulseStep(mult, kv(2))).toMatchObject({ ok: false, above: false });
+    expect(ruleSeriesSi(mult)).toBeUndefined();
+  });
+  it('property: the reinforced step is strictly above the required value and is a series value', () => {
+    const rule = findRule(synthTable('T7'), 'reinforced-clearance');
+    if (rule === undefined) throw new Error('no rule');
+    const series = ruleSeriesSi(rule) as number[];
+    fc.assert(
+      fc.property(fc.double({ min: 1, max: 6000, noNaN: true }), (x) => {
+        const r = nextPreferredImpulseStep(rule, x);
+        return !r.ok || (r.valueSi > x && series.includes(r.valueSi));
+      }),
+    );
   });
   it('altitude table T4 and the T5 selectors', () => {
     const T4 = synthTable('T4');
@@ -457,5 +537,51 @@ describe('material group and rule helpers', () => {
   });
   it('TABLE_IDS lists all eight tables', () => {
     expect(TABLE_IDS).toEqual(['T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8'] as TableId[]);
+  });
+});
+
+describe('VERIFIED needs a second person (verifiedBy differs from every enteredBy and checkedBy, case-insensitive, trimmed)', () => {
+  const v = (): Rec => rawSynthetic('T4', { verified: true });
+  const cells = (over: Rec): Rec[] => (v()['cells'] as Rec[]).map((c, i) => (i === 0 ? { ...c, ...over } : c));
+  it('a different verifier is accepted', () => {
+    expect(errs(parseSpacingTable(v()))).toBe('');
+  });
+  it.each([
+    ['table enteredBy', { enteredBy: 'Test-Verifier' }],
+    ['table enteredBy with spaces', { enteredBy: '  TEST-VERIFIER ' }],
+    ['a cell enteredBy', { cells: cells({ enteredBy: 'test-verifier' }) }],
+    ['a cell checkedBy', { cells: cells({ checkedBy: 'TEST-verifier ' }) }],
+    ['table enteredBy with inner spaces', { verifiedBy: 'Test   Verifier', enteredBy: '  test VERIFIER ' }],
+    ['a cell enteredBy with a no-break space', { cells: cells({ enteredBy: 'test-verifier\u00a0' }) }],
+    ['a cell checkedBy with a full-width letter (NFKC)', { cells: cells({ checkedBy: '\uff54est-verifier' }) }],
+  ])('verifiedBy equal to %s is refused with a clear message', (_n, over) => {
+    const m = errs(parseSpacingTable({ ...v(), ...over }));
+    expect(m).toContain('second person');
+    expect(m).toContain('verifiedBy');
+  });
+  it('rule, group and breakpoint records are covered as well', () => {
+    const t7 = rawSynthetic('T7', { verified: true });
+    const rules = (t7['rules'] as Rec[]).map((r, i) => (i === 0 ? { ...r, checkedBy: 'test-verifier' } : r));
+    expect(errs(parseSpacingTable({ ...t7, rules }))).toContain('second person');
+    const t6 = rawSynthetic('T6', { verified: true });
+    const groups = (t6['groups'] as Rec[]).map((r, i) => (i === 0 ? { ...r, enteredBy: 'Test-Verifier' } : r));
+    expect(errs(parseSpacingTable({ ...t6, groups }))).toContain('second person');
+    const t8 = rawSynthetic('T8', { verified: true });
+    const bp = { ...(t8['elevationBreakpoint'] as Rec), checkedBy: 'test-verifier' };
+    expect(errs(parseSpacingTable({ ...t8, elevationBreakpoint: bp }))).toContain('second person');
+  });
+  it('the importer refuses it too, and an unverified table may keep any names', () => {
+    expect(errs(importSpacingTables(JSON.stringify({ ...v(), enteredBy: 'test-verifier' })))).toContain('second person');
+    const u = rawSynthetic('T4');
+    expect(errs(parseSpacingTable({ ...u, enteredBy: 'someone', cells: (u['cells'] as Rec[]).map((c) => ({ ...c, checkedBy: 'someone', checkedDate: '2026-01-02' })) }))).toBe('');
+  });
+});
+
+describe('source hygiene', () => {
+  const files = import.meta.glob('./tables.ts', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+  it('tables.ts has no raw NUL byte (use an escape sequence)', () => {
+    const text = files['./tables.ts'];
+    expect(text).toBeDefined();
+    expect((text as string).includes(String.fromCharCode(0))).toBe(false);
   });
 });

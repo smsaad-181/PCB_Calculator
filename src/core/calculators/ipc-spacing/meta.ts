@@ -11,11 +11,11 @@ export const meta = {
   reference: {
     standard: 'IPC-2221',
     edition: 'the data set edition selected by the user',
-    ledgerIds: ['S-033', 'S-033a', 'S-034'],
+    ledgerIds: ['S-006', 'S-033', 'S-033a', 'S-034'],
   },
   formula:
     'spacing = T8(voltage between conductors (DC or AC peak), location, conductor kind, coating, elevation); above the top voltage band: top-band value + (V - V_top) x per-volt value from the same column; every table value is user-entered from the licensed standard',
-  ledgerIds: ['S-033', 'S-033a', 'S-034'],
+  ledgerIds: ['S-006', 'S-033', 'S-033a', 'S-034'],
   /** Plausibility windows only catch unit slips; they are not standard limits. */
   validity: { voltageV: [1e-3, 1e8], elevationM: [-500, 100_000] },
   accuracyClass: 'analytical' as AccuracyClass,

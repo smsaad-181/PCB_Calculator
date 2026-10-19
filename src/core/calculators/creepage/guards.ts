@@ -15,6 +15,7 @@ import {
   readQuantity,
   readTables,
   readWorkingVoltage,
+  waveformFrequencyError,
 } from '../../spacing/gating';
 import type { CoatingCredit, InsulationType, PollutionDegree } from '../../spacing/gating';
 import { MATERIAL_GROUPS } from '../../spacing/tables';
@@ -33,6 +34,7 @@ export interface ValidInputs {
   readonly peak?: Quantity;
   readonly voltageHow: 'direct' | 'waveform';
   readonly waveformShape?: string;
+  readonly waveformBasis?: string;
   readonly pollutionDegree: PollutionDegree;
   readonly materialGroup?: MaterialGroup;
   readonly cti?: Quantity;
@@ -67,6 +69,8 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
 
   const surface = c.take(readEnum(raw, 'surface', SURFACES), 'surface');
   const frequency = c.take(readQuantity(raw, 'frequency', DIM.FREQUENCY, 'frequency (Hz; 0 for DC)', { allowZero: true, window: WINDOWS.frequency }), 'frequency');
+  const shapeError = frequency === undefined ? undefined : waveformFrequencyError(v.waveformShape, frequency.si);
+  if (shapeError !== undefined) c.note(shapeError);
   const associatedClearance = c.take(readQuantity(raw, 'associatedClearance', DIM.LENGTH, 'length', { window: WINDOWS.length }), 'associatedClearance');
   const coating = c.opt(readEnum(raw, 'coatingCredit', COATING_CREDITS)) ?? 'none';
   const grooves = c.opt(readEnum(raw, 'grooves', GROOVE_STATES)) ?? 'none';
@@ -85,6 +89,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       ...(v.peak !== undefined ? { peak: v.peak } : {}),
       voltageHow: v.how === 'waveform' ? 'waveform' : 'direct',
       ...(v.waveformShape !== undefined ? { waveformShape: v.waveformShape } : {}),
+      ...(v.waveformBasis !== undefined ? { waveformBasis: v.waveformBasis } : {}),
       pollutionDegree: pollutionDegree as PollutionDegree,
       ...(group !== undefined ? { materialGroup: group } : {}),
       ...(cti !== undefined ? { cti } : {}),

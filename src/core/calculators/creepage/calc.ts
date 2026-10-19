@@ -4,19 +4,25 @@ import type { CalcError, CalcInput, CalcOutcome, CalcResult, CalcWarning } from 
 import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import {
-  INDICATIVE_PREFIX,
   anyUnverified,
   checkScope,
   coatingDecision,
   commonWarnings,
   dimless,
-  emptyTablesError,
+  iecRecommendation,
+  insulationAssumption,
   lookupError,
+  primaryResult,
   provenanceLine,
+  requiredDataError,
   ruleMissingError,
-  rulesEditionError,
+  scopeTable,
   spacingConfidence,
+  standardChecks,
+  SOLDERMASK_DECLARED_WARNING,
+  squareRmsWarning,
   userInput,
+  withWaveformRow,
 } from '../../spacing/gating';
 import type { CoatingCredit, InsulationType, PollutionDegree } from '../../spacing/gating';
 import { findGroupForCti, findRule, lookupGrid } from '../../spacing/tables';
@@ -64,13 +70,13 @@ function build(raw: unknown): CalcOutcome {
   const required: SpacingTable[] = [T.T5];
   if (inp.cti !== undefined) required.push(T.T6);
   if (reinforced || inp.coating !== 'none') required.push(T.T7);
-  const empty = emptyTablesError(required);
-  if (empty !== undefined) return { ok: false, error: empty };
-  const t7Edition = rulesEditionError(T.T7, edition);
-  if (t7Edition !== undefined) return { ok: false, error: t7Edition };
+  const missingData = requiredDataError(required, T.T7, inp.frequency.si);
+  if (missingData !== undefined) return { ok: false, error: missingData };
+  const t7 = scopeTable(T.T7, edition, reinforced || inp.coating !== 'none' || inp.frequency.si > 0);
+  if (t7.error !== undefined) return { ok: false, error: t7.error };
 
   const rmsV = inp.rms.si;
-  const scope = checkScope(T.T7, { frequencyHz: inp.frequency.si, rmsV, peakV: inp.peak?.si });
+  const scope = checkScope(t7.table, { frequencyHz: inp.frequency.si, rmsV, peakV: inp.peak?.si });
   if (scope.refusal !== undefined) return { ok: false, error: scope.refusal };
 
   const used: SpacingTable[] = [];
@@ -107,11 +113,12 @@ function build(raw: unknown): CalcOutcome {
     used.push(T.T7);
     const k = rule.value as number;
     creepage *= k;
-    steps.push({ label: 'Reinforced multiplier (T7)', expr: 'user-entered rule record', value: dimless(k) });
+    steps.push({ label: 'Reinforced multiplier (T7)', expr: 'user-entered rule record (greater than 1)', value: dimless(k) });
+    steps.push({ label: 'Creepage after the reinforced multiplier', expr: 'T5 value x reinforced multiplier', value: lenQ(creepage), bound: 'min-requirement' });
     lines.push(`T7 rule reinforced-creepage-multiplier = ${String(k)}, source ${rule.source}: ${rule.clauseText}`);
   }
 
-  const coat = coatingDecision(T.T7, inp.coating);
+  const coat = coatingDecision(T.T7, inp.coating, 'creepage');
   if (coat.applied) {
     creepage *= coat.factor;
     steps.push({ label: 'Coating credit factor (T7)', expr: 'verified user-entered rule record', value: dimless(coat.factor) });
@@ -128,7 +135,7 @@ function build(raw: unknown): CalcOutcome {
     warnings.push({
       severity: 'warning',
       code: 'CREEPAGE_RAISED_TO_CLEARANCE',
-      message: `The creepage from the table (${String(creepage)} m) was below the associated clearance (${String(clearance)} m); creepage is not less than the associated clearance (S-030b), so the clearance is shown as the creepage.`,
+      message: `The table creepage (${String(creepage)} m) was below the associated clearance (${String(clearance)} m); creepage is not less than the associated clearance (S-030b), so the clearance is shown.`,
     });
     creepage = clearance;
   }
@@ -145,9 +152,7 @@ function build(raw: unknown): CalcOutcome {
 
   const assumptions: string[] = [
     `Data set edition: ${edition} (every table used holds exactly this edition).`,
-    inp.insulationType === 'basic' || inp.insulationType === 'reinforced'
-      ? `Insulation type: ${inp.insulationType}.`
-      : `Insulation type: ${inp.insulationType}. It uses the basic-insulation lookup (conservative reading; the standard's own rule for it is not encoded). Double insulation is basic plus supplementary: calculate each layer separately.`,
+    insulationAssumption(inp.insulationType),
     groupText,
     `Pollution degree: ${String(inp.pollutionDegree)}. Surface: ${inp.surface} (used only if the T5 columns distinguish it).`,
     'Creepage is never scaled by altitude (S-032).',
@@ -157,6 +162,9 @@ function build(raw: unknown): CalcOutcome {
   if (inp.coating === 'none') assumptions.push('No coating credit applied (none selected).');
 
   const allWarnings: CalcWarning[] = [...commonWarnings({ unverified, iec: true }), ...scope.warnings, ...warnings, ...coat.warnings];
+  const sq = squareRmsWarning(inp.waveformShape, inp.waveformBasis);
+  if (sq !== undefined) allWarnings.push(sq);
+  const ledgerIds = withWaveformRow(meta.reference.ledgerIds, inp.voltageHow === 'waveform');
   if (inp.altitude !== undefined) {
     allWarnings.push({
       severity: 'info',
@@ -169,34 +177,28 @@ function build(raw: unknown): CalcOutcome {
       severity: 'caution',
       code: 'GROOVES_NOT_CREDITED',
       message:
-        'Grooves, slots and ribs are not credited: the creepage shown is the requirement for a flat surface path. A width/depth rule record is not applied in this version; check the standard before relying on a longer path.',
+        'Grooves, slots and ribs are not credited: the creepage shown is for a flat surface path; check the standard before relying on a longer path.',
     });
   }
-  if (inp.soldermask) allWarnings.push({ severity: 'caution', message: 'Solder mask was declared: it is not conformal coating and gives no credit.', code: 'SOLDERMASK_DECLARED' });
+  if (inp.soldermask) allWarnings.push(SOLDERMASK_DECLARED_WARNING);
 
   const validityChecks: CalcResult['validityChecks'] = [
-    { name: 'all mandatory inputs given', ok: true, detail: `Mandatory inputs: ${meta.mandatoryInputs.join('; ')}. None has a default.` },
-    { name: 'tables populated and of the selected edition', ok: true, detail: `${[...new Set(used.map((t) => t.table))].join(', ')} hold entered values of edition ${edition}.` },
-    { name: 'every looked-up cell carries provenance', ok: true, detail: 'Each cell records its printed text, source, who entered it and when.' },
+    ...standardChecks(meta.mandatoryInputs, used, edition),
     { name: 'creepage not less than the associated clearance', ok: true, detail: 'Enforced in code: the larger of the table value and the associated clearance is reported.' },
     ...scope.checks,
   ];
 
-  const name = (n: string): string => (unverified ? `${INDICATIVE_PREFIX}: ${n}` : n);
   const confidence = spacingConfidence({ verified: !unverified, safetyRelevantDefaults: scope.unchecked, dataStatus: DATA_STATUS });
-  const recommendation = unverified
-    ? `${INDICATIVE_PREFIX}: the table data is UNVERIFIED (entered by a user, not verified by a named person). Check every cell against your licensed copy of IEC 60664-1 and against your product standard before using this distance.`
-    : `Distances are lookups from user-entered tables signed off by ${[...new Set(used.map((t) => t.verifiedBy))].join(', ')}. The product standard may require more; check it before using this distance.`;
-  const note = unverified ? 'indicative only (UNVERIFIED table data)' : undefined;
+  const recommendation = iecRecommendation(unverified, used);
 
   const result: CalcResult = {
     method: meta.method,
-    reference: { standard: meta.reference.standard, edition, ledgerIds: [...meta.reference.ledgerIds] },
+    reference: { standard: meta.reference.standard, edition, ledgerIds },
     formula: meta.formula,
     inputs,
     assumptions,
     steps,
-    results: [{ name: name('minimum creepage distance'), value: lenQ(creepage), role: 'primary', bound: 'min-requirement', ...(note !== undefined ? { note } : {}) }],
+    results: [primaryResult(unverified, 'minimum creepage distance', creepage)],
     validityChecks,
     warnings: allWarnings,
     confidence,

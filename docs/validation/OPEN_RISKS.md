@@ -419,11 +419,11 @@ Final validator verdicts: calc `phase-2-calc.md` PASS-WITH-CONDITIONS (0 BLOCKER
 | PV2-7 | Branch coverage 95.5 % vs 95 % varies between runs (same as CF-14) | test-engineer | Include src/state and view-models, add tests; never lower the threshold | OPEN |
 | PV2-8 | Pages disabled; setup-node 7.1.0; no Phase 2 PR | human + devops | Enable Pages; PR for phase-2-closure | OPEN (human) |
 | CP-1 | The mandatory banner and shared STANDING_ASSUMPTION name the 'PCB manufacturer stackup' even on the coax page (a cable); only the UI assumption text was reworded | calc-implementer | Decide coax-specific banner wording (banner text is mandated verbatim by the skill) | OPEN (minor) |
-| CP-2 | Total gzip JS 369.6 KB of 400 KB after Phase 2 (largest route 135.0 KB of 150): about 30 KB headroom before Phase 3 pages | devops / ui-engineer | Watch; split or trim | WATCH |
+| CP-2 | Total gzip JS 369.6 KB of 400 KB after Phase 2 (largest route 135.0 KB of 150). Superseded: Phase 3 pages and fixes brought the total to 399.79 KB (see PV3-1 and "Phase 3 UI fixes") | devops / ui-engineer | Superseded by PV3-1 | CLOSED (stale figure) |
 
 ## Phase 3 core: safety spacing, gated logic with EMPTY tables (logged 2026-10-19, branch phase-3, core only; no UI, no import UI)
 
-Built: `src/core/spacing/` (`tables.ts` loader, strict validator, importer and lookup; `gating.ts` shared gate; `waveform.ts` S-035 helpers), `src/core/calculators/{clearance,creepage,ipc-spacing}/`, eight EMPTY table shells (`src/core/data/iec60664/T1..T7`, `src/core/data/ipc2221-spacing.json` = T8), the audit rule below and the table-free waveform oracle vectors. Tests use SYNTHETIC tables (`synthetic-tables.testutil.ts`, fake round numbers, labelled 'SYNTHETIC TEST DATA, not from any standard'). Nothing numeric from IEC 60664-1 or IPC-2221 exists anywhere in the repository.
+Built: `src/core/spacing/` (`tables.ts` loader, strict validator, importer and lookup; `gating.ts` shared gate; `waveform.ts` S-035 helpers), `src/core/calculators/{clearance,creepage,ipc-spacing}/`, eight EMPTY table shells (`src/core/data/iec60664/T1..T7`, `src/core/data/ipc2221-spacing.json` = T8), the audit rule below and the table-free waveform oracle vectors. Tests use SYNTHETIC tables (`synthetic-tables.testutil.ts`, fake round numbers, labelled 'SYNTHETIC TEST DATA, not from any standard'). No numeric table value of IEC 60664-1 or IPC-2221 spacing (impulse voltage, clearance, creepage, altitude factor, material-group CTI limit, IPC Table 6-1 cell, voltage-band boundary or elevation breakpoint) is recorded anywhere in the repository (corrected 2026-10-19 after the Phase 3 redaction below). Numbers that remain on purpose: the scope limits quoted from the official IEC abstracts (ledger S-030a, S-031a; docs only, never in code) and the Phase 0 IPC-2221 trace-current curve-fit constants (S-001, legacy mode).
 
 **Human decisions recorded 2026-10-19:** Q-31 no licensed copies at hand, so tables ship EMPTY and every calculator ends in INSUFFICIENT DATA; Q-33 the entry flow is a JSON file the human edits and imports (`importSpacingTables`; the import UI is deferred).
 
@@ -432,7 +432,7 @@ Built: `src/core/spacing/` (`tables.ts` loader, strict validator, importer and l
 | P3-1 | **Tables empty: values to enter from licensed IEC 60664-1 and IPC-2221 copies (T1 impulse voltage, T2 clearance, T3 steady-state clearance if the edition has one, T4 altitude factor, T5 creepage, T6 material groups by CTI, T7 rule records, T8 IPC-2221 Table 6-1)**. Until then no numeric clearance, creepage or spacing can be produced, and the Phase 3 exit criterion 'Human has signed verifiedBy for any table shipped without banner' is vacuous (nothing ships without the banner) | human | Fill the JSON (schema `pcb-calc/safety-table@1`; per cell: value, unit, printed text, source clause, enteredBy/Date; a second person adds checkedBy/Date), import it, sign `verifiedBy`/`verifiedDate` and set status VERIFIED only when every record is checked | OPEN (human) |
 | P3-2 | The compliance gate (`src/core/gate.ts`) is unchanged and still denies IEC 60664-1: its required ledger row is the umbrella pointer, which stays PAYWALLED until the human verifies the sub-rows. The calculators never write compliance wording | human | Verify S-030a, S-030e, S-030f, S-030g, S-031a, S-032, S-033 against licensed copies; then decide gate wiring (research doc section 5 rule 7) | OPEN (human) |
 | P3-3 | Table and clause numbers (F.1, F.2, F.4, F.10, A.2, Table 6-1) are as reported by secondary sources; the edition in use decides (Q-30). The data set carries an edition string; a table of another edition is never used | human | Enter the edition with the values | OPEN (human) |
-| P3-4 | No UI, no import UI, no export-to-file UI for the table JSON | ui-engineer | Phase 3 UI task: import textarea with the core size cap, per-table state badges (EMPTY / ENTERED_UNVERIFIED / VERIFIED), red UNVERIFIED banner, 'indicative only', INSUFFICIENT DATA panel text from the error `message`, always-visible product-standard banner (`PRODUCT_STANDARD_BANNER`) | OPEN (deferred) |
+| P3-4 | Import UI, per-table state badges, red UNVERIFIED banner, INSUFFICIENT DATA state and blank-template download exist (Phase 3 UI commit). Added in the UI fixes: import help with worked FAKE example and "Export my loaded tables" | ui-engineer | Done; see "Phase 3 UI fixes" | FIXED |
 | P3-5 | Skill `iec60664-gating` still says 'about 30 kHz' and 'reinforced doubles basic'; the code takes both only from T7 records the human enters (S-031a, S-030f are PAYWALLED) | orchestrator | Reword the skill to the structure the code implements | OPEN (minor) |
 | P3-6 | Groove, slot and rib credit and IEC 60664-3 coating credit beyond a single multiplier record are not modelled; IEC 60664-4 numbers and product-standard tables are out of scope | human | Say whether any of it is wanted in a later phase | ACCEPTED (deferral) |
 
@@ -468,4 +468,90 @@ Other conservative choices: functional and supplementary insulation use the basi
 
 **Deferred:** no net-class (mm and mil) copy block for spacing results (the headline prints both units; a clearance export into the Phase 1 net-class block is Phase 4 work); no live browser/accessibility pass by an agent (the human checks the pages on localhost:4173); the frequency/voltage scope wording depends entirely on T7 records the human enters; grooves/ribs remain warning only (core rule); the edition field is free text (no pick list), the panel lists the editions found in the loaded tables to help typing it.
 
-**BLOCKER (bundle budget, needs a human decision):** `npm run check:size` FAILS on total JS: 410.94 KB gzip against the 400 KB ceiling (was 371.44; largest route PathLoad 137.95 of 150, Clearance 74, Creepage 74, IpcSpacing 72, all fine). The overage is structural: the Phase 3 core (tables.ts 56 KB source, gating, three calculators, waveform) was never reachable from the UI before, so it first enters the bundle now (about 25 KB gzip), plus about 13 KB of UI. Options: (a) raise the SPEC total ceiling (for example to 430 KB) with a logged decision; (b) move the `CALCULATOR_STATE_KEYS` description strings (about 6.5 KB gzip, shipped to every user) behind a names-only runtime module (touches about 17 view-models and hash.ts, saves about 5.7 KB net); (c) both. Not done by the UI agent because (a) changes the spec and (b) edits Phase 1 and 2 files.
+**Bundle budget (stale text replaced 2026-10-19):** the 410.94 KB overage found at the first Phase 3 UI build was brought to 399.16 KB by the bundle trim in commit 2876cea (state-key names split, ledger status split) and to 399.79 KB by the core fixes. `check:size` passed at those points. The current state is in "Phase 3 UI fixes" below (PV3-1 stands).
+
+## Phase 3 phase-validator: human-only items (logged 2026-10-19, branch phase-3 @ 2876cea, report `phase-3-phase.md`, verdict PASS-WITH-CONDITIONS)
+
+Accepted deferral recorded: tables ship EMPTY (Q-31); exit criterion "verifiedBy for any table shipped without banner" is vacuously met; numeric Phase 3 output waits on P3-1. Note for the orchestrator (not human-only): the bundle BLOCKER paragraph above, P3-4 and CP-2 are stale (check:size now PASSES at 399.16/400 KB; UI and import shipped in 2876cea) and should be updated (report M-2).
+
+| # | Item | Owner | Needed to close | Status |
+|---|---|---|---|---|
+| PV3-1 | Bundle headroom 0.84 KB (399.16 of 400 KB total gzip JS). The next page will fail CI `check:size` | human + devops | Decide: raise the SPEC total ceiling with a logged decision, or require a further split before Phase 4 | OPEN (human) |
+| PV3-2 | Phase 3 cannot be closed until `phase-3-calc.md` and `phase-3-pcb.md` exist with PASS / PASS-WITH-CONDITIONS | orchestrator | Run calc-validator and pcb-domain-reviewer | OPEN |
+| PV3-3 | Imported files may claim VERIFIED with any signer name; the app passes the claim on (UI3-1). Only the human can decide whether browser import should refuse VERIFIED | human | Decide UI3-1 | OPEN (human) |
+| PV3-4 | Gate wiring for IEC 60664-1 still keyed to the umbrella pointer row `S-030…S-034` (P3-2); verifying sub-rows will not by itself change the gate | human | Decide gate wiring when sub-rows are verified | OPEN (human) |
+| PV3-5 | IEC 60664-1 edition: ed. 3.1 (2020+AMD1:2025) exists; the human must state which edition the entered tables come from (Q-30) and enter it as the data-set edition | human | Enter edition with the values | OPEN (human) |
+
+## Phase 3 redaction (logged 2026-10-19, standards-researcher; calc F-1, pcb F-1 rule text)
+
+- Removed from `docs/`: the material-group CTI band limits (LEDGER S-030e, `notes/spacing-iec60664-ipc2221.md`), the IPC-2221 elevation breakpoint (LEDGER S-010 notes, `notes/ipc2221.md`) and the IPC top voltage-band boundary (`docs/research/kicad-pcb-calculator.md` table row, C-K14, section 4, E1). Each now reads "published in the standard; enter from your licensed copy" with a public URL. No ledger status or id changed; `src/core/data/ledger.ts` needed no change (it holds no such value). The Phase 3 core sentence above was corrected to say exactly what remains. Validation reports were not edited.
+- Reinforced rule text (S-030f, unconfirmed, PAYWALLED): clearance = next step of the preferred impulse-voltage series (not the next clearance-table row); creepage = twice basic; no public rule found for the steady-state / recurring-peak case (T3). The pcb report's reading of the TI AMC1411 "doubled" sentence as a T3 rule is not supported (it concerns the temporary overvoltage vs a component rating). Skill `iec60664-gating` and SPEC corrections table reworded (closes the wording part of P3-5).
+- Not run by the researcher (no shell in this session): `npm run check:audit` and `npx --no-install vitest run tests/ledger-sync.test.ts`. The orchestrator must run both.
+
+## Phase 3 core fixes (logged 2026-10-19, branch phase-3, core only; UI follows; fixes for phase-3-pcb F-1..F-4, F-6, m-3 and phase-3-calc F-2..F-7)
+
+Tests use only the synthetic fake tables (`synthetic-tables.testutil.ts`). No IEC 60664-1 or IPC-2221 value was entered anywhere; the shipped tables are still empty shells.
+
+| # | Change (core) | Status |
+|---|---|---|
+| CF-1 | Reinforced clearance: mode `next-higher-row` removed. New T7 mode `next-preferred-impulse-step` carries a human-entered, strictly increasing `series` (unit V or kV) with the usual provenance. Reinforced clearance = T2 lookup at the next series value above the required impulse voltage. A required impulse that is not itself a series value is refused (INSUFFICIENT DATA); the last series value has no step (OUT OF TABLE RANGE). `lookupGrid` has no step-up option any more. The `multiplier` (>= 1) mode is kept and applies to the T2 part only | FIXED (pcb F-1, calc F-2, F-3) |
+| CF-2 | T3 (steady-state) reinforced needs its own T7 record `reinforced-clearance-steady-state` (mode `multiplier`, value >= 1); without it a reinforced clearance with T3 populated is INSUFFICIENT DATA naming that rule. The impulse step is never applied to T3 | FIXED (pcb F-1, calc F-2) |
+| CF-3 | VERIFIED needs a second person: `verifiedBy` must differ (case-insensitive, trimmed) from the table `enteredBy` and from every record `enteredBy` and `checkedBy` (cells, groups, rules, breakpoint). The validator and importer refuse the table with a message (chosen: refuse, not downgrade); `dataStateOf` and `tools/audit-lib.mjs` mirror it | FIXED (pcb F-2) |
+| CF-4 | A frequency above 0 now needs the T7 `scope-max-frequency` record: without it the result is INSUFFICIENT DATA naming T7 (clearance and creepage), also when the tables are empty (the missing T7 limit is listed next to the empty tables). The old warning `HF_NOT_CHECKED` is gone. The voltage scope records stay optional (still a caution) | FIXED (pcb F-3, calc m-6) |
+| CF-5 | Clearance with T3 empty: a peak working voltage above the impulse withstand voltage used for the T2 lookup (the stepped series value for reinforced) is refused OUT_OF_SCOPE with the reason. With T3 populated the larger value still wins | FIXED (pcb F-4) |
+| CF-6 | Results using a declared waveform cite S-035 (ledger row exists, VERIFIED, so the data status is unchanged); IPC results cite S-006. A non-DC declared shape with frequency 0 is refused ("frequency 0 Hz means DC"). A square waveform stated by rms gets the warning `SQUARE_RMS_UNIPOLAR` (a unipolar 0 to V pulse has a higher peak). The core offers no pulse shape in `WAVEFORM_SHAPES`, so no user choice was added | FIXED (calc F-5, F-6). Open for UI: offer "symmetric square" versus "unipolar pulse" (the core has `pulseRms`) |
+| CF-7 | Two raw NUL bytes removed from `tables.ts` (escape `\u0000`); a test fails if one comes back | FIXED (calc F-7, phase m-2) |
+| CF-8 | The coating-credit record is described as `coating-credit multiplier (user-stated rule; may not match your standard)` in code and messages. The credit is still blocked unless T7 is VERIFIED and the record is checked. It applies to creepage only unless the record states `appliesTo` `clearance` or `both` | FIXED (pcb F-6). The PD-substitute and solid-insulation modes are NOT built (needs the licensed rule text) |
+| CF-9 | A T7 of another edition no longer blocks a calculation that does not use T7 (basic, no coating, frequency 0): T7 is left out and the voltage scope reads "not checked" | FIXED (pcb m-3) |
+
+**Behaviour changes the UI must follow (4 tests in `src/ui/calculators/spacing.vm.test.ts` fail until the UI work is done):** the clearance and creepage pages need T7 whenever the frequency is above 0 (the "tables needed" list gains T7); the clearance page no longer applies a coating credit unless the T7 record states `appliesTo` clearance or both; the importer error text for a self-signed table is new; the T7 schema (series, `reinforced-clearance-steady-state`, `appliesTo`) needs documenting on the import help. Not done (UI work): pcb F-5, F-7 (link and `associatedClearanceInsulation`), F-8, F-9, m-1, m-2, m-4 to m-8.
+
+**Bundle:** 399.79 KB of 400 KB after the fixes (was 399.16; headroom 0.21 KB). The additions were offset by moving text shared by the clearance and creepage calculators into `gating.ts` and by folding duplicate rule parsing. PV3-1 still stands: the next UI addition needs a human decision on the ceiling.
+
+**Environment incident (no repo change):** a scratch `git worktree` used for a size baseline had a `node_modules` link to the real folder, and `git worktree remove --force` deleted part of the real `node_modules` before it failed. It was restored with `npm install --offline --ignore-scripts` from the local npm cache (no script run, no network); `package-lock.json` was restored byte for byte. Only packages for other operating systems are absent, as before. A human may want to run `npm ci` to be sure.
+
+## Phase 3 UI fixes (logged 2026-10-19, branch phase-3, uncommitted; ui-engineer)
+
+Tests use only synthetic or FAKE data. No IEC 60664-1 or IPC-2221 value was entered anywhere. The shipped tables are still empty.
+
+| # | Change | Status |
+|---|---|---|
+| UF-1 | `spacing.vm.test.ts`: the 4 failing tests now follow the corrected core (T7 listed when frequency > 0; empty-table cases also run at 0 Hz; fixtures include T7; clearance takes no coating credit unless T7 says `appliesTo` clearance or both, with a test for each). No assertion about empty tables or banners was weakened | FIXED |
+| UF-2 | pcb F-9: collapsed help on the table panel (lazy module `SpacingHelp`): schema `pcb-calc/safety-table@1` per table T1 to T8, selectors listed from the core specs, T7 rules incl. `series`, `reinforced-clearance-steady-state`, `appliesTo`, second-person rule, edition rule; FAKE worked example and button "Download worked example (fake)"; button "Export my loaded tables" (bundle JSON, disabled while all tables are empty). Self-signed VERIFIED files are refused with the core's "needs a second person" text (shown in the import error list; test added) | FIXED |
+| UF-3 | pcb F-5: supply voltage (T1 row key, often line-to-neutral, not the voltage across the gap; DC bus and circuits behind an isolating transformer or converter use the impulse route) and peak working voltage (the actual stress across the insulation) help texts | FIXED (wording not reviewed by standards-researcher) |
+| UF-4 | pcb F-8: IPC page shows an exposed-pad caution when a coated column is chosen; the policy sentence (the choice only selects a column) is unchanged. The core mandatory yes/no input "both conductors covered" is NOT built | PARTLY FIXED |
+| UF-5 | pcb F-7: creepage page hint (same pair, same insulation type, never below clearance) and a link to the clearance page. The "use result from clearance page" button and `associatedClearanceInsulation` are NOT built (bundle) | PARTLY FIXED |
+| UF-6 | pcb m-1 inner-layer note on both IEC pages; m-4 plain hint when no column matches; m-7 unipolar-pulse hint in the waveform help (the core offers no pulse shape, so no new choice) | FIXED / PARTLY (m-7 hint only) |
+
+**BLOCKER (bundle, human decision, PV3-1 now due):** with all of the above `npm run check:size` FAILS: total 402.92 KB gzip JS of 400 (largest route PathLoad 131.33 of 150; Clearance, Creepage and IpcSpacing routes about 68 KB). Before this batch it was 399.79. The help module is 2.2 KB gzip (lazy, so no route grows; total still counts), the rest is about 0.9 KB. No ceiling was raised. Even the small items alone (UF-3 to UF-6) do not fit in the 0.21 KB headroom. Trimming 3 KB elsewhere would touch code of other phases (prose is spread thinly: about 229 KB of long strings across the sources, no single block); the pair-search worker carries its own copy of the ledger status table (about 0.8 KB). Options for the human: raise the SPEC total ceiling with a logged decision, or approve trimming other pages' help text, or drop the per-table help prose (about 1 KB) and accept a smaller F-9.
+
+## Phase 3 bundle budget decision (2026-10-19)
+User decision (AskUserQuestion): total gzip JS ceiling raised from 400 KB to 430 KB (docs/SPEC.md, tools/check-size.mjs). Per-route first-load limit stays 150 KB. Reason: Phase 3 core + pages + entry guide reached 402.9 KB after 11 KB of trims; no further cheap savings without editing closed phases. Supersedes the UI BLOCKER and PV3-1/M-1 paragraphs about check:size; headroom for Phase 4 is about 27 KB.
+
+## Phase 3 final fixes and conditions (logged 2026-10-19, branch phase-3, uncommitted; calc-implementer)
+
+Tests use only synthetic data (fake round numbers). No IEC 60664-1 or IPC-2221 value was entered anywhere. The shipped tables are still empty.
+
+Fixed:
+
+| # | Finding | Fix |
+|---|---|---|
+| FF-1 | pcb N-1 (MAJOR): reinforced `multiplier` mode accepting 1 made reinforced equal to basic silently | `reinforced-clearance` now has only mode `next-preferred-impulse-step` (importer refuses `multiplier`; audit-lib mirrors it). `reinforced-creepage-multiplier` and `reinforced-clearance-steady-state` must be strictly greater than 1 (importer, audit-lib, tests). The multiplier is now an explicit calculation step in the clearance result ("Reinforced steady-state multiplier (T7)", "Clearance from T3 after the reinforced multiplier") and the creepage result ("Reinforced multiplier (T7)", "Creepage after the reinforced multiplier"). Help text updated. |
+| FF-2 | calc N-1: second-person name check ignored inner spaces and Unicode forms | `normName` in `src/core/spacing/tables.ts` and `tools/audit-lib.mjs`: NFKC, whitespace runs collapsed, trim, lower-case. |
+| FF-3 | calc N-2: input-format examples looked like standard figures | `src/state/state-key-docs.ts` examples now read "a value with a unit". |
+| FF-4 | calc R-2: DC waveform with frequency above 0 accepted silently | Refused ("DC means 0 Hz"), same guard as the 0 Hz case in reverse, in clearance and creepage. |
+| FF-5 | calc observation / pcb N-2: with T3 empty and reinforced insulation the peak was compared with the stepped impulse value | Compared with the BASIC impulse value (more conservative); T3_NOT_ENTERED warning kept. |
+| FF-6 | pcb N-4: IPC exposed-pad caution only in the UI | Core warning `COATED_COLUMN_EXPOSED_COPPER` for a coated external column. The UI inline note shows only while no result is shown (no duplicate). The "both conductors covered" yes/no input is NOT built (see F-8 residual). |
+
+Open conditions (not fixed here):
+
+| # | Condition | Note |
+|---|---|---|
+| F-6 | Coating credit is a user-entered multiplier, while IEC 60664-3 may work by pollution-degree substitution; there is no "100 % coverage" input | The credit stays blocked unless a VERIFIED T7 record exists and the user selects it. To be resolved before any real table is imported. |
+| F-7 | The creepage associated clearance is typed by hand; there is no check that it belongs to the same insulation type | Hint and link exist on the page. A later feature may link it to the clearance result. |
+| N-3 | Second-person names are free text | NFKC and whitespace normalisation reduce honest mistakes only. They do not prove two different people. |
+| N-5 | T1 row-key definition field, table-level provenance defaults, CSV importer not built | Convenience and clarity features for data entry, planned after the data policy is settled. |
+| PV3 | PV3 items remaining (human-only items in the Phase 3 phase-validator section above) | Unchanged by this change set. |
+
+## Phase 3 closure record (2026-10-19, branch phase-3)
+All three validators PASS-WITH-CONDITIONS after fixes; full record in `docs/validation/reports/phase-3-closure.md`. Human items: enter T1-T8 from licensed copies with a second-person verifier (P3-1), run a cross-check with real values, decide on F-6 (coating credit) and F-7; PR for `phase-3` (chain: phase-1-closure -> phase-2 -> phase-2-closure -> phase-3).

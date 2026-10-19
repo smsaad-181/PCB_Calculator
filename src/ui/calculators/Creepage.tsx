@@ -28,6 +28,7 @@ import {
   type CreepageState,
 } from './creepage.vm';
 import { SelectField } from '../components/SelectField';
+import { ASSOCIATED_HINT, INNER_LAYER_NOTE } from './spacing-common.vm';
 
 export default function Creepage() {
   const { tables } = useSpacingTables();
@@ -43,6 +44,7 @@ export default function Creepage() {
   return (
     <div class="calc-layout">
       <p class="muted">{PAGE_INTRO}</p>
+      <p class="muted">{INNER_LAYER_NOTE}</p>
       <SpacingBanners banners={view.banners} />
       <NoticeBanner notices={notices} onDismiss={() => setNotices([])} />
       <div class="calc-grid">
@@ -109,6 +111,9 @@ export default function Creepage() {
             required
             externalError={fe['associated']}
           />
+          <p class="help">
+            {ASSOCIATED_HINT} <a href="#/calc/clearance">Open the clearance page</a>.
+          </p>
           <QuantityField
             id="cr-frequency"
             label={FIELD_LABEL.frequency}

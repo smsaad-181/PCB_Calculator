@@ -236,12 +236,32 @@ describe('spacing table audit (Phase 3: build fails if a safety table without ve
   });
   it('VERIFIED needs verifiedBy and verifiedDate, no banner, every record checked; a signer needs status VERIFIED', () => {
     const cell = { row: 'a', col: 'b', value: 1, unit: 'mm' };
-    const verified = shell({ status: 'VERIFIED', entered: true, verifiedBy: 'A. Person', verifiedDate: '2026-01-02', bannerRequired: false, cells: [{ ...cell, checkedBy: 'A. Person', checkedDate: '2026-01-02' }] });
+    const verified = shell({ status: 'VERIFIED', entered: true, verifiedBy: 'A. Person', verifiedDate: '2026-01-02', bannerRequired: false, cells: [{ ...cell, enteredBy: 'C. Author', checkedBy: 'B. Checker', checkedDate: '2026-01-02' }] });
     expect(validateTable(verified, path)).toEqual([]);
     expect(errs({ ...verified, verifiedDate: '' })).toContain('verifiedDate');
     expect(errs({ ...verified, bannerRequired: true })).toContain('bannerRequired');
     expect(errs({ ...verified, cells: [cell] })).toContain('checkedBy');
+    // second person: the signer may not be an enterer or checker of any record (case-insensitive, trimmed)
+    const cells = (over: Record<string, unknown>) => [{ ...cell, enteredBy: 'C. Author', checkedBy: 'B. Checker', checkedDate: '2026-01-02', ...over }];
+    expect(errs({ ...verified, cells: cells({ checkedBy: ' a. PERSON ' }) })).toContain('second person');
+    expect(errs({ ...verified, cells: cells({ enteredBy: 'a. person' }) })).toContain('second person');
+    expect(errs({ ...verified, enteredBy: 'A. Person' })).toContain('second person');
+    expect(errs({ ...verified, elevationBreakpoint: { checkedBy: 'A. Person' } })).toContain('second person');
     expect(errs(shell({ verifiedBy: 'A. Person' }))).toContain('status');
+    // names are normalised: NFKC, inner whitespace collapsed, trimmed, lower-cased
+    expect(errs({ ...verified, enteredBy: '  a.   PERSON ' })).toContain('second person');
+    expect(errs({ ...verified, cells: cells({ checkedBy: 'A.\u00a0Person' }) })).toContain('second person');
+    expect(errs({ ...verified, cells: cells({ checkedBy: '\uff21. Person' }) })).toContain('second person');
+    expect(errs({ ...verified, enteredBy: 'A. Persona' })).not.toContain('second person');
+  });
+  it('reinforced rules: multipliers strictly greater than 1, no multiplier mode for reinforced-clearance', () => {
+    const rec = { clauseText: 'x', source: 'x', enteredBy: 'C. Author', enteredDate: '2026-01-01' };
+    const t = (rules: Record<string, unknown>[]) => errs(shell({ entered: true, rules: rules.map((r) => ({ ...rec, ...r })) }));
+    expect(t([{ rule: 'reinforced-creepage-multiplier', value: 1, unit: '1' }])).toContain('greater than 1');
+    expect(t([{ rule: 'reinforced-clearance-steady-state', mode: 'multiplier', value: 1, unit: '1' }])).toContain('greater than 1');
+    expect(t([{ rule: 'reinforced-creepage-multiplier', value: 2, unit: '1' }])).not.toContain('greater than 1');
+    expect(t([{ rule: 'reinforced-clearance', mode: 'multiplier', value: 3, unit: '1' }])).toContain('next-preferred-impulse-step');
+    expect(t([{ rule: 'reinforced-clearance', mode: 'next-preferred-impulse-step', series: [1, 2], unit: 'kV' }])).not.toContain('next-preferred-impulse-step');
   });
   it('an unentered table must hold no values, and values need entered true', () => {
     const cell = { row: 'a', col: 'b', value: 1, unit: 'mm' };

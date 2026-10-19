@@ -46,6 +46,20 @@ const fails = (i: unknown) => {
 };
 const primary = (r: CalcResult): number => (r.results.find((x) => x.role === 'primary') as { value: Quantity }).value.si;
 
+describe('ipc-spacing: traceability and waveform notes', () => {
+  it('always cites S-006 (mm/mil conversion) and cites S-035 only for a declared waveform', () => {
+    expect(ok(base()).reference.ledgerIds).toContain('S-006');
+    expect(ok(base()).reference.ledgerIds).not.toContain('S-035');
+    const w = ok(base({ voltagePeak: undefined as never, waveform: { shape: 'sine', basis: 'rms', value: V(10) } }));
+    expect(w.reference.ledgerIds).toEqual(expect.arrayContaining(['S-006', 'S-035']));
+  });
+  it('a square waveform declared from rms warns that a unipolar pulse would have a higher peak', () => {
+    const w = (basis: 'rms' | 'peak') => ok(base({ voltagePeak: undefined as never, waveform: { shape: 'square', basis, value: V(10) } }));
+    expect(w('rms').warnings.find((x) => x.code === 'SQUARE_RMS_UNIPOLAR')?.message).toMatch(/understates/);
+    expect(w('peak').warnings.some((x) => x.code === 'SQUARE_RMS_UNIPOLAR')).toBe(false);
+  });
+});
+
 describe('ipc-spacing: numbers from the synthetic T8', () => {
   it('internal conductors: next higher voltage band', () => {
     expect(primary(ok(base()))).toBeCloseTo(mm(t8(0, 1)), 12); // 15 V -> row 20 V
@@ -67,6 +81,15 @@ describe('ipc-spacing: numbers from the synthetic T8', () => {
     const i = external({ coating: 'permanent-polymer-or-solder-mask' }) as unknown as Record<string, unknown>;
     delete i['elevation'];
     expect(primary(ok(i as unknown as Inputs))).toBeCloseTo(mm(t8(3, 1)), 12);
+  });
+  it('a coated column carries the exposed-pad caution as a core warning; uncoated and internal do not', () => {
+    const i = external({ coating: 'permanent-polymer-or-solder-mask' }) as unknown as Record<string, unknown>;
+    delete i['elevation'];
+    const coated = ok(i as unknown as Inputs).warnings.find((w) => w.code === 'COATED_COLUMN_EXPOSED_COPPER');
+    expect(coated?.message).toMatch(/uncoated/);
+    expect(coated?.message).toMatch(/Pads/);
+    expect(ok(external()).warnings.some((w) => w.code === 'COATED_COLUMN_EXPOSED_COPPER')).toBe(false);
+    expect(ok(base()).warnings.some((w) => w.code === 'COATED_COLUMN_EXPOSED_COPPER')).toBe(false);
   });
   it('a combination the edition has no column for is refused with the table named, never a neighbour column', () => {
     expect(fails(external({ coating: 'conformal-coating' })).message).toContain('T8');

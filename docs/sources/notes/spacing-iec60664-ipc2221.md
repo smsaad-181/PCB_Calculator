@@ -8,6 +8,7 @@ Phase 3 research pass. Retrieved 2026-10-19 (standards-researcher). Ledger rows:
 - **"fetcher"**: an HTML page passed through a summarizing fetcher, asked to quote exactly. A summarizer can drop a symbol (it lost the √ in OpenStax and possibly the ≤ in TI SLYY063A). Quotes below are as the fetcher returned them.
 - **"search snippet"**: seen only in a search-engine summary. Never a basis for a status.
 - **STRICT rule applied:** no impulse-voltage, clearance, creepage, altitude-factor or IPC-2221 spacing value is recorded here or in any repo file. Where a public page prints such a table this note says "a public source prints a table; not recorded" and gives the URL.
+- **Phase 3 redaction (2026-10-19, calc-validator F-1):** the material-group CTI band limits (S-030e) and the IPC-2221 elevation breakpoint were removed from this note, the ledger and `notes/ipc2221.md`; the IPC top voltage-band boundary was removed from `docs/research/kicad-pcb-calculator.md`. Each is replaced by "value published in the standard; enter from your licensed copy" and a public URL. Numbers that remain on purpose: the scope limits quoted verbatim from the official IEC abstracts (S-030a, S-031a; not table values; never in code).
 
 ### Not read
 - IEC 60664-1 (any edition), IEC 60664-3, -4, -5, IEC 60112, IPC-2221B/C, UL 840, IEC 62368-1, 61010-1, 60601-1, 61558-1, 61800-5-1: paywalled, not read. Only official abstracts were read.
@@ -78,21 +79,33 @@ Phase 3 research pass. Retrieved 2026-10-19 (standards-researcher). Ledger rows:
 - VERIFIED for: four degrees, numbered 1-4, with these meanings. Not verified: exact normative text, which degree applies to an inner layer or a coated surface (a forum post claims inner layers are PD1; tier 5, not used), whether a default exists.
 
 ## S-030e Material groups and CTI — PAYWALLED-USER-MUST-VERIFY
-- Definitional bands (not a spacing table), as printed by PTR Hartmann (EN 60664-1:2007) and In Compliance (MacArthur, June 2025, Table 1):
-  - I: 600 ≤ CTI
-  - II: 400 ≤ CTI < 600
-  - IIIa: 175 ≤ CTI < 400
-  - IIIb: 100 ≤ CTI < 175
+- Definitional bands (not a spacing table) for groups I, II, IIIa and IIIb, printed by PTR Hartmann (EN 60664-1:2007) and In Compliance (MacArthur, June 2025, Table 1). The band limits are published in the standard; enter them from your licensed copy as table T6. Public sources: https://www.ptr-hartmann.com/know-how/connection-technology/materials/insulation-material-groups/ and https://digital.incompliancemag.com/issue/june-2025/material-group-selection-and-how-it-affects-spacings/ . (Phase 3 redaction 2026-10-19: the four band limits formerly listed here were removed.)
 - PTR: CTI "determined in accordance with IEC 60112 using solution A"; "materials are classified into four groups according to their CTI values".
-- TI SLYY063A (fetcher): "IEC 60664-1 classifies materials into four material groups according to their CTI values"; same band numbers but rendered "600 V < CTI", "400 V < CTI < 600 V" etc. Likely the fetcher dropped ≤; recorded as a minor discrepancy in boundary inclusivity.
+- TI SLYY063A (fetcher): "IEC 60664-1 classifies materials into four material groups according to their CTI values"; same band limits, but every bound rendered with a strict "<" (redacted 2026-10-19; see PTR/In Compliance above). Likely the fetcher dropped ≤; recorded as a minor discrepancy in boundary inclusivity.
 - TI SLYY063A: "CTI plays a major role in determining the minimum creepage"; "A minimum creepage is required for a given working voltage".
 - In Compliance: inorganic materials such as glass and ceramics that do not track do not require creepage distances (UL 61010-1 context; not used).
 - Lead not confirmed: one search snippet says IIIb is the default when CTI is unknown. Needs the licensed copy.
 
 ## S-030f Insulation types and reinforced rules — PAYWALLED-USER-MUST-VERIFY
-- TI SLUAAR5 §2.2: "The insulation type includes basic, functional and reinforced insulation."; "Creepage distance for reinforced insulation shall be twice the creepage distance for basic insulation."; "clearances of reinforced insulation shall be dimensioned as specified in Table F.2." A search snippet of the same paper: reinforced clearance uses the next higher impulse voltage step.
+- TI SLUAAR5 §2.2: "The insulation type includes basic, functional and reinforced insulation."; "Creepage distance for reinforced insulation shall be twice the creepage distance for basic insulation."; "clearances of reinforced insulation shall be dimensioned as specified in Table F.2."
+- Re-read 2026-10-19 (fetcher, same URL): "With respect to impulse voltages, clearances of reinforced insulation shall be dimensioned as specified in Table F.2 corresponding to the rated impulse voltage" and "but one step higher in the preferred series of values than that specified for basic insulation." This replaces the earlier search-snippet-only reading.
+- TI AMC1411 datasheet (SBASAB3, §8.2.2.1 "Insulation Coordination", fetcher, 2026-10-19), https://ti.com/document-viewer/lit/html/SBASAB3/GUID-E226C2E8-2871-425C-A26D-C554E661C8A1 :
+  - clearance: "the minimum clearance value is taken from the line corresponding to the next higher impulse voltage rating" (cites 60664-1 Table F.2);
+  - creepage: the basic value "is doubled for reinforced isolation" (cites Table F.4);
+  - "The value must be doubled for reinforced isolation" refers to the TEMPORARY OVERVOLTAGE, which the datasheet compares with the isolator's rated transient isolation voltage. It is not a clearance-table rule. The phase-3-pcb report F-1 cites this sentence as a "different reinforced rule" for T3; that reading is not supported by the page.
+  - Same publisher as SLUAAR5, so not independent.
+- TI SLLA563 (white paper, June 2021, §5.3), https://www.ti.com/document-viewer/lit/html/SLLA563/GUID-C84AC9BC-CE7B-4CBB-9405-AA75A73C68B2 : "For reinforced insulation, the transient voltage has to be increased by one level". Context is IEC 62368-1, not 60664-1; supports the pattern only.
+- Search-engine summaries (calculator sites, blogs; not read): "d_reinforced,creepage = 2 × d_basic,creepage"; reinforced clearance from the next impulse step. Tier 5.
+- IEC 60664-1:2007 table of contents (standards.ie listing, fetcher), https://shop.standards.ie/en-ie/standards/iec-60664-1-2007-565005_saig_iec_iec_1289053/ : "5.1.6 Dimensioning of clearances of basic, supplementary and reinforced insulation"; "5.2.4 Dimensioning of creepage distances of basic, supplementary and reinforced insulation"; "4.2.4 Insulation coordination with regard to recurring peak voltage"; "4.2.5 Insulation coordination with regard to temporary overvoltage". Ed. 3 numbering not confirmed (the ed. 3 abstract says clauses 4 and 5 were restructured).
 - IEC 60664-4 abstract: "The dimensioning values directly apply for basic insulation;" "for reinforced insulation additional requirements apply according to Part 1."
-- No second tier 1-3 source read for the factor or the step rule. The skill says "reinforced doubles basic requirements"; per TI that is the creepage rule, while clearance follows a different rule. **Do not implement either rule until the human confirms the clause text.** Supplementary and double insulation definitions: not found in a readable public source.
+
+**What the secondary sources say (unconfirmed, PAYWALLED):**
+1. Reinforced clearance, impulse case: take the rated impulse voltage one step higher in the PREFERRED SERIES of impulse values than for basic insulation, then read the clearance table at that impulse. This is not "the next row of the clearance table": if the clearance table has rows between preferred steps, stepping one row gives a smaller (non-conservative) distance. The preferred series is a published list; it must be entered by the human (a T7 record or the T1 values), never written in code or docs.
+2. Reinforced creepage: twice the basic creepage (TI SLUAAR5, TI AMC1411; blogs).
+3. Reinforced clearance, steady-state / recurring-peak / temporary-overvoltage case (T3): **no public source found** that states the rule. Neither the impulse step nor a factor 2 may be assumed for T3. The only "doubled" sentence found (AMC1411) concerns the temporary overvoltage compared with a component rating, not a clearance table.
+4. The skill's former "reinforced doubles basic requirements" was right only for creepage per these sources. The skill was reworded 2026-10-19.
+
+Only one publisher (TI, two documents) states rules 1 and 2 for IEC 60664-1, so nothing here is verified. **Do not implement any rule except from a human-entered T7 record.** Human: read clause 5.1.6 and 5.2.4 (ed. 2 numbering) or their ed. 3 equivalents, the clauses on recurring peak and temporary overvoltage, and the preferred impulse-voltage series. Supplementary and double insulation definitions: not found in a readable public source.
 
 ## S-030g Printed boards and coatings — PAYWALLED-USER-MUST-VERIFY
 - IEC 60664-3:2016 abstract, https://webstore.iec.ch/publication/26148 (fetcher): ed. 3.0, 2016-11-04. "applies to assemblies protected against pollution by the use of coating, potting or moulding," "thus allowing a reduction of clearance and creepage distances as described in IEC 60664-1."; "type 1 protection improves the microenvironment of the parts under the protection;" "type 2 protection is considered to be similar to solid insulation."
@@ -109,7 +122,7 @@ Phase 3 research pass. Retrieved 2026-10-19 (standards-researcher). Ledger rows:
 ## S-031a Frequency boundaries — PAYWALLED-USER-MUST-VERIFY
 - Part 1: "This document applies to frequencies up to 30 kHz." (IEC and SFS abstracts.)
 - Part 4: "periodic voltages with a fundamental frequency above 30 kHz and up to 10 MHz"; "Applies to equipment for use up to 2 000 m above sea level having a rated voltage up to a.c. 1 000 V." (IEC and EVS abstracts.)
-- Above 10 MHz neither abstract covers the case. The skill wording "about 30 kHz" should become "above the Part 1 frequency limit stated in its scope (S-031a)".
+- Above 10 MHz neither abstract covers the case. The skill wording "about 30 kHz" was reworded 2026-10-19: the high-frequency limit is a user-entered T7 record; no frequency figure is in code.
 
 ## S-032 Altitude correction — PAYWALLED-USER-MUST-VERIFY
 - IEC 60664-1 ed. 3 abstract: "update of distances altitude correction in a new Table F.10"; scope "provides guidance for use at higher altitudes".
@@ -166,9 +179,10 @@ Phase 3 research pass. Retrieved 2026-10-19 (standards-researcher). Ledger rows:
 4. IPC-2221 column set by source/edition (A6 qualifier, A8, Rev C B5, B4 wording). S-033.
 5. CTI boundary inclusivity rendering (TI vs PTR/In Compliance). S-030e.
 6. Creepage-not-less-than-clearance: PTR attributes it to 60664-1 (2007); TI quotes it from IEC 61800-5-1. S-030b.
+7. Reinforced rule for the steady-state / recurring-peak clearance case (T3): the phase-3-pcb report reads TI AMC1411's "doubled for reinforced isolation" as that rule; the page applies it to the temporary overvoltage compared with a component rating. No public rule for T3 found. S-030f.
 
 ## What the human must still verify (licensed copies)
-- IEC 60664-1 (edition in use): Scope; terms (clearance, creepage distance, working voltage, recurring peak, rated impulse voltage, pollution degree, micro-environment, overvoltage category, insulation types); clearance clause (impulse, steady-state/recurring peak, temporary overvoltage, field condition A/B, pollution-degree minima); creepage clause (RMS, pollution degree, material group, printed wiring columns, interpolation rule, creepage not less than clearance); reinforced insulation rules for clearance and creepage; altitude clause and table (F.10 in ed. 3); Annex G and H flowcharts; rated impulse voltage table; clearance table; creepage table; material-group definitions.
+- IEC 60664-1 (edition in use): Scope; terms (clearance, creepage distance, working voltage, recurring peak, rated impulse voltage, pollution degree, micro-environment, overvoltage category, insulation types); clearance clause (impulse, steady-state/recurring peak, temporary overvoltage, field condition A/B, pollution-degree minima); creepage clause (RMS, pollution degree, material group, printed wiring columns, interpolation rule, creepage not less than clearance); reinforced insulation rules for clearance (impulse case, and separately the steady-state / recurring-peak / temporary-overvoltage case) and creepage; the preferred series of impulse voltages used for the reinforced step; altitude clause and table (F.10 in ed. 3); Annex G and H flowcharts; rated impulse voltage table; clearance table; creepage table; material-group definitions.
 - IEC 60664-3 if any coating credit is wanted; IEC 60664-4 if anything above the Part 1 frequency limit is wanted (the app should only warn).
 - IPC-2221B §6.3 Table 6-1 or IPC-2221C Table 6-1: column headings, voltage bands, cells, per-volt rule, notes.
 - The product standard that governs the user's product (it may change every one of the above).

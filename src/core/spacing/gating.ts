@@ -2,8 +2,8 @@ import { rateConfidence } from '../confidence';
 import type { Confidence, DataStatus } from '../confidence';
 import { DIM, q, sameDim } from '../units';
 import type { Dim, Quantity } from '../units';
-import type { CalcError, CalcInput, CalcWarning, Result } from '../result';
-import { SHIPPED_TABLES, UNIT_SLIP_WINDOWS, dataStateOf, emptyTableMessage, findRule, isTableEmpty, isTableSet, ruleIsChecked, ruleValueSi } from './tables';
+import type { CalcError, CalcInput, CalcResult, CalcWarning, Result } from '../result';
+import { COATING_RULE_KIND, SHIPPED_TABLES, UNIT_SLIP_WINDOWS, dataStateOf, emptyTableMessage, findRule, isTableEmpty, isTableSet, ruleIsChecked, ruleValueSi } from './tables';
 import type { LookupOutcome, SpacingTable, SpacingTableSet } from './tables';
 import { WAVEFORM_SHAPES, resolveVoltage } from './waveform';
 import type { ResolvedVoltage, VoltageBasis, VoltageSpec } from './waveform';
@@ -25,8 +25,6 @@ export const PAYWALLED_NOTE =
   'The table values come from a licensed standard that this application does not hold or verify (ledger status PAYWALLED-USER-MUST-VERIFY); they are exactly what the user entered.';
 export const SOLDERMASK_NOTE =
   'Solder mask is not conformal coating (IEC 60664-3 coating, S-030g): no coating credit is ever given for solder mask.';
-export const HF_NOT_CHECKED_TEXT =
-  'high-frequency applicability (IEC 60664-4) not checked: no frequency limit is recorded in table T7. Above the frequency limit of IEC 60664-1 the IEC 60664-4 values apply instead (S-031, S-031a).';
 export const CATEGORY_CONFLICT_NOTE =
   'The meaning of overvoltage categories II and III differs between public sources (S-030c, CONFLICT); the product standard decides which category applies.';
 export const INDICATIVE_PREFIX = 'indicative only';
@@ -163,6 +161,55 @@ export function emptyTablesError(required: readonly SpacingTable[]): CalcError |
   return empties.length === 0 ? undefined : insufficientData(empties.map(emptyTableMessage));
 }
 
+/** All empty tables among those required, plus the missing T7 frequency limit when a frequency above zero is given (it is always needed then). */
+export function requiredDataError(required: readonly SpacingTable[], t7: SpacingTable, frequencyHz: number): CalcError | undefined {
+  const msgs = required.filter(isTableEmpty).map(emptyTableMessage);
+  const t7Named = required.includes(t7) && isTableEmpty(t7);
+  if (frequencyHz > 0 && !t7Named && findRule(t7, 'scope-max-frequency') === undefined) msgs.push(ruleMissingError(t7, 'scope-max-frequency').message);
+  return msgs.length === 0 ? undefined : insufficientData(msgs);
+}
+
+/**
+ * The T7 to use for the scope checks. A non-empty T7 of another edition is never consulted silently: when the calculation needs T7
+ * (reinforced, coating credit, a frequency above zero) it is refused; otherwise it is left out (the voltage scope then reads "not checked").
+ */
+export function scopeTable(t7: SpacingTable, edition: string, needed: boolean): { table: SpacingTable; error?: CalcError } {
+  const error = rulesEditionError(t7, edition);
+  if (error === undefined) return { table: t7 };
+  return needed ? { table: t7, error } : { table: SHIPPED_TABLES.tables.T7 };
+}
+
+/** Frequency 0 Hz means DC: a declared waveform that is not DC contradicts it, and a declared DC waveform with a frequency above 0 does too. */
+export function waveformFrequencyError(shape: string | undefined, frequencyHz: number): CalcError | undefined {
+  if (shape === 'dc' && frequencyHz > 0) {
+    return {
+      code: 'INVALID_INPUT',
+      field: 'frequency',
+      message: `The declared dc waveform contradicts a frequency of ${String(frequencyHz)} Hz: DC means 0 Hz. Set the frequency to 0 or declare an AC waveform.`,
+    };
+  }
+  if (shape === undefined || shape === 'dc' || frequencyHz !== 0) return undefined;
+  return {
+    code: 'INVALID_INPUT',
+    field: 'frequency',
+    message: `The declared ${shape} waveform needs a frequency above 0: frequency 0 Hz means DC.`,
+  };
+}
+
+/** Ledger ids of a result, with S-035 (VERIFIED, so the data status is unchanged) added when the voltage came from a declared waveform. */
+export const withWaveformRow = (ids: readonly string[], viaWaveform: boolean): string[] => (viaWaveform ? [...ids, 'S-035'] : [...ids]);
+
+/** A square waveform stated by its rms value has peak = rms only if it is symmetric; a unipolar 0..V pulse has a higher peak. */
+export function squareRmsWarning(shape: string | undefined, basis: string | undefined): CalcWarning | undefined {
+  if (shape !== 'square' || basis !== 'rms') return undefined;
+  return {
+    severity: 'warning',
+    code: 'SQUARE_RMS_UNIPOLAR',
+    message:
+      'Symmetric square assumed (peak equals rms). A unipolar 0 to V pulse has a higher peak (sqrt(2) times its rms at 50 % duty) that this result understates; enter the peak instead.',
+  };
+}
+
 /** T7 is optional where a rule is not needed, but a non-empty T7 of another edition is never consulted silently. */
 export function rulesEditionError(t7: SpacingTable, edition: string): CalcError | undefined {
   if (isTableEmpty(t7)) return undefined;
@@ -193,7 +240,7 @@ export interface ScopeOutcome {
 
 /**
  * Frequency and voltage scope from the T7 records (the limits are user-entered, never code). Frequency above the recorded limit:
- * no number, IEC 60664-4 named. No recorded limit: generic "not checked" warning when a frequency above zero is given.
+ * no number, IEC 60664-4 named. A frequency above zero with no recorded limit: INSUFFICIENT DATA naming T7 (no number).
  */
 export function checkScope(t7: SpacingTable, a: { frequencyHz: number; rmsV?: number | undefined; peakV?: number | undefined }): ScopeOutcome {
   const warnings: CalcWarning[] = [];
@@ -219,8 +266,7 @@ export function checkScope(t7: SpacingTable, a: { frequencyHz: number; rmsV?: nu
     }
     checks.push({ name: 'frequency within the limit recorded in T7', ok: true, detail: `${String(a.frequencyHz)} Hz is at or below ${String(limit)} Hz (user-entered record, ${fRule.source}).` });
   } else if (a.frequencyHz > 0) {
-    warnings.push({ severity: 'warning', message: HF_NOT_CHECKED_TEXT, code: 'HF_NOT_CHECKED' });
-    unchecked.push('high-frequency applicability (IEC 60664-4) not checked');
+    return { refusal: ruleMissingError(t7, 'scope-max-frequency'), warnings, checks, unchecked };
   }
 
   const vRule = findRule(t7, dc ? 'scope-max-voltage-dc' : 'scope-max-voltage-ac-rms');
@@ -255,19 +301,33 @@ export interface CoatingDecision {
   readonly warnings: CalcWarning[];
   readonly note?: string;
 }
-/** Coating credit (IEC 60664-3) only when the user selects it AND T7 is VERIFIED and holds the rule record for that type. */
-export function coatingDecision(t7: SpacingTable, wanted: CoatingCredit): CoatingDecision {
+/**
+ * Coating credit only when the user selects it AND T7 is VERIFIED and holds the rule record for that type. The record is a
+ * user-stated multiplier (COATING_RULE_KIND); IEC 60664-3 may work differently (S-030g). It applies to creepage only unless the
+ * record states scope clearance (or both).
+ */
+export function coatingDecision(t7: SpacingTable, wanted: CoatingCredit, distance: 'clearance' | 'creepage'): CoatingDecision {
   if (wanted === 'none') return { factor: 1, applied: false, warnings: [] };
   const rule = findRule(t7, 'coating-credit', { coatingType: wanted });
   const notApplied = (why: string): CoatingDecision => ({
     factor: 1,
     applied: false,
-    warnings: [{ severity: 'warning', message: `Coating credit ${wanted} was selected but is NOT applied: ${why}. The distance shown has no coating credit.`, code: 'COATING_CREDIT_NOT_APPLIED' }],
+    warnings: [
+      {
+        severity: 'warning',
+        message: `Coating credit ${wanted} (${COATING_RULE_KIND}) is NOT applied: ${why}.`,
+        code: 'COATING_CREDIT_NOT_APPLIED',
+      },
+    ],
   });
-  if (rule === undefined) return notApplied(`no "${wanted}" coating-credit record is entered in table T7`);
+  if (rule === undefined) return notApplied(`no "${wanted}" ${COATING_RULE_KIND} record is entered in table T7`);
   if (dataStateOf(t7) !== 'VERIFIED' || !ruleIsChecked(rule)) return notApplied('the T7 rule record is not verified by a named person');
+  const scope = rule.appliesTo ?? 'creepage';
+  if (scope !== 'both' && scope !== distance) {
+    return notApplied(scope === 'creepage' ? 'the T7 record applies to creepage only' : 'the T7 record applies to clearance only');
+  }
   const factor = ruleValueSi(rule) as number;
-  return { factor, applied: true, warnings: [], note: `Coating credit ${wanted}: distance multiplied by ${String(factor)} (verified T7 record, ${rule.source}).` };
+  return { factor, applied: true, warnings: [], note: `Coating credit ${wanted} (${COATING_RULE_KIND}): ${distance} multiplied by ${String(factor)} (verified T7 record, ${rule.source}).` };
 }
 
 // ---- result pieces ------------------------------------------------------------------------------------------------------------
@@ -305,6 +365,45 @@ export function provenanceLine(table: SpacingTable, l: Extract<LookupOutcome, { 
 }
 
 export const dimless = (n: number): Quantity => q(n, DIM.DIMENSIONLESS);
+
+// ---- text shared by the two IEC 60664-1 calculators (kept here so it is shipped once) ------------------------------------------
+
+export const insulationAssumption = (t: InsulationType): string =>
+  t === 'basic' || t === 'reinforced'
+    ? `Insulation type: ${t}.`
+    : `Insulation type: ${t}. It uses the basic-insulation lookup (conservative reading; the standard's own rule for it is not encoded). Double insulation is basic plus supplementary: calculate each layer separately.`;
+
+/** The primary (minimum-requirement) length result, labelled "indicative only" while any table is unverified. */
+export function primaryResult(unverified: boolean, label: string, valueSi: number): CalcResult['results'][number] {
+  return {
+    name: unverified ? `${INDICATIVE_PREFIX}: ${label}` : label,
+    value: q(valueSi, DIM.LENGTH),
+    role: 'primary',
+    bound: 'min-requirement',
+    ...(unverified ? { note: 'indicative only (UNVERIFIED table data)' } : {}),
+  };
+}
+
+export const SOLDERMASK_DECLARED_WARNING: CalcWarning = {
+  severity: 'caution',
+  message: 'Solder mask was declared: it is not conformal coating and gives no credit.',
+  code: 'SOLDERMASK_DECLARED',
+};
+
+/** The three checks every gated lookup passes before it returns a number. */
+export function standardChecks(mandatory: readonly string[], used: readonly SpacingTable[], edition: string): ValidityCheck[] {
+  return [
+    { name: 'all mandatory inputs given', ok: true, detail: `Mandatory inputs: ${mandatory.join('; ')}. None has a default.` },
+    { name: 'tables populated and of the selected edition', ok: true, detail: `${[...new Set(used.map((t) => t.table))].join(', ')} hold entered values of edition ${edition}.` },
+    { name: 'every looked-up cell carries provenance', ok: true, detail: 'Each cell records its printed text, source, who entered it and when.' },
+  ];
+}
+
+export function iecRecommendation(unverified: boolean, used: readonly SpacingTable[]): string {
+  return unverified
+    ? `${INDICATIVE_PREFIX}: the table data is UNVERIFIED (entered by a user, not verified by a named person). Check every cell against your licensed copy of IEC 60664-1 and against your product standard before using this distance.`
+    : `Distances are lookups from user-entered tables signed off by ${[...new Set(used.map((t) => t.verifiedBy))].join(', ')}. The product standard may require more; check it before using this distance.`;
+}
 
 export function userInput(name: string, value: Quantity, detail?: string): CalcInput {
   return { name, value, source: 'user', ...(detail !== undefined ? { sourceDetail: detail } : {}) };

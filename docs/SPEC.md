@@ -8,7 +8,7 @@ Full original feature list: `MASTER_PROMPT_ORIGINAL.md`. This file corrects and 
 |---|---|
 | "Closed-form relationship derived from IPC-2152" | Partly right. **The standard:** IPC-2152 (2009) is reported to present charts plus correction factors, and no secondary source reports a printed closed-form equation (ledger S-002, `PAYWALLED-USER-MUST-VERIFY`: nobody here has read the standard). **Third-party fits:** published closed-form *fits* to IPC-2152 chart data do exist. Examples are Brooks & Adam 2015 (S-011a) and others (S-011b..e), all `UNVERIFIED` or `CONFLICT`. Mode A stays labelled **"IPC-2152-informed estimate"** because any equation is a third-party fit, not the standard (see skill `ipc2152-policy`). Open policy question: may Mode A use a cited published fit? Never digitize the charts ourselves. Human decision, see `docs/validation/OPEN_RISKS.md` R-8. |
 | °C/°F, oz/ft² as plain units | Separate dimensions: absolute temperature, ΔT, areal mass. |
-| Altitude/frequency applied to creepage | Altitude → clearance only. Frequency > ~30 kHz → IEC 60664-4 warning. |
+| Altitude/frequency applied to creepage | Altitude → clearance only. High-frequency limit: a user-entered T7 record (the IEC 60664-4 abstract mentions a boundary; no number in code); above it, refuse and name IEC 60664-4. Reinforced insulation rules come only from user-entered T7 records: clearance steps to the next preferred impulse-voltage step (per secondary sources, unconfirmed; not the next table row); creepage doubles basic (per secondary sources, unconfirmed); no public rule found for the steady-state clearance case (ledger S-030f, S-031a). |
 | IPC-2221C is the only IPC reference | Add IPC-6012 (acceptance), IPC-2141 (impedance, legacy), IPC-4562 (foil), IEC 60664-4, IEC 60063 (E-series). |
 | Confidence level (subjective) | Rule-based (`confidence.ts`). |
 | Fabricator capabilities implied | User-editable, date-stamped fab profiles only. |
@@ -38,7 +38,7 @@ The reference calculator is `src/core/calculators/copper-converter/`. The UI sho
 
 ## Non-functional requirements
 - Closed-form calc < 1 ms; self-heating solver ≤ 50 iterations; envelope via corners (≤ 6 inputs) else Monte Carlo (5-10k samples) in a Web Worker.
-- Bundle: first-load JS per calculator route ≤ 150 KB gzip (entry + shared chunks + that route's lazy chunks) and total JS across all chunks ≤ 400 KB gzip (user decision 2026-10-14), code-split per calculator. Load < 1 s broadband.
+- Bundle: first-load JS per calculator route ≤ 150 KB gzip (entry + shared chunks + that route's lazy chunks) and total JS across all chunks ≤ 430 KB gzip (user decision 2026-10-14 set 400 KB; raised to 430 KB by user decision 2026-10-19 for Phase 3), code-split per calculator. Load < 1 s broadband.
 - Offline capable. No runtime network calls. Hash-routed. State in URL hash (schema-versioned).
 - Per-calculator error boundary. Input guards. Never display NaN.
 - **Headline formatting:** every headline number is printed through `src/core/format-result.ts`. This covers results, design values, margins and utilisation. The four helpers are `formatResult`, `formatDesignValue`, `formatMargin` and `formatUtilisation`.

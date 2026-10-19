@@ -39,6 +39,9 @@ export const T7_SCOPE_AC_RMS_V = 5000;
 export const T7_SCOPE_DC_V = 8000;
 export const T7_COATING_TYPE1 = 0.75;
 export const T7_REINFORCED_CLEARANCE_MULTIPLIER = 4;
+/** Fake preferred impulse series (kV). It deliberately skips the 3 kV row of T2, so a one-row step in T2 and a one-step move in the series differ. */
+export const T7_IMPULSE_SERIES_KV = [1, 2, 4, 5] as const;
+export const T7_REINFORCED_STEADY_MULTIPLIER = 3;
 
 const cell = (row: string, col: string, value: number, unit: string, verified: boolean): Rec => ({
   row,
@@ -163,7 +166,8 @@ export function rawSynthetic(id: TableId, o: SynthOptions = {}): Rec {
       const base = { clauseText: SYNTH, source: SYNTH, enteredBy: 'test-author', enteredDate: '2026-01-01', ...(v ? CHECK : {}) };
       const rules = [
         { rule: 'reinforced-creepage-multiplier', value: T7_REINFORCED_CREEPAGE, unit: '1', ...base },
-        { rule: 'reinforced-clearance', mode: 'next-higher-row', ...base },
+        { rule: 'reinforced-clearance', mode: 'next-preferred-impulse-step', series: [...T7_IMPULSE_SERIES_KV], unit: 'kV', ...base },
+        { rule: 'reinforced-clearance-steady-state', mode: 'multiplier', value: T7_REINFORCED_STEADY_MULTIPLIER, unit: '1', ...base },
         { rule: 'scope-max-frequency', value: T7_SCOPE_FREQUENCY_HZ, unit: 'Hz', ...base },
         { rule: 'scope-max-voltage-ac-rms', value: T7_SCOPE_AC_RMS_V, unit: 'V', ...base },
         { rule: 'scope-max-voltage-dc', value: T7_SCOPE_DC_V, unit: 'V', ...base },

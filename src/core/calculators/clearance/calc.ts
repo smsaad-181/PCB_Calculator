@@ -5,22 +5,29 @@ import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import {
   CATEGORY_CONFLICT_NOTE,
-  INDICATIVE_PREFIX,
   anyUnverified,
   checkScope,
   coatingDecision,
   commonWarnings,
   dimless,
-  emptyTablesError,
+  iecRecommendation,
+  insulationAssumption,
+  insufficientData,
   lookupError,
+  primaryResult,
   provenanceLine,
+  requiredDataError,
   ruleMissingError,
-  rulesEditionError,
+  scopeTable,
   spacingConfidence,
+  standardChecks,
+  SOLDERMASK_DECLARED_WARNING,
+  squareRmsWarning,
   userInput,
+  withWaveformRow,
 } from '../../spacing/gating';
 import type { CoatingCredit, InsulationType, PollutionDegree } from '../../spacing/gating';
-import { findRule, isTableEmpty, lookupGrid } from '../../spacing/tables';
+import { findRule, isTableEmpty, lookupGrid, nextPreferredImpulseStep } from '../../spacing/tables';
 import type { SpacingTable, SpacingTableSet } from '../../spacing/tables';
 import { validate } from './guards';
 import type { FieldCondition, OvervoltageCategory } from './guards';
@@ -68,15 +75,15 @@ function build(raw: unknown): CalcOutcome {
   const required: SpacingTable[] = [T.T2, T.T4];
   if (viaCategory) required.push(T.T1);
   if (reinforced || inp.coating !== 'none') required.push(T.T7);
-  const empty = emptyTablesError(required);
-  if (empty !== undefined) return { ok: false, error: empty };
-  const t7Edition = rulesEditionError(T.T7, edition);
-  if (t7Edition !== undefined) return { ok: false, error: t7Edition };
+  const missingData = requiredDataError(required, T.T7, inp.frequency.si);
+  if (missingData !== undefined) return { ok: false, error: missingData };
+  const t7 = scopeTable(T.T7, edition, reinforced || inp.coating !== 'none' || inp.frequency.si > 0);
+  if (t7.error !== undefined) return { ok: false, error: t7.error };
 
   // 2. recorded scope (frequency, voltage) before any lookup
   const peakV = inp.peak.si;
   const rmsV = inp.rms?.si;
-  const scope = checkScope(T.T7, { frequencyHz: inp.frequency.si, rmsV, peakV });
+  const scope = checkScope(t7.table, { frequencyHz: inp.frequency.si, rmsV, peakV });
   if (scope.refusal !== undefined) return { ok: false, error: scope.refusal };
 
   const used: SpacingTable[] = [];
@@ -99,20 +106,41 @@ function build(raw: unknown): CalcOutcome {
   }
   steps.push({ label: 'Rated impulse withstand voltage', expr: impulseSource === 'user' ? 'user-entered' : 'T1(supply voltage, overvoltage category)', value: q(impulseV, DIM.VOLTAGE), bound: 'min-requirement' });
 
-  // 4. reinforced insulation: only the T7 rule record
-  let stepUp = false;
-  let multiplier = 1;
+  // 4. reinforced insulation: only the T7 rule records. The impulse part steps in the T7 preferred impulse series (never a T2 row);
+  //    the steady-state (T3) part needs its own record.
+  let lookupV = impulseV;
+  let steadyMultiplier = 1;
   if (reinforced) {
     const rule = findRule(T.T7, 'reinforced-clearance');
     if (rule === undefined) return { ok: false, error: ruleMissingError(T.T7, 'reinforced-clearance') };
     used.push(T.T7);
-    if (rule.mode === 'next-higher-row') stepUp = true;
-    else multiplier = rule.value as number;
     lines.push(`T7 rule reinforced-clearance (${rule.mode ?? ''}), source ${rule.source}: ${rule.clauseText}`);
+    const st = nextPreferredImpulseStep(rule, impulseV);
+    if (!st.ok) return { ok: false, error: st.above ? { code: 'OUT_OF_DOMAIN', gate: 'OUT_OF_SCOPE', message: st.message } : insufficientData([st.message]) };
+    lookupV = st.valueSi;
+    steps.push({ label: 'Next preferred impulse step (T7 series)', expr: 'T7 series value above the required impulse voltage', value: q(lookupV, DIM.VOLTAGE), bound: 'min-requirement' });
+    if (!isTableEmpty(T.T3)) {
+      const steady = findRule(T.T7, 'reinforced-clearance-steady-state');
+      if (steady === undefined) return { ok: false, error: ruleMissingError(T.T7, 'reinforced-clearance-steady-state') };
+      steadyMultiplier = steady.value as number;
+      steps.push({ label: 'Reinforced steady-state multiplier (T7)', expr: 'user-entered rule record (greater than 1)', value: dimless(steadyMultiplier) });
+    }
+  }
+  // With T3 empty the peak is compared with the BASIC impulse value (the more conservative one), never the stepped reinforced value.
+  if (isTableEmpty(T.T3) && peakV > impulseV * (1 + 1e-12)) {
+    return {
+      ok: false,
+      error: {
+        code: 'OUT_OF_DOMAIN',
+        gate: 'OUT_OF_SCOPE',
+        field: 'workingVoltagePeak',
+        message: `The peak working voltage ${String(peakV)} V exceeds the impulse withstand voltage ${String(impulseV)} V (the basic value, used for the reinforced check too), and table T3 is not entered: the clearance for that voltage cannot be found. Enter T3 from your licensed copy.`,
+      },
+    };
   }
 
   // 5. T2 lookup (and T3 when entered)
-  const l2 = lookupGrid(T.T2, { rowSi: impulseV, selectors: { pollutionDegree: inp.pollutionDegree, fieldCondition: inp.fieldCondition }, edition }, { stepUp });
+  const l2 = lookupGrid(T.T2, { rowSi: lookupV, selectors: { pollutionDegree: inp.pollutionDegree, fieldCondition: inp.fieldCondition }, edition });
   if (!l2.ok) return { ok: false, error: lookupError(l2) };
   used.push(T.T2);
   lines.push(provenanceLine(T.T2, l2));
@@ -124,20 +152,21 @@ function build(raw: unknown): CalcOutcome {
     warnings.push({
       severity: 'warning',
       code: 'T3_NOT_ENTERED',
-      message: 'Table T3 (clearance for steady-state and recurring peak voltages) is not entered, so that check was NOT done. If your edition has such a table, enter it; the clearance may be larger.',
+      message: 'Table T3 (steady-state and recurring peak voltages) is not entered, so that check was NOT done; the clearance may be larger.',
     });
     safetyDefaults.push('steady-state/recurring-peak clearance table T3 not entered; that check is not done');
   } else {
-    const l3 = lookupGrid(T.T3, { rowSi: peakV, selectors: { pollutionDegree: inp.pollutionDegree, fieldCondition: inp.fieldCondition }, edition }, { stepUp });
+    const l3 = lookupGrid(T.T3, { rowSi: peakV, selectors: { pollutionDegree: inp.pollutionDegree, fieldCondition: inp.fieldCondition }, edition });
     if (!l3.ok) return { ok: false, error: lookupError(l3) };
     used.push(T.T3);
     lines.push(provenanceLine(T.T3, l3));
     steps.push({ label: 'Clearance from T3', expr: 'T3(peak working voltage, field condition)', value: lenQ(l3.valueSi), bound: 'min-requirement' });
-    base = Math.max(base, l3.valueSi);
-  }
-  if (multiplier !== 1) {
-    base *= multiplier;
-    steps.push({ label: 'Reinforced multiplier (T7)', expr: 'user-entered rule record', value: dimless(multiplier) });
+    let t3Part = l3.valueSi;
+    if (reinforced) {
+      t3Part *= steadyMultiplier;
+      steps.push({ label: 'Clearance from T3 after the reinforced multiplier', expr: 'T3 clearance x steady-state multiplier', value: lenQ(t3Part), bound: 'min-requirement' });
+    }
+    base = Math.max(base, t3Part);
   }
 
   // 6. altitude: clearance only
@@ -150,7 +179,7 @@ function build(raw: unknown): CalcOutcome {
   steps.push({ label: 'Clearance corrected for altitude', expr: 'clearance = base x T4 factor', value: lenQ(clearance), bound: 'min-requirement' });
 
   // 7. coating credit: only a verified rule AND the user's selection
-  const coat = coatingDecision(T.T7, inp.coating);
+  const coat = coatingDecision(T.T7, inp.coating, 'clearance');
   if (coat.applied) {
     clearance *= coat.factor;
     steps.push({ label: 'Coating credit factor (T7)', expr: 'verified user-entered rule record', value: dimless(coat.factor) });
@@ -171,11 +200,9 @@ function build(raw: unknown): CalcOutcome {
 
   const assumptions: string[] = [
     `Data set edition: ${edition} (every table used holds exactly this edition).`,
-    inp.insulationType === 'basic' || inp.insulationType === 'reinforced'
-      ? `Insulation type: ${inp.insulationType}.`
-      : `Insulation type: ${inp.insulationType}. It uses the basic-insulation lookup (conservative reading; the standard's own rule for it is not encoded). Double insulation is basic plus supplementary: calculate each layer separately.`,
+    insulationAssumption(inp.insulationType),
     `Field condition: ${inp.fieldCondition} (user-entered, no default). Pollution degree: ${String(inp.pollutionDegree)}.`,
-    impulseSource === 'user' ? 'Rated impulse withstand voltage: user-supplied.' : `Rated impulse withstand voltage: read from T1 for overvoltage category ${inp.route.kind === 'category' ? inp.route.category : ''} (the row key is the supply voltage as entered; how a system voltage maps to the T1 row is the user's responsibility).`,
+    impulseSource === 'user' ? 'Rated impulse withstand voltage: user-supplied.' : `Rated impulse withstand voltage: read from T1 for overvoltage category ${inp.route.kind === 'category' ? inp.route.category : ''} (the row key is the supply voltage as entered; mapping a system voltage to a T1 row is your responsibility).`,
     'Altitude correction applies to clearance only (S-032); creepage is never scaled by altitude.',
     ...lines,
     ...(coat.note !== undefined ? [coat.note] : []),
@@ -183,33 +210,30 @@ function build(raw: unknown): CalcOutcome {
   if (inp.coating === 'none') assumptions.push('No coating credit applied (none selected).');
 
   const allWarnings: CalcWarning[] = [...commonWarnings({ unverified, iec: true }), ...scope.warnings, ...warnings, ...coat.warnings];
+  const sq = squareRmsWarning(inp.waveformShape, inp.waveformBasis);
+  if (sq !== undefined) allWarnings.push(sq);
+  const ledgerIds = withWaveformRow(viaCategory ? LEDGER_ROUTE_A : meta.reference.ledgerIds, inp.voltageHow === 'waveform');
   if (viaCategory) allWarnings.push({ severity: 'caution', message: CATEGORY_CONFLICT_NOTE, code: 'OVERVOLTAGE_CATEGORY_CONFLICT' });
-  if (inp.soldermask) allWarnings.push({ severity: 'caution', message: 'Solder mask was declared: it is not conformal coating and gives no credit.', code: 'SOLDERMASK_DECLARED' });
+  if (inp.soldermask) allWarnings.push(SOLDERMASK_DECLARED_WARNING);
 
   const validityChecks: CalcResult['validityChecks'] = [
-    { name: 'all mandatory inputs given', ok: true, detail: `Mandatory inputs: ${meta.mandatoryInputs.join('; ')}. None has a default.` },
-    { name: 'tables populated and of the selected edition', ok: true, detail: `${[...new Set(used.map((t) => t.table))].join(', ')} hold entered values of edition ${edition}.` },
-    { name: 'every looked-up cell carries provenance', ok: true, detail: 'Each cell records its printed text, source, who entered it and when.' },
+    ...standardChecks(meta.mandatoryInputs, used, edition),
     ...scope.checks,
   ];
 
   const verified = !unverified;
-  const name = (n: string): string => (unverified ? `${INDICATIVE_PREFIX}: ${n}` : n);
   const confidence = spacingConfidence({ verified, safetyRelevantDefaults: safetyDefaults, dataStatus: DATA_STATUS });
-  const recommendation = unverified
-    ? `${INDICATIVE_PREFIX}: the table data is UNVERIFIED (entered by a user, not verified by a named person). Check every cell against your licensed copy of IEC 60664-1 and against your product standard before using this distance.`
-    : `Distances are lookups from user-entered tables signed off by ${[...new Set(used.map((t) => t.verifiedBy))].join(', ')}. The product standard may require more; check it before using this distance.`;
-  const note = unverified ? 'indicative only (UNVERIFIED table data)' : undefined;
+  const recommendation = iecRecommendation(unverified, used);
 
   const result: CalcResult = {
     method: meta.method,
-    reference: { standard: meta.reference.standard, edition, ledgerIds: viaCategory ? [...LEDGER_ROUTE_A] : [...meta.reference.ledgerIds] },
+    reference: { standard: meta.reference.standard, edition, ledgerIds },
     formula: meta.formula,
     inputs,
     assumptions,
     steps,
     results: [
-      { name: name('minimum clearance'), value: lenQ(clearance), role: 'primary', bound: 'min-requirement', ...(note !== undefined ? { note } : {}) },
+      primaryResult(unverified, 'minimum clearance', clearance),
       { name: 'rated impulse withstand voltage used', value: q(impulseV, DIM.VOLTAGE), role: 'secondary', bound: 'min-requirement' },
       { name: 'altitude correction factor', value: dimless(l4.valueSi), role: 'secondary', bound: 'nominal' },
     ],

@@ -78,7 +78,7 @@ describe('creepage: numbers from synthetic tables', () => {
     const gap = fails(base({ materialGroup: undefined as never, cti: raw(89.5, DIM.VOLTAGE) }));
     expect(gap.gate).toBe('INSUFFICIENT_DATA');
     const noT6 = fails(base({ materialGroup: undefined as never, cti: V(95) }, synthSet(['T5'])));
-    expect(noT6.message).toBe('INSUFFICIENT DATA: table T6 material groups by CTI is empty (enter values from your licensed copy)');
+    expect(noT6.message).toContain('INSUFFICIENT DATA: table T6 material groups by CTI is empty (enter values from your licensed copy)');
   });
   it('a group that T5 has no column for (IIIa) is refused', () => {
     const e = fails(base({ materialGroup: 'IIIa' }));
@@ -100,6 +100,11 @@ describe('creepage: numbers from synthetic tables', () => {
   it('reinforced insulation applies only the T7 multiplier record', () => {
     const r = ok(base({ insulationType: 'reinforced', associatedClearance: MM(1) }));
     expect(primary(r)).toBeCloseTo(mm(t5(2, 2, 1)) * T7_REINFORCED_CREEPAGE, 12);
+    const step = r.steps.find((s) => s.label.startsWith('Reinforced multiplier'));
+    expect(step?.value.si).toBe(T7_REINFORCED_CREEPAGE);
+    expect(T7_REINFORCED_CREEPAGE).toBeGreaterThan(1);
+    expect(r.steps.map((s) => s.label)).toContain('Creepage after the reinforced multiplier');
+    expect(ok(base({ associatedClearance: MM(1) })).steps.some((s) => s.label.includes('multiplier'))).toBe(false);
     const e = fails(base({ insulationType: 'reinforced' }, synthSet(['T5'])));
     expect(e.message).toBe('INSUFFICIENT DATA: table T7 rule records is empty (enter values from your licensed copy)');
     const raw7 = rawSynthetic('T7');
@@ -205,7 +210,10 @@ describe('creepage: gating', () => {
   it('empty shipped tables: INSUFFICIENT DATA with the exact text, never a number', () => {
     const e = fails(base({}, SHIPPED_TABLES));
     expect(e.gate).toBe('INSUFFICIENT_DATA');
-    expect(e.message).toBe('INSUFFICIENT DATA: table T5 creepage distance (basic insulation) is empty (enter values from your licensed copy)');
+    expect(e.message).toBe(
+      'INSUFFICIENT DATA: table T5 creepage distance (basic insulation) is empty (enter values from your licensed copy); ' +
+        'INSUFFICIENT DATA: rule "scope-max-frequency" is not entered in table T7 rule records (enter it from your licensed copy)',
+    );
     const c = fails(base({ materialGroup: undefined as never, cti: V(95) }, SHIPPED_TABLES));
     expect(c.message).toContain('table T5');
     expect(c.message).toContain('table T6');
@@ -246,14 +254,31 @@ describe('creepage: banners, grooves, frequency', () => {
     const withRule = ok(base({ grooves: 'present' }, synthSet(undefined, { verified: true })));
     expect(withRule.warnings.some((w) => w.code === 'GROOVES_NOT_CREDITED')).toBe(true);
   });
-  it('frequency above the T7 limit gives no number; with no recorded limit a generic warning appears', () => {
+  it('frequency above the T7 limit gives no number; with no recorded limit and a frequency above zero it is refused naming T7', () => {
     const e = fails(base({ frequency: HZ(T7_SCOPE_FREQUENCY_HZ + 1) }));
     expect(e.gate).toBe('OUT_OF_SCOPE');
     expect(e.message).toContain('IEC 60664-4');
     const t = synthSet(['T5']);
-    const r = ok(base({ frequency: HZ(1e6) }, t));
-    expect(r.warnings.find((w) => w.code === 'HF_NOT_CHECKED')?.message).toContain('high-frequency applicability (IEC 60664-4) not checked');
+    const n = fails(base({ frequency: HZ(1e6) }, t));
+    expect(n.gate).toBe('INSUFFICIENT_DATA');
+    expect(n.message).toBe('INSUFFICIENT DATA: rule "scope-max-frequency" is not entered in table T7 rule records (enter it from your licensed copy)');
     expect(ok(base({ frequency: HZ(0) }, t)).warnings.some((w) => w.code === 'HF_NOT_CHECKED')).toBe(false);
+    expect(fails(base({}, SHIPPED_TABLES)).message).toContain('rule "scope-max-frequency" is not entered in table T7');
+  });
+  it('a T7 of another edition does not block a calculation that does not use T7', () => {
+    const other = makeTableSet({ T5: synthTable('T5'), T7: synthTable('T7', { edition: 'OTHER-ED' }) });
+    if (!other.ok) throw new Error(other.error.join('; '));
+    expect(ok(base({ frequency: HZ(0) }, other.value)).warnings.some((w) => w.code === 'SCOPE_NOT_CHECKED')).toBe(true);
+    expect(fails(base({ frequency: HZ(50) }, other.value)).message).toContain('differs from the selected edition');
+  });
+  it('a non-DC declared shape with frequency 0 is refused; a square waveform from rms warns about unipolar pulses; S-035 is cited', () => {
+    const e = fails(base({ frequency: HZ(0), workingVoltageRms: undefined as never, waveform: { shape: 'triangle', basis: 'rms', value: V(150) } }));
+    expect(e.field).toBe('frequency');
+    expect(e.message).toContain('frequency 0 Hz means DC');
+    const sq = ok(base({ workingVoltageRms: undefined as never, waveform: { shape: 'square', basis: 'rms', value: V(150) } }));
+    expect(sq.warnings.find((w) => w.code === 'SQUARE_RMS_UNIPOLAR')?.message).toMatch(/understates/);
+    expect(sq.reference.ledgerIds).toContain('S-035');
+    expect(ok(base()).reference.ledgerIds).not.toContain('S-035');
   });
   it('voltage scope uses the rms (or DC) value against the T7 records', () => {
     expect(fails(base({ workingVoltageRms: V(5001) })).gate).toBe('OUT_OF_SCOPE');

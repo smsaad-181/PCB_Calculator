@@ -7,7 +7,7 @@ import type { CalcResult } from '../../result';
 import { SHIPPED_TABLES, makeTableSet, parseSpacingTable } from '../../spacing/tables';
 import type { SpacingTableSet, TableId } from '../../spacing/tables';
 import { PRODUCT_STANDARD_BANNER } from '../../spacing/gating';
-import { T4_FACTORS, T7_COATING_TYPE1, T7_SCOPE_FREQUENCY_HZ, rawSynthetic, synthSet, synthTable, t1, t2, t3 } from '../../spacing/synthetic-tables.testutil';
+import { T4_FACTORS, T7_COATING_TYPE1, T7_REINFORCED_STEADY_MULTIPLIER, T7_SCOPE_FREQUENCY_HZ, rawSynthetic, synthSet, synthTable, t1, t2, t3 } from '../../spacing/synthetic-tables.testutil';
 import { compute } from './calc';
 import type { Inputs } from './calc';
 import { meta } from './meta';
@@ -95,12 +95,66 @@ describe('clearance: numbers from synthetic tables', () => {
     expect(r.confidence.reasons.join(' ')).toMatch(/steady-state/i);
     expect(r.confidence.level).toBe('low');
   });
-  it('reinforced insulation applies only the T7 rule record (next-higher row), never a hard-coded doubling', () => {
-    const r = ok(base({ insulationType: 'reinforced' }));
-    expect(primary(r)).toBeCloseTo(mm(Math.max(t2(3, 2, true), t3(2, true))), 12);
+  it('reinforced insulation: next preferred impulse step in the T7 series, never the next T2 row', () => {
+    // fake series 1, 2, 4, 5 kV; required impulse 2 kV is in the series, so the reinforced lookup is T2 at 4 kV (a row step would be 3 kV)
+    const noT3 = synthSet(['T2', 'T4', 'T7']);
+    const r = ok(base({ insulationType: 'reinforced' }, noT3));
+    expect(primary(r)).toBeCloseTo(mm(t2(4, 2, true)), 12);
+    expect(primary(r)).not.toBeCloseTo(mm(t2(3, 2, true)), 12);
+    expect(r.assumptions.join(' ')).toMatch(/next-preferred-impulse-step/);
     const none = fails(base({ insulationType: 'reinforced' }, synthSet(['T2', 'T4'])));
     expect(none.gate).toBe('INSUFFICIENT_DATA');
-    expect(none.message).toBe('INSUFFICIENT DATA: table T7 rule records is empty (enter values from your licensed copy)');
+    expect(none.message).toContain('INSUFFICIENT DATA: table T7 rule records is empty (enter values from your licensed copy)');
+  });
+  it('reinforced: the required impulse must be a series value; between values and above the series are refused', () => {
+    const noT3 = synthSet(['T2', 'T4', 'T7']);
+    const between = fails(base({ insulationType: 'reinforced', ratedImpulseVoltage: V(2500) }, noT3));
+    expect(between.gate).toBe('INSUFFICIENT_DATA');
+    expect(between.message).toContain('not a value of the preferred impulse series');
+    const top = fails(base({ insulationType: 'reinforced', ratedImpulseVoltage: V(5000) }, noT3));
+    expect(top.gate).toBe('OUT_OF_SCOPE');
+    expect(top.message).toContain('no higher value in the preferred impulse series');
+  });
+  it('reinforced with T3 populated needs its own steady-state record (not the impulse step), and multiplies only the T3 part', () => {
+    const r = ok(base({ insulationType: 'reinforced' }));
+    expect(primary(r)).toBeCloseTo(mm(Math.max(t2(4, 2, true), t3(1, true) * T7_REINFORCED_STEADY_MULTIPLIER)), 12);
+    const raw7 = rawSynthetic('T7');
+    const rules = (raw7['rules'] as Record<string, unknown>[]).filter((x) => x['rule'] !== 'reinforced-clearance-steady-state');
+    const p = parseSpacingTable({ ...raw7, rules });
+    if (!p.ok) throw new Error(p.error.join('; '));
+    const set = makeTableSet({ T2: synthTable('T2'), T3: synthTable('T3'), T4: synthTable('T4'), T7: p.value });
+    if (!set.ok) throw new Error(set.error.join('; '));
+    const e = fails(base({ insulationType: 'reinforced' }, set.value));
+    expect(e.gate).toBe('INSUFFICIENT_DATA');
+    expect(e.message).toBe('INSUFFICIENT DATA: rule "reinforced-clearance-steady-state" is not entered in table T7 rule records (enter it from your licensed copy)');
+    // basic insulation does not need it
+    expect(compute(base({}, set.value)).ok).toBe(true);
+  });
+  it('reinforced with T3: the steady-state multiplier is an explicit calculation step, strictly above 1, and the T3 part shows its product', () => {
+    const r = ok(base({ insulationType: 'reinforced' }));
+    const step = r.steps.find((s) => s.label.startsWith('Reinforced steady-state multiplier'));
+    expect(step?.value.si).toBe(T7_REINFORCED_STEADY_MULTIPLIER);
+    expect(T7_REINFORCED_STEADY_MULTIPLIER).toBeGreaterThan(1);
+    const prod = r.steps.find((s) => s.label.startsWith('Clearance from T3 after the reinforced multiplier'));
+    expect(prod?.value.si).toBeCloseTo(mm(t3(1, true) * T7_REINFORCED_STEADY_MULTIPLIER), 12);
+    // basic insulation has no such step
+    expect(ok(base()).steps.some((s) => s.label.includes('multiplier'))).toBe(false);
+  });
+  it('reinforced with T3 empty: the peak working voltage is compared with the BASIC impulse value, not the stepped one', () => {
+    const noT3 = synthSet(['T2', 'T4', 'T7']);
+    // fake series 1, 2, 4, 5 kV: basic impulse 2 kV steps to 4 kV for reinforced. A 3 kV peak is above 2 kV.
+    const peak3k = { workingVoltagePeak: V(3000) };
+    const basic = fails(base({ ...peak3k }, noT3));
+    expect(basic.gate).toBe('OUT_OF_SCOPE');
+    const reinforced = fails(base({ insulationType: 'reinforced', ...peak3k }, noT3));
+    expect(reinforced.gate).toBe('OUT_OF_SCOPE');
+    expect(reinforced.field).toBe('workingVoltagePeak');
+    expect(reinforced.message).toContain('2000');
+    expect(reinforced.message).not.toContain('4000');
+    // at the basic value it passes and keeps the T3_NOT_ENTERED warning
+    const edge = ok(base({ insulationType: 'reinforced', workingVoltagePeak: V(2000) }, noT3));
+    expect(edge.warnings.some((w) => w.code === 'T3_NOT_ENTERED')).toBe(true);
+    expect(primary(edge)).toBeCloseTo(mm(t2(4, 2, true)), 12);
   });
   it('a T7 without the reinforced-clearance record is refused with the rule named', () => {
     const raw7 = rawSynthetic('T7');
@@ -128,9 +182,22 @@ describe('clearance: numbers from synthetic tables', () => {
     // verified T7 but not selected: no credit
     const verified = synthSet(undefined, { verified: true });
     expect(primary(ok(base({}, verified)))).toBeCloseTo(plain, 12);
-    // verified and selected: credit applied
-    const cr = ok(base({ coatingCredit: 'type1' }, verified));
-    expect(primary(cr)).toBeCloseTo(plain * T7_COATING_TYPE1, 12);
+    // verified and selected, but the record does not state clearance scope: not applied to a clearance
+    expect(primary(ok(base({ coatingCredit: 'type1' }, verified)))).toBeCloseTo(plain, 12);
+    // verified, selected, and the record states appliesTo clearance (or both): applied
+    const scoped = (appliesTo: string) => {
+      const raw7 = rawSynthetic('T7', { verified: true });
+      const rules = (raw7['rules'] as Record<string, unknown>[]).map((x) => (x['rule'] === 'coating-credit' ? { ...x, appliesTo } : x));
+      const p = parseSpacingTable({ ...raw7, rules });
+      if (!p.ok) throw new Error(p.error.join('; '));
+      const set = makeTableSet({ T7: p.value }, verified);
+      if (!set.ok) throw new Error(set.error.join('; '));
+      return set.value;
+    };
+    for (const a of ['clearance', 'both']) {
+      expect(primary(ok(base({ coatingCredit: 'type1' }, scoped(a))))).toBeCloseTo(plain * T7_COATING_TYPE1, 12);
+    }
+    expect(primary(ok(base({ coatingCredit: 'type1' }, scoped('creepage'))))).toBeCloseTo(plain, 12);
     // verified, selected type with no record: not applied
     const t2c = ok(base({ coatingCredit: 'type2' }, verified));
     expect(primary(t2c)).toBeCloseTo(plain, 12);
@@ -202,7 +269,8 @@ describe('clearance: gating', () => {
     expect(e.gate).toBe('INSUFFICIENT_DATA');
     expect(e.message).toBe(
       'INSUFFICIENT DATA: table T2 clearance to withstand transient overvoltages is empty (enter values from your licensed copy); ' +
-        'INSUFFICIENT DATA: table T4 altitude correction factor (clearance only) is empty (enter values from your licensed copy)',
+        'INSUFFICIENT DATA: table T4 altitude correction factor (clearance only) is empty (enter values from your licensed copy); ' +
+        'INSUFFICIENT DATA: rule "scope-max-frequency" is not entered in table T7 rule records (enter it from your licensed copy)',
     );
     const a = fails(base({ ratedImpulseVoltage: undefined as never, overvoltageCategory: 'II', supplyVoltage: V(150) }, SHIPPED_TABLES));
     expect(a.message).toContain('table T1 rated impulse voltage is empty');
@@ -297,20 +365,97 @@ describe('clearance: frequency and scope', () => {
     expect(e.message).toContain('IEC 60664-4');
     expect(ok(base({ frequency: HZ(T7_SCOPE_FREQUENCY_HZ) })).warnings.some((w) => w.code === 'HF_NOT_CHECKED')).toBe(false);
   });
-  it('with no recorded limit a generic "not checked" warning appears whenever a frequency above zero is given', () => {
+  it('with no recorded frequency limit and a frequency above zero the result is refused, naming T7', () => {
     const t = synthSet(['T2', 'T3', 'T4']);
-    const r = ok(base({ frequency: HZ(1e6) }, t));
-    const w = r.warnings.find((x) => x.code === 'HF_NOT_CHECKED');
-    expect(w?.message).toContain('high-frequency applicability (IEC 60664-4) not checked');
+    const e = fails(base({ frequency: HZ(1e6) }, t));
+    expect(e.gate).toBe('INSUFFICIENT_DATA');
+    expect(e.message).toBe('INSUFFICIENT DATA: rule "scope-max-frequency" is not entered in table T7 rule records (enter it from your licensed copy)');
     expect(ok(base({ frequency: HZ(0) }, t)).warnings.some((x) => x.code === 'HF_NOT_CHECKED')).toBe(false);
+  });
+  it('a T7 that holds other rules but no frequency limit is refused for a frequency above zero', () => {
+    const raw7 = rawSynthetic('T7');
+    const rules = (raw7['rules'] as Record<string, unknown>[]).filter((x) => x['rule'] !== 'scope-max-frequency');
+    const p = parseSpacingTable({ ...raw7, rules });
+    if (!p.ok) throw new Error(p.error.join('; '));
+    const set = makeTableSet({ T2: synthTable('T2'), T3: synthTable('T3'), T4: synthTable('T4'), T7: p.value });
+    if (!set.ok) throw new Error(set.error.join('; '));
+    expect(fails(base({}, set.value)).message).toContain('"scope-max-frequency"');
+    expect(compute(base({ frequency: HZ(0) }, set.value)).ok).toBe(true);
+  });
+  it('empty tables with a frequency above zero still list the missing T7 limit', () => {
+    const e = fails(base({}, SHIPPED_TABLES));
+    expect(e.message).toContain('rule "scope-max-frequency" is not entered in table T7');
+    expect(fails(base({ frequency: HZ(0) }, SHIPPED_TABLES)).message).not.toContain('scope-max-frequency');
+  });
+  it('a T7 of another edition does not block a calculation that does not use T7', () => {
+    const other = makeTableSet({ T2: synthTable('T2'), T3: synthTable('T3'), T4: synthTable('T4'), T7: synthTable('T7', { edition: 'OTHER-ED' }) });
+    if (!other.ok) throw new Error(other.error.join('; '));
+    const r = ok(base({ frequency: HZ(0) }, other.value));
+    expect(r.warnings.some((w) => w.code === 'SCOPE_NOT_CHECKED')).toBe(true);
+    const e = fails(base({ frequency: HZ(50) }, other.value));
+    expect(e.message).toContain('differs from the selected edition');
+    expect(fails(base({ frequency: HZ(0), insulationType: 'reinforced' }, other.value)).message).toContain('differs from the selected edition');
   });
   it('voltage scope: DC limit on the peak, AC rms limit when rms is known', () => {
     const dc = fails(base({ frequency: HZ(0), workingVoltagePeak: V(8001) }));
     expect(dc.gate).toBe('OUT_OF_SCOPE');
     const ac = fails(base({ waveform: { shape: 'sine', basis: 'rms', value: V(5001) }, workingVoltagePeak: undefined as never }));
     expect(ac.gate).toBe('OUT_OF_SCOPE');
-    const unknownRms = ok(base({ workingVoltagePeak: V(9000) }, synthSet(['T2', 'T4', 'T7'])));
+    const unknownRms = ok(base({ workingVoltagePeak: V(1500) }, synthSet(['T2', 'T4', 'T7'])));
     expect(unknownRms.warnings.some((w) => w.code === 'SCOPE_NOT_CHECKED')).toBe(true);
+  });
+});
+
+describe('clearance: peak working voltage against the impulse withstand voltage (T3 empty)', () => {
+  const noT3 = synthSet(['T2', 'T4', 'T7']);
+  it('a peak working voltage above the impulse voltage used is refused when T3 is empty, with the reason', () => {
+    const e = fails(base({ workingVoltagePeak: V(2500) }, noT3));
+    expect(e.gate).toBe('OUT_OF_SCOPE');
+    expect(e.message).toContain('exceeds the impulse withstand voltage');
+    expect(e.message).toContain('T3');
+    expect(compute(base({ workingVoltagePeak: V(2000) }, noT3)).ok).toBe(true);
+  });
+  it('for reinforced insulation the BASIC impulse value is used (more conservative), not the stepped series value', () => {
+    expect(fails(base({ insulationType: 'reinforced', workingVoltagePeak: V(3500) }, noT3)).gate).toBe('OUT_OF_SCOPE');
+    expect(compute(base({ insulationType: 'reinforced', workingVoltagePeak: V(2000) }, noT3)).ok).toBe(true);
+  });
+  it('with T3 populated the larger of the two clearances wins instead', () => {
+    const r = ok(base({ workingVoltagePeak: V(2500) }));
+    expect(primary(r)).toBeCloseTo(mm(Math.max(t2(2, 2, true), t3(3, true))), 12);
+  });
+});
+
+describe('clearance: waveform, frequency and traceability', () => {
+  it('a non-DC declared shape with frequency 0 is refused ("0 Hz means DC"); a DC shape is accepted', () => {
+    const sine = fails(base({ frequency: HZ(0), workingVoltagePeak: undefined as never, waveform: { shape: 'sine', basis: 'peak', value: V(300) } }));
+    expect(sine.code).toBe('INVALID_INPUT');
+    expect(sine.field).toBe('frequency');
+    expect(sine.message).toContain('frequency 0 Hz means DC');
+    expect(compute(base({ frequency: HZ(0), workingVoltagePeak: undefined as never, waveform: { shape: 'dc', basis: 'peak', value: V(300) } })).ok).toBe(true);
+  });
+  it('a declared DC waveform with a frequency above 0 is refused ("DC means 0 Hz")', () => {
+    const e = fails(base({ frequency: HZ(50), workingVoltagePeak: undefined as never, waveform: { shape: 'dc', basis: 'peak', value: V(300) } }));
+    expect(e.code).toBe('INVALID_INPUT');
+    expect(e.field).toBe('frequency');
+    expect(e.message).toContain('DC means 0 Hz');
+  });
+  it('a square waveform declared from an rms value warns that a unipolar pulse would have a higher peak', () => {
+    const w = (basis: 'rms' | 'peak') => ok(base({ workingVoltagePeak: undefined as never, waveform: { shape: 'square', basis, value: V(100) } }));
+    const r = w('rms').warnings.find((x) => x.code === 'SQUARE_RMS_UNIPOLAR');
+    expect(r?.message).toMatch(/unipolar/);
+    expect(r?.message).toMatch(/understates/);
+    expect(w('peak').warnings.some((x) => x.code === 'SQUARE_RMS_UNIPOLAR')).toBe(false);
+  });
+  it('cites S-035 when a declared waveform is used, and only then', () => {
+    const w = ok(base({ workingVoltagePeak: undefined as never, waveform: { shape: 'sine', basis: 'rms', value: V(100) } }));
+    expect(w.reference.ledgerIds).toContain('S-035');
+    expect(ok(base()).reference.ledgerIds).not.toContain('S-035');
+  });
+  it('coating credit applies to creepage only unless the record states clearance (no credit on clearance by default)', () => {
+    const verified = synthSet(undefined, { verified: true });
+    const r = ok(base({ coatingCredit: 'type1' }, verified));
+    expect(primary(r)).toBeCloseTo(primary(ok(base({}, verified))), 12);
+    expect(r.warnings.find((x) => x.code === 'COATING_CREDIT_NOT_APPLIED')?.message).toMatch(/creepage only/);
   });
 });
 
