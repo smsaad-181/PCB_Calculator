@@ -66,11 +66,12 @@ Both limits are user decisions and are enforced by `npm run check:size`:
 
 ## Validation status (honest)
 
-- Phases 0 to 3 are closed as PASS-WITH-CONDITIONS. Phase 4 has calc, phase and PCB-domain reports (all PASS-WITH-CONDITIONS); there is no Phase 4 closure record yet, and task 5 (performance audit, offline test, accessibility pass) is not done. Conditions and open decisions are in `docs/validation/OPEN_RISKS.md`.
+- Phases 0 to 3 are closed as PASS-WITH-CONDITIONS. Phase 4 has calc (PASS-WITH-CONDITIONS), phase (PASS-WITH-CONDITIONS) and PCB-domain (PASS) reports; there is no Phase 4 closure record yet. Task 5 (performance audit, offline test, accessibility pass) is only partly done: the human accepted it on 2026-10-19 as a logged partial deferral (the SPEC "Load < 1 s" target, an axe scan, a screen-reader check, 200 % zoom/reflow, a long-task trace and radio/collapsible keyboard behaviour were not checked). Conditions and open decisions are in `docs/validation/OPEN_RISKS.md`.
 - **Tool cross-checks have not been run.** 77 cases are prepared (24 for KiCad and twc, 53 for KiCad and Qucs-S transcalc); all tool outputs are null. Tool agreement would not verify a source anyway.
 - IPC and IEC standards are paywalled and have not been read by this project. Anything depending on them is marked `PAYWALLED-USER-MUST-VERIFY` or `UNVERIFIED`.
 - No spacing result has ever been produced or compared with any tool, because no licensed table has been entered.
-- No agent has checked the pages in a real browser with a keyboard or screen reader. The human checks pages on localhost:4173 (P4U-17).
+- No agent has checked the pages with a screen reader. The orchestrator's scripted Playwright run pressed Tab 40 times on the Fusing page (12 stops, no trap), but no other keyboard check was done. The human checks pages on localhost:4173 (P4U-17).
+- Offline: no network calls at runtime; a route works offline once its code has loaded; a reload while offline is not supported (no service worker).
 - CI on the Ubuntu 26 runner and the live Pages URL have not been observed (V-13, R-15).
 
 ## Using this kit with Claude Code

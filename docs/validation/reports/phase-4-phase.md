@@ -1,198 +1,205 @@
-# Phase 4 phase-validator report (thermal via array and fusing)
+# Phase 4 phase-validator report: re-validation for closure (thermal via array and fusing)
 
-- Branch `phase-4`, head `3420891`. The working tree was clean before and after the gates; the only files this validator wrote are this report and the new section at the end of `docs/validation/OPEN_RISKS.md`.
-- Date 2026-10-19. Lens: senior engineer and standards auditor. No edits to `src/` or `tests/`.
-- Inputs read: `docs/phases/phase-4.md`, `docs/PLAN.md`, `docs/SPEC.md`, `CLAUDE.md`, `docs/research/phase-4-thermal-via-and-fusing.md`, `docs/sources/LEDGER.md` (S-003d, S-004, S-007, S-019d, S-040…S-044), `docs/validation/OPEN_RISKS.md` (Phase 4 core and UI sections), `README.md`, `docs/RUNBOOK.md`, `CHANGELOG.md`, `.github/workflows/deploy.yml`, and all Phase 4 code: `src/core/calculators/{thermal-via,fusing}/*`, `src/core/data/{constants,ledger,ledger-status}.ts`, `src/core/units/{dim,display,units-table}.ts`, `src/ui/calculators/{ThermalVia,Fusing}.tsx` with their `*.vm.ts` and `*.vm.test.ts`, `src/ui/components/{ValidityChecksList.tsx,view.ts}`, `src/ui/registry.ts`, `src/state/state-keys.ts`.
+- Branch `phase-4`, head `fcf4603`. Date 2026-10-19. Lens: senior engineer and standards auditor.
+- This report replaces the earlier phase report (head `3420891`, PASS-WITH-CONDITIONS, M-1 to M-3, m-1 to m-9).
+- No edits to `src/` or `tests/`. The only files this validator wrote are this report and a new section at the end of `docs/validation/OPEN_RISKS.md`.
+- There was no `npm ci`/`npm install` and no worktree. Before and after the gates, `node_modules` was unchanged:
+  - 140 entries;
+  - mtime `1792390944`;
+  - `.package-lock.json` sha1 `84387a03…`;
+  - `package-lock.json` sha1 `5e4cfeca…`;
+  - `git status --short` was empty both times.
+- Inputs read:
+  - `docs/phases/phase-4.md`, `docs/SPEC.md` and `docs/validation/OPEN_RISKS.md` (l.1-30 and l.556-698);
+  - `README.md`, `CHANGELOG.md`, `docs/RUNBOOK.md`;
+  - the reports `phase-4-calc.md`, `phase-4-pcb.md` and `phase-4-hardening.md`;
+  - the diffs `3420891..fcf4603` (docs, SPEC, tools) and `2107b42..fcf4603` (all `src` changes made after the calc and pcb re-reviews);
+  - LEDGER S-003d, S-003e and S-045, the `source-verification` skill, and `src/ui/styles.css`.
 
-## Verdict: PASS-WITH-CONDITIONS (phase NOT closable yet)
+## Verdict: PASS-WITH-CONDITIONS. Phase 4 can close once conditions C-1 to C-3 are met.
 
-The built scope (thermal via array, fusing) passes. Both calculators are correct where checked, labelled honestly, properly separated, and every gate passes. There are no BLOCKERs in the built code.
+The built scope (thermal via array and fusing) is correct where checked, honestly labelled and properly separated. Every gate passes. There is no BLOCKER.
 
-The **phase as a whole cannot close** for three reasons:
-1. Exit criterion 3 is not met: final hardening (task 5) has not been done, README and RUNBOOK are not complete, and the calc-validator and pcb-domain reports for Phase 4 do not exist yet.
-2. The user's scope decision is recorded in the research doc and the ledger only. The authoritative documents (SPEC, phase-4.md, OPEN_RISKS R-6) still describe the old scope.
-3. Bundle headroom is 3.25 KB.
+- The earlier M-2 (scope decision) is **mostly fixed**: SPEC l.15 and `phase-4.md` now record it. The residual record drift is C-1.
+- The earlier M-3 (bundle headroom) is **closed** by a user decision: the ceiling is 460 KB, the measured total is 432.12 KB, and headroom is 27.9 KB.
+- The earlier M-1 (task 5, docs, reports) is **partly met**:
+  - the reports and docs now exist;
+  - task 5 is done only in part, and the human's own scope decision says "Final hardening (task 5) stays required by the exit criteria".
 
-See section 9.
+So task 5 must be recorded as a **partial deferral that the human explicitly accepts** (C-2). It must not be recorded as done.
 
-**Scope (user decision 2026-10-19):** only the thermal via array and fusing were built. Not built: θJA/θJC estimate, exposed-pad spreading, copper-area spreading, RF/antenna helper, twisted pair/coax references. Section 2.1 checks where each deferral is logged.
+**Closure conditions (all must be met before the closure record is written):**
 
-## 1. Gates (run by this validator; no `npm ci` or `npm install`, no worktree)
+| # | Condition | Owner |
+|---|---|---|
+| C-1 | Sync the records. This is docs only and must be in the closure commit:<br>- Close R-6 (pointing to `phase-4.md` §Scope decision).<br>- Update the PV4-1 to PV4-6 statuses: PV4-1 done except SPEC row 4; PV4-3 and PV4-4 decided; PV4-5 partial; PV4-6 structural half done by CF-5.<br>- Update the stale CF statuses: CF-1, CF-2, CF-8 and CF-13 say "UI OPEN" although P4U-11 to P4U-13 are DONE; CF-4 "source OPEN" although S-045 now exists; CF-7 is still OPEN although N-7 fixed it; CF-14 is still a decision although the 460 KB ceiling is decided; CF-15 says tests are failing although they now pass.<br>- Fix the stale lines D4-3 and l.686 ("N-4 stays with the researcher"; the ledger was corrected in `fcf4603`).<br>- Fix the "uncommitted" section headings (l.559, l.631).<br>- SPEC row 4 (l.60) still reads "Thermal estimates (confirm scope), RF/antenna helper, twisted pair/coax references, fusing".<br>- SPEC l.42 still reads "Offline capable" without the user's definition.<br>- Tick the `phase-4.md` exit-criteria boxes with evidence or a deferral note.<br>- Correct the README and CHANGELOG status lines (m-3). | orchestrator |
+| C-2 | The human accepts the task 5 residuals as a logged partial deferral (PV4R-1). Otherwise they must be done before closure: throttled first-load measurement against SPEC "Load < 1 s broadband", axe-style scan (third-party code, needs approval), screen-reader check of the live regions, 200 % zoom and reflow, keyboard behaviour of the radio groups and `<details>` panels, and a long-task trace | human |
+| C-3 | The human confirms the offline interpretation (PV4R-2). The recorded wording "every route works with the network cut after load" is **not met for routes never visited**: the hardening report says the lazy chunk would not load. Either the wording becomes "no runtime network calls; no cross-origin requests; a route works offline once its chunk has loaded", or the chunks get preloaded (costs bundle) | human, then orchestrator (wording) |
 
-`node_modules` was not modified. Before and after all gates: 140 entries; `node_modules` mtime `1792390944`; `.package-lock.json` sha1 `84387a03…`; `package-lock.json` sha1 `5e4cfeca…`; `git status --short` empty. Local Node is v24.13.0 (`.nvmrc` 22; R-15).
+The human items carried forward do not block closure. They stay OPEN in OPEN_RISKS:
+- P4-1/P4U-7: confidence is always low;
+- Q-54: the specific heat default;
+- Q-56: the IPC scope reading;
+- P4U-17: the human browser pass;
+- V-13/R-15: CI and live Pages not observed;
+- D4-1: setup-node pin;
+- PV4-2: permanent deferral of θJA/θJC, spreading, RF/antenna and twisted pair.
+
+## 1. Gates (run by this validator)
 
 | Gate | Result (real output) |
 |---|---|
-| `npm run typecheck` | `tsc --noEmit`, exit 0 |
+| `npm run typecheck` | `tsc --noEmit`, no output, exit 0 |
 | `npm run lint` | `eslint .`, exit 0, no findings |
-| `npm test` | `Test Files  172 passed (172)` / `Tests  6832 passed (6832)` |
-| Phase 4 files only (fusing, thermal-via core and vm tests, `tests/ledger-sync.test.ts`, `tests/audit.test.ts`) | `Test Files  6 passed (6)` / `Tests  318 passed (318)`; perf: thermal-via `10 000 computes within a 5 s total budget 106ms`, fusing `... 206ms` (about 11 µs and 21 µs per compute, well under SPEC's 1 ms) |
-| `npm run build` | `✓ built in 342ms` |
-| `npm run check:size` | `largest first-load PathLoad 133.31 KB of 150.00 KB`; `total 426.75 KB gzip JS of 430.00 KB ceiling (76 files)`; `check:size: PASS`. Fusing 58.53 KB, ThermalVia 54.77 KB |
-| `npm run check:audit` | `10 data tables audited, 105 ledger rows checked`; `check:audit: PASS` |
+| `npm test` | `Test Files  172 passed (172)` / `Tests  6906 passed (6906)` (was 6832 at `3420891`) |
+| `npm run build` | `✓ built in 332ms` |
+| `npm run check:size` | `largest first-load PathLoad 133.53 KB of 150.00 KB`; `total 432.12 KB gzip JS of 460.00 KB ceiling (76 files)`; `check:size: PASS`. Fusing 62.06 KB, ThermalVia 56.61 KB first load |
+| `npm run check:audit` | `10 data tables audited, 106 ledger rows checked`; `check:audit: PASS` |
 | `npm audit --omit=dev` | `found 0 vulnerabilities` |
-| `python3 tools/reference/ref_calcs.py` | exit 0, 2057 `OK` lines, no failure lines; 45 `thermalvia_*`/`fusing_*` lines, e.g. `OK   fusing_K_c385_A2s_per_m4 got=5.05124e+16 expected~5.05124e+16` |
-| `python3 tools/reference/gen_golden.py --check` | `OK   docs/golden-vectors.json matches the oracle` |
+| `python tools/reference/ref_calcs.py` (Windows; `python3` is the Store stub) | exit 0; 2071 `OK` lines, 0 other lines; 59 `thermalvia_*`/`fusing_*` lines (45 + 14, matching the CHANGELOG) |
+| `python tools/reference/gen_golden.py --check` | `OK   docs/golden-vectors.json matches the oracle` |
 
-Hand checks by this validator (independent arithmetic):
-- **Fusing case 1** (0.254 mm × 35 µm, Ta 20 °C, c 385, I 10 A): K = 8890·385·58e6/0.00393 = 5.0512e16 A²·s/m⁴; β20 = 234.45 °C; ln(1319.07/254.45) = 1.6455; I²t = (8.89e-9)²·5.0512e16·1.6455 = 6.57 A²s; t = 0.0657 s. This matches the test `case 1` and the research sanity value.
-- **Onderdonk** with 1083 °C and square mils reduces to I = 0.186·A/√t, consistent with the published 0.188 form.
-- **Thermal via** (d 0.3 mm, t 25 µm, L 1.6 mm, k 401): A = π·25e-6·325e-6 = 2.5525e-8 m²; θ = 156.3 K/W. This matches the test and the pre-existing via golden.
+Local Node is v24.13.0 and `.nvmrc` is 22 (R-15).
+
+The built bundle was checked for network use:
+- `dist/index.html` has CSP `connect-src 'none'`.
+- The only absolute URLs in `dist` are `http://www.w3.org` (SVG namespace, 7×) and `https://jlcpcb.com` (fab-profile source text). Neither is fetched.
+- There is no `fetch(`, `XMLHttpRequest`, `WebSocket`, `sendBeacon` or `EventSource` in non-test `src`.
 
 ## 2. Exit criteria (`docs/phases/phase-4.md`)
 
 | Criterion | Status | Evidence |
 |---|---|---|
-| θJA never presented as a design constant | **MET** | No θJA value or input anywhere: `grep -rniE "theta-?JA\|θ ?JA\|junction" src` finds only negations. Core: warning `NOT_THETA_JA` is always emitted (`thermal-via/calc.ts` l.47-48, 149). `RECOMMENDATION` says "not a design constant and not a package metric". The title contains "not a design constant" (`meta.ts` l.19). UI: `STATUS_LINES` "Not theta-JA and not a design constant." is shown with or without a result (`ThermalVia.tsx` l.78-86). The callout is headed "Not theta-JA, not theta-JC". The live region says "not theta-JA". Tests: `thermal-via/calc.test.ts` "always shows the ... not-theta-JA statements", "the method, primary label and recommendation say estimate / not a design constant"; `thermal-via.vm.test.ts` "prints the array resistance with the 1-D lower-bound and not-theta-JA statements always present". Ledger S-040 is VERIFIED for the qualitative caveat only, with no number. |
-| Fusing and heating clearly separated | **MET** | Own core module with its own meta and ledger ids. Test `'fusing does not import from self-heating (separate calculators)'` greps the sources. It has its own registry category "Fusing (short pulse to melting; not steady-state heating)" (`registry.ts`). The page notice "A different question from steady-state heating" links to `#/calc/self-heating` (`Fusing.tsx` l.102-107; test `'fusing is separated from steady-state heating with a link to the self-heating page'`). The core warning `IPC_SCOPE_PAYWALLED` states that IPC methods address steady-state heating and are not used. The fusing output contains no "rating", "safe current" or "fuse rating" claim (test l.282 and the vm page-source test). Minor: no reverse link from the self-heating page (m-8). |
-| Final validator reports PASS and RUNBOOK/README complete | **NOT MET** | (a) When the gates ran, `docs/validation/reports/` had no `phase-4-calc.md` or `phase-4-pcb.md`. A `phase-4-pcb.md` appeared (untracked) while this report was being written; it was not read here. `phase-4-calc.md` is still absent. (b) README.md (19 lines) lists the calculators as "trace/current, resistance, voltage drop, path/load, vias, annular ring, circuit values, controlled impedance, spacing". Thermal via and fusing are missing, and there is no per-calculator limits section. RUNBOOK has no offline, accessibility or performance procedure. See section 8 for the full task 5 gap list. |
+| θJA never presented as a design constant | **MET** | Unchanged from the earlier report §2 (warning `NOT_THETA_JA` is always on; title and status lines say so; tests). `fcf4603` added no θJA value. The `phase-4.md` box is still unticked (C-1) |
+| Fusing and heating clearly separated | **MET** | As before, plus the reverse link now exists. The self-heating page links to `#/calc/fusing` (`SelfHeating.tsx`, `self-heating.vm.ts`, test in `self-heating.vm.test.ts`; pcb re-review m-7 FIXED). The over-10 s headline now says "Outside this model: beyond 10 s, heat loss to the board and air dominates … use the trace self-heating calculator" (`fusing.vm.ts` `NOT_MEANINGFUL_TEXT`) |
+| Final validator reports PASS and RUNBOOK/README complete | **MET WITH CONDITIONS** | Reports: `phase-4-calc.md` PASS-WITH-CONDITIONS (head `2107b42`), `phase-4-pcb.md` **PASS** (head `2107b42`), this report PASS-WITH-CONDITIONS. Under CLAUDE.md, PASS-WITH-CONDITIONS closes a phase once the conditions are logged. README (85 lines) and RUNBOOK (99 lines) cover the features, the deferrals, the no-compliance policy, the budget, deployment, honest validation status, preview on :4173, manual perf/offline/a11y procedures, data flows, the ledger workflow, agent safety rules, the V-13 runner note and rollback. Residual inaccuracies are m-3. Task 5 is partial (§2.1) |
 
-### 2.1 Tasks and scope deferrals
+### 2.1 Task 5 (final hardening): partial; it must be recorded as a partial deferral
 
-| Task (phase-4.md) | Status | Logged where |
-|---|---|---|
-| 1. Thermal estimates, low confidence, assumptions shown | **Partly built (thermal via only), as decided.** Confidence is always low (P4-1). The assumptions list barrel-only conduction, finished hole, plating source, k choice, fill and N vias. Board size and airflow do not apply to a 1-D barrel model, and the page says spreading, package, solder and airflow are not modelled | θJA/θJC, exposed pad and spreading: research doc l.4; OPEN_RISKS "Phase 4 core … Deferred" (l.592: "an exposed-pad or theta-JA calculator (out of scope by user decision)", "a spreading model (new research pass needed)") |
-| 2. RF/antenna helper with free-space vs guided warning | **Deferred by user.** Partly covered by Phase 2: `quarter-wave.ts` (S-029c) computes free-space and guided λ/4, carries the antenna warning and computes no antenna length (Q-18, P2-31) | Research doc l.4; LEDGER S-043…S-044 placeholder. **Not in OPEN_RISKS** (M-2) |
-| 3. Twisted pair, coax references | **Deferred by user.** Coax impedance exists from Phase 2 (`coax/`, X-01 cross-check). Twisted pair: nothing (only presets S-026d/e quote 120 Ω cable values) | Research doc l.4; LEDGER S-043…S-044. **Not in OPEN_RISKS** (M-2) |
-| 4. Fusing, separate from steady-state heating | **Built**, see section 2 | — |
-| 5. Final hardening (performance audit, offline test, accessibility pass, docs) | **NOT DONE** (user-confirmed: next step) | Section 8 lists exactly what is missing |
+The evidence is `docs/validation/reports/phase-4-hardening.md`. That report was written by the orchestrator: scripted Playwright against :4173, with the scripts not kept. It is **not independent**, and this validator has no browser tool to repeat it. What I could corroborate is marked "(validator)".
 
-Recording gaps: OPEN_RISKS **R-6** ("Phase 4 thermal scope … Confirm scope") is still `OPEN` although the user decided on 2026-10-19. `docs/SPEC.md` l.15 still says "Phase 4 scope to be confirmed by the human", and its scope row 4 (l.60) still lists RF/antenna, twisted pair/coax and thermal estimates. `docs/phases/phase-4.md` is unchanged, and the repo-layout list in SPEC (l.66-80) does not name `thermal-via` or `fusing` (M-2).
-
-## 3. Spec traceability (SPEC.md and phase-4.md, for the built scope)
-
-| Requirement | Code | Test | Gap |
+| Part | Done | Not done | Assessment |
 |---|---|---|---|
-| Fusing (Onderdonk/Preece), SPEC row 4 | `fusing/calc.ts`: adiabatic primary (S-042a), Onderdonk secondary with ratio (S-042), Preece historical in a collapsed panel (S-042b) | `fusing/calc.test.ts` golden cases 1-4, properties, Preece-area-only | none |
-| Thermal estimates, labelled low confidence, assumptions shown | `thermal-via/calc.ts` warnings ONE_D_ESTIMATE, RECEIVING_COPPER_CONFLICT, BULK_COPPER_K, IDEAL_PARALLEL, NOT_THETA_JA; static "Estimate, low confidence" | `'CONFLICT data status, never high, with reasons, for every case'`, vm "always visible" tests | Spreading, exposed pad, θJA: deferred |
-| `CalcResult` schema | Both `build()` run `assertCalcResult` before returning | per-calc property tests "assertCalcResult holds" | none |
-| Rule-based confidence | `rateConfidence` / `confidenceFactorsFromInputs`; fusing counts the defaulted specific heat and a nominal copper basis as a safety-relevant default | `'specific heat default ... lowers confidence'`, `'CONFLICT data status ... low'` | P4-1 (always low); see m-1 for a second, structural cause |
-| Units: separate dimensions, convert at UI only | `DIM.ACTION_INTEGRAL` (A²·s) added with unit spellings and display; Ta is `ABS_TEMPERATURE`, β20 is `TEMPERATURE_DIFFERENCE`, ΔT of the via is `mul(θ, P)` → temperature difference | `'steps use the units engine with the right dimensions (temperatures absolute, beta20 a difference)'`, `'dimensions: ... temperature DIFFERENCE for the rise, never an absolute temperature'` | The local K dimension (A²·s/m⁴) has no unit-table entry. The UI prints it from SI (P4U-3): acceptable |
-| Input guards (NaN/Inf/zero/negative) | `guardQuantity` on every quantity; count integer ≥ 1; Ta < melting point and above the linear-model floor; exactly one geometry and one pulse input; no melting point override | `guards` describe blocks in both calc tests; vm `'invalid input never gives a number'` | none |
-| Fab limits never hard-coded | Plating is required and never pre-filled; `platingSource: 'fab-profile-average'` is a flag only; `toleranceInputs: []`; no hole-to-hole limit | `'meta lists the ledger rows ... no hard-coded fab limit'` | Hole-to-hole check (S-019k) deferred (P4U-10) |
-| Tests first (oracle) | `ref_calcs.py` +172 lines and 45 golden vectors in commit `f196259`, the same commit as the code | `gen_golden.py --check` OK | Order within the commit cannot be shown from git; the implementer's log states it |
-| Closed-form calc < 1 ms | about 11 µs and 21 µs per compute | perf tests | none |
-| Bundle ≤ 150 KB/route, ≤ 430 KB total | check-size | gate output | 3.25 KB total headroom (M-3) |
-| Accessibility: keyboard, labels, contrast | labelled fields, `aria-describedby`, live regions, `role="note"`, `<details>` for Preece | vm "page source" tests (labelled inputs, live region, no raw HTML) | No browser or axe pass (task 5) |
-| Offline, no runtime network | No `fetch`/XHR in `src`. Built `dist` contains only the Vite same-origin modulepreload `fetch(e.href)`. CSP `connect-src 'none'`. No external URL in `dist/index.html` | `csp-plugin.test.ts` | No offline load test and no service worker (by design, RUNBOOK). See section 8 |
+| Performance audit | Route switches for 27 routes (slowest 375 ms); loopback cold load (DCL 12-17 ms, FCP 32-52 ms, which the report itself says is meaningless for the SPEC target); bundle budgets (validator: 432.12/460 KB, largest route 133.53/150 KB); compute time from unit tests (µs) | Throttled broadband first load against SPEC "Load < 1 s"; long-task trace; no `perf-stability-auditor` report since Phase 0 | **Partial.** The SPEC load target has never been measured |
+| Offline test | 27 routes, same-origin requests only, no console errors; after cutting the network, navigation to 4 already-visited routes worked. (validator) CSP `connect-src 'none'`, no network API in `src`, no cross-origin URL fetched in `dist` | Unvisited lazy routes while offline (reported to fail); reload while offline (not required by the user decision) | **Met for "no runtime network calls".** The recorded wording "every route works with the network cut after load" is not met for unvisited routes (C-3) |
+| Accessibility pass | Structural checks on 27 routes (one h1, `main`, every control labelled, button names, img alt); 40 Tab presses on Fusing reached 12 stops with no trap. (validator) WCAG contrast computed from `src/ui/styles.css` variables: all text pairs ≥ 4.5:1 in both schemes (light: fg/bg 16.91, muted/card 7.42, link/card 6.96, warn-fg/warn-bg 10.28, err-fg/err-bg 10.44, focus/card 4.74; dark: muted/warn-bg 6.16 lowest). Input borders use `--muted` (8.04:1). `--border` (1.68:1 light) is used only for decorative card and table rules | axe-style scan (needs approval: third-party code); screen reader; 200 % zoom/reflow; radio-group and `<details>` keyboard behaviour; contrast of rendered pages (my check is palette-level only and does not cover opacity or overrides) | **Partial** |
+| Docs | README, RUNBOOK, CHANGELOG written | Status lines inaccurate (m-3) | **Met with fixes** (C-1) |
 
-## 4. Standards honesty
+**Conclusion.** Task 5 is not done in full. It is adequately bounded: everything not done is listed explicitly in the hardening report, in RUNBOOK §Performance/offline/accessibility and in OPEN_RISKS D4-2 and "Phase 4 hardening". Because the human made task 5 a required part of the exit criteria, the residuals need the human's explicit acceptance as a partial deferral (C-2, PV4R-1). Agents cannot close it themselves.
 
-- **Forbidden phrases.** `grep -rniE "compliant|certified|guarantee|production safe|\bsafe\b|meets (iec|ipc)|conforms?"` over the Phase 4 sources (non-test) finds only negations: "not a safe overload limit", "never a safe current", "no result is rounded toward a presumed safe side". There is no positive claim. The repo phrase audit (`tests/audit.test.ts`) passes. `gate.ts` is untouched by Phase 4 (`git diff cd13672..HEAD --stat` does not list it), and neither calculator calls it.
-- **Not a fuse rating.** The recommendation, the always-on `NOT_A_RATING` callout, the static status line and every primary result label say "estimate, not a fuse rating". The 1 s and 10 s thresholds are worded "product choices, not sourced limits" (S-042e is one author group). They are warnings, not refusals.
-- **IPC scope for fusing** (S-042f, PAYWALLED). The core makes no IPC statement and keeps a validity check that is not passed. The UI shows it as "Not checked, needs your copy of the standard", counted separately from failures. Honest, but see m-1 on how it is modelled.
-- **Legacy / estimate labels** (Phase 1). Unchanged; the existing tests pass.
-- **Thermal via.** Labelled a 1-D lower bound everywhere. The S-041c CONFLICT (app notes vs Brooks & Adam on via usefulness) is shown without taking a side. k has no default (S-007 CONFLICT, non-conservative direction stated). Fill k has no built-in value.
+### 2.2 Scope deferrals
 
-## 5. Source ledger: Phase 4 rows and spot-checks
+These are logged in `phase-4.md` §Scope decision, SPEC l.15, README §What is not built, CHANGELOG, OPEN_RISKS PV4-2 and the LEDGER placeholder S-043…S-044 (now 9 cells; the earlier m-5 is fixed).
 
-**Honesty of S-040…S-042f (13 rows).** The statuses match the evidence recorded in each row:
-- VERIFIED: S-040 (caveat only, no number), S-041 (formula only, k excluded), S-041b (ideal relation only), S-042b (form and constant, primary not read), S-042c.
-- UNVERIFIED: S-041a (derived), S-041d (not found), S-042 (one readable source), S-042a (derived), S-042e (one author group).
-- CONFLICT: S-041c, S-042d.
-- PAYWALLED-USER-MUST-VERIFY: S-042f.
+Residual: SPEC row 4 (l.60) and R-6 are not updated (C-1).
 
-No DERIVED row is marked VERIFIED. **Ledger sync:** `ledger-status.ts` and `ledger.ts` carry all 14 ids (13 rows plus the S-043…S-044 placeholder) with the same statuses. `tests/ledger-sync.test.ts` "every markdown row is present in ledger.ts with the same status" passes, and `check:audit` checks 105 rows.
+## 3. Spec traceability (built scope; changes since `3420891`)
 
-Every Phase 4 constant appears in the ledger:
+The table in the earlier report §3 still holds. The new behaviour was traced as follows:
 
-| Constant | Code | Ledger |
-|---|---|---|
-| 8890 kg/m³ | `COPPER_DENSITY_KG_M3` | S-003d |
-| 1084.62 °C | `COPPER_MELTING_POINT_C` | S-042c |
-| 383.48, 385.00, 386 J/(kg·K) | `CP_TABLE` | S-042d |
-| 33, 234 | `ONDERDONK_*` | S-042 |
-| 10244 | `PREECE_COPPER_A_INCH` | S-042b |
-| circular mil | `CIRCULAR_MIL_M2` | S-006 |
-| 401 and 391 W/(m·K) | `copperThermalConductivity` | S-007 |
-| 1/58e6 Ω·m, 0.00393 /K | `COPPER_RESISTIVITY_20C`, `COPPER_ALPHA_20C` | S-004 |
-
-Web spot-checks (2026-10-19):
-
-| Row | Ledger claim | Finding | Result |
+| Requirement / change | Code | Test | Gap |
 |---|---|---|---|
-| S-042c | Cu freezing point 1357.77 K = 1084.62 °C (ITS-90) | [NIST ITS-90 Overview](https://its90.nist.gov/Overview): "the freezing point of Cu at 1357.77 K (1084.62 ° C)" | Confirmed, VERIFIED correct |
-| S-042b / S-042f | Preece I = a·d^1.5, a = 10244 for copper, d in inches; fusing "outside the scope of IPC-2152" | [PCD&F 2015-06-29](https://www.pcdandf.com/pcdesign/index.php/editorial/menu-features/10179-pcb-design-1507): "d is the diameter of the wire in inches; a is a constant (10244 for copper)", "found in his third paper (1888)"; area form 12277·A^(3/4); "falls outside the scope of IPC-2152"; 234 + Ta derived from 1/0.00393 − 20. The constant 33 is in an image on that page and was not readable | Confirmed. S-042b VERIFIED is right. S-042f is correctly PAYWALLED: the source is secondhand |
-| S-042 | Onderdonk 33·(I/A)²·t = log10[(Tm − Ta)/(234 + Ta) + 1], A in cmil | Web search: calculator pages reproduce the same log10 form with 33 and 234; no source explains 33; origin is Stauffacher 1928 (GE Review). Validator arithmetic: the form reduces to the published 0.188·A/√t (A in mil²) within 1 % | Consistent. UNVERIFIED (origin unknown) is the honest status |
-| S-041b / S-041c | θ_array = θ_unit/N; 1-D underestimates θ by up to 27 % | [Electronics Cooling 2004-08](https://www.electronics-cooling.com/2004/08/thermal-vias-a-packaging-engineers-best-friend/): "The total resistance is equal to the resistance for a unit cell divided by the total number of vias"; "as high as 27% for 9 through 16 vias. Worse, the calculation underestimates the thermal resistance" | Confirmed, verbatim |
-| S-042d / S-007 | c = 383.48 (293 K), 385.00 (300 K); k = 401 W/(m·K) at 300 K | [PPPL pure copper](https://aries.pppl.gov/LIB/PROPS/PANOS/cu.html): 383.48 and 385.00 J/kg-K; 401.00 W/m-K at 300 K; melting point "1083 C" (older value, noted in S-042c). **Also lists density 8933 kg/m³ at 293 K (8.96 g/cm³ general)** | c and k confirmed. Density see m-4 |
-| S-040 | θJA depends on the test board and environment; "predictions cannot be expected to be accurate for different environmental conditions" | [Electronics Cooling 2019-11](https://www.electronics-cooling.com/2019/11/jedec-thermal-standards-developing-a-common-understanding/): quote confirmed; 1S2P about half of 1S0P (the ledger correctly keeps that number out of the app) | Confirmed, VERIFIED (caveat only) correct |
+| Not-checked validity item (earlier m-1) | `result.ts` l.141-142 `notChecked?`; l.522 excludes it from the low-forcing rule; the UI reads the flag (`fusing.vm.ts` `notCheckedChecks`) and the name regex is removed (grep of non-test `src/ui` for `IPC scope for fusing/` is empty) | `result.schema.test.ts` (+33 lines); fusing vm tests | none |
+| Ledger ids cited in text (earlier m-3) | thermal-via `meta.ts` ids include S-015, S-019m and now S-045; fusing cites S-009, S-015, S-019m | ledger-sync, `check:audit` (106 rows) | none |
+| Density basis (earlier m-4) | fusing assumption cites S-003d (IACS) and S-003e (CONFLICT) as a reference not used | fusing calc tests | none |
+| End-temperature time thresholds (calc N-5) | `fusing/calc.ts` `SUB_MS_END_TIME`, `OVER_1S_END_TIME`, `OVER_10S_END_TIME`, `END_TEMP_NEAR_START` (5 K, `meta.endNearStartKelvin`, labelled a product choice); pinned in `fusing.vm.ts` `pinWarningCodes` | `fusing/calc.test.ts` (+57), `fusing.vm.test.ts` (+64) | Not re-reviewed by calc or pcb (both at `2107b42`); see m-6 |
+| Relief callout (pcb m-N6), thermal-relief text (calc N-2) | `thermal-via/calc.ts` `RELIEF_TEXT` (no "dominate", cites S-045, "size of the effect is unknown"); `thermal-via.vm.ts` `reliefCallout`; `ThermalVia.tsx` l.57 `underHeadline` | `thermal-via.vm.test.ts` (+24) | none |
+| End-temperature headline (pcb m-N4) | `fusing.vm.ts` `endTempHeadline` (label "your value, not checked"; 1 s/10 s cue from `meta.timeWarnings`); `ResultsPanel` `aboveHeadline` | `fusing.vm.test.ts` | none |
+| Bundle ≤ 150 KB/route, ≤ 460 KB total | `tools/check-size.mjs` `TOTAL_BUDGET = 460 * 1024`; SPEC l.41 | gate | none (decided) |
+| Load < 1 s broadband (SPEC l.41) | none | none | **Never measured** (C-2) |
+| Offline capable (SPEC l.42) | CSP, no network API | `csp-plugin.test.ts` | Wording vs behaviour (C-3) |
 
-Stale or unsupported entries:
-- The S-043…S-044 placeholder row has 5 cells against a 9-column header, so the status sits in the URL column (m-5, shape inherited from the Phase 0 placeholder).
-- The S-003d density is a wire-table convention, not pure-copper density; its use in fusing is not stated as such (m-4).
-- No row is stale.
+## 4. Standards honesty and claim audit
+
+- **Forbidden phrases in Phase 4 sources** (`compliant|certified|guarantee|production safe|\bsafe\b|conforms?`, non-test files of fusing, thermal-via and both pages): every hit is a negation ("not a fuse rating and not a safe overload limit", "never a safe current", "no result is rounded toward a presumed safe side"). `gate.ts` is untouched by Phase 4. The repo phrase audit passes.
+- **README / CHANGELOG / RUNBOOK** (grep for `accessib|offline|validated|compliant|certified|guarantee|safe|verified against|meets|conform`). There are **no overclaims**:
+  - No "accessible", "offline capable", "validated against standards" or "compliant".
+  - README l.3 says "no runtime network calls", which is true.
+  - README l.19 says "not a fuse rating and not a safe current".
+  - README l.36 states the no-compliance policy.
+  - README l.71 says IPC/IEC were not read.
+  - The inaccuracies found all **understate** the work (m-3).
+- **New text in `fcf4603`.**
+  - `RISE_TEXT` and `RELIEF_TEXT` are now qualified ("usually a lower bound … not assured"; "size of the effect is unknown").
+  - The end-time thresholds are labelled "product choices, not sourced limits".
+  - `NOT_MEANINGFUL_TEXT` no longer says "would not fuse".
+  - The thermal-via `DIAMETER_HELP` names Eurocircuits "finished + 0.1 mm … one fab practice, not a standard, and no allowance is built in". The claim is correct (web check below), but it has no ledger row (m-4).
+
+## 5. Source ledger: sync and spot-checks
+
+- **Sync.** `tests/ledger-sync.test.ts` passes inside the full run, and `check:audit` checks 106 rows (105 before, plus S-045).
+- **S-045 status.** S-045 is VERIFIED for a caveat only.
+  - The skill rule is "two independent sources agree, at least one tier 1-3". TI (tier 3) together with LearnEMC (tier 5) or JLCPCB (tier 3 or 5) satisfies the rule as written.
+  - The ledger itself says the row must be downgraded if the human rules that two tier 1-3 sources are needed. That human ruling is **not in OPEN_RISKS** (m-5, logged now as PV4R-4).
+
+Web spot-checks (2026-10-19, all through WebFetch):
+
+| Row / claim | Ledger or code claim | Finding | Result |
+|---|---|---|---|
+| S-045 (TI THS3095 datasheet) | "do not use the typical web or spoke via connection methodology"; "Web connections have a high thermal resistance"; complete connection around the circumference | [TI document viewer](https://ti.com/document-viewer/THS3095/datasheet/GUID-264019F5-1035-4577-8A67-69D99B217A95): all three quotes found verbatim | Confirmed |
+| S-045 (LearnEMC) | "Thermal reliefs are intended to aid in the soldering process." / "They prevent the planes from pulling too much heat away…"; inductance remark is electrical | [learnemc.com/qotw-230424](https://learnemc.com/qotw-230424): both quotes verbatim; "thermal reliefs add negligible inductance compared to the overall connection inductance" | Confirmed, including the ledger's caution about the inductance sentence |
+| S-045 (JLCPCB, calc N-4 correction) | "1 to 3 milliohms per pad" (per pad, not per spoke); exposed pads stay solid | [jlcpcb.com/blog/thermal-relief-pad-design](https://jlcpcb.com/blog/thermal-relief-pad-design): "A four-spoke relief with 0.25 mm (10 mil) arms lands around 1 to 3 milliohms per pad"; "Tabs and exposed pads stay solid…"; "Set it to direct connect explicitly" | Confirmed; the N-4 correction is right |
+| S-003d | IACS density 8.89 g/cm³ at 20 °C (NBS Circular 31) | [archive.org OCR](https://archive.org/stream/copperwiretables31unituoft/copperwiretables31unituoft_djvu.txt): "8.89 grams per cm³ at 20° C" (one OCR instance reads "8.8g") | Confirmed |
+| S-003e | 8.935 g/cm³ at STP (LANL) vs 8.96 (RSC), CONFLICT | [LANL copper](https://www.lanl.gov/science-engineering/periodic-table/element/copper): "8.935 g/cm³ at STP" | Confirmed; CONFLICT is the honest status |
+| S-042e | "1.5 to 6.0 times larger than Onderdonk"; a plane 12 mil below adds about 33 % to over 100 % fusing time | [PCD&F 2015-09](https://www.pcdandf.com/pcdesign/index.php/magazine/10293-pcb-design-1509): both statements confirmed; it also says a plane on the underside "had no effect" | Confirmed; UNVERIFIED (one author group) stays correct |
+| UI `DIAMETER_HELP` (no ledger row) | Eurocircuits reads hole sizes as finished and drills plated holes finished + 0.1 mm | [Eurocircuits drilled holes](https://www.eurocircuits.com/pcb-design-guidelines-drilled-holes/): "Tool lists … ALWAYS set as the finished hole sizes (ENDSIZE)"; "TOOLSIZE = ENDSIZE + 0.100mm (4mil)" for PTH | Correct, but **not in the ledger** (m-4) |
+
+There are no stale rows. The earlier spot-checks (S-040, S-041b/c, S-042, S-042b, S-042c, S-042d) stand.
 
 ## 6. Architecture
 
-- `src/core/calculators/{fusing,thermal-via}` import only from core: no `preact`, no DOM, no `fetch`, and no `Date.now`/`Math.random` outside tests (grep, empty).
-- Results use the standard schema. Both modules wrap `build` in try/catch, map overflow to `OUT_OF_DOMAIN` and never return Infinity (tests "overflow ... is an OUT_OF_DOMAIN error value").
-- Compliance wording appears only in `gate.ts`, which Phase 4 did not touch.
-- Units are not mixed at the quantity level. The fusing log term adds a Celsius scalar and β20 (a difference) as plain numbers after `toUnit(…, 'degC')`. This is the published derivation's arithmetic, done after leaving the units engine; the steps re-express both with the correct dimensions.
-- UI view-models hold no engineering math. The only number formatting outside `format-result.ts` is the K step `toExponential(4)`, a step and not a headline (P4U-3).
-- **Coupling note (m-1).** The fusing UI recognises the not-checked IPC item by a regex on the check **name** (`/^IPC scope for fusing/`). The core has no `notChecked` field.
+- Unchanged and still sound: `src/core` has no DOM, network or clock imports (lint purity rules pass), both calculators run `assertCalcResult`, and compliance wording appears only in `gate.ts`.
+- `fcf4603` adds `endNearStartKelvin` to fusing `meta` as a labelled product choice. The UI reads the time thresholds from `meta.timeWarnings`, so there is no duplicated number.
+- The UI recognises the end-time row by its result name (`TIME_END_NAME`), and the relief warning by its code. Code-based matching is fine. The name-based match is fragile, in the same way as the earlier m-1, but it only affects a hint (INFO, no action needed now).
 
 ## 7. Stability and security
 
-- **Guards.** Every quantity goes through `guardQuantity`. Enumerations are checked with `hasOwnProperty` (so `"__proto__"` and `"toString"` are refused). Hash loading uses `hasOwnProperty`, refuses over-long fields, and turns unknown values into blanks plus a notice. Test `'hostile text is just text'`.
-- **No raw HTML.** `grep innerHTML|dangerouslySetInnerHTML src` (non-test) is empty, and a vm page-source test asserts "no raw HTML".
-- **State.** Ten new state keys are documented in `state-key-docs.ts` (`WRITTEN_KEYS` test "writes only documented keys"). No schema-version bump is needed for new calculator ids.
-- **Error boundary.** Per-route boundary unchanged; both pages are lazy routes.
-- **Dependencies.** `npm audit --omit=dev`: 0 vulnerabilities. No new dependencies (package.json unchanged).
-- **Secrets.** None found.
+- Unchanged: guards on every input, no raw HTML (`innerHTML`/`dangerouslySetInnerHTML` absent from non-test `src`), state keys documented, per-route error boundary, `npm audit --omit=dev` 0 vulnerabilities, no new dependencies, no secrets.
+- `END_TEMP_NEAR_START` is a caution only. The result is still computed from validated inputs.
 
-## 8. Deployment, and exactly what task 5 still needs
+## 8. Deployment
 
-**Deployment.**
-- `deploy.yml` is unchanged in Phase 4. It runs typecheck, lint, the oracle, the golden check, coverage, build, size and audit, then the Pages artifact.
-- Base `./` (vite.config.ts l.22). Actions are pinned by SHA.
-- Action release check (GitHub releases pages, 2026-10-19):
-  - checkout v7.0.1 (latest)
-  - setup-node pinned v7.0.0; **v7.1.0 released 08 Oct** (m-7)
-  - deploy-pages v5.0.1 (latest)
-- Rollback is documented (RUNBOOK §Rollback).
-- V-13: `ubuntu-latest` moves to Ubuntu 26 from today; no CI run has been observed (R-15).
+- `deploy.yml` is unchanged in Phase 4. Base `./`. Actions are pinned by SHA. Rollback is documented (RUNBOOK §Rollback).
+- Action check today: [actions/setup-node releases](https://github.com/actions/setup-node/releases) lists v7.1.0 (08 Oct, "Latest"). The pin is still v7.0.0 (D4-1; m-7).
+- V-13 (Ubuntu 26 runner) and R-15 (live Pages) are not observed. The RUNBOOK documents both.
 
-**Task 5, what is missing (not done by this validator, as instructed):**
+## 9. Status of the earlier findings
 
-1. **Performance audit.** The only perf report is `phase-0-perf.md`. No `perf-stability-auditor` report exists for Phases 1-4. Missing items:
-   - measured first load on throttled broadband against the SPEC "Load < 1 s", e.g. a Lighthouse or Playwright trace of the built `dist` on :4173;
-   - route-switch timings for the heaviest routes (PathLoad 133 KB, Fusing, ThermalVia);
-   - a check that no long task above 50 ms occurs on input;
-   - a review of the 3.25 KB bundle headroom, with either a trim plan or a human ceiling decision (M-3);
-   - a record in `docs/validation/reports/phase-4-perf.md`.
-2. **Offline test.** Nothing tests that the app works offline. R-15 ("offline load ... not observed") is still OPEN. Missing items:
-   - a Playwright (or manual, recorded) run that loads the built site, sets the context offline, navigates every route including lazy chunks, and confirms no network request beyond same-origin assets (CSP `connect-src 'none'` already blocks runtime calls);
-   - a human decision on what "offline capable" (SPEC l.42) means. With no service worker (RUNBOOK §Service worker), a cold reload while offline fails. Either accept "no runtime network after load" and write that in SPEC, or add a versioned-precache service worker (bundle and stale-cache risk).
-3. **Accessibility pass.** No browser, axe or keyboard pass has been run on any page. The Phase 3 and Phase 4 UI logs say "not verified in a real browser". Missing items:
-   - an axe (or equivalent) scan of every route;
-   - keyboard-only walk-through of the form controls, `<details>` panels, radio groups and reset;
-   - contrast check of the `.notice`, `.validity-count` and badge colours;
-   - screen-reader check of the live regions on the Fusing and ThermalVia pages;
-   - results recorded in a report.
-4. **Docs.**
-   - README: list thermal via and fusing, with one honest line each ("1-D lower bound, not θJA", "adiabatic estimate, not a fuse rating"); state what was deferred (θJA/θJC, exposed pad and spreading, RF/antenna beyond the quarter-wave helper, twisted pair); link OPEN_RISKS human items.
-   - RUNBOOK: add how to run the perf, offline and accessibility checks; the local preview on :4173; the Ubuntu 26 runner note (V-13); refresh the action-version date.
-   - CHANGELOG: it has only kit-level `v1`/`v2` entries and no phase entries.
-   - SPEC: record the Phase 4 scope decision (M-2).
-   - phase-4.md: mark criteria and deferrals.
-5. **Remaining validators.** `/validate-phase 4` still needs `phase-4-calc.md` (calc-validator, which should run first) and `phase-4-pcb.md`, then a closure record.
+| Earlier | Status now |
+|---|---|
+| M-1 task 5, docs, reports | Reports and docs done. Task 5 partial: **C-2** |
+| M-2 scope in authoritative docs | SPEC l.15 and `phase-4.md` fixed. R-6, SPEC row 4 and PV4-1 are stale: **C-1** |
+| M-3 bundle headroom | **Closed** (user decision 460 KB; 27.9 KB headroom) |
+| m-1 notChecked | Fixed (CF-5, P4U-2) |
+| m-2 "uncommitted" labels / Owner columns | Owner and Status columns now exist in P4U and CF. The "uncommitted" headings remain (C-1) |
+| m-3 ledger ids in text | Fixed (CF-6, N-2) |
+| m-4 density basis | Fixed (CF-7/N-7) |
+| m-5 malformed placeholder row | Fixed (9 cells) |
+| m-6 P4-1 confidence always low | Human, OPEN (carried) |
+| m-7 setup-node | OPEN (D4-1) |
+| m-8 reverse link | Fixed |
+| m-9 V-13 / R-15 | OPEN (carried) |
 
-## 9. Findings
+## 10. Findings
 
 | # | Severity | Finding | Evidence | Owner |
 |---|---|---|---|---|
-| M-1 | MAJOR | Exit criterion 3 not met: task 5 not done; README and RUNBOOK incomplete; Phase 4 calc and pcb reports absent | Section 2, section 8; `ls docs/validation/reports` | perf-stability-auditor, test-engineer, ui-engineer, devops-engineer; orchestrator for the reports |
-| M-2 | MAJOR | Scope decision not recorded in the authoritative documents. R-6 is still OPEN; SPEC l.15 and row 4 (l.60) are unchanged; phase-4.md is unchanged; the RF/antenna and twisted pair/coax deferrals are not in OPEN_RISKS (only in the research doc and the S-043…S-044 placeholder). Traceability is priority 2 | `OPEN_RISKS.md` l.10, `SPEC.md` l.15/60, `phase-4.md` | orchestrator (docs only) |
-| M-3 | MAJOR | Bundle headroom 3.25 KB (426.75 of 430 KB). Any task 5 UI change (accessibility fixes, offline notice, SW registration) is likely to fail `check:size` in CI | `check:size` output | human (ceiling decision) + devops-engineer / ui-engineer (trim) |
-| m-1 | MINOR | The paywalled IPC fusing item is modelled as `ok:false`. `assertCalcResult` (`result.ts` l.521-525) forces confidence to low whenever any check fails, so fusing confidence is capped at low regardless of the rule score: changing the P4-1 weights alone could never raise it. Generic consumers of `!c.ok` would count it as a failure. The UI identifies it by a name regex | `fusing/calc.ts` l.208-212; `fusing.vm.ts` l.395, 507 | calc-implementer (add a core `notChecked` flag to validity checks, excluded from the low-forcing rule; keep the UI on the flag, not the name) |
-| m-2 | MINOR | OPEN_RISKS Phase 4 sections say "uncommitted" but are committed (`f196259`, `3420891`). The P4-* and P4U-* tables have no Owner or Status columns, so human items are not separable | OPEN_RISKS l.559, l.594 | orchestrator |
-| m-3 | MINOR | Warning and assumption text cites ledger rows that are not in `reference.ledgerIds`, so they get no badge or data-status contribution: S-019m and S-015 (thermal via plating text) and S-009 (fusing `THICKNESS_NOMINAL`). S-003 is excluded on purpose (foil policy) | `thermal-via/calc.ts` l.50, l.162; `fusing/calc.ts` l.66; `meta.ts` ledgerIds | calc-implementer |
-| m-4 | MINOR | Fusing uses the IACS wire-table density 8890 kg/m³ (S-003d) with pure-copper specific heat (PPPL). PPPL lists 8933 kg/m³ at 293 K, 0.5 % higher. The time scales with D, so 8890 gives a slightly shorter time. The fusing assumptions do not state that the density is the IACS convention or give the spread | `constants.ts`; PPPL page | standards-researcher (note in S-003d or S-042a) + calc-implementer (assumption text) |
-| m-5 | MINOR | The S-043…S-044 placeholder ledger row has 5 cells against a 9-column header (status in the URL column). Sync passes, but the row is malformed | `LEDGER.md` l.160 | standards-researcher |
-| m-6 | MINOR | P4-1: confidence is permanently low for both calculators (estimate 2 + CONFLICT 2). Honest, but the "medium" in the research doc is unreachable. Needs a human acknowledgement | OPEN_RISKS P4-1 | human |
-| m-7 | MINOR | `actions/setup-node` is pinned at v7.0.0; v7.1.0 was released 08 Oct. RUNBOOK's version check is dated 2026-10-06 | GitHub releases page | devops-engineer (or Dependabot) |
-| m-8 | MINOR | One-way separation link: the self-heating page does not point to fusing for short pulses (P4U-1) | `Fusing.tsx` l.107; no reverse link | ui-engineer (costs bundle; see M-3) |
-| m-9 | MINOR | CI not yet observed on Ubuntu 26 (V-13, effective today), and the live Pages URL is not observed (R-15) | OPEN_RISKS V-13, R-15 | human + devops-engineer |
+| M-1 | MAJOR (closure condition C-2) | Task 5 is partial. The SPEC "Load < 1 s broadband" target has never been measured. There has been no axe scan, screen-reader check, zoom/reflow check, radio or `<details>` keyboard check, or long-task trace. The hardening evidence is the orchestrator's (not independent; scripts not kept). Task 5 was made required by the human, so only the human can accept the residuals as a deferral | `phase-4-hardening.md` "Not done"; `phase-4.md` §Scope decision "stays required"; §2.1 | human (accept, PV4R-1); perf-stability-auditor / ui-engineer if not accepted |
+| m-1 | MINOR (closure condition C-1) | Records out of sync:<br>- R-6 is still OPEN (l.10).<br>- PV4-1 to PV4-6 are all OPEN although partly done or decided.<br>- CF-1, CF-2, CF-4, CF-7, CF-8, CF-13, CF-14 and CF-15 have stale statuses.<br>- D4-3 is stale, and l.686 says N-4 is still open.<br>- The "uncommitted" headings remain (l.559, l.631).<br>- SPEC row 4 (l.60) still shows the old scope, and SPEC l.42 lacks the offline definition.<br>- The `phase-4.md` boxes are unticked | `OPEN_RISKS.md` l.10, 559, 622-651, 666, 686; `SPEC.md` l.42, l.60; `phase-4.md` l.17-19 | orchestrator |
+| m-2 | MINOR (closure condition C-3) | The offline decision is recorded as "every route works with the network cut after load" (OPEN_RISKS l.654, RUNBOOK l.56). The hardening report says unvisited lazy routes do not load offline. The behaviour honestly meets "no runtime network calls", but the recorded sentence overstates it | `phase-4-hardening.md` l.8; RUNBOOK l.56 | human (confirm wording) + orchestrator |
+| m-3 | MINOR | README and CHANGELOG status lines are inaccurate. They understate, and none overclaims:<br>- "calc, phase and PCB-domain reports (all PASS-WITH-CONDITIONS)": the pcb report is **PASS**.<br>- "task 5 … is not done": it is partial (hardening report).<br>- "No agent has checked the pages in a real browser with a keyboard": the orchestrator's Playwright run pressed Tab on Fusing.<br>- CHANGELOG total 431.00 KB: measured now 432.12 KB.<br>- RUNBOOK l.57 "a contrast test": it exists only for the circuit-value styles (`circuit-choices.test.ts` l.204) | README l.69, l.73; CHANGELOG l.9, l.11; RUNBOOK l.57 | orchestrator |
+| m-4 | MINOR | `thermal-via.vm.ts` `DIAMETER_HELP` states a sourced fab practice (Eurocircuits, finished + 0.1 mm) with no ledger row (CLAUDE.md rule 1). The claim is correct (web check §5) and no calculation uses it | `thermal-via.vm.ts` `DIAMETER_HELP`; `grep -i eurocircuits docs/sources` is empty | standards-researcher (row, e.g. S-019n or a note under S-015) |
+| m-5 | MINOR | S-045 VERIFIED depends on an open human ruling on whether a fabricator blog is tier 3 or tier 5. The ruling is recorded only inside the ledger note, not in OPEN_RISKS | LEDGER S-045 notes; calc report condition 5 | human (PV4R-4) |
+| m-6 | MINOR (process) | The `src` changes in `fcf4603` (calc N-1, N-2, N-3, N-5, N-6, N-7; pcb m-N1 to m-N4 and m-N6) came after the calc and pcb re-reviews (both at `2107b42`). This validator reviewed the diff: text is qualified, the new warnings are labelled product choices and no number changed. Tests (6906) and the oracle pass. The closure record should state that these follow-ups were checked by the phase-validator only | `git diff 2107b42..fcf4603 -- src` | orchestrator (closure record) |
+| m-7 | MINOR (carried) | setup-node v7.1.0 not pinned | D4-1; GitHub releases | devops-engineer / Dependabot |
+| m-8 | MINOR (carried, human) | P4-1/P4U-7 confidence always low; Q-54; Q-56; P4U-17; V-13/R-15; PV4-2 permanent deferral | OPEN_RISKS | human |
 
-Human-only items are added to `docs/validation/OPEN_RISKS.md` under "Phase 4 phase-validator".
+Human-only items from this re-validation are appended to `docs/validation/OPEN_RISKS.md` under "Phase 4 phase-validator re-validation" (PV4R-1 to PV4R-4).
+
+## 11. Can Phase 4 close?
+
+**Yes, once C-1 to C-3 are met.**
+- C-1 is a docs-only sync in the closure commit.
+- C-2 and C-3 are two human confirmations: accept the task 5 residuals as a partial deferral, and the offline wording.
+
+No re-run of the validators is needed for these conditions, because they change no code or numbers. If the human does not accept C-2, the task 5 residuals must be done and this report re-run.

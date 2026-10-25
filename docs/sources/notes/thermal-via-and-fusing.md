@@ -134,6 +134,12 @@ Inputs: `docs/validation/reports/phase-4-calc.md` (C4-5), `phase-4-phase.md` (m-
 ### 6. Ledger shape (phase m-5)
 - The S-043…S-044 placeholder now sits in a 9-column table, with its status in the Status column. Id and status are unchanged.
 
+### 7. Eurocircuits hole-size convention (docs note only; phase m-4; no ledger row)
+- The thermal-via `DIAMETER_HELP` text (`thermal-via.vm.ts`) names Eurocircuits "finished + 0.1 mm" as one fab practice, "not a standard", with "no allowance built in". CLAUDE.md rule 1 asks for a ledger entry for any such claim. None exists. This is a docs note only; `LEDGER.md` and `ledger.ts` were NOT changed.
+- Checked by the phase-validator on 2026-10-19 (WebFetch, https://www.eurocircuits.com/pcb-design-guidelines-drilled-holes/, report `phase-4-phase.md` §5). The page says: "Tool lists … ALWAYS set as the finished hole sizes (ENDSIZE)" and, for plated holes, "TOOLSIZE = ENDSIZE + 0.100mm (4mil)".
+- Scope: one fabricator's own documentation. It is not a standard and is not shown to apply to any other fab. No calculation uses it.
+- Status: not a ledger row. Adding one (for example a note under S-015 or a new S-019n) stays with the standards-researcher (OPEN_RISKS PV4R-4). A status for such a row is not decided here.
+
 ## Not used (leads only)
 - ICEA/IEEE-242 short-circuit form with 0.0297 (Mike Holt documents: 403; search snippet only).
 - IEEE Std 80 / ASTM F855 use of Onderdonk (search snippets only; paywalled).
