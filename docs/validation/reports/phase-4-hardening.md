@@ -20,3 +20,9 @@ Keyboard: 40 Tab presses on the Fusing page reached 12 distinct focus stops with
 
 ## Result
 No defect found by these checks. Coverage of the SPEC targets is partial and stated above.
+
+## Addendum (orchestrator, 2026-10-25, same build, scripted Playwright, not stored)
+- Reflow: all 28 calculator routes at viewport widths 640 px (about 200 % zoom on 1280) and 320 px: no horizontal page scroll (scrollWidth minus clientWidth at most 1 px). This is a viewport-width proxy, not a browser-zoom run, and it checks page scroll only, not clipped content.
+- Radio keyboard (Fusing page, 9 radios): ArrowRight from the first radio moved the selection to the next one in its group.
+- Collapsible panels: the Fusing page has no details/summary or aria-expanded buttons, so nothing to test there; other pages were not checked.
+- Still open: throttled broadband load, axe-core (needs approval), screen-reader run, long-task trace.
