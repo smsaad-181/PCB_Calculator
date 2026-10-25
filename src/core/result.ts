@@ -138,7 +138,8 @@ export interface CalcResult {
   steps: { label: string; expr: string; value: Quantity; bound?: Bound }[];
   /** `note`, when set, is a short caveat that must be shown with the value (for example 'solved without FB bias'). */
   results: { name: string; value: Quantity; role: 'primary' | 'secondary'; bound: Bound; note?: string }[];
-  validityChecks: { name: string; ok: boolean; detail: string }[];
+  /** `notChecked`, when true, marks a condition that was not evaluated (for example a paywalled source). It is not a failure: `ok` stays false (not passed), it does not force confidence to low and it is not counted as failed. */
+  validityChecks: { name: string; ok: boolean; detail: string; notChecked?: boolean }[];
   warnings: CalcWarning[];
   confidence: Confidence;
   recommendation: string;
@@ -518,7 +519,7 @@ export function assertCalcResult(r: CalcResult): Result<CalcResult, string[]> {
         errors.push(`The fab profile status is ${String(r.fabProfile.status)} but dataStatus is VERIFIED; dataStatus must be the same non-VERIFIED status.`);
       }
     }
-    const failed = r.validityChecks.filter((c) => !c.ok);
+    const failed = r.validityChecks.filter((c) => !c.ok && c.notChecked !== true);
     const lvl = r.confidence.level;
     if (failed.length > 0 && lvl !== 'low') {
       errors.push(`Validity check failed ("${failed.map((c) => c.name).join('", "')}") but confidence level is ${String(lvl)}; it must be low.`);

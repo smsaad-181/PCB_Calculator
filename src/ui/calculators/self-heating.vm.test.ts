@@ -8,6 +8,8 @@ import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
+  FUSING_HREF,
+  FUSING_NOTE,
   LAW_LABEL,
   WRITTEN_KEYS,
   activeFields,
@@ -321,6 +323,16 @@ describe('hash state', () => {
   it('hostile text is only ever text', () => {
     const { state } = fromHashState({ law: 'user-theta', l: '<img src=x onerror=alert(1)>', w: '1 mm', ct: '35 um', cs: 'thickness', ly: 'outer', i: '1 A', th: '1 K/W' });
     expect(computeView(state).status).toBe('error');
+  });
+});
+
+describe('link to the fusing page', () => {
+  it('points to the fusing route with a one-line note that it is a different question', () => {
+    expect(FUSING_HREF).toBe('#/calc/fusing');
+    expect(FUSING_NOTE).toMatch(/different question/i);
+    expect(FUSING_NOTE).toMatch(/not steady-state/i);
+    expect(pageSrc).toContain('FUSING_HREF');
+    expect(pageSrc).toContain('FUSING_NOTE');
   });
 });
 

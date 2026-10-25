@@ -26,13 +26,13 @@ export const meta = {
   method:
     'Adiabatic heating of a copper conductor from the initial temperature to the melting point (time to reach it, heat of fusion excluded), with Onderdonk as a secondary check and Preece as a historical reference',
   reference: {
-    standard: 'Adiabatic energy balance with copper constants (S-003d, S-004, S-042c, S-042d); Onderdonk equation (attributed); Preece equation (1888)',
+    standard: 'Adiabatic energy balance with copper constants (S-003d, S-004, S-042c, S-042d); Onderdonk equation (attributed); Preece (1884 or 1888, sources conflict, see S-042b)',
     edition: 'n/a',
-    ledgerIds: ['S-003d', 'S-004', 'S-006', 'S-042', 'S-042a', 'S-042b', 'S-042c', 'S-042d', 'S-042e', 'S-042f'],
+    ledgerIds: ['S-003d', 'S-004', 'S-006', 'S-009', 'S-015', 'S-019m', 'S-042', 'S-042a', 'S-042b', 'S-042c', 'S-042d', 'S-042e', 'S-042f'],
   },
   formula:
     'I²·t = A²·K·ln[(Tm + β20)/(Ta + β20)]; K = D·c/(ρ20·α20); β20 = 1/α20 − 20 °C; Onderdonk: 33·(I/A)²·t = log10[(Tm + 234)/(Ta + 234)] with A in circular mils; Preece (historical, no time): I = 10244·d^1.5, d in inches; t = I²t/I²; I = √(I²t/t)',
-  ledgerIds: ['S-003d', 'S-004', 'S-006', 'S-042', 'S-042a', 'S-042b', 'S-042c', 'S-042d', 'S-042e', 'S-042f'],
+  ledgerIds: ['S-003d', 'S-004', 'S-006', 'S-009', 'S-015', 'S-019m', 'S-042', 'S-042a', 'S-042b', 'S-042c', 'S-042d', 'S-042e', 'S-042f'],
   accuracyClass: 'estimate' as AccuracyClass,
   /** Engineering plausibility ranges (not from a standard); a value outside fails a validity check. */
   validity: {
@@ -40,6 +40,8 @@ export const meta = {
     traceThicknessM: [5e-6, 500e-6] as readonly [number, number],
   },
   /** PRODUCT CHOICES based on S-042e (one author group), not sourced limits. */
-  timeWarnings: { overSeconds: 1, strongSeconds: 10 },
+  timeWarnings: { overSeconds: 1, strongSeconds: 10, subMsSeconds: 1e-3 },
+  /** PRODUCT CHOICE, no sourced limit: an end temperature less than this many kelvin above the start gets a unit-check caution. */
+  endNearStartKelvin: 5,
   toleranceInputs: [] as string[],
 } as const;

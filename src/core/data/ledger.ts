@@ -116,6 +116,7 @@ const LEDGER_TEXT: readonly LedgerText[] = [
   { id: 'S-042d', item: 'Copper specific heat capacity near room temperature and its rise with temperature', edition: 'PPPL pure copper table; HyperPhysics (Tipler); retrieved 2026-10-19' },
   { id: 'S-042e', item: 'PCB traces vs Onderdonk/Preece: validity time and why the result is not a fuse rating', edition: 'Brooks and Adam, PCD&F (2015-09-01, 2023-06-02), Signal Integrity Journal (2020-05-05); retrieved 2026-10-19' },
   { id: 'S-042f', item: 'Fusing and short-time overload vs IPC-2221 / IPC-2152 scope (secondhand)', edition: 'Brooks and Adam, PCD&F (2015-06-29); IPC-2152 and IPC-2221 not read; retrieved 2026-10-19' },
+  { id: 'S-045', item: 'Thermal-relief (spoke) vs solid connection of thermal vias and exposed pads to the plane: caveat text only, no number (relief not modelled)', edition: 'TI THS3091/THS3095 datasheet SLOS423K (2023-04) §9.4.1.1.1; JLCPCB blog (2026-08-24); LearnEMC QOTW 2023-04-24 (mechanism only); retrieved 2026-10-19' },
   { id: 'S-043…S-044', item: 'Twisted pair / coax and antenna references (out of Phase 4 scope by user decision 2026-10-19)', edition: E },
   { id: 'S-050', item: 'twc IPC-2152 methods (cross-check tool; describes the tool only)', edition: 'ymic9963/twc commit 308002f (main, 2026-10-06)' },
   { id: 'S-051', item: 'Cross-check tool licenses', edition: 'each repository license file, 2026-10-06' },

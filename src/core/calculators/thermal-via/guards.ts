@@ -1,4 +1,4 @@
-import { DIM } from '../../units';
+import { DIM, q } from '../../units';
 import type { Quantity } from '../../units';
 import type { CalcError, Result } from '../../result';
 import { copperThermalConductivity } from '../../data/constants';
@@ -12,9 +12,14 @@ function isRecord(x: unknown): x is Record<string, unknown> {
 }
 
 export type PlatingSource = 'user' | 'fab-profile-average';
+export type DiameterBasis = 'finished' | 'drill';
 
 export interface ValidInputs {
+  /** The finished (inside) hole diameter used by the model: as entered, or D - 2t when the entered value is a drill diameter. */
   readonly finishedHoleDiameter: Quantity;
+  /** The diameter exactly as the user entered it. */
+  readonly enteredDiameter: Quantity;
+  readonly diameterBasis: DiameterBasis;
   readonly platingThickness: Quantity;
   readonly barrelLength: Quantity;
   readonly count: number;
@@ -44,6 +49,23 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
     const g = guardQuantity(f, raw[f], DIM.LENGTH, name);
     if (!g.ok) return g;
     len[f] = g.value;
+  }
+
+  const basis = raw['diameterBasis'];
+  if (basis !== 'finished' && basis !== 'drill') {
+    return {
+      ok: false,
+      error: err('INVALID_INPUT', 'diameterBasis', 'diameterBasis is required and must be "finished" (inside the plating) or "drill". There is no default: a drill diameter entered as the finished hole makes theta about 15 % too low (the real theta is about 18 % higher) for 25 um plating on a 0.3 mm drill.'),
+    };
+  }
+  const enteredDiameter = len.finishedHoleDiameter as Quantity;
+  let finishedHoleDiameter = enteredDiameter;
+  if (basis === 'drill') {
+    const t2 = 2 * (len.platingThickness as Quantity).si;
+    if (t2 >= enteredDiameter.si) {
+      return { ok: false, error: err('OUT_OF_DOMAIN', 'platingThickness', 'With a drill diameter D the plating must be thinner than D/2 (finished hole D - 2t must be positive). Check the units and the diameter basis.') };
+    }
+    finishedHoleDiameter = q(enteredDiameter.si - t2, DIM.LENGTH);
   }
 
   const n = raw['count'];
@@ -99,7 +121,9 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   return {
     ok: true,
     value: {
-      finishedHoleDiameter: len.finishedHoleDiameter as Quantity,
+      finishedHoleDiameter,
+      enteredDiameter,
+      diameterBasis: basis,
       platingThickness: len.platingThickness as Quantity,
       barrelLength: len.barrelLength as Quantity,
       count: n,

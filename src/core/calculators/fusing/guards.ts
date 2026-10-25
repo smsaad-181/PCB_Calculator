@@ -12,7 +12,7 @@ function isRecord(x: unknown): x is Record<string, unknown> {
 }
 
 export type ThicknessBasis = 'finished' | 'measured' | 'nominal';
-export type Geometry = 'area' | 'trace' | 'wire';
+export type Geometry = 'area' | 'trace' | 'wire' | 'via';
 export type Pulse = 'current' | 'time' | 'i2t';
 
 export interface ValidInputs {
@@ -22,9 +22,14 @@ export interface ValidInputs {
   readonly traceWidth?: Quantity;
   readonly traceThickness?: Quantity;
   readonly wireDiameter?: Quantity;
+  /** Via barrel: FINISHED hole diameter and barrel plating thickness. */
+  readonly viaHoleDiameter?: Quantity;
+  readonly viaPlatingThickness?: Quantity;
   readonly area?: Quantity;
   readonly thicknessBasis?: ThicknessBasis;
   readonly initialTemperature: Quantity;
+  /** Optional user end temperature (absolute), above the initial temperature and at most the melting point. No default. */
+  readonly endTemperature?: Quantity;
   readonly pulse: Pulse;
   readonly current?: Quantity;
   readonly pulseTime?: Quantity;
@@ -36,6 +41,12 @@ export interface ValidInputs {
 
 const BASES: readonly string[] = ['finished', 'measured', 'nominal'];
 
+/** Input sanity limits (NOT sourced limits): they only reject absurd magnitudes, almost always a unit slip. */
+const SANITY_AREA_M2 = 1;
+const SANITY_LENGTH_M = 1;
+const sanity = (field: string, what: string): CalcError =>
+  err('OUT_OF_DOMAIN', field, `${what} is above the input sanity limit (${String(SANITY_LENGTH_M)} m or ${String(SANITY_AREA_M2)} m2). This is an input sanity limit to catch unit slips, not a sourced limit; check the units.`);
+
 /** Full input validation. Returns an error value for anything malformed; never throws. */
 export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   if (!isRecord(raw)) return { ok: false, error: err('INVALID_INPUT', 'inputs', 'inputs must be an object.') };
@@ -44,10 +55,11 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   const hasArea = raw['area'] !== undefined;
   const hasWire = raw['wireDiameter'] !== undefined;
   const hasTrace = raw['traceWidth'] !== undefined || raw['traceThickness'] !== undefined || raw['thicknessBasis'] !== undefined;
-  if (Number(hasArea) + Number(hasWire) + Number(hasTrace) !== 1) {
+  const hasVia = raw['viaHoleDiameter'] !== undefined || raw['viaPlatingThickness'] !== undefined;
+  if (Number(hasArea) + Number(hasWire) + Number(hasTrace) + Number(hasVia) !== 1) {
     return {
       ok: false,
-      error: err('INVALID_INPUT', 'geometry', 'Give exactly one conductor geometry: area, or a trace (traceWidth, traceThickness and thicknessBasis), or a wireDiameter.'),
+      error: err('INVALID_INPUT', 'geometry', 'Give exactly one conductor geometry: area, or a trace (traceWidth, traceThickness and thicknessBasis), or a wireDiameter, or a via barrel (viaHoleDiameter and viaPlatingThickness).'),
     };
   }
   let geometry: Geometry;
@@ -57,6 +69,8 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   let traceThickness: Quantity | undefined;
   let wireDiameter: Quantity | undefined;
   let thicknessBasis: ThicknessBasis | undefined;
+  let viaHoleDiameter: Quantity | undefined;
+  let viaPlatingThickness: Quantity | undefined;
   if (hasArea) {
     const g = guardQuantity('area', raw['area'], DIM.AREA, 'area (conductor cross-section)');
     if (!g.ok) return g;
@@ -66,9 +80,26 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   } else if (hasWire) {
     const g = guardQuantity('wireDiameter', raw['wireDiameter'], DIM.LENGTH, 'length (wire diameter)');
     if (!g.ok) return g;
+    if (g.value.si > SANITY_LENGTH_M) return { ok: false, error: sanity('wireDiameter', 'The wire diameter') };
     geometry = 'wire';
     wireDiameter = g.value;
     areaM2 = (Math.PI * g.value.si * g.value.si) / 4;
+  } else if (hasVia) {
+    if (raw['viaHoleDiameter'] === undefined) {
+      return { ok: false, error: err('INVALID_INPUT', 'viaHoleDiameter', 'viaHoleDiameter is required for a via barrel: the FINISHED hole diameter (inside the plating), not the drill.') };
+    }
+    const d = guardQuantity('viaHoleDiameter', raw['viaHoleDiameter'], DIM.LENGTH, 'length (finished hole diameter, not the drill diameter)');
+    if (!d.ok) return d;
+    if (raw['viaPlatingThickness'] === undefined) {
+      return { ok: false, error: err('INVALID_INPUT', 'viaPlatingThickness', 'viaPlatingThickness is required for a via barrel. It is never pre-filled: take it from your fabricator (an AVERAGE, not a minimum) or measure it.') };
+    }
+    const t = guardQuantity('viaPlatingThickness', raw['viaPlatingThickness'], DIM.LENGTH, 'length (barrel plating thickness)');
+    if (!t.ok) return t;
+    if (d.value.si > SANITY_LENGTH_M) return { ok: false, error: sanity('viaHoleDiameter', 'The via hole diameter') };
+    geometry = 'via';
+    viaHoleDiameter = d.value;
+    viaPlatingThickness = t.value;
+    areaM2 = Math.PI * t.value.si * (d.value.si + t.value.si);
   } else {
     if (raw['traceWidth'] === undefined) return { ok: false, error: err('INVALID_INPUT', 'traceWidth', 'traceWidth is required for a trace.') };
     const w = guardQuantity('traceWidth', raw['traceWidth'], DIM.LENGTH, 'length (trace width)');
@@ -78,6 +109,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
     }
     const t = guardQuantity('traceThickness', raw['traceThickness'], DIM.LENGTH, 'length (finished copper thickness)');
     if (!t.ok) return t;
+    if (w.value.si > SANITY_LENGTH_M) return { ok: false, error: sanity('traceWidth', 'The trace width') };
     const b = raw['thicknessBasis'];
     if (typeof b !== 'string' || !BASES.includes(b)) {
       return { ok: false, error: err('INVALID_INPUT', 'thicknessBasis', 'thicknessBasis is required and must be "finished", "measured" or "nominal". There is no default: thinner finished copper fuses sooner.') };
@@ -91,6 +123,7 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   if (!Number.isFinite(areaM2) || areaM2 <= 0) {
     return { ok: false, error: err('OUT_OF_DOMAIN', 'geometry', 'The conductor cross-section is outside the representable range (check the units).') };
   }
+  if (areaM2 > SANITY_AREA_M2) return { ok: false, error: sanity('geometry', 'The conductor cross-section') };
 
   // Initial temperature: required, absolute, below the melting point and inside the linear-resistivity model.
   if (raw['initialTemperature'] === undefined) {
@@ -108,6 +141,21 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
   }
   if (taC + beta20 <= 0 || taC + ONDERDONK_OFFSET_C <= 0) {
     return { ok: false, error: err('OUT_OF_DOMAIN', 'initialTemperature', 'initialTemperature is too low for the linear resistivity model used by these equations.') };
+  }
+
+  // Optional end temperature (S-042a with Te in place of Tm): never defaulted; above Ta and at most the melting point.
+  let endTemperature: Quantity | undefined;
+  if (raw['endTemperature'] !== undefined) {
+    const te = guardQuantity('endTemperature', raw['endTemperature'], DIM.ABS_TEMPERATURE, 'absolute temperature (degC or K, not a temperature difference)');
+    if (!te.ok) return te;
+    const teC = toUnit(te.value, 'degC');
+    if (teC <= taC) {
+      return { ok: false, error: err('OUT_OF_DOMAIN', 'endTemperature', 'endTemperature must be above the initial temperature (the conductor would already be at it).') };
+    }
+    if (teC > COPPER_MELTING_POINT_C + 1e-9) {
+      return { ok: false, error: err('OUT_OF_DOMAIN', 'endTemperature', 'endTemperature must not exceed the copper melting point; the model stops there.') };
+    }
+    endTemperature = te.value;
   }
 
   // Exactly one of current, pulseTime, actionIntegral.
@@ -149,6 +197,9 @@ export function validate(raw: unknown): Result<ValidInputs, CalcError> {
       ...(traceWidth !== undefined ? { traceWidth } : {}),
       ...(traceThickness !== undefined ? { traceThickness } : {}),
       ...(wireDiameter !== undefined ? { wireDiameter } : {}),
+      ...(viaHoleDiameter !== undefined ? { viaHoleDiameter } : {}),
+      ...(viaPlatingThickness !== undefined ? { viaPlatingThickness } : {}),
+      ...(endTemperature !== undefined ? { endTemperature } : {}),
       ...(thicknessBasis !== undefined ? { thicknessBasis } : {}),
       initialTemperature: ta.value,
       pulse: spec.pulse,

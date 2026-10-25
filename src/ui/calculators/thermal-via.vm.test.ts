@@ -6,9 +6,12 @@ import { CALCULATOR_STATE_KEYS } from '../../state/state-key-docs';
 import {
   CALCULATOR_ID,
   DEFAULT_STATE,
+  DIAMETER_HELP,
   STATUS_LINES,
+  VIA_COUNT_HINT_FROM,
   WRITTEN_KEYS,
   computeView,
+  diameterPlaceholder,
   fromHashState,
   kOptions,
   liveSummary,
@@ -18,7 +21,7 @@ import {
 
 const st = (p: Partial<ThermalViaState>): ThermalViaState => ({ ...DEFAULT_STATE, ...p });
 const ROUTE = { name: 'calc', id: CALCULATOR_ID } as const;
-const BASE: Partial<ThermalViaState> = { diameter: '0.3 mm', plating: '25 um', length: '1.6 mm', count: '4', kMaterial: 'pure-401', fill: 'none' };
+const BASE: Partial<ThermalViaState> = { diameter: '0.3 mm', diameterBasis: 'finished', plating: '25 um', length: '1.6 mm', count: '4', kMaterial: 'pure-401', fill: 'none' };
 
 function ok(s: ThermalViaState) {
   const v = computeView(s);
@@ -32,8 +35,21 @@ describe('mandatory inputs start blank and nothing is assumed', () => {
     expect(v.status).toBe('needs-input');
     if (v.status !== 'needs-input') return;
     const t = v.needs.join(' | ');
-    for (const w of [/hole diameter/i, /plating thickness/i, /barrel length/i, /number of vias/i, /conductivity/i, /fill/i]) expect(t).toMatch(w);
+    for (const w of [/hole diameter/i, /plating thickness/i, /barrel length/i, /number of vias/i, /conductivity/i, /fill/i, /diameter basis/i]) expect(t).toMatch(w);
     expect(Object.values(DEFAULT_STATE).filter((x) => x !== '' && x !== 'metric' && x !== 'user')).toEqual([]);
+  });
+  it('the diameter basis is required, starts blank and the core is not called without it', () => {
+    const v = computeView(st({ ...BASE, diameterBasis: '' }));
+    expect(v.status).toBe('needs-input');
+    if (v.status === 'needs-input') expect(v.needs.join(' ')).toMatch(/diameter basis.*no default/i);
+    expect(vmSrc).not.toMatch(/diameterBasis:\s*'(finished|drill)'/);
+  });
+  it('the placeholder is neutral: never a typical drill size, only a finished-size example on the finished basis', () => {
+    expect(diameterPlaceholder('')).not.toMatch(/\d/);
+    expect(diameterPlaceholder('drill')).not.toMatch(/\d/);
+    expect(diameterPlaceholder('finished')).toBe('0.25 mm');
+    expect(pageSrc).not.toMatch(/placeholder="0\.3/);
+    expect(vmSrc).not.toMatch(/0\.3 mm/);
   });
   it('no choice is pre-selected in source', () => {
     expect(vmSrc).not.toMatch(/kMaterial:\s*'(pure|c11000)/);
@@ -66,6 +82,48 @@ describe('a result for a worked case', () => {
     expect(s).toMatch(/lower bound/i);
     expect(s).toMatch(/not theta-JA/i);
     expect(s).toMatch(/not a design constant/i);
+  });
+  it('a drill basis gives a smaller finished hole, shown as its own result row with the basis stated', () => {
+    const f = ok(st(BASE));
+    const d = ok(st({ ...BASE, diameterBasis: 'drill' }));
+    const rowOf = (v: typeof f) => v.result.rows.find((r) => /finished hole diameter used/i.test(r.label));
+    expect(rowOf(f)).toBeDefined();
+    expect(rowOf(d)?.text).not.toBe(rowOf(f)?.text);
+    expect(rowOf(d)?.hint).toMatch(/DRILL/);
+    expect(d.result.details.inputs.some((i) => /hole diameter as entered/i.test(i.label) && /DRILL/.test(i.detail ?? ''))).toBe(true);
+    expect(d.result.headline.text).not.toBe(f.result.headline.text);
+  });
+  it('a plating of half the drill or more is an error on the diameter', () => {
+    const v = computeView(st({ ...BASE, diameterBasis: 'drill', plating: '0.2 mm' }));
+    expect(v.status).toBe('error');
+  });
+  it('the thermal-relief warning is a callout directly under the headline and not in the warning list (m-N6)', () => {
+    const v = ok(st(BASE));
+    expect(v.reliefCallout?.code).toBe('THERMAL_RELIEF_NOT_MODELLED');
+    expect(v.reliefCallout?.text).toMatch(/thermal-relief|connect style|relief/i);
+    expect(v.reliefCallout?.heading).toMatch(/relief/i);
+    expect(v.result.warnings.some((x) => /thermal-relief|connect style/i.test(x.message))).toBe(false);
+    expect(v.callouts.some((c) => c.code === 'THERMAL_RELIEF_NOT_MODELLED')).toBe(false);
+    expect(pageSrc).toMatch(/underHeadline=/);
+    expect(pageSrc).toMatch(/reliefCallout/);
+  });
+  it('the diameter help names the fab convention without building in an allowance (m-N2)', () => {
+    expect(DIAMETER_HELP).toMatch(/many fab/i);
+    expect(DIAMETER_HELP).toMatch(/finished hole/i);
+    expect(DIAMETER_HELP).toMatch(/Eurocircuits/);
+    expect(DIAMETER_HELP).toMatch(/confirm with your fab/i);
+    expect(DIAMETER_HELP).toMatch(/drill.*finished.*conservative/i);
+    expect(DIAMETER_HELP).toMatch(/not a standard|no standard/i);
+    expect(vmSrc).not.toMatch(/allowance\s*[:=]\s*[\d.]/i);
+  });
+  it('"lower bound" is never unqualified in page text', () => {
+    expect(vmSrc).not.toMatch(/(?<!usually a )lower bound/i);
+    expect(liveSummary(ok(st(BASE)))).toMatch(/usually a lower bound/);
+    expect(ok(st(BASE)).result.headline.label).toMatch(/usually a lower bound/);
+  });
+  it('a very large via count adds a fit and wicking hint; a normal count does not', () => {
+    expect(ok(st({ ...BASE, count: String(VIA_COUNT_HINT_FROM) })).notes.join(' ')).toMatch(/hole-to-hole.*wick/i);
+    expect(ok(st(BASE)).notes).toEqual([]);
   });
   it('confidence is low and its reasons are listed', () => {
     const v = ok(st(BASE));
@@ -142,7 +200,7 @@ describe('invalid input never gives a number', () => {
 });
 
 describe('hash state', () => {
-  const full = st({ ...BASE, fill: 'filled', fillK: '2 W/mK', power: '1 W', platingSource: 'fab-profile-average', units: 'imperial' });
+  const full = st({ ...BASE, diameterBasis: 'drill', fill: 'filled', fillK: '2 W/mK', power: '1 W', platingSource: 'fab-profile-average', units: 'imperial' });
   it('round-trips through the URL hash', () => {
     const p = parseHash(serializeHash(ROUTE, toHashState(full)));
     expect(fromHashState(p.state).state).toEqual(full);
@@ -150,6 +208,7 @@ describe('hash state', () => {
   it('the default state writes nothing, and no choice is ever invented', () => {
     expect(serializeHash(ROUTE, toHashState(DEFAULT_STATE))).toBe('#/calc/thermal-via');
     const h = fromHashState({ d: '1 mm' }).state;
+    expect(h.diameterBasis).toBe('');
     expect(h.kMaterial).toBe('');
     expect(h.fill).toBe('');
   });
@@ -159,10 +218,10 @@ describe('hash state', () => {
     for (const k of WRITTEN_KEYS) expect([...documented, 'u']).toContain(k);
   });
   it('unknown values fall back to blank with notices; corrupt hashes give the defaults', () => {
-    const { state, notices } = fromHashState({ km: 'gold', fl: 'half', ps: 'x', u: 'furlongs' });
+    const { state, notices } = fromHashState({ db: 'both', km: 'gold', fl: 'half', ps: 'x', u: 'furlongs' });
     expect(state).toEqual(DEFAULT_STATE);
-    expect(notices.length).toBeGreaterThanOrEqual(3);
-    expect(fromHashState({ d: 'x'.repeat(500) }).notices.join(' ')).toMatch(/Finished hole diameter/);
+    expect(notices.length).toBeGreaterThanOrEqual(4);
+    expect(fromHashState({ d: 'x'.repeat(500) }).notices.join(' ')).toMatch(/Hole diameter/);
     expect(() => fromHashState({ __proto__: 'x', constructor: 'y' } as never)).not.toThrow();
     for (const h of ['#/calc/thermal-via?v=1&d=%E0%A4%A', '#/calc/thermal-via?v=99&d=1%20mm', '#/calc/thermal-via?v=1&=&&&']) {
       expect(fromHashState(parseHash(h).state).state).toEqual(DEFAULT_STATE);

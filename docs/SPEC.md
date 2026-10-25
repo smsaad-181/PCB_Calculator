@@ -12,7 +12,7 @@ Full original feature list: `MASTER_PROMPT_ORIGINAL.md`. This file corrects and 
 | IPC-2221C is the only IPC reference | Add IPC-6012 (acceptance), IPC-2141 (impedance, legacy), IPC-4562 (foil), IEC 60664-4, IEC 60063 (E-series). |
 | Confidence level (subjective) | Rule-based (`confidence.ts`). |
 | Fabricator capabilities implied | User-editable, date-stamped fab profiles only. |
-| Section 15 truncated | Phase 4 scope to be confirmed by the human. |
+| Section 15 truncated | Phase 4 scope confirmed by the human 2026-10-19: thermal via array + fusing; theta-JA/JC, exposed-pad spreading, RF/antenna, twisted pair/coax deferred (see docs/phases/phase-4.md). |
 
 ## Result schema
 The source of truth is `src/core/result.ts` (`CalcResult`). Skill `calc-module-pattern` documents it and must be kept in step. Every calculator returns it. Besides method, reference, formula, steps, validity checks and recommendation, it carries:
@@ -38,8 +38,8 @@ The reference calculator is `src/core/calculators/copper-converter/`. The UI sho
 
 ## Non-functional requirements
 - Closed-form calc < 1 ms; self-heating solver ≤ 50 iterations; envelope via corners (≤ 6 inputs) else Monte Carlo (5-10k samples) in a Web Worker.
-- Bundle: first-load JS per calculator route ≤ 150 KB gzip (entry + shared chunks + that route's lazy chunks) and total JS across all chunks ≤ 430 KB gzip (user decision 2026-10-14 set 400 KB; raised to 430 KB by user decision 2026-10-19 for Phase 3), code-split per calculator. Load < 1 s broadband.
-- Offline capable. No runtime network calls. Hash-routed. State in URL hash (schema-versioned).
+- Bundle: first-load JS per calculator route ≤ 150 KB gzip (entry + shared chunks + that route's lazy chunks) and total JS across all chunks ≤ 460 KB gzip (user decision 2026-10-14 set 400 KB; raised to 430 KB 2026-10-19 for Phase 3, then to 460 KB 2026-10-19 for Phase 4), code-split per calculator. Load < 1 s broadband.
+- Offline (human decision 2026-10-19): no network calls at runtime; a route works offline once its code has loaded; a reload while offline is not supported (no service worker). No runtime network calls. Hash-routed. State in URL hash (schema-versioned).
 - Per-calculator error boundary. Input guards. Never display NaN.
 - **Headline formatting:** every headline number is printed through `src/core/format-result.ts`. This covers results, design values, margins and utilisation. The four helpers are `formatResult`, `formatDesignValue`, `formatMargin` and `formatUtilisation`.
   - The rounding direction comes from the result's `bound`. Minimums and predictions round up, capacities and margins round down, and utilisation rounds up.
@@ -57,7 +57,7 @@ The reference calculator is `src/core/calculators/copper-converter/`. The UI sho
 | 1 | Copper converter; trace width/current (Mode B legacy + Mode A estimate); trace resistance with self-heating & skin warning; voltage drop/power; **path/load calculator**; via (electrical); annular ring; circuit values |
 | 2 | Impedance (microstrip, stripline, differential, CPW/CPWG, coax), delay/skew, guided wavelength, stackup editor, tolerance envelope, protocol presets |
 | 3 | IPC-2221 spacing; IEC 60664-1 clearance & creepage with gating (human-verified tables) |
-| 4 | Thermal estimates (confirm scope), RF/antenna helper, twisted pair/coax references, fusing (Onderdonk/Preece) |
+| 4 | Thermal via array estimate and fusing (Onderdonk/Preece, separate from steady-state heating), plus final hardening (task 5, partial deferral logged 2026-10-19). Deferred by human decision, not built: theta-JA/theta-JC, exposed-pad and copper-area spreading, RF/antenna helper, twisted pair/coax references (see `docs/phases/phase-4.md`) |
 
 ## Tech stack
 Vite, TypeScript strict, Preact, Vitest, fast-check, ESLint. `src/core` pure. Python 3 for the independent oracle only (not shipped).
